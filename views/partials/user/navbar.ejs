@@ -1,0 +1,55 @@
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light py-3">
+    <div class="container-fluid px-5">
+
+        <a class="navbar-brand fs-2 text-dark" href="#">Cake O Clock</a>
+
+        <!-- Search Bar -->
+        <form class="d-flex mx-auto" style="width: 400px; position: relative;">
+            <input class="form-control rounded-pill px-4 py-2"
+                type="search"
+                placeholder="search"
+                aria-label="Search"
+                style="color:#AF5454; background-color: rgba(232, 158, 158, 0.3); border: none;">
+            <button class="btn position-absolute end-0 top-0 h-100 pe-4"
+                type="submit"
+                style="border:none; background:transparent;">
+                <i class="fas fa-search fa-lg" style="color:#AF5454;"></i>
+            </button>
+        </form>
+
+        <!-- Icons -->
+       <div class="d-flex align-items-center gap-4">
+
+    <!-- Cart Icon -->
+    <a href="#" class="text-reset">
+        <img width="25" height="25" src="media/icons8-cart-50.png" alt="cart" />
+    </a>
+
+    <!-- Wishlist Icon -->
+    <a href="#" class="text-reset" style="color:#AF5454 !important; width:30px; height:30px; padding-top:5px;">
+        <i class="fas fa-heart fa-lg"></i>
+    </a>
+<% if (locals.user) { %>
+    <div class="dropdown">
+        <a class="nav-link dropdown-toggle small fw-bold" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="color:#AF5454;">
+            <%= locals.user.name %>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li><a class="dropdown-item" href="/profile">Profile</a></li>
+            <li><a class="dropdown-item" href="/logout">Logout</a></li>
+        </ul>
+    </div>
+<% } else { %>
+    <a href="/signUp" class="text-reset" style="color:#AF5454 !important;">
+        <span class="small fw-bold">Sign Up</span>
+    </a>
+    <a href="/login" class="text-reset" style="color:#AF5454 !important;">
+        <span class="small fw-bold">Log In</span>
+    </a>
+<% } %>
+
+
+</div>
+
+</nav>

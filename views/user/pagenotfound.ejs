@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found | 404</title>
+    <style>
+        /* Google Fonts Import */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-color: #FFEDE8;
+            --card-right-bg: #DFA9A9;
+            /* Muted Rose - Requested Color */
+            --text-color-primary: #8B3A3A;
+            /* Dark Red/Brown */
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .error-card {
+            display: flex;
+            /* Side by side on desktop */
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            min-height: 500px;
+        }
+
+        /* Left Side - Illustration */
+        .card-left {
+            flex: 1;
+            background: var(--white);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .illustration {
+            width: 100%;
+            max-width: 350px;
+            height: auto;
+        }
+
+        .error-code {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #DFA9A9;
+            /* Changed to Pink as requested */
+            margin-bottom: 20px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .error-code span {
+            color: #DFA9A9;
+            /* Match with right side bg or specific request */
+            font-size: 1.2em;
+            display: block;
+        }
+
+        /* Right Side - Content */
+        .card-right {
+            flex: 1;
+            background-color: var(--card-right-bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+            color: var(--text-color-primary);
+        }
+
+        .card-right h2 {
+            font-size: 2rem;
+            font-weight: 500;
+            line-height: 1.4;
+            margin-bottom: 40px;
+        }
+
+        .home-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            color: var(--text-color-primary);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .home-btn:hover {
+            opacity: 0.8;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .error-card {
+                flex-direction: column;
+                /* Stack vertically on mobile */
+                min-height: auto;
+            }
+
+            .card-left,
+            .card-right {
+                padding: 30px 20px;
+                flex: auto;
+                /* Allow auto sizing */
+            }
+
+            .illustration {
+                max-width: 250px;
+            }
+
+            .card-right h2 {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="error-card">
+            <div class="card-left">
+                <!-- Using a placeholder illustration -->
+                <div class="error-code">Page not found<br><span>ERROR 404</span></div>
+                <img src="https://cdni.iconscout.com/illustration/premium/thumb/404-error-3702359-3119148.png"
+                    alt="404 Illustration" class="illustration" style="color: #AF5454 !important">
+            </div>
+            <div class="card-right">
+                <h2>Looks like the page<br>doesn't exist</h2>
+                <a href="/" class="home-btn">Back to home</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

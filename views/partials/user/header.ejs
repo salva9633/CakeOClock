@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cake O Clock - Home</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #E8A0A0;
+            /* Accents */
+            --secondary-color: #F8CACA;
+            /* Main Pink */
+            --text-color: #5D2E2E;
+            /* Dark Brown Text */
+            --bg-gradient-start: #F9D1D1;
+            --bg-gradient-end: #FFF5F5;
+            --font-heading: 'Dancing Script', cursive;
+            --font-body: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            color: var(--text-color);
+            font-family: var(--font-body);
+            min-height: 100vh;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: var(--font-heading);
+            color: var(--text-color);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #d88e8e;
+            border-color: #d88e8e;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: transparent !important;
+        }
+
+        .navbar-brand {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            letter-spacing: -1px;
+            color: #AF5454 !important;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            /* color: #5D2E2E !important; */
+            color: #AF5454 !important;
+            font-size: 1.1rem;
+        }
+
+        /* Hero */
+        .hero-title {
+            color: #954545;
+            font-size: 7rem;
+            font-family: "Pacifico", cursive;
+            text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.4);
+        }
+
+        .akaya-kanadaka-regular {
+            font-family: "Akaya Kanadaka", system-ui;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        .hero-subtitle {
+            font-family: 'Outfit', sans-serif;
+            color: #954545;
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .hero-img {
+            object-fit: cover;
+            width: 100%;
+            /* Height is set inline for alternating layout */
+        }
+
+        .hero-img-wrapper {
+            position: relative;
+            border-radius: 1rem;
+            /* match rounded-4 */
+            overflow: hidden;
+        }
+
+        .hero-img-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(128, 128, 128, 0.6), transparent);
+            pointer-events: none;
+        }
+
+        /* Sections */
+        section h2,
+        section h3 {
+            margin-bottom: 30px;
+        }
+
+        /* Seasonal Sales Box */
+        .seasonal-box {
+            background-color: #E8A0A0 !important;
+            border-radius: 20px;
+            color: #AF5454;
+        }
+
+        .btn-outline-custom {
+            color: #AF5454;
+            border: 1px solid #AF5454;
+            border-radius: 5px;
+            /* Slightly rounded */
+            padding: 8px 30px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .btn-outline-custom:hover {
+            background-color: #AF5454;
+            color: #E8A0A0;
+        }
+
+        /* Product Cards */
+        .img-wrapper {
+            background: transparent !important;
+            /* Remove white bg */
+            padding: 0 !important;
+            /* Remove padding */
+            box-shadow: none !important;
+            /* Remove shadow */
+        }
+
+        .img-wrapper img {
+            border-radius: 20px !important;
+        }
+
+        /* About Section */
+        .about-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        /* Categories */
+        .category-item {
+            width: 120px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .category-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .category-img-wrapper {
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .category-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border: 3px solid white;
+        }
+
+        /* Search Placeholder */
+        input[type="search"]::placeholder {
+            color: #AF5454 !important;
+            opacity: 1;
+            /* Firefox */
+        }
+
+        input[type="search"]::-ms-input-placeholder {
+            /* Edge 12-18 */
+            color: #AF5454 !important;
+        }
+    </style>
+
+    <!-- FontAwesome for Icons -->
+
+
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Akaya+Kanadaka&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel='stylesheet'
+        href='https://cdn-uicons.flaticon.com/uicons-regular-straight/css/uicons-regular-straight.css'>
+
+
+</head>
