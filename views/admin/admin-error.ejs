@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Page Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #FCECE8;
+            background: linear-gradient(135deg, #FCECE8 0%, #F9E0DA 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+        }
+
+        .card {
+            display: flex;
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            min-height: 500px;
+            flex-direction: row;
+        }
+
+        .left-section {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+            position: relative;
+        }
+
+        .illustration {
+            width: 100%;
+            max-width: 350px;
+            height: auto;
+            object-fit: contain;
+            margin-bottom: 20px;
+        }
+
+       
+
+        .error-text {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #c35151;
+            /* Teal color matching illustration usually */
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .error-text h1 {
+            font-size: 1.5rem;
+            color: #5D2E2E;
+            margin-bottom: 5px;
+        }
+
+        .error-text .code {
+            color:#c35151;
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .right-section {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #D99494;
+            /* Rose/Dusty Pink */
+            color: #5D2E2E;
+            text-align: center;
+        }
+
+        .right-section h2 {
+            font-size: 2rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            color: #6D2E2E;
+            /* Darker brown/red text */
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 30px;
+            color: #6D2E2E;
+            text-decoration: none;
+            font-size: 1.1rem;
+            border: 1px solid transparent;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            color: #fff;
+            border-color: #fff;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .card {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .left-section {
+                padding: 30px;
+                order: 1;
+                /* Illustration on top */
+            }
+
+            .right-section {
+                padding: 40px 30px;
+                order: 2;
+                min-height: 200px;
+            }
+
+            .right-section h2 {
+                font-size: 1.5rem;
+            }
+
+            .illustration {
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="card">
+            <div class="left-section">
+                <!-- Text based on reference image "Page not found ERROR 404" -->
+                <div class="error-text">
+                    <h1>Error Page Admin</h1>
+                    <div class="code">ERROR 404</div>
+                </div>
+                <!-- Using the copied image -->
+                <img src="media/not_found.png" alt="404 Illustration" class="illustration">
+            </div>
+            <div class="right-section">
+                <!-- Text based on reference image -->
+                <h2>Looks like the page<br>doesn't exist</h2>
+                <a href="dashboard.html" class="back-btn">Back to home</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

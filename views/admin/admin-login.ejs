@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login As Admin - Cake O Clock</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body,
+        html {
+            height: 100%;
+            width: 100%;
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Full-screen background image */
+        .background-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            z-index: -2;
+        }
+
+        .background-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        /* Shadow blur layer overlay */
+        .blur-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 200, 200, 0.25);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: -1;
+        }
+
+        /* Main container to center the form */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Login card */
+        .login-card {
+            background: rgba(255, 220, 210, 0.95);
+            border-radius: 30px;
+            padding: 60px 50px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(175, 84, 84, 0.3);
+        }
+
+        /* Title */
+        .login-title {
+            font-size: 48px;
+            font-weight: 600;
+            color: #8B4844;
+            text-align: center;
+            margin-bottom: 60px;
+            font-family: 'Outfit', cursive;
+            letter-spacing: -1px;
+        }
+
+        /* Form styling */
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            font-size: 18px;
+            font-weight: 500;
+            color: #8B4844;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 18px 24px;
+            border: 3px solid #D4A5A5;
+            border-radius: 50px;
+            font-size: 16px;
+            background: rgba(255, 235, 230, 0.8);
+            color: #8B4844;
+            transition: all 0.3s ease;
+            outline: none;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .form-control::placeholder {
+            color: #C4A0A0;
+            opacity: 0.8;
+        }
+
+        .form-control:focus {
+            border-color: #5B9BD5;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 0 4px rgba(91, 155, 213, 0.15);
+        }
+
+        /* Login button */
+        .btn-login {
+            width: 100%;
+            padding: 20px;
+            background: #C8998E;
+            border: none;
+            border-radius: 50px;
+            color: #8B4844;
+            font-size: 22px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(139, 72, 68, 0.25);
+        }
+
+        .btn-login:hover {
+            background: #B88A7E;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(139, 72, 68, 0.35);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        /* Error message */
+        .error-message {
+            background: rgba(239, 68, 68, 0.15);
+            border: 2px solid rgba(239, 68, 68, 0.4);
+            color: #dc2626;
+            padding: 14px 20px;
+            border-radius: 25px;
+            font-size: 15px;
+            margin-bottom: 25px;
+            display: none;
+            text-align: center;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            50% {
+                transform: translateX(10px);
+            }
+
+            75% {
+                transform: translateX(-10px);
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 576px) {
+            .login-card {
+                padding: 45px 35px;
+            }
+
+            .login-title {
+                font-size: 38px;
+                margin-bottom: 45px;
+            }
+
+            .form-label {
+                font-size: 16px;
+            }
+
+            .form-control {
+                padding: 16px 20px;
+                font-size: 15px;
+            }
+
+            .btn-login {
+                padding: 18px;
+                font-size: 20px;
+                margin-top: 40px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Full-screen background image -->
+    <div class="background-wrapper">
+
+
+        <img src="/media/5png.png" alt="Background" class="background-image">
+    </div>
+
+    <!-- Shadow blur layer -->
+    <div class="blur-overlay"></div>
+
+    <!-- Centered login container -->
+    <div class="login-container">
+        <div class="login-card">
+            <h1 class="login-title">Login As Admin</h1>
+
+            <div class="error-message" id="errorMessage">
+                Invalid credentials. Please try again.
+            </div>
+
+            <form action="/admin/login" method="POST">
+                <div class="form-group">
+                    <label for="email" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter your Email"
+                        required autocomplete="email">
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password"
+                        placeholder="Enter Your Password" required autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="btn-login">Login</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>

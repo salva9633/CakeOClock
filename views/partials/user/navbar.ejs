@@ -19,37 +19,47 @@
         </form>
 
         <!-- Icons -->
-       <div class="d-flex align-items-center gap-4">
+        <div class="d-flex align-items-center gap-4">
 
-    <!-- Cart Icon -->
-    <a href="#" class="text-reset">
-        <img width="25" height="25" src="media/icons8-cart-50.png" alt="cart" />
+            <a href="#" class="text-reset">
+                <img width="25" height="25" src="media/icons8-cart-50.png" alt="cart" />
+            </a>
+ 
+          <% if (locals.user) { %>
+  <div class="dropdown">
+    <a class="nav-link dropdown-toggle fw-bold"
+       href="#"
+       role="button"
+       data-bs-toggle="dropdown"
+       style="color:#AF5454;">
+       <%= locals.user.name %>
     </a>
 
-    <!-- Wishlist Icon -->
-    <a href="#" class="text-reset" style="color:#AF5454 !important; width:30px; height:30px; padding-top:5px;">
-        <i class="fas fa-heart fa-lg"></i>
-    </a>
-<% if (locals.user) { %>
-    <div class="dropdown">
-        <a class="nav-link dropdown-toggle small fw-bold" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="color:#AF5454;">
-            <%= locals.user.name %>
-        </a>
-        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-            <li><a class="dropdown-item" href="/profile">Profile</a></li>
-            <li><a class="dropdown-item" href="/logout">Logout</a></li>
-        </ul>
-    </div>
-<% } else { %>
-    <a href="/signUp" class="text-reset" style="color:#AF5454 !important;">
-        <span class="small fw-bold">Sign Up</span>
-    </a>
-    <a href="/login" class="text-reset" style="color:#AF5454 !important;">
-        <span class="small fw-bold">Log In</span>
-    </a>
-<% } %>
+    <ul class="dropdown-menu dropdown-menu-end custom-dropdown">
+      <li><a class="dropdown-item" href="/profile">Profile</a></li>
+      <li><a class="dropdown-item" href="/logout">Logout</a></li>
+    </ul>
+  </div>
+
+            <% } else { %>
+                <!-- Guest user -->
+                <a href="/signUp" class="text-reset" style="color:#AF5454 !important;">
+                    <span class="small fw-bold">Sign Up</span>
+                </a>
+                <a href="/login" class="text-reset" style="color:#AF5454 !important;">
+                    <span class="small fw-bold">Log In</span>
+                </a>
+            <% } %>
+
+            <a href="#" class="text-reset"
+               style="color:#AF5454 !important; width:30px; height:30px; padding-top:5px;">
+               <!-- Bootstrap JS Bundle (includes Popper) -->
 
 
-</div>
+                <i class="fas fa-heart fa-lg"></i>
+            </a>
 
+        </div>
+
+    </div> <!-- ✅ container-fluid closed -->
 </nav>

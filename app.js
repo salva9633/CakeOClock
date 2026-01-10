@@ -6,6 +6,7 @@ const session = require("express-session");
 const passport = require("./config/passport");
 const db = require("./config/db");
 const userRouter = require("./routes/userRouter");
+const adminRouter=require("./routes/adminRouter");
 const path = require("path");
 
 db();
@@ -42,11 +43,28 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // routes
 app.use("/", userRouter);
+app.use("/admin",adminRouter);
 
 // 404 handler
 app.use((req, res) => {
     res.status(404).render("pagenotfound");
 });
+
+
+
+app.use((req, res, next) => {
+    res.locals.user = req.session.user || null;
+    next();
+});
+
+app.use((req, res, next) => {
+    res.locals.admin = req.session.admin || null;
+    next();
+});
+
+
+
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
