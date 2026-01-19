@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        :root {
+            --page-bg: #dba39a;
+            --card-bg: #ffffff;
+            --accent-brown: #5c2823;
+            --label-brown: #8c5852;
+            --field-bg: #fbdfdd;
+            --btn-color: #bd7b72;
+            --shadow-soft: 0 20px 40px rgba(189, 123, 114, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--page-bg);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .profile-card {
+            width: 100%;
+            max-width: 850px;
+            background: var(--card-bg);
+            border-radius: 30px;
+            box-shadow: var(--shadow-soft);
+            padding: 50px;
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px;
+        }
+
+        .avatar-preview {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #f0cdc9;
+        }
+
+        .camera-icon {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background-color: var(--btn-color);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .camera-icon:hover {
+            opacity: 0.9;
+        }
+
+        .section-header {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-brown);
+            margin-bottom: 25px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--label-brown);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        input, select {
+            background-color: var(--field-bg);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 1rem;
+            color: var(--accent-brown);
+            border: none;
+        }
+
+        .btn-save {
+            margin-top: 30px;
+            width: 100%;
+            background-color: var(--btn-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .note {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: var(--label-brown);
+        }
+
+        .hidden-file {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<form class="profile-card"
+      action="/editProfile"
+      method="POST"
+      enctype="multipart/form-data">
+
+    <!-- PROFILE HEADER -->
+    <div class="profile-header">
+
+        <div class="avatar-wrapper">
+            <img
+                src="<%= user.profileImage || '/uploads/default-user.png' %>"
+                class="avatar-preview"
+                id="avatarPreview"
+            >
+
+            <label for="profileImage" class="camera-icon">
+                <i class="fa-solid fa-camera"></i>
+            </label>
+        </div>
+
+        <h2>Edit Profile</h2>
+    </div>
+
+    <!-- HIDDEN FILE INPUT -->
+    <input
+        type="file"
+        id="profileImage"
+        name="profileImage"
+        accept="image/*"
+        class="hidden-file"
+        onchange="previewImage(event)"
+    >
+
+    <h3 class="section-header">User Profile</h3>
+
+    <div class="info-grid">
+
+        <div class="form-group">
+            <label>Name</label>
+            <input type="text" name="name" value="<%= user.name %>" required>
+        </div>
+
+        <div class="form-group">
+            <label>Gender</label>
+            <select name="gender">
+                <option value="">Select</option>
+                <option value="male" <%= user.gender === "male" ? "selected" : "" %>>Male</option>
+                <option value="female" <%= user.gender === "female" ? "selected" : "" %>>Female</option>
+                <option value="other" <%= user.gender === "other" ? "selected" : "" %>>Other</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input
+                type="email"
+                name="email"
+                value="<%= user.email %>"
+                <%= user.authType === "google" ? "readonly" : "" %>>
+        </div>
+
+        <div class="form-group">
+            <label>Phone</label>
+            <input type="text" name="phone" value="<%= user.phone || '' %>">
+        </div>
+
+    </div>
+
+    <button class="btn-save" type="submit">Save Changes</button>
+
+    <% if (user.authType === "google") { %>
+        <p class="note">You signed in with Google. Email cannot be changed.</p>
+    <% } %>
+
+</form>
+
+<script>
+    function previewImage(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            document.getElementById("avatarPreview").src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+</script>
+
+</body>
+</html>

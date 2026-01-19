@@ -1,0 +1,163 @@
+<style>
+    /* Sidebar Navigation Styles */
+    .brand {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin-top: 1.5rem;
+        margin-bottom: 2.5rem;
+        margin-left: 1.5rem;
+        color: #AF5454;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        letter-spacing: -0.5px;
+        padding-left: 10px;
+        /* Align brand */
+    }
+
+    .menu-item {
+        display: flex;
+        align-items: center;
+        padding: 14px 20px;
+        margin-bottom: 12px;
+        margin-inline: 10px;
+        /* Spacing from edges */
+        border-radius: 15px;
+        /* Softer pills */
+        color: #4A3B32;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    .menu-item i {
+        display: inline-block;
+        width: 24px;
+        margin-right: 15px;
+        font-size: 1.1rem;
+        text-align: center;
+        color: #5c2823;
+    }
+
+    .menu-item:hover {
+        background-color: #F4D0CB;
+        color: #5c2823;
+    }
+
+    .menu-item.active {
+        background-color: #AF5454;
+        color: white !important;
+        box-shadow: 0 8px 20px rgba(175, 84, 84, 0.3);
+        font-weight: 600;
+        transform: translateY(-1px);
+    }
+
+    .menu-item.active i {
+        color: white !important;
+    }
+</style>
+
+<div class="brand">
+    cakeOclock
+</div>
+
+<nav id="sidebar-nav">
+
+    <!-- My Orders -->
+    <a href="/profile/orders" class="menu-item active">
+        <i class="fa-solid fa-bag-shopping"></i>
+        My Orders
+    </a>
+
+    <!-- Profile Information -->
+    <a href="/profile" class="menu-item">
+        <i class="fa-regular fa-user"></i>
+        Profile Information
+    </a>
+
+    <!-- Manage Address -->
+    <a href="/profile/address" class="menu-item">
+        <i class="fa-solid fa-location-dot"></i>
+        Manage Address
+    </a>
+
+    <!-- Privacy Settings -->
+    <a href="/profile/privacy" class="menu-item">
+        <i class="fa-solid fa-shield-halved"></i>
+        Privacy Settings
+    </a>
+
+    <!-- Referral -->
+    <a href="/profile/referral" class="menu-item">
+        <i class="fa-solid fa-users"></i>
+        Referral
+    </a>
+
+    <!-- Coupon -->
+    <a href="/profile/coupons" class="menu-item">
+        <i class="fa-solid fa-ticket"></i>
+        Coupon
+    </a>
+
+    <!-- Wallet -->
+    <a href="/profile/wallet" class="menu-item">
+        <i class="fa-solid fa-wallet"></i>
+        Wallet
+    </a>
+
+    <!-- Shop -->
+    <a href="/shop" class="menu-item">
+        <i class="fa-solid fa-store"></i>
+        Shop
+    </a>
+
+    <!-- Home -->
+    <a href="/" class="menu-item">
+        <i class="fa-solid fa-house"></i>
+        Home
+    </a>
+
+</nav>
+
+<script>
+    // Handle Menu Active State
+    document.addEventListener('DOMContentLoaded', function () {
+        const currentPath = window.location.pathname;
+        const menuItems = document.querySelectorAll('.menu-item');
+        let bestMatch = null;
+        let maxMatchLength = 0;
+
+        // 1. Find the best matching link for the current URL
+        menuItems.forEach(item => {
+            const href = item.getAttribute('href');
+
+            // Simple logic: if the current path starts with this href, it's a candidate.
+            // We want the longest matching href (most specific).
+            if (currentPath === href || (currentPath.startsWith(href) && href !== '/' && href !== '#')) {
+                if (href.length > maxMatchLength) {
+                    maxMatchLength = href.length;
+                    bestMatch = item;
+                }
+            }
+        });
+
+        // Default to first item if no match found (or Home if strict) - mostly for dev/demo
+        // If we found a match, activate it.
+        if (bestMatch) {
+            menuItems.forEach(i => i.classList.remove('active'));
+            bestMatch.classList.add('active');
+        }
+
+        // 2. Add Click Event for Immediate Feedback (Dynamic Switching)
+        menuItems.forEach(item => {
+            item.addEventListener('click', function () {
+                // Remove active class from all
+                menuItems.forEach(i => i.classList.remove('active'));
+                // Add to clicked
+                this.classList.add('active');
+            });
+        });
+    });
+</script>

@@ -1,4 +1,4 @@
-const User = require("../models/userModel");
+const User = require("../../models/userModel");
 const bcrypt = require("bcrypt");
 
 // admin error page
@@ -29,7 +29,10 @@ const login = async (req, res) => {
             return res.redirect("/admin/login");
         }
 
-        req.session.admin = true;
+          req.session.admin = {
+            id: admin._id,
+            role: "admin"
+        };
         return res.redirect("/admin");
 
     } catch (error) {
@@ -48,9 +51,28 @@ const loadDashboard = (req, res) => {
     }
 };
 
+const logout = (req, res) => {
+    try {
+        req.session.destroy(err => {
+            if (err) {
+                console.log("Session destroy error:", err);
+                return res.redirect("/admin/pagenotfound");
+            }
+
+            res.clearCookie("connect.sid");
+            return res.redirect("/admin/login");
+        });
+    } catch (error) {
+        console.log("Unexpected logout error:", error);
+        return res.redirect("/admin/pagenotfound");
+    }
+};
+
+
 module.exports = {
     loadLogin,
     login,
     loadDashboard,
-    pageerror
+    pageerror,
+    logout
 };

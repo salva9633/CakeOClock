@@ -1,4 +1,4 @@
-const User = require("../models/userModel");
+const User = require("../../models/userModel");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt")
 const env = require("dotenv").config()
@@ -137,50 +137,64 @@ const createUser = async (req, res) => {
 }
 
 const verifyOtp = async (req, res) => {
-    try {
-        const { otp } = req.body;
+  try {
+    const { otp } = req.body;
 
-        if (!req.session.userOtp || !req.session.userData) {
-            return res.status(400).json({ message: "OTP expired" });
-        }
-
-
-        if (Date.now() > req.session.otpExpiry) {
-            return res.status(400).json({ message: "OTP expired" });
-        }
-
-
-        if (otp !== req.session.userOtp) {
-            return res.status(400).json({ message: "Invalid OTP" });
-        }
-
-
-        const hashedPassword = await bcrypt.hash(
-            req.session.userData.password,
-            10
-        );
-
-
-        const newUser = new User({
-            name: req.session.userData.name,
-            phone: req.session.userData.phone,
-            email: req.session.userData.email,
-            password: hashedPassword
-        });
-
-
-        await newUser.save();
-
-
-        req.session.destroy();
-
-        res.status(200).json({ message: "OTP verified successfully" });
-
-    } catch (error) {
-        console.log("OTP verify error:", error);
-        res.status(500).json({ message: "Server error" });
+    if (!req.session.userOtp || !req.session.userData) {
+      return res.status(400).json({ message: "OTP expired" });
     }
+
+    if (Date.now() > req.session.otpExpiry) {
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    if (otp !== req.session.userOtp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    const { name, phone, email, password } = req.session.userData;
+
+    // ✅ Check if user already exists
+    let user = await User.findOne({ $or: [{ email }, { phone }] });
+
+    if (!user) {
+      // Create new user
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      user = new User({
+        name,
+        phone,
+        email,
+        password: hashedPassword,
+        isVerified: true
+      });
+
+      await user.save();
+    } else {
+      // User exists → just verify
+      user.isVerified = true;
+      await user.save();
+    }
+
+    // ✅ Create login session
+    req.session.user = {
+      id: user._id,
+      name: user.name,
+      email: user.email
+    };
+
+    
+    delete req.session.userOtp;
+    delete req.session.userData;
+    delete req.session.otpExpiry;
+
+    return res.status(200).json({ message: "OTP verified successfully" });
+  } catch (error) {
+    console.log("OTP verify error:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
 };
+
 
 const resendOtp = async (req, res) => {
     try {

@@ -1,49 +1,72 @@
-const { name } = require("ejs")
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
-const userSchema= new mongoose.Schema({
-    name:{
-        type:String,
-        required:true
-    },
-
-    email:{
-        type:String,
-        unique:true,
-        required:true,
-        
+const userSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
     },
 
-  phone:{
-    type:String,
-    required:false,
-    unique:true,
-    sparse:true,
-    default:null
-  },
-    googleId:{
-        type:String,
-        default:null
+    email: {
+        type: String,
+        unique: true,
+        required: true
     },
-    password:{
-        type:String,
-        required: false
+
+    phone: {
+        type: String,
+        unique: true,
+        sparse: true
     },
-    isBlocked:{
-        type:Boolean,
-        default:false
+
+    googleId: {
+        type: String,
+        default: null
     },
-    isAdmin:{
-        type:Boolean,
-        default:false
+
+    googleImage: {
+        type: String,
+        default: null
     },
-    t:{
-        type:Boolean,
-        default:false
+
+    password: {
+        type: String
     },
-    createdOn:{
-        type:Date,
-        default:Date.now
+
+    isBlocked: {
+        type: Boolean,
+        default: false
+    },
+
+  gender: {
+    type: String,
+    enum: ["male", "female", "other"],
+    default: "other" 
+},
+
+    
+    profileImage: {
+        type: String,
+        default: null
+    },
+
+    authType: {
+        type: String,
+        enum: ["local", "google"],
+        default: "local"
+    },
+
+    isAdmin: {
+        type: Boolean,
+        default: false
+    },
+
+    isVerified: {
+        type: Boolean,
+        default: false
     }
+
+}, {
+    timestamps: true
 });
-module.exports=mongoose.model("User",userSchema);
+
+module.exports = mongoose.model("User", userSchema);
