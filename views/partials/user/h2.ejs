@@ -1,0 +1,126 @@
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    /* Custom Header Styles */
+    .navbar {
+        font-family: 'Outfit', sans-serif;
+        /* background-color: transparent !important; */
+        background-color: #f3d7d3;
+        width: 100%;
+        height: 80px;
+        /* Allow page bg to show or set specific */
+    }
+
+    .navbar-brand {
+        font-weight: 700;
+        color: #AF5454 !important;
+        /* accent-brown */
+        letter-spacing: -0.5px;
+    }
+
+    .nav-link {
+        color: #AF5454 !important;
+        font-weight: 500;
+        transition: color 0.2s ease;
+    }
+
+    .nav-link:hover {
+        color: #bd7b72 !important;
+        /* btn-color */
+    }
+
+    .nav-link.small {
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+
+    /* Icon styling */
+    .text-reset i,
+    .text-reset img {
+        transition: transform 0.2s ease;
+    }
+
+    .text-reset:hover i,
+    .text-reset:hover img {
+        transform: scale(1.1);
+        color: #bd7b72 !important;
+    }
+
+    /* Dropdown overrides */
+    .custom-dropdown {
+        border: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border-radius: 15px;
+    }
+
+    .dropdown-item:hover {
+        background-color: #fff5f2;
+        /* sidebar-bg */
+        color: #AF5454;
+    }
+</style>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light py-3">
+
+    <div class="container-fluid px-5 d-flex justify-content-between align-items-center">
+
+        <!-- 1. Logo -->
+        <a class="navbar-brand fs-2 text-dark m-0" href="#">Cake O Clock</a>
+
+        <!-- 2. Navigation Links -->
+        <ul class="nav gap-4 d-none d-lg-flex">
+            <li class="nav-item"><a class="nav-link text-uppercase text-dark small" href="#">Home</a></li>
+            <li class="nav-item"><a class="nav-link text-uppercase text-dark small" href="#">Shop</a></li>
+            <li class="nav-item"><a class="nav-link text-uppercase text-dark small" href="#">About Us</a></li>
+            <li class="nav-item"><a class="nav-link text-uppercase text-dark small" href="#">Contact Us</a></li>
+            <li class="nav-item"><a class="nav-link text-uppercase text-dark small" href="#">Customer Support</a></li>
+        </ul>
+
+        <!-- 3. Icons (Wishlist, Cart, Signup) -->
+        <div class="d-flex align-items-center gap-4">
+
+            <!-- Wishlist -->
+            <a href="#" class="text-reset" style="color:#AF5454 !important; width:30px; height:30px; padding-top:5px;">
+                <i class="fas fa-heart fa-lg"></i>
+            </a>
+
+            <!-- Cart -->
+            <a href="#" class="text-reset">
+                <img width="25" height="25" src="media/icons8-cart-50.png" alt="cart" />
+            </a>
+
+            <!-- Signup / User -->
+            <% if (locals.user) { %>
+                <div class="dropdown">
+                    <a class="nav-link dropdown-toggle fw-bold" href="#" role="button" data-bs-toggle="dropdown"
+                        style="color:#AF5454;">
+                        <%= locals.user.name %>
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end custom-dropdown">
+                        <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                        <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                    </ul>
+                </div>
+
+                <% } else { %>
+                    <!-- Guest user -->
+                    <a href="/signUp" class="text-reset" style="color:#AF5454 !important;">
+                        <span class="small fw-bold">Sign Up</span>
+                    </a>
+                    <a href="/login" class="text-reset" style="color:#AF5454 !important;">
+                        <span class="small fw-bold">Log In</span>
+                    </a>
+                    <% } %>
+
+        </div>
+
+    </div> <!-- ✅ container-fluid closed -->
+
+</nav>
+
+<!-- Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

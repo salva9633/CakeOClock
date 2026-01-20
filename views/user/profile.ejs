@@ -12,7 +12,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-
     <style>
         :root {
             --page-bg: #dba39a;
@@ -35,10 +34,13 @@
         body {
             background-color: var(--page-bg);
             height: 100vh;
-            width: 100vw;
+            width: 100%;
             display: flex;
+            flex-direction: column;
+            /* Stack header and content */
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
+            /* Start from top */
             overflow: hidden;
             /* Unscrollable page */
         }
@@ -47,9 +49,11 @@
         .dashboard-container {
             display: flex;
             width: 100%;
-            max-width: 1050px;
-            height: 95vh;
-            /* Fixed height relative to viewport */
+            max-width: 98%;
+            height: 90vh;
+            /* Reduced height to fit header */
+            margin-top: 20px;
+            /* Space from header */
             background: var(--card-bg);
             border-radius: 30px;
             box-shadow: var(--shadow-soft);
@@ -65,8 +69,11 @@
             flex-shrink: 0;
             overflow-y: auto;
             overflow-x: hidden;
+            padding: 2rem 1.5rem;
+            /* Restored Padding */
         }
 
+        /* Main Content Area (Right Panel) */
         /* Main Content Area (Right Panel) */
         .main-content {
             flex: 1;
@@ -76,8 +83,8 @@
             /* Scrollable content area */
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
-            /* Align to left instead of center */
+            align-items: center;
+            /* Centered content */
         }
 
         .profile-content-wrapper {
@@ -193,6 +200,8 @@
             font-size: 0.85rem;
         }
 
+
+
         @media (max-width: 900px) {
             .dashboard-container {
                 flex-direction: column;
@@ -219,89 +228,91 @@
 
 <body>
 
-    <div class="dashboard-container">
+    <%- include("../../views/partials/user/h2") %>
 
-        <!-- Sidebar Area -->
-        <aside class="sidebar-area">
-            <%- include("../../views/partials/user/sider") %>
-        </aside>
+        <div class="dashboard-container">
 
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <div class="profile-content-wrapper">
+            <!-- Sidebar Area -->
+            <aside class="sidebar-area">
+                <%- include("../../views/partials/user/sider") %>
+            </aside>
 
-                <!-- PROFILE HEADER -->
-                <div class="profile-header">
-                    <div class="avatar-circle">
+            <!-- Main Content Area -->
+            <main class="main-content">
+                <div class="profile-content-wrapper">
 
-                        <% if (user.authType==="google" && user.googleImage) { %>
-                            <!-- Google profile image -->
-                            <img src="<%= user.googleImage %>" class="profile-img" alt="Google Profile Image">
+                    <!-- PROFILE HEADER -->
+                    <div class="profile-header">
+                        <div class="avatar-circle">
 
-                            <% } else if (user.profileImage) { %>
-                                <!-- Cloudinary image -->
-                                <img src="<%= user.profileImage %>" class="profile-img" alt="Profile Image">
+                            <% if (user.authType==="google" && user.googleImage) { %>
+                                <!-- Google profile image -->
+                                <img src="<%= user.googleImage %>" class="profile-img" alt="Google Profile Image">
 
-                                <% } else { %>
-                                    <!-- Default image -->
-                                    <img src="/images/default-user.png" class="profile-img" alt="Default Image">
-                                    <% } %>
+                                <% } else if (user.profileImage) { %>
+                                    <!-- Cloudinary image -->
+                                    <img src="<%= user.profileImage %>" class="profile-img" alt="Profile Image">
+
+                                    <% } else { %>
+                                        <!-- Default image -->
+                                        <img src="/images/default-user.png" class="profile-img" alt="Default Image">
+                                        <% } %>
+
+                        </div>
+
+                        <h1 class="user-title">
+                            <%= user.name %>
+                        </h1>
+
+                        <p class="user-subtitle">
+                            Joined On:
+                            <span>
+                                <%= new Date(user.createdAt).toDateString() %>
+                            </span>
+                        </p>
+                    </div>
+
+                    <!-- ACCOUNT INFO -->
+                    <h2 class="section-header">User Profile</h2>
+
+                    <div class="info-grid">
+
+                        <div class="form-group">
+                            <label class="info-label">Username</label>
+                            <input class="info-input" value="<%= user.name %>" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="info-label">Gender</label>
+                            <input class="info-input" value="<%= user.gender || 'N/A' %>" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="info-label">Email</label>
+                            <input class="info-input" value="<%= user.email %>" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="info-label">Phone</label>
+                            <input class="info-input" value="<%= user.phone || 'N/A' %>" readonly>
+                        </div>
 
                     </div>
 
-                    <h1 class="user-title">
-                        <%= user.name %>
-                    </h1>
+                    <a href="/editProfile" style="text-decoration: none;">
+                        <button class="btn-edit">Edit Profile</button>
+                    </a>
 
-                    <p class="user-subtitle">
-                        Joined On:
-                        <span>
-                            <%= new Date(user.createdAt).toDateString() %>
-                        </span>
-                    </p>
+                    <% if (user.authType==="google" ) { %>
+                        <p class="footer-text">
+                            You signed in with Google. Email cannot be changed.
+                        </p>
+                        <% } %>
+
                 </div>
+            </main>
 
-                <!-- ACCOUNT INFO -->
-                <h2 class="section-header">User Profile</h2>
-
-                <div class="info-grid">
-
-                    <div class="form-group">
-                        <label class="info-label">Username</label>
-                        <input class="info-input" value="<%= user.name %>" readonly>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="info-label">Gender</label>
-                        <input class="info-input" value="<%= user.gender || 'N/A' %>" readonly>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="info-label">Email</label>
-                        <input class="info-input" value="<%= user.email %>" readonly>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="info-label">Phone</label>
-                        <input class="info-input" value="<%= user.phone || 'N/A' %>" readonly>
-                    </div>
-
-                </div>
-
-                <a href="/editProfile" style="text-decoration: none;">
-                    <button class="btn-edit">Edit Profile</button>
-                </a>
-
-                <% if (user.authType==="google" ) { %>
-                    <p class="footer-text">
-                        You signed in with Google. Email cannot be changed.
-                    </p>
-                    <% } %>
-
-            </div>
-        </main>
-
-    </div>
+        </div>
 
 </body>
 

@@ -1,6 +1,5 @@
 const User = require("../../models/userModel");
 const cloudinary = require("../../config/cloudinary");
-
 /* ================= PROFILE PAGE ================= */
 const userProfile = async (req, res) => {
   try {

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Addresses</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        :root {
+            --page-bg: #dba39a;
+            --card-bg: #ffffff;
+            --sidebar-bg: #fff5f2;
+            --accent-brown: #5c2823;
+            --label-brown: #8c5852;
+            --btn-green: #108565;
+            /* Matches screenshot green */
+            --btn-green-hover: #0d6e53;
+            --tag-bg: #cbf3e3;
+            --tag-text: #0b5e48;
+            --shadow-soft: 0 20px 40px rgba(189, 123, 114, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--page-bg);
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow: hidden;
+        }
+
+        /* Reusing Dashboard Container to match Profile Page */
+        .dashboard-container {
+            display: flex;
+            width: 100%;
+            max-width: 98%;
+            height: 85vh;
+            margin-top: 20px;
+            background: var(--card-bg);
+            border-radius: 30px;
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Sidebar (Left Panel) */
+        .sidebar-area {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+            flex-shrink: 0;
+            overflow-y: auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Main Content (Right Panel) */
+        .main-content {
+            flex: 1;
+            padding: 30px 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Address Specific Styles */
+        .address-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .btn-add-address {
+            background-color: var(--btn-green);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+
+        .btn-add-address:hover {
+            background-color: var(--btn-green-hover);
+        }
+
+        .address-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .address-card {
+            background-color: #f6fcf9;
+            /* Very light green hint from screenshot */
+            border: 1px solid #eefdf6;
+            border-radius: 16px;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .address-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .address-details {
+            flex: 1;
+        }
+
+        .contact-info {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .address-text {
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 12px;
+            max-width: 80%;
+        }
+
+        .tag {
+            background-color: var(--tag-bg);
+            color: var(--tag-text);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .card-actions {
+            position: relative;
+        }
+
+        .btn-menu {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.2s;
+            color: #555;
+        }
+
+        .btn-menu:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Dropdown Menu Styles */
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 8px 0;
+            min-width: 120px;
+            z-index: 10;
+            display: none;
+            flex-direction: column;
+            border: 1px solid #eee;
+        }
+
+        .dropdown-menu.show {
+            display: flex;
+        }
+
+        .dropdown-item {
+            padding: 8px 16px;
+            text-align: left;
+            background: none;
+            border: none;
+            width: 100%;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #333;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f5f5f5;
+            color: var(--accent-brown);
+        }
+
+        .dropdown-item.delete {
+            color: #dc3545;
+        }
+
+        .dropdown-item.delete:hover {
+            background-color: #fff5f5;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .dashboard-container {
+                flex-direction: column;
+                height: 95vh;
+            }
+
+            .sidebar-area {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                padding: 15px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .address-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .btn-add-address {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <%- include("../../views/partials/user/h2") %>
+
+        <div class="dashboard-container">
+
+            <!-- Sidebar Area -->
+            <aside class="sidebar-area">
+                <%- include("../../views/partials/user/sider") %>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="main-content">
+
+                <div class="address-header">
+                    <h1 class="page-title">Manage Addresses</h1>
+                    <button class="btn-add-address">Add Address</button>
+                </div>
+
+                <div class="address-list">
+                    <!-- Address Card Mockup -->
+                    <div class="address-card">
+                        <div class="address-details">
+                            <div class="contact-info">
+                                <span>BSFBS 3245678987</span>
+                            </div>
+                            <p class="address-text">
+                                fgbsn, rqegrwty, hntu446ht, <br>
+                                Madhya Pradesh - 123456
+                            </p>
+                            <span class="tag">work</span>
+                        </div>
+
+                        <div class="card-actions">
+                            <button class="btn-menu">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <button class="dropdown-item">
+                                    <i class="fa-regular fa-pen-to-square"></i> Edit
+                                </button>
+                                <button class="dropdown-item delete">
+                                    <i class="fa-regular fa-trash-can"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Another Example Card to show list behavior -->
+                    <div class="address-card" style="background-color: #fff; border: 1px solid #eaeaea;">
+                        <div class="address-details">
+                            <div class="contact-info">
+                                <span>John Doe 9876543210</span>
+                            </div>
+                            <p class="address-text">
+                                123 Main Street, Greenwood Apt, <br>
+                                New York - 10001
+                            </p>
+                            <span class="tag" style="background-color: #eee; color: #555;">Home</span>
+                        </div>
+
+                        <div class="card-actions">
+                            <button class="btn-menu">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <button class="dropdown-item">
+                                    <i class="fa-regular fa-pen-to-square"></i> Edit
+                                </button>
+                                <button class="dropdown-item delete">
+                                    <i class="fa-regular fa-trash-can"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </main>
+        </div>
+
+        <!-- JavaScript for Mobile Menu or simple interactions if needed -->
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const menuButtons = document.querySelectorAll('.btn-menu');
+
+                // Toggle Dropdown
+                menuButtons.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent closing immediately
+                        const dropdown = btn.nextElementSibling;
+
+                        // Close all other dropdowns
+                        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                            if (menu !== dropdown) menu.classList.remove('show');
+                        });
+
+                        dropdown.classList.toggle('show');
+                    });
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', () => {
+                    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                        menu.classList.remove('show');
+                    });
+                });
+            });
+        </script>
+
+</body>
+
+</html>
