@@ -188,12 +188,29 @@
 
                             <td>
                                 <% if (user.isBlocked) { %>
-                                    <a href="/admin/unblock-user/<%= user._id %>"
-                                       class="btn-custom btn-unblock-custom">Unblock</a>
-                                <% } else { %>
-                                    <a href="/admin/block-user/<%= user._id %>"
-                                       class="btn-custom btn-block-custom">Block</a>
-                                <% } %>
+  <button
+    class="btn-custom btn-unblock-custom"
+    onclick="openConfirmModal(
+      'Unblock User',
+      'Are you sure you want to unblock <%= user.name %>?',
+      '/admin/unblock-user/<%= user._id %>',
+      'btn-success'
+    )">
+    Unblock
+  </button>
+<% } else { %>
+  <button
+    class="btn-custom btn-block-custom"
+    onclick="openConfirmModal(
+      'Block User',
+      'Are you sure you want to block <%= user.name %>?',
+      '/admin/block-user/<%= user._id %>',
+      'btn-danger'
+    )">
+    Block
+  </button>
+<% } %>
+
                             </td>
                         </tr>
                     <% }) %>
@@ -201,6 +218,33 @@
             </tbody>
         </table>
     </div>
+    <!-- CONFIRM BLOCK / UNBLOCK MODAL -->
+<div class="modal fade" id="confirmActionModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmModalTitle">Confirm Action</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body" id="confirmModalBody">
+        Are you sure?
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <a href="#" id="confirmActionBtn" class="btn">
+          Yes, Continue
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 
     <!-- PAGINATION -->
     <div class="pagination-container">
@@ -214,6 +258,24 @@
     </div>
 
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  function openConfirmModal(title, message, actionUrl, btnClass) {
+    document.getElementById("confirmModalTitle").innerText = title;
+    document.getElementById("confirmModalBody").innerText = message;
+
+    const confirmBtn = document.getElementById("confirmActionBtn");
+    confirmBtn.href = actionUrl;
+    confirmBtn.className = "btn " + btnClass;
+
+    const modal = new bootstrap.Modal(
+      document.getElementById("confirmActionModal")
+    );
+    modal.show();
+  }
+</script>
+
 
 </body>
 

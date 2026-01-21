@@ -2,380 +2,313 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Addresses</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Addresses</title>
 
-    <!-- Google Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <style>
-        :root {
-            --page-bg: #dba39a;
-            --card-bg: #ffffff;
-            --sidebar-bg: #fff5f2;
-            --accent-brown: #5c2823;
-            --label-brown: #8c5852;
-            --btn-green: #108565;
-            /* Matches screenshot green */
-            --btn-green-hover: #0d6e53;
-            --tag-bg: #cbf3e3;
-            --tag-text: #0b5e48;
-            --shadow-soft: 0 20px 40px rgba(189, 123, 114, 0.15);
-        }
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Outfit', sans-serif;
-        }
+  <style>
+    :root {
+      --page-bg: #dba39a;
+      --card-bg: #ffffff;
+      --sidebar-bg: #fff5f2;
+      --accent-brown: #5c2823;
+      --btn-green: #108565;
+      --btn-green-hover: #0d6e53;
+      --tag-bg: #cbf3e3;
+      --tag-text: #0b5e48;
+    }
 
-        body {
-            background-color: var(--page-bg);
-            height: 100vh;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            overflow: hidden;
-        }
+    * {
+      box-sizing: border-box;
+      font-family: 'Outfit', sans-serif;
+    }
 
-        /* Reusing Dashboard Container to match Profile Page */
-        .dashboard-container {
-            display: flex;
-            width: 100%;
-            max-width: 98%;
-            height: 85vh;
-            margin-top: 20px;
-            background: var(--card-bg);
-            border-radius: 30px;
-            box-shadow: var(--shadow-soft);
-            overflow: hidden;
-            position: relative;
-        }
+    body {
+      margin: 0;
+      background: var(--page-bg);
+    }
 
-        /* Sidebar (Left Panel) */
-        .sidebar-area {
-            width: 260px;
-            background-color: var(--sidebar-bg);
-            border-right: 1px solid rgba(0, 0, 0, 0.05);
-            flex-shrink: 0;
-            overflow-y: auto;
-            padding: 2rem 1.5rem;
-        }
+    .dashboard-container {
+      display: flex;
+      width: 98%;
+      height: 85vh;
+      margin: 20px auto;
+      background: white;
+      border-radius: 25px;
+      overflow: hidden;
+    }
 
-        /* Main Content (Right Panel) */
-        .main-content {
-            flex: 1;
-            padding: 30px 40px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
+    .sidebar-area {
+      width: 260px;
+      background: var(--sidebar-bg);
+      padding: 25px;
+    }
 
-        /* Address Specific Styles */
-        .address-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
+    .main-content {
+      flex: 1;
+      padding: 30px 40px;
+      overflow-y: auto;
+    }
 
-        .page-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1a1a1a;
-        }
+    .address-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
 
-        .btn-add-address {
-            background-color: var(--btn-green);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
-        }
+    .btn-add-address {
+      background: var(--btn-green);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
 
-        .btn-add-address:hover {
-            background-color: var(--btn-green-hover);
-        }
+    .address-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
 
-        .address-list {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            width: 100%;
-        }
+    .address-card {
+      background: #f6fcf9;
+      border-radius: 15px;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
 
-        .address-card {
-            background-color: #f6fcf9;
-            /* Very light green hint from screenshot */
-            border: 1px solid #eefdf6;
-            border-radius: 16px;
-            padding: 20px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            position: relative;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
+    .contact-info {
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
 
-        .address-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
+    .address-text {
+      color: #555;
+      margin-bottom: 10px;
+    }
 
-        .address-details {
-            flex: 1;
-        }
+    .tag {
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
 
-        .contact-info {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 6px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
+    .delete {
+      color: red;
+      text-decoration: none;
+      font-weight: 600;
+    }
 
-        .address-text {
-            color: #555;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            margin-bottom: 12px;
-            max-width: 80%;
-        }
+    /* Drop down */
+    .menu-wrapper {
+  position: relative;
+}
 
-        .tag {
-            background-color: var(--tag-bg);
-            color: var(--tag-text);
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            display: inline-block;
-        }
+.menu-icon {
+  cursor: pointer;
+  font-size: 18px;
+  color: #555;
+}
 
-        .card-actions {
-            position: relative;
-        }
+.menu-dropdown {
+  position: absolute;
+  top: 25px;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  display: none;
+  min-width: 120px;
+  overflow: hidden;
+  z-index: 100;
+}
 
-        .btn-menu {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 50%;
-            transition: background 0.2s;
-            color: #555;
-        }
+.menu-dropdown a {
+  display: block;
+  padding: 10px 14px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
 
-        .btn-menu:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
+.menu-dropdown a:hover {
+  background: #f2f2f2;
+}
 
-        /* Dropdown Menu Styles */
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 8px 0;
-            min-width: 120px;
-            z-index: 10;
-            display: none;
-            flex-direction: column;
-            border: 1px solid #eee;
-        }
+.menu-dropdown .delete {
+  color: red;
+}
 
-        .dropdown-menu.show {
-            display: flex;
-        }
-
-        .dropdown-item {
-            padding: 8px 16px;
-            text-align: left;
-            background: none;
-            border: none;
-            width: 100%;
-            cursor: pointer;
-            font-size: 0.9rem;
-            color: #333;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .dropdown-item:hover {
-            background-color: #f5f5f5;
-            color: var(--accent-brown);
-        }
-
-        .dropdown-item.delete {
-            color: #dc3545;
-        }
-
-        .dropdown-item.delete:hover {
-            background-color: #fff5f5;
-        }
-
-        /* Responsive */
-        @media (max-width: 900px) {
-            .dashboard-container {
-                flex-direction: column;
-                height: 95vh;
-            }
-
-            .sidebar-area {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-                padding: 15px;
-            }
-
-            .main-content {
-                padding: 20px;
-            }
-
-            .address-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .btn-add-address {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-    </style>
+  </style>
 </head>
 
 <body>
 
-    <%- include("../../views/partials/user/h2") %>
+  <!-- Header -->
+  <%- include("../../views/partials/user/h2") %>
 
-        <div class="dashboard-container">
+  <div class="dashboard-container">
 
-            <!-- Sidebar Area -->
-            <aside class="sidebar-area">
-                <%- include("../../views/partials/user/sider") %>
-            </aside>
+    <!-- Sidebar -->
+    <aside class="sidebar-area">
+      <%- include("../../views/partials/user/sider") %>
+    </aside>
 
-            <!-- Main Content Area -->
-            <main class="main-content">
+    <!-- Main -->
+    <main class="main-content">
 
-                <div class="address-header">
-                    <h1 class="page-title">Manage Addresses</h1>
-                    <button class="btn-add-address">Add Address</button>
+      <div class="address-header">
+        <h2>Manage Addresses</h2>
+        <a href="/add-address">
+          <button class="btn-add-address">Add Address</button>
+        </a>
+      </div>
+
+      <!-- ADDRESS LIST -->
+      <div class="address-list">
+
+        <% if (!addresses || addresses.length === 0) { %>
+          <p>No address added yet.</p>
+        <% } else { %>
+
+          <% addresses.forEach(address => { %>
+            <div class="address-card">
+
+              <div>
+                <div class="contact-info">
+                  <%= address.name %> - <%= address.phone %>
                 </div>
 
-                <div class="address-list">
-                    <!-- Address Card Mockup -->
-                    <div class="address-card">
-                        <div class="address-details">
-                            <div class="contact-info">
-                                <span>BSFBS 3245678987</span>
-                            </div>
-                            <p class="address-text">
-                                fgbsn, rqegrwty, hntu446ht, <br>
-                                Madhya Pradesh - 123456
-                            </p>
-                            <span class="tag">work</span>
-                        </div>
-
-                        <div class="card-actions">
-                            <button class="btn-menu">
-                                <i class="fa-solid fa-ellipsis-vertical"></i>
-                            </button>
-                            <div class="dropdown-menu">
-                                <button class="dropdown-item">
-                                    <i class="fa-regular fa-pen-to-square"></i> Edit
-                                </button>
-                                <button class="dropdown-item delete">
-                                    <i class="fa-regular fa-trash-can"></i> Delete
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Another Example Card to show list behavior -->
-                    <div class="address-card" style="background-color: #fff; border: 1px solid #eaeaea;">
-                        <div class="address-details">
-                            <div class="contact-info">
-                                <span>John Doe 9876543210</span>
-                            </div>
-                            <p class="address-text">
-                                123 Main Street, Greenwood Apt, <br>
-                                New York - 10001
-                            </p>
-                            <span class="tag" style="background-color: #eee; color: #555;">Home</span>
-                        </div>
-
-                        <div class="card-actions">
-                            <button class="btn-menu">
-                                <i class="fa-solid fa-ellipsis-vertical"></i>
-                            </button>
-                            <div class="dropdown-menu">
-                                <button class="dropdown-item">
-                                    <i class="fa-regular fa-pen-to-square"></i> Edit
-                                </button>
-                                <button class="dropdown-item delete">
-                                    <i class="fa-regular fa-trash-can"></i> Delete
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
+                <div class="address-text">
+                  <%= address.street %>, <%= address.city %><br>
+                  <%= address.state %> - <%= address.pincode %>
                 </div>
 
-            </main>
-        </div>
+                <span class="tag"><%= address.type %></span>
+              </div>
 
-        <!-- JavaScript for Mobile Menu or simple interactions if needed -->
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const menuButtons = document.querySelectorAll('.btn-menu');
+              <div class="menu-wrapper">
+                <i class="fa-solid fa-ellipsis-vertical menu-icon"
+                  onclick="toggleMenu('<%= address._id %>')"></i>
 
-                // Toggle Dropdown
-                menuButtons.forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation(); // Prevent closing immediately
-                        const dropdown = btn.nextElementSibling;
+                <div class="menu-dropdown" id="menu-<%= address._id %>">
+                  <a href="/address/edit/<%= address._id %>">Edit</a>
+                  <a href="javascript:void(0)"
+                    class="delete"
+                    onclick="openDeleteModal('<%= address._id %>')">
+                    Delete
+                  </a>
 
-                        // Close all other dropdowns
-                        document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                            if (menu !== dropdown) menu.classList.remove('show');
-                        });
+                </div>
+              </div>
 
-                        dropdown.classList.toggle('show');
-                    });
-                });
 
-                // Close dropdown when clicking outside
-                document.addEventListener('click', () => {
-                    document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                        menu.classList.remove('show');
-                    });
-                });
-            });
-        </script>
+            </div>
+          <% }) %>
+
+        <% } %>
+
+      </div>
+
+    </main>
+  </div>
+
+
+  <!-- DELETE CONFIRMATION MODAL -->
+<div id="deleteModal" style="
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.5);
+  align-items:center;
+  justify-content:center;
+  z-index:200;
+">
+
+  <div style="
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    width:320px;
+    text-align:center;
+  ">
+    <h3 style="margin-bottom:10px;">Delete Address?</h3>
+    <p style="color:#555;">Are you sure you want to delete this address?</p>
+
+    <div style="margin-top:20px; display:flex; justify-content:space-between;">
+      <button onclick="closeDeleteModal()"
+        style="padding:8px 20px; border-radius:6px; border:1px solid #ccc;">
+        Cancel
+      </button>
+
+      <button onclick="confirmDelete()"
+        style="padding:8px 20px; border-radius:6px; background:red; color:white; border:none;">
+        Delete
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- modal script -->
+<script>
+  let deleteAddressId = null;
+
+  function openDeleteModal(id) {
+    deleteAddressId = id;
+    document.getElementById("deleteModal").style.display = "flex";
+
+    // close any open dropdown
+    document.querySelectorAll('.menu-dropdown')
+      .forEach(menu => menu.style.display = 'none');
+  }
+
+  function closeDeleteModal() {
+    deleteAddressId = null;
+    document.getElementById("deleteModal").style.display = "none";
+  }
+
+  function confirmDelete() {
+    if (deleteAddressId) {
+      window.location.href = `/address/delete/${deleteAddressId}`;
+    }
+  }
+</script>
+<!-- drop down for edit / delete -->
+  <script>
+  function toggleMenu(id) {
+    document.querySelectorAll('.menu-dropdown').forEach(menu => {
+      if (menu.id !== 'menu-' + id) {
+        menu.style.display = 'none';
+      }
+    });
+
+    const menu = document.getElementById('menu-' + id);
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function (e) {
+    if (!e.target.classList.contains('menu-icon')) {
+      document.querySelectorAll('.menu-dropdown')
+        .forEach(menu => menu.style.display = 'none');
+    }
+  });
+</script>
 
 </body>
-
 </html>

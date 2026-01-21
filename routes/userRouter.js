@@ -51,6 +51,21 @@ router.get(
   }
 );
 
+// Address management
+router.get("/profile/address", userAuth, profileController.addressPage);
+router.get("/add-address", userAuth, (req, res) => {
+  res.render("add-address");
+});
+router.get("/address", userAuth, profileController.addressPage);
+
+router.post("/add-address", userAuth, profileController.addAddress);
+router.get("/address/delete/:id", userAuth, profileController.deleteAddress);
+router.get("/address/edit/:id", userAuth, profileController.editAddressPage);
+router.post("/address/edit/:id", userAuth, profileController.updateAddress);
+
+// Change password
+router.get("/changePassword", userAuth, profileController.loadChangePassword);
+router.post("/changePassword", userAuth, profileController.changePassword);
 
 
 module.exports = router;
