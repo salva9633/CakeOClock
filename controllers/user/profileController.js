@@ -338,6 +338,32 @@ const changePassword = async (req, res) => {
 };
 
 
+/* ================= CHECK CURRENT PASSWORD (AJAX) ================= */
+const checkCurrentPassword = async (req, res) => {
+  try {
+    if (!req.session.user) {
+      return res.json({ valid: false });
+    }
+
+    const { currentPassword } = req.body;
+    const userId = req.session.user.id;
+
+    const user = await User.findById(userId);
+
+    if (!user || !user.password) {
+      return res.json({ valid: false });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+    return res.json({ valid: isMatch });
+
+  } catch (error) {
+    console.error("Password check error:", error);
+    res.status(500).json({ valid: false });
+  }
+};
+
 
 
 
@@ -355,7 +381,8 @@ module.exports = {
   loadChangePassword,
   changePassword,
   verifyEmailOtpPage,
-  verifyEmailOtp
+  verifyEmailOtp,
+  checkCurrentPassword
 
 
 };

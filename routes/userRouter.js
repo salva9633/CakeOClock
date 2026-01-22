@@ -78,6 +78,8 @@ router.post("/address/edit/:id", userAuth, profileController.updateAddress);
 // Change password
 router.get("/changePassword", userAuth, profileController.loadChangePassword);
 router.post("/changePassword", userAuth, profileController.changePassword);
+router.post("/checkCurrentPassword",userAuth, profileController.checkCurrentPassword);
+
 
 
 // Forgot password
