@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP - Cake O Clock</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #fff0ed 0%, #ffe4e1 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-card {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            width: 100%;
+            max-width: 900px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .form-section {
+            padding: 4rem;
+        }
+
+        .image-section {
+            background-color: #ffe4e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .image-section img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .image-section:hover img {
+            transform: scale(1.05);
+        }
+
+        h2 {
+            color: #8c3a3a;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        p.subtitle {
+            color: #a67c7c;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        /* OTP Input Styling */
+        .otp-container {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .otp-input {
+            width: 60px;
+            height: 60px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.5);
+            border: 2px solid rgba(140, 58, 58, 0.2);
+            border-radius: 12px;
+            color: #5c2823;
+            transition: all 0.3s ease;
+        }
+
+        .otp-input:focus {
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(189, 123, 114, 0.2);
+            border-color: #bd7b72;
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: #8a3b3b;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #6e2e2e;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(138, 59, 59, 0.3);
+        }
+
+        .resend-section {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #a67c7c;
+            font-size: 0.9rem;
+        }
+
+        .resend-link {
+            color: #8c3a3a;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .resend-link:hover {
+            color: #6e2e2e;
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 1rem;
+            color: #a67c7c;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #8c3a3a;
+        }
+
+        @media (max-width: 768px) {
+            .form-section {
+                padding: 2rem;
+            }
+
+            .image-section {
+                height: 250px;
+            }
+
+            .otp-input {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+
+            .otp-container {
+                gap: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .otp-input {
+                width: 45px;
+                height: 45px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container p-3">
+        <div class="row main-card m-0">
+            <!-- Image Side -->
+            <div class="col-md-6 image-section p-0 order-1 order-md-1">
+                <img src="C:/Users/hp/.gemini/antigravity/brain/f33e7ac5-5060-4213-87bd-b2a03351389d/otp_cake_1769054068752.png"
+                    alt="Beautiful Heart Cake">
+            </div>
+
+            <!-- Form Side -->
+            <div class="col-md-6 form-section d-flex flex-column justify-content-center order-2 order-md-2">
+                <div class="text-center mb-4">
+                    <h2>Confirm with OTP</h2>
+                    <p class="subtitle">Please check your mail address for OTP</p>
+                </div>
+
+                <form id="otpForm" action="/verifyOTP" method="POST">
+                    <div class="otp-container">
+                        <input type="text" class="otp-input" name="otp1" maxlength="1" pattern="[0-9]"
+                            inputmode="numeric" required>
+                        <input type="text" class="otp-input" name="otp2" maxlength="1" pattern="[0-9]"
+                            inputmode="numeric" required>
+                        <input type="text" class="otp-input" name="otp3" maxlength="1" pattern="[0-9]"
+                            inputmode="numeric" required>
+                        <input type="text" class="otp-input" name="otp4" maxlength="1" pattern="[0-9]"
+                            inputmode="numeric" required>
+                        <input type="text" class="otp-input" name="otp5" maxlength="1" pattern="[0-9]"
+                            inputmode="numeric" required>
+                        <input type="text" class="otp-input" name="otp6" maxlength="1" pattern="[0-9]"
+                            inputmode="numeric" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Confirm</button>
+                </form>
+
+                <div class="resend-section">
+                    <span>Resend OTP in <span id="timer">2:00</span></span>
+                </div>
+
+                <a href="/login" class="back-link">Go back to login page</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // OTP Input Auto-focus and Navigation
+        const otpInputs = document.querySelectorAll('.otp-input');
+
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                const value = e.target.value;
+
+                // Only allow numbers
+                if (!/^\d*$/.test(value)) {
+                    e.target.value = '';
+                    return;
+                }
+
+                // Move to next input if value entered
+                if (value && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                // Move to previous input on backspace if current is empty
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+
+                // Move to next on arrow right
+                if (e.key === 'ArrowRight' && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+
+                // Move to previous on arrow left
+                if (e.key === 'ArrowLeft' && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+
+            // Handle paste
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pastedData = e.clipboardData.getData('text').slice(0, 4);
+                const digits = pastedData.split('');
+
+                digits.forEach((digit, i) => {
+                    if (otpInputs[i] && /^\d$/.test(digit)) {
+                        otpInputs[i].value = digit;
+                    }
+                });
+
+                // Focus last filled input or next empty
+                const lastIndex = Math.min(digits.length, otpInputs.length - 1);
+                otpInputs[lastIndex].focus();
+            });
+        });
+
+        // Timer Countdown
+        let timeLeft = 120; // 2 minutes in seconds
+        const timerElement = document.getElementById('timer');
+
+        const countdown = setInterval(() => {
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                document.querySelector('.resend-section').innerHTML =
+                    '<a href="/forgotPassword" class="resend-link">Resend OTP</a>';
+            }
+        }, 1000);
+
+        // Form submission
+        document.getElementById('otpForm').addEventListener('submit', (e) => {
+            // Prevent default submission for client-side validation
+            e.preventDefault();
+            const otp = Array.from(otpInputs).map(input => input.value).join('');
+
+            if (otp.length === 6) {
+                // If OTP is valid, allow the form to submit naturally
+                // This will redirect to /reset-password as per the form's action attribute
+                e.target.submit();
+            } else {
+                // Optionally, show an error message if OTP is not complete
+                console.log('Please enter the complete 6-digit OTP.');
+            }
+        });
+    </script>
+</body>
+
+</html>

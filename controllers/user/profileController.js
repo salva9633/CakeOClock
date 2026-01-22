@@ -1,6 +1,8 @@
 const User = require("../../models/userModel");
 const cloudinary = require("../../config/cloudinary");
 const bcrypt = require("bcrypt");
+const { sendVerificationEmail } = require("../../utils/email");
+
 
 /* ================= PROFILE PAGE ================= */
 const userProfile = async (req, res) => {
@@ -38,32 +40,83 @@ const editProfilePost = async (req, res) => {
     const user = await User.findById(req.session.user.id);
     if (!user) return res.redirect("/login");
 
+    // update non-sensitive fields
     user.name = name;
     user.phone = phone;
     user.gender = gender;
 
-    if (user.authType === "local") {
-      user.email = email;
+    // 🚫 GOOGLE USERS: EMAIL CHANGE BLOCKED
+    if (user.authType === "google") {
+      await user.save();
+      return res.redirect("/profile");
     }
 
-    // ✅ UPLOAD IMAGE TO CLOUDINARY
+    // 🔐 LOCAL USERS: EMAIL CHANGE WITH OTP
+    if (email && email !== user.email) {
+
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+      req.session.emailChangeOtp = otp;
+      req.session.emailChangeExpiry = Date.now() + 5 * 60 * 1000;
+      req.session.newEmail = email;
+
+      await sendVerificationEmail(email, otp);
+
+      // ⛔ stop execution until OTP verified
+      return res.redirect("/verifyEmailOtp");
+    }
+
+    // profile image upload
     if (req.file) {
       const result = await cloudinary.uploader.upload(
         `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
         { folder: "user_profiles" }
       );
-
-      // ✅ SAVE CLOUDINARY URL
       user.profileImage = result.secure_url;
     }
 
     await user.save();
-res.redirect("/address");
+    res.redirect("/profile");
+
   } catch (error) {
     console.error("Edit profile error:", error);
     res.redirect("/pageNotFound");
   }
 };
+
+const verifyEmailOtpPage = (req, res) => {
+  if (!req.session.newEmail) return res.redirect("/editProfile");
+  res.render("verifyEmailOtp");
+};
+
+const verifyEmailOtp = async (req, res) => {
+  const { otp1, otp2, otp3, otp4, otp5, otp6 } = req.body;
+  const otp = otp1 + otp2 + otp3 + otp4 + otp5 + otp6;
+
+  if (
+    !req.session.emailChangeOtp ||
+    Date.now() > req.session.emailChangeExpiry
+  ) {
+    return res.redirect("/editProfile");
+  }
+
+  if (otp !== req.session.emailChangeOtp) {
+    return res.render("verifyEmailOtp", { error: "Invalid OTP" });
+  }
+
+  // ✅ update email only now
+  await User.findByIdAndUpdate(req.session.user.id, {
+    email: req.session.newEmail
+  });
+
+  // cleanup
+  delete req.session.emailChangeOtp;
+  delete req.session.emailChangeExpiry;
+  delete req.session.newEmail;
+
+  res.redirect("/profile");
+};
+
 
 /* ================= ADDRESS PAGE ================= */
 const addressPage = async (req, res) => {
@@ -300,6 +353,9 @@ module.exports = {
   editAddressPage,
   updateAddress,
   loadChangePassword,
-  changePassword
+  changePassword,
+  verifyEmailOtpPage,
+  verifyEmailOtp
+
 
 };

@@ -113,9 +113,10 @@
         <button type="submit" class="btn-confirm">Verify OTP</button>
     </form>
 
-    <div class="resend">
-        <a id="resendOtp">Resend OTP</a>
+    <div class="resend" id="resendSection">
+        <span>Resend OTP in <span id="timer">2:00</span></span>
     </div>
+    
 
     <div class="back">
         <a href="/login">Go back to login</a>
@@ -173,6 +174,47 @@ document.getElementById("resendOtp").addEventListener("click", async () => {
     Swal.fire(data.message);
 });
 </script>
+<script>
+/* ===== OTP RESEND TIMER ===== */
+let timeLeft = 120; // 2 minutes
+const timerEl = document.getElementById("timer");
+const resendSection = document.getElementById("resendSection");
+
+const countdown = setInterval(() => {
+    timeLeft--;
+
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+
+    timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+
+    if (timeLeft <= 0) {
+        clearInterval(countdown);
+        resendSection.innerHTML = `
+            <a id="resendOtp">Resend OTP</a>
+        `;
+
+        // Re-attach click event after link appears
+        document.getElementById("resendOtp").addEventListener("click", async () => {
+            const res = await fetch("/reseupnd-otp", { method: "POST" });
+            const data = await res.json();
+            Swal.fire(data.message);
+
+            // Restart timer after resend
+            restartTimer();
+        });
+    }
+}, 1000);
+
+function restartTimer() {
+    timeLeft = 120;
+    resendSection.innerHTML = `
+        <span>Resend OTP in <span id="timer">2:00</span></span>
+    `;
+    location.reload(); // simplest & safe restart
+}
+</script>
+
 
 </body>
 </html>

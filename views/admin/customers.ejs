@@ -162,6 +162,7 @@
                     <th>Name</th>
                     <th>Email</th>
                     <th>Phone</th>
+                    <th>Join Date</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -185,31 +186,39 @@
 
                             <td><%= user.email %></td>
                             <td><%= user.phone || "N/A" %></td>
+            <td>
+                <%= new Date(user.createdAt).toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric"
+                }) %>
+            </td>
 
-                            <td>
-                                <% if (user.isBlocked) { %>
-  <button
-    class="btn-custom btn-unblock-custom"
-    onclick="openConfirmModal(
-      'Unblock User',
-      'Are you sure you want to unblock <%= user.name %>?',
-      '/admin/unblock-user/<%= user._id %>',
-      'btn-success'
-    )">
-    Unblock
-  </button>
-<% } else { %>
-  <button
-    class="btn-custom btn-block-custom"
-    onclick="openConfirmModal(
-      'Block User',
-      'Are you sure you want to block <%= user.name %>?',
-      '/admin/block-user/<%= user._id %>',
-      'btn-danger'
-    )">
-    Block
-  </button>
-<% } %>
+
+            <td>
+                <% if (user.isBlocked) { %>
+                    <button
+                        class="btn-custom btn-unblock-custom"
+                        onclick="openConfirmModal(
+                        'Unblock User',
+                        'Are you sure you want to unblock <%= user.name %>?',
+                        '/admin/unblock-user/<%= user._id %>',
+                        'btn-success'
+                        )">
+                        Unblock
+                    </button>
+                <% } else { %>
+                    <button
+                        class="btn-custom btn-block-custom"
+                        onclick="openConfirmModal(
+                        'Block User',
+                        'Are you sure you want to block <%= user.name %>?',
+                        '/admin/block-user/<%= user._id %>',
+                        'btn-danger'
+                        )">
+                        Block
+                    </button>
+                <% } %>
 
                             </td>
                         </tr>

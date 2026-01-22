@@ -2,6 +2,8 @@ const User = require("../../models/userModel");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt")
 const env = require("dotenv").config()
+const { sendVerificationEmail } = require("../../utils/email");
+
 const loadHomepage = async (req, res) => {
     try {
         if (req.session.user) {
@@ -46,34 +48,34 @@ function generateOtp() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-async function sendVerificationEmail(email, otp) {
-    try {
-        const transporter = nodemailer.createTransport({
+// async function sendVerificationEmail(email, otp) {
+//     try {
+//         const transporter = nodemailer.createTransport({
 
-            service: "gmail",
-            auth: {
-                user: process.env.NODEMAILER_EMAIL,
-                pass: process.env.NODEMAILER_PASSWORD
-            }
-        })
-        const info = await transporter.sendMail({
-            from: process.env.NODEMAILER_EMAIL,
-            to: email,
-            subject: "veryfy your account",
-            text: `your otp is ${otp}`,
-            html: `<b> your OTP: ${otp} </b>`,
+//             service: "gmail",
+//             auth: {
+//                 user: process.env.NODEMAILER_EMAIL,
+//                 pass: process.env.NODEMAILER_PASSWORD
+//             }
+//         })
+//         const info = await transporter.sendMail({
+//             from: process.env.NODEMAILER_EMAIL,
+//             to: email,
+//             subject: "veryfy your account",
+//             text: `your otp is ${otp}`,
+//             html: `<b> your OTP: ${otp} </b>`,
 
-        })
+//         })
 
-        return info.accepted.length > 0
+//         return info.accepted.length > 0
 
-    } catch (error) {
+//     } catch (error) {
 
-        console.error("Error sending email", error);
-        return false;
+//         console.error("Error sending email", error);
+//         return false;
 
-    }
-}
+//     }
+// }
 
 
 
@@ -276,6 +278,8 @@ const loginUser = async (req, res) => {
 
 
 
+
+
 const logout= async(req,res)=>{
     try{
         req.session.destroy((err)=>{
@@ -291,11 +295,108 @@ const logout= async(req,res)=>{
     }
 }
 
+const forgotPasswordPage = async (req, res) => {
+  res.render("forgotPassword");
+};
+
+const sendForgotOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    const otp = generateOtp();
+
+    req.session.forgotOtp = otp;
+    req.session.forgotOtpExpiry = Date.now() + 5 * 60 * 1000;
+    req.session.forgotEmail = email;
+
+    const emailSent = await sendVerificationEmail(email, otp);
+    if (!emailSent) {
+      return res.status(500).json({ message: "Failed to send OTP" });
+    }
+
+    res.redirect("/verifyOTP");
+
+  } catch (error) {
+    console.log("Forgot OTP error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 
+const verifyForgotOtpPage = async (req, res) => {
+  res.render("verifyOTP");
+};
+
+const verifyForgotOtp = async (req, res) => {
+  try {
+    const { otp1, otp2, otp3, otp4, otp5, otp6 } = req.body;
+    const otp = otp1 + otp2 + otp3 + otp4 + otp5 + otp6;
+
+    if (!req.session.forgotOtp) {
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    if (Date.now() > req.session.forgotOtpExpiry) {
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    if (otp !== req.session.forgotOtp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    req.session.isOtpVerified = true;
+    res.redirect("/resetPassword");
+
+  } catch (error) {
+    console.log("Verify forgot OTP error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const resetPasswordPage = async (req, res) => {
+  if (!req.session.isOtpVerified) {
+    return res.redirect("/login");
+  }
+  res.render("resetPassword");
+};
 
 
+const updatePassword = async (req, res) => {
+  try {
+    const { newPassword, confirmPassword } = req.body;
 
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match" });
+    }
+
+    if (!req.session.forgotEmail) {
+      return res.redirect("/login");
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await User.updateOne(
+      { email: req.session.forgotEmail },
+      { $set: { password: hashedPassword } }
+    );
+
+    // clear session
+    req.session.forgotOtp = null;
+    req.session.forgotEmail = null;
+    req.session.isOtpVerified = null;
+
+    res.redirect("/login");
+
+  } catch (error) {
+    console.log("Update password error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 
 
@@ -308,5 +409,11 @@ module.exports = {
     resendOtp,
     loadlogin,
     loginUser,
-    logout
+    logout,
+    forgotPasswordPage,
+    sendForgotOtp,
+    verifyForgotOtpPage,
+    verifyForgotOtp,
+    resetPasswordPage,
+    updatePassword
 };

@@ -30,6 +30,18 @@ router.post(
 );
 
 
+router.get(
+  "/verifyEmailOtp",
+  userAuth,
+  profileController.verifyEmailOtpPage
+);
+
+router.post(
+  "/verifyEmailOtp",
+  userAuth,
+  profileController.verifyEmailOtp
+);
+
 
 
 router.get(
@@ -66,6 +78,17 @@ router.post("/address/edit/:id", userAuth, profileController.updateAddress);
 // Change password
 router.get("/changePassword", userAuth, profileController.loadChangePassword);
 router.post("/changePassword", userAuth, profileController.changePassword);
+
+
+// Forgot password
+router.get("/forgotPassword", userController.forgotPasswordPage);
+router.post("/forgotPassword", userController.sendForgotOtp);
+
+router.get("/verifyOTP", userController.verifyForgotOtpPage);
+router.post("/verifyOTP", userController.verifyForgotOtp);
+
+router.get("/resetPassword", userController.resetPasswordPage);
+router.post("/update-password", userController.updatePassword);
 
 
 module.exports = router;

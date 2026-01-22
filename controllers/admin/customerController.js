@@ -15,8 +15,9 @@ const customerInfo = async (req, res) => {
     };
 
     const users = await User.find(query)
-      .limit(limit)
+      .sort({ createdAt: -1 }) 
       .skip((page - 1) * limit)
+      .limit(limit)
       .lean();
 
     const totalUsers = await User.countDocuments(query);

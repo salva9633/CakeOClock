@@ -215,8 +215,16 @@
                 type="email"
                 name="email"
                 value="<%= user.email %>"
-                <%= user.authType === "google" ? "readonly" : "" %>>
+                <%= (user.authType === "google" || !user.password) ? "readonly" : "" %>
+            >
         </div>
+        <!-- <% if (user.authType === "google" || !user.password) { %>
+            <p class="note">
+                This email is linked to a social login and cannot be changed.
+            </p>
+        <% } %> -->
+
+
 
         <div class="form-group">
             <label>Phone</label>
