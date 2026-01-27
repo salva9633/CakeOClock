@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema(
       required: true
     },
 
+  
     phone: {
       type: String,
       unique: true,
@@ -66,42 +67,68 @@ const userSchema = new mongoose.Schema(
     },
 
     
-    addresses: [
-      {
-        name: {
-          type: String,
-          required: true
-        },
-        phone: {
-          type: String,
-          required: true
-        },
-        street: {
-          type: String,
-          required: true
-        },
-        city: {
-          type: String,
-          required: true
-        },
-        state: {
-          type: String
-        },
-        pincode: {
-          type: String,
-          required: true
-        },
-        type: {
-          type: String,
-          enum: ["HOME", "WORK"],
-          default: "HOME"
-        },
-        isDefault: {
-          type: Boolean,
-          default: false
-        }
-      }
-    ]
+addresses: [
+  {
+    name: {
+      type: String,
+      required: true
+    },
+
+    phone: {
+      type: String,
+      required: true
+    },
+
+    altPhone: {
+      type: String,
+      default: null
+    },
+
+    street: {
+      type: String,
+      required: true
+    },
+
+    address: {
+      type: String,
+      default: null
+    },
+
+    landmark: {
+      type: String,
+      default: null
+    },
+
+    city: {
+      type: String,
+      required: true
+    },
+
+    state: {
+      type: String,
+      required: true
+    },
+
+    pincode: {
+      type: String,
+      required: true
+    },
+
+    type: {
+      type: String,
+      enum: ["HOME", "WORK", "FAMILY", "FRIEND"],
+      default: "HOME"
+    },
+
+    isDefault: {
+      type: Boolean,
+      default: false
+    }
+  }
+]
+
+
+
   },
   {
     timestamps: true

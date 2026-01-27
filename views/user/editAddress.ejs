@@ -4,141 +4,288 @@
   <meta charset="UTF-8">
   <title>Edit Address</title>
 
+  <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     body {
-      margin: 0;
       background: #dba39a;
       font-family: 'Outfit', sans-serif;
     }
 
-    .container {
-      max-width: 600px;
-      margin: 40px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 16px;
+    .dashboard-container {
+      display: flex;
+      width: 98%;
+      height: 85vh;
+      margin: 20px auto;
+      background: #feebe7;
+      border-radius: 30px;
     }
 
-    h2 {
-      margin-bottom: 20px;
-      color: #5c2823;
+    .main-content {
+      flex: 1;
+      padding: 40px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .page-title {
+      font-size: 1.6rem;
+      color: #AF5454;
+      margin-bottom: 30px;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    /* FORM */
+    .address-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
     }
 
     .form-group {
       display: flex;
       flex-direction: column;
-      margin-bottom: 15px;
+      gap: 8px;
     }
 
     label {
-      font-weight: 600;
-      margin-bottom: 6px;
+      color: #7a2e2e;
+      font-weight: 500;
     }
 
-    input {
-      padding: 10px;
+    input,
+    textarea {
+      padding: 12px;
+      border: none;
       border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 14px;
+      background: #d9a3a0;
+      color: #7a2e2e;
+      font-size: 0.95rem;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #7a2e2e;
+      opacity: 0.7;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(175, 84, 84, 0.3);
+    }
+
+    textarea {
+      resize: none;
+      min-height: 110px;
+    }
+
+    /* RADIO + ACTIONS */
+    .form-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
     }
 
     .radio-group {
       display: flex;
-      gap: 15px;
-      margin-top: 6px;
+      gap: 20px;
     }
 
-    .actions {
+    .radio-group label {
+      font-size: 0.95rem;
+      color: #7a2e2e;
+    }
+
+    .actions-right {
       display: flex;
-      justify-content: space-between;
-      margin-top: 25px;
+      gap: 12px;
     }
 
     button {
-      padding: 10px 20px;
-      border-radius: 8px;
+      background: #AF5454;
+      color: #fff;
       border: none;
+      padding: 10px 26px;
+      border-radius: 8px;
+      font-size: 0.95rem;
       cursor: pointer;
-      font-weight: 600;
     }
 
-    .save {
-      background: #108565;
-      color: white;
-    }
-
-    .cancel {
+    .cancel-btn {
       background: #ccc;
+      color: #333;
+    }
+
+    button:hover {
+      background: #963f3f;
+    }
+
+    .cancel-btn:hover {
+      background: #b5b5b5;
+    }
+
+    /* VALIDATION */
+    .error-text {
+      color: red;
+      font-size: 0.85rem;
+    }
+
+    input.error {
+      border: 2px solid red;
+    }
+
+    input.success {
+      border: 2px solid green;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="container">
-    <h2>Edit Address</h2>
+<%- include("../../views/partials/user/h2") %>
 
-    <form action="/address/edit/<%= address._id %>" method="POST">
+<div class="dashboard-container">
+  <main class="main-content">
+
+    <h1 class="page-title">Edit Address</h1>
+
+    <form action="/address/edit/<%= address._id %>" method="POST" class="address-form">
 
       <div class="form-group">
         <label>Name</label>
-        <input type="text" name="name" value="<%= address.name %>" required>
+        <input type="text" id="name" name="name" value="<%= address.name %>">
+        <span class="error-text" id="nameError"></span>
       </div>
 
       <div class="form-group">
-        <label>Phone</label>
-        <input type="text" name="phone" value="<%= address.phone %>" required>
-      </div>
-
-      <div class="form-group">
-        <label>Street</label>
-        <input type="text" name="street" value="<%= address.street %>" required>
-      </div>
-
-      <div class="form-group">
-        <label>City</label>
-        <input type="text" name="city" value="<%= address.city %>" required>
-      </div>
-
-      <div class="form-group">
-        <label>State</label>
-        <input type="text" name="state" value="<%= address.state %>" required>
+        <label>Mobile Number</label>
+        <input type="tel" id="phone" name="phone" value="<%= address.phone %>">
+        <span class="error-text" id="phoneError"></span>
       </div>
 
       <div class="form-group">
         <label>Pincode</label>
-        <input type="text" name="pincode" value="<%= address.pincode %>" required>
+        <input type="text" id="pincode" name="pincode" value="<%= address.pincode %>">
+        <span class="error-text" id="pincodeError"></span>
       </div>
 
       <div class="form-group">
-        <label>Address Type</label>
+        <label>Locality</label>
+        <input type="text" id="street" name="street" value="<%= address.street %>">
+        <span class="error-text" id="streetError"></span>
+      </div>
+
+      <div class="form-group full-width">
+        <label>Address</label>
+<textarea name="address"><%= address.address || "" %></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>City / District / Town</label>
+        <input type="text" id="city" name="city" value="<%= address.city %>">
+        <span class="error-text" id="cityError"></span>
+      </div>
+
+      <div class="form-group">
+        <label>State</label>
+        <input type="text" id="state" name="state" value="<%= address.state %>">
+        <span class="error-text" id="stateError"></span>
+      </div>
+
+      <div class="form-group">
+        <label>Landmark</label>
+<input type="text" name="landmark" value="<%= address.landmark || "" %>">
+      </div>
+
+      <div class="form-group">
+        <label>Alternate phone number</label>
+<input type="tel" name="altPhone" value="<%= address.altPhone || "" %>">
+      </div>
+
+      <!-- Bottom -->
+      <div class="form-actions">
         <div class="radio-group">
           <label>
             <input type="radio" name="type" value="HOME"
-              <%= address.type === "HOME" ? "checked" : "" %>>
-            Home
+              <%= address.type === "HOME" ? "checked" : "" %>> Home
           </label>
           <label>
             <input type="radio" name="type" value="WORK"
-              <%= address.type === "WORK" ? "checked" : "" %>>
-            Work
+              <%= address.type === "WORK" ? "checked" : "" %>> Work
           </label>
+          <label>
+            <input type="radio" name="type" value="FAMILY"
+              <%= address.type === "FAMILY" ? "checked" : "" %>> Family
+          </label>
+          <label>
+            <input type="radio" name="type" value="FRIEND"
+              <%= address.type === "FRIEND" ? "checked" : "" %>> Friend
+          </label>
+        </div>
+
+        <div class="actions-right">
+          <a href="/address">
+            <button type="button" class="cancel-btn">Cancel</button>
+          </a>
+          <button type="submit">Update</button>
         </div>
       </div>
 
-      <div class="actions">
-        <a href="/address">
-          <button type="button" class="cancel">Cancel</button>
-        </a>
-        <button type="submit" class="save">Update</button>
-      </div>
-
     </form>
-  </div>
+  </main>
+</div>
+
+<!-- VALIDATION SCRIPT (same logic as add address) -->
+<script>
+  const fields = {
+    name: { id: "name", error: "nameError", regex: /^[A-Za-z ]{3,}$/, msg: "Min 3 letters" },
+    phone: { id: "phone", error: "phoneError", regex: /^[6-9][0-9]{9}$/, msg: "Invalid phone" },
+    pincode: { id: "pincode", error: "pincodeError", regex: /^[0-9]{6}$/, msg: "6 digit pincode" },
+    street: { id: "street", error: "streetError", regex: /^.{3,}$/, msg: "Required" },
+    city: { id: "city", error: "cityError", regex: /^[A-Za-z ]{2,}$/, msg: "Invalid city" },
+    state: { id: "state", error: "stateError", regex: /^[A-Za-z ]{2,}$/, msg: "Invalid state" }
+  };
+
+  function validate(field) {
+    const input = document.getElementById(field.id);
+    const error = document.getElementById(field.error);
+
+    if (!field.regex.test(input.value.trim())) {
+      input.classList.add("error");
+      input.classList.remove("success");
+      error.textContent = field.msg;
+      return false;
+    } else {
+      input.classList.remove("error");
+      input.classList.add("success");
+      error.textContent = "";
+      return true;
+    }
+  }
+
+  Object.values(fields).forEach(f => {
+    document.getElementById(f.id).addEventListener("input", () => validate(f));
+  });
+
+  window.onload = () => {
+    Object.values(fields).forEach(f => validate(f));
+  };
+</script>
 
 </body>
 </html>

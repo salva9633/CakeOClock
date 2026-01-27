@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Categories</title>
+  <%- include("../../views/partials/admin/sidebar") %>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(180deg, #fdecec, #f7dada);
+      padding: 24px;
+      color: #4a2b2b;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .top-bar h1 {
+      font-size: 32px;
+      font-weight: 700;
+    }
+
+    .add-btn {
+      background: #c75c5c;
+      color: #fff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .controls select {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: none;
+      background: #ddb0b0;
+    }
+
+    .search-box {
+      display: flex;
+      width: 320px;
+    }
+
+    .search-box input {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 10px 0 0 10px;
+      border: none;
+      background: #ddb0b0;
+    }
+
+    .search-box button {
+      border: none;
+      padding: 10px 14px;
+      background: #c75c5c;
+      color: #fff;
+      border-radius: 0 10px 10px 0;
+      cursor: pointer;
+    }
+
+    .table-wrapper {
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: #b85b5b;
+      color: #fff;
+    }
+
+    th, td {
+      padding: 16px;
+      font-size: 14px;
+      text-align: left;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #f1f1f1;
+    }
+
+    .category-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #f3f3f3;
+      overflow: hidden;
+    }
+
+    .icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .category-name {
+      font-weight: 600;
+    }
+
+    .desc {
+      max-width: 350px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #7a5a5a;
+    }
+
+    .status {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #b85b5b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .offer {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .offer.discount {
+      background: #f2994a;
+      color: #fff;
+    }
+
+    .offer.add {
+      background: linear-gradient(135deg, #b85b5b, #2bb0c7);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .edit-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .page {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid #c75c5c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .page.active {
+      background: #c75c5c;
+      color: #fff;
+    }
+
+    /* MODAL */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+    }
+
+    .modal-box {
+      background: #fff;
+      width: 560px;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      background: #1a9d6f;
+      color: #fff;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-body {
+      padding: 18px;
+    }
+
+    .modal-body label {
+      font-weight: 600;
+      margin-top: 10px;
+      display: block;
+    }
+
+    .modal-body input,
+    .modal-body textarea,
+    .modal-body select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-top: 6px;
+    }
+
+    .modal-row {
+      display: flex;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    .image-box {
+      width: 140px;
+      height: 120px;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .image-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    .modal-footer {
+      padding: 14px 18px;
+      text-align: right;
+    }
+
+    .error {
+      color: red;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- <div class="top-bar">
+  <h1>Categories</h1>
+  <button class="add-btn" onclick="openAddModal()">+ New</button>
+</div> -->
+
+<div class="controls">
+  <select><option>All</option></select>
+  <div class="search-box">
+    <input type="text" placeholder="Search category name...">
+    <button>🔍</button>
+  </div>
+</div>
+
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th>Category Info</th>
+        <th>Description</th>
+        <th>Item Count</th>
+        <th>Created Date</th>
+        <th>Status</th>
+        <th>Offer</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+   <tbody>
+  <% if (cat && cat.length > 0) { %>
+    <% cat.forEach(item => { %>
+      <tr>
+        <td>
+          <div class="category-cell">
+            <div class="icon">
+              <img src="<%= item.image %>" alt="category">
+            </div>
+            <div class="category-name">
+              <%= item.name %>
+            </div>
+          </div>
+        </td>
+
+        <td class="desc">
+          <%= item.description %>
+        </td>
+
+        <td>0</td>
+
+        <td>
+          <%= new Date(item.createdAt).toDateString() %>
+        </td>
+
+        <td>
+          <div class="status">
+            <%= item.isActive ? "✔" : "✖" %>
+          </div>
+        </td>
+
+        <td>—</td>
+
+        <td>
+          <button class="edit-btn">✏️</button>
+        </td>
+      </tr>
+    <% }) %>
+  <% } else { %>
+    <tr>
+      <td colspan="7" style="text-align:center; padding:20px;">
+        No categories found
+      </td>
+    </tr>
+  <% } %>
+</tbody>
+
+  </table>
+</div>
+
+<div class="pagination">
+  <div class="page">‹</div>
+  <div class="page active">1</div>
+  <div class="page">2</div>
+  <div class="page">›</div>
+</div>
+
+<!-- ADD CATEGORY MODAL -->
+<div class="modal" id="addModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Add Category</h3>
+      <span style="cursor:pointer" onclick="closeAddModal()">×</span>
+    </div>
+
+    <div class="modal-body">
+      <label>Category Name</label>
+      <input type="text" id="catName">
+
+      <div class="modal-row">
+        <div>
+          <label>Image</label>
+          <div class="image-box" onclick="catImage.click()">
+            <span id="imgText">+ Add Image</span>
+            <img id="preview" style="display:none">
+          </div>
+          <input type="file" id="catImage" hidden accept="image/*" onchange="previewImage(event)">
+        </div>
+
+        <div style="flex:1">
+          <label>Description</label>
+          <textarea id="catDesc"></textarea>
+        </div>
+      </div>
+
+      <label>Status</label>
+      <select id="catStatus">
+        <option value="true">Active</option>
+        <option value="false">Inactive</option>
+      </select>
+
+      <p class="error" id="errorMsg"></p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="add-btn" onclick="submitCategory()">Add Category</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openAddModal() {
+    addModal.style.display = "flex";
+    errorMsg.innerText = "";
+  }
+
+  function closeAddModal() {
+    addModal.style.display = "none";
+  }
+
+  function previewImage(e) {
+    preview.src = URL.createObjectURL(e.target.files[0]);
+    preview.style.display = "block";
+    imgText.style.display = "none";
+  }
+
+  function submitCategory() {
+    const name = catName.value.trim();
+    const desc = catDesc.value.trim();
+    const image = catImage.files[0];
+
+    if (!name || !desc || !image) {
+      errorMsg.innerText = "All fields are required";
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", desc);
+    formData.append("image", image);
+    formData.append("isActive", catStatus.value);
+
+    fetch("/admin/category/add", {
+      method: "POST",
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) {
+        errorMsg.innerText = data.message;
+      } else {
+        location.reload();
+      }
+    });
+  }
+</script>
+
+</body>
+</html>

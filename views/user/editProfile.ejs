@@ -152,6 +152,18 @@
         .hidden-file {
             display: none;
         }
+
+        .error-text {
+    color: #c0392b;
+    font-size: 0.75rem;
+    margin-top: 6px;
+    display: none;
+}
+
+input.error, select.error {
+    border: 2px solid #c0392b;
+}
+
     </style>
 </head>
 
@@ -167,7 +179,7 @@
 
         <div class="avatar-wrapper">
             <img
-                src="<%= user.profileImage || '/uploads/default-user.png' %>"
+                src="<%= user.profileImage || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRa4dLHtaXEf7QlVZYYQSnAbAi_8RuuLEzps2qyfORSMg&s' ||  '/uploads/default-user.png' %>"
                 class="avatar-preview"
                 id="avatarPreview"
             >
@@ -176,6 +188,9 @@
                 <i class="fa-solid fa-camera"></i>
             </label>
         </div>
+
+        <span class="error-text" id="imageError"></span>
+
 
         <h2>Edit Profile</h2>
     </div>
@@ -195,43 +210,43 @@
     <div class="info-grid">
 
         <div class="form-group">
-            <label>Name</label>
-            <input type="text" name="name" value="<%= user.name %>" required>
-        </div>
-
-        <div class="form-group">
-            <label>Gender</label>
-            <select name="gender">
-                <option value="">Select</option>
-                <option value="male" <%= user.gender === "male" ? "selected" : "" %>>Male</option>
-                <option value="female" <%= user.gender === "female" ? "selected" : "" %>>Female</option>
-                <option value="other" <%= user.gender === "other" ? "selected" : "" %>>Other</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Email</label>
-            <input
-                type="email"
-                name="email"
-                value="<%= user.email %>"
-                <%= (user.authType === "google" || !user.password) ? "readonly" : "" %>
-            >
-        </div>
-        <!-- <% if (user.authType === "google" || !user.password) { %>
-            <p class="note">
-                This email is linked to a social login and cannot be changed.
-            </p>
-        <% } %> -->
-
+    <label>Name</label>
+    <input type="text" name="name" id="name" value="<%= user.name %>">
+    <span class="error-text" id="nameError"></span>
+</div>
 
 
         <div class="form-group">
-            <label>Phone</label>
-            <input type="text" name="phone" value="<%= user.phone || '' %>">
-        </div>
+    <label>Gender</label>
+    <select name="gender" id="gender">
+        <option value="">Select</option>
+        <option value="male" <%= user.gender === "male" ? "selected" : "" %>>Male</option>
+        <option value="female" <%= user.gender === "female" ? "selected" : "" %>>Female</option>
+        <option value="other" <%= user.gender === "other" ? "selected" : "" %>>Other</option>
+    </select>
+    <span class="error-text" id="genderError"></span>
+</div>
+<div class="form-group">
+    <label>Email</label>
+    <input
+        type="email"
+        name="email"
+        id="email"
+        value="<%= user.email %>"
+        <%= (user.authType === "google" || !user.password) ? "readonly" : "" %>
+    >
+    <span class="error-text" id="emailError"></span>
+</div>
 
-    </div>
+
+
+
+      <div class="form-group">
+    <label>Phone</label>
+    <input type="text" name="phone" id="phone" value="<%= user.phone || '' %>">
+    <span class="error-text" id="phoneError"></span>
+</div>
+</div>
 
     <button class="btn-save" type="submit">Save Changes</button>
 
@@ -242,16 +257,129 @@
 </form>
 
 <script>
-    function previewImage(event) {
-        const file = event.target.files[0];
-        if (!file) return;
+function previewImage(event) {
+    const file = event.target.files[0];
+    const imageError = document.getElementById("imageError");
 
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            document.getElementById("avatarPreview").src = e.target.result;
-        };
-        reader.readAsDataURL(file);
+    imageError.innerText = "";
+    imageError.style.display = "none";
+
+    if (!file) return;
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+    const maxSize = 2 * 1024 * 1024; // 2MB
+
+    // Type validation
+    if (!allowedTypes.includes(file.type)) {
+        imageError.innerText = "Only JPG, PNG, JPEG, WEBP images are allowed";
+        imageError.style.display = "block";
+        event.target.value = "";
+        return;
     }
+
+    // Size validation
+    if (file.size > maxSize) {
+        imageError.innerText = "Image size must be less than 2MB";
+        imageError.style.display = "block";
+        event.target.value = "";
+        return;
+    }
+
+    // Preview image
+    const reader = new FileReader();
+    reader.onload = e => {
+        document.getElementById("avatarPreview").src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+const form = document.querySelector("form");
+
+form.addEventListener("submit", function (e) {
+    let isValid = true;
+    clearErrors();
+
+    const name = document.getElementById("name");
+    const email = document.getElementById("email");
+    const phone = document.getElementById("phone");
+    const gender = document.getElementById("gender");
+    const imageInput = document.getElementById("profileImage");
+    const imageError = document.getElementById("imageError");
+
+    /* ---------- Name validation ---------- */
+    const namePattern = /^[A-Za-z ]+$/;
+
+    if (name.value.trim() === "") {
+        showError(name, "nameError", "Name is required");
+        isValid = false;
+    } else if (name.value.trim().length < 3) {
+        showError(name, "nameError", "Name must be at least 3 characters");
+        isValid = false;
+    } else if (!namePattern.test(name.value.trim())) {
+        showError(name, "nameError", "Name can contain only letters");
+        isValid = false;
+    }
+
+    /* ---------- Email validation ---------- */
+    if (!email.hasAttribute("readonly")) {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email.value.trim())) {
+            showError(email, "emailError", "Enter a valid email address");
+            isValid = false;
+        }
+    }
+
+    /* ---------- Phone validation ---------- */
+    if (phone.value.trim() !== "") {
+        if (!/^[6-9]\d{9}$/.test(phone.value.trim())) {
+            showError(phone, "phoneError", "Enter a valid 10-digit phone number");
+            isValid = false;
+        }
+    }
+
+    /* ---------- Gender validation ---------- */
+    if (gender.value === "") {
+        showError(gender, "genderError", "Please select gender");
+        isValid = false;
+    }
+
+    /* ---------- Image validation (submit safety) ---------- */
+    if (imageInput.files.length > 0) {
+        const file = imageInput.files[0];
+        const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+        const maxSize = 2 * 1024 * 1024;
+
+        if (!allowedTypes.includes(file.type)) {
+            imageError.innerText = "Invalid image format";
+            imageError.style.display = "block";
+            isValid = false;
+        } else if (file.size > maxSize) {
+            imageError.innerText = "Image size must be less than 2MB";
+            imageError.style.display = "block";
+            isValid = false;
+        }
+    }
+
+    if (!isValid) e.preventDefault();
+});
+
+/* ---------- Helper functions ---------- */
+function showError(input, errorId, message) {
+    input.classList.add("error");
+    const error = document.getElementById(errorId);
+    error.innerText = message;
+    error.style.display = "block";
+}
+
+function clearErrors() {
+    document.querySelectorAll(".error-text").forEach(err => {
+        err.innerText = "";
+        err.style.display = "none";
+    });
+    document.querySelectorAll("input, select").forEach(el => {
+        el.classList.remove("error");
+    });
+}
 </script>
 
 </body>

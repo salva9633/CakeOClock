@@ -146,14 +146,35 @@ const addressPage = async (req, res) => {
 /* ================= ADD ADDRESS ================= */
 const addAddress = async (req, res) => {
   try {
-    const { name, phone, street, city, state, pincode, type } = req.body;
+    const {
+      name,
+      phone,
+      altPhone,
+      street,
+      address,
+      landmark,
+      city,
+      state,
+      pincode,
+      type
+    } = req.body;
 
     await User.findByIdAndUpdate(req.session.user.id, {
       $push: {
-        addresses: { name, phone, street, city, state, pincode, type }
+        addresses: {
+          name,
+          phone,
+          street,
+          city,
+          state,
+          pincode,
+          type,
+          address: address || null,
+          landmark: landmark || null,
+          altPhone: altPhone || null
+        }
       }
     });
-
     res.redirect("/address");
   } catch (error) {
     console.error(error);
@@ -201,7 +222,16 @@ const editAddressPage = async (req, res) => {
 
 const updateAddress = async (req, res) => {
   try {
-    const { name, phone, street, city, state, pincode, type } = req.body;
+    const {    name,
+      phone,
+      altPhone,
+      street,
+      address,
+      landmark,
+      city,
+      state,
+      pincode,
+      type } = req.body;
 
     await User.updateOne(
       { 
@@ -216,7 +246,11 @@ const updateAddress = async (req, res) => {
           "addresses.$.city": city,
           "addresses.$.state": state,
           "addresses.$.pincode": pincode,
-          "addresses.$.type": type
+          "addresses.$.type": type,
+          "addresses.$.address": address || null,
+"addresses.$.landmark": landmark || null,
+"addresses.$.altPhone": altPhone || null
+
         }
       }
     );

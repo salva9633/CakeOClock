@@ -2,108 +2,256 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Create User Address</title>
+  <title>Add New Address</title>
 
+  <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
-    body { background:#dba39a; font-family:Outfit; }
-    .dashboard-container { display:flex; width:98%; height:85vh; margin:20px auto; background:#fff; border-radius:30px; }
-    .sidebar-area { width:260px; background:#fff5f2; padding:2rem; }
-    .main-content { flex:1; padding:40px; overflow-y:auto; }
-    .page-title { font-size:1.6rem; color:#AF5454; margin-bottom:30px; }
-    .address-form { display:grid; grid-template-columns:1fr 1fr; gap:25px; max-width:900px; }
-    .full-width { grid-column:1/-1; }
-    .form-group { display:flex; flex-direction:column; gap:8px; }
-    input { padding:12px; border:1px solid #ccc; border-radius:6px; }
-    button { background:#d89696; border:none; padding:12px 30px; border-radius:6px; cursor:pointer; }
-    .address-wrapper {
-  display: flex;
-  align-items: flex-start;
-  gap: 30px;
-}
+    body {
+      background: #dba39a;
+      font-family: 'Outfit', sans-serif;
+    }
 
-.address-title {
-  min-width: 120px; /* keeps label aligned */
-}
+    .dashboard-container {
+      display: flex;
+      width: 98%;
+      height: 85vh;
+      margin: 20px auto;
+      background: #feebe7;
+      border-radius: 30px;
+    }
+    .main-content {
+      flex: 1;
+      padding: 40px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-.radio-column {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+    .page-title {
+      font-size: 1.6rem;
+      color: #AF5454;
+      margin-bottom: 30px;
+      width: 100%;
+      max-width: 900px;
+    }
 
+    /* FORM */
+    .address-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+      max-width: 900px;
+       width: 100%;
+    }
 
+    .full-width {
+      grid-column: 1 / -1;
+    }
 
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      color: #7a2e2e;
+      font-weight: 500;
+    }
+
+    input,
+    textarea,
+    select {
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      background: #d9a3a0;
+      color: #7a2e2e;
+      font-size: 0.95rem;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #7a2e2e;
+      opacity: 0.7;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(175, 84, 84, 0.3);
+    }
+
+    textarea {
+      resize: none;
+      min-height: 110px;
+    }
+
+    /* RADIO + SAVE */
+    .form-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 20px;
+    }
+
+    .radio-group label {
+      font-size: 0.95rem;
+      color: #7a2e2e;
+    }
+
+    button {
+      background: #AF5454;
+      color: #fff;
+      border: none;
+      padding: 10px 28px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #963f3f;
+    }
+
+    /* VALIDATION */
+    .error-text {
+      color: red;
+      font-size: 0.85rem;
+    }
+
+    input.error {
+      border: 2px solid red;
+    }
+
+    input.success {
+      border: 2px solid green;
+    }
   </style>
 </head>
 
 <body>
-
 <%- include("../../views/partials/user/h2") %>
-
 <div class="dashboard-container">
 
-  <aside class="sidebar-area">
-    <%- include("../../views/partials/user/sider") %>
-  </aside>
+  
+ 
 
   <main class="main-content">
-    <h1 class="page-title">Create User Address</h1>
+    <h1 class="page-title">Add a new address</h1>
 
-<form action="/add-address" method="POST">
-
-      <!-- Address Type -->
-      <div class="form-group address-wrapper">
-        <label class="address-title"><b>Address Type</b></label>
-        <div class="radio-column">
-          <label><input type="radio" name="type" value="HOME" checked> Home</label>
-          <label><input type="radio" name="type" value="WORK"> Work</label>
-          <label><input type="radio" name="type" value="OTHER"> Other</label>
-        </div>
-
-      </div>
+    <form action="/add-address" method="POST" class="address-form">
 
       <div class="form-group">
         <label>Name</label>
-        <input type="text" name="name" required>
+        <input type="text" id="name" name="name" placeholder="Enter your name">
+        <span class="error-text" id="nameError"></span>
+      </div>
+
+      <div class="form-group">
+        <label>Mobile Number</label>
+        <input type="tel" id="phone" name="phone" placeholder="Enter your mobile number">
+        <span class="error-text" id="phoneError"></span>
       </div>
 
       <div class="form-group">
         <label>Pincode</label>
-        <input type="text" name="pincode" required>
+        <input type="text" id="pincode" name="pincode" placeholder="Enter pincode">
+        <span class="error-text" id="pincodeError"></span>
       </div>
 
       <div class="form-group">
-        <label>Street</label>
-        <input type="text" name="street" required>
+        <label>Locality</label>
+        <input type="text" id="street" name="street" placeholder="Enter locality">
+        <span class="error-text" id="streetError"></span>
+      </div>
+
+      <div class="form-group full-width">
+        <label>Address</label>
+        <textarea name="address" placeholder="Address (House name/number)"></textarea>
       </div>
 
       <div class="form-group">
-        <label>City</label>
-        <input type="text" name="city" required>
+        <label>City / District / Town</label>
+        <input type="text" id="city" name="city" placeholder="Enter city">
+        <span class="error-text" id="cityError"></span>
       </div>
 
       <div class="form-group">
         <label>State</label>
-        <input type="text" name="state" required>
+        <input type="text" id="state" name="state" placeholder="Select state">
+        <span class="error-text" id="stateError"></span>
       </div>
 
       <div class="form-group">
-        <label>Phone</label>
-        <input type="tel" name="phone" required>
+        <label>Landmark</label>
+        <input type="text" name="landmark" placeholder="Enter landmark (optional)">
       </div>
 
-      <div class="full-width">
-        <button type="submit">Save Address</button>
+      <div class="form-group">
+        <label>Alternate phone number</label>
+        <input type="tel" name="altPhone" placeholder="Alternate mobile number">
+      </div>
+
+      <!-- Bottom Row -->
+      <div class="form-actions">
+        <div class="radio-group">
+          <label><input type="radio" name="type" value="HOME" checked> Home</label>
+          <label><input type="radio" name="type" value="WORK"> Work</label>
+          <label><input type="radio" name="type" value="FAMILY"> Family</label>
+          <label><input type="radio" name="type" value="FRIEND"> Friend</label>
+        </div>
+
+        <button type="submit">Save</button>
       </div>
 
     </form>
   </main>
-
 </div>
+
+<!-- VALIDATION SCRIPT -->
+<script>
+  const fields = {
+    name: { id: "name", error: "nameError", regex: /^[A-Za-z ]{3,}$/, msg: "Min 3 letters" },
+    phone: { id: "phone", error: "phoneError", regex: /^[6-9][0-9]{9}$/, msg: "Invalid phone" },
+    pincode: { id: "pincode", error: "pincodeError", regex: /^[0-9]{6}$/, msg: "6 digit pincode" },
+    street: { id: "street", error: "streetError", regex: /^.{3,}$/, msg: "Required" },
+    city: { id: "city", error: "cityError", regex: /^[A-Za-z ]{2,}$/, msg: "Invalid city" },
+    state: { id: "state", error: "stateError", regex: /^[A-Za-z ]{2,}$/, msg: "Invalid state" }
+  };
+
+  function validate(field) {
+    const input = document.getElementById(field.id);
+    const error = document.getElementById(field.error);
+
+    if (!field.regex.test(input.value.trim())) {
+      input.classList.add("error");
+      input.classList.remove("success");
+      error.textContent = field.msg;
+      return false;
+    } else {
+      input.classList.remove("error");
+      input.classList.add("success");
+      error.textContent = "";
+      return true;
+    }
+  }
+
+  Object.values(fields).forEach(f => {
+    document.getElementById(f.id).addEventListener("input", () => validate(f));
+  });
+</script>
+
 </body>
 </html>

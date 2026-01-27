@@ -1,31 +1,37 @@
 const express = require("express");
 const router = express.Router();
 
+const customerController = require("../controllers/admin/customerController");
+const categoryController = require("../controllers/admin/categoryController");
+const upload = require("../middlewares/multer");
+const { adminAuth } = require("../middlewares/auth");
+
 const {
-    loadLogin,
-    login,
-    loadDashboard,
-    pageerror,
-    logout
+  loadLogin,
+  login,
+  loadDashboard,
+  pageerror,
+  logout
 } = require("../controllers/admin/adminController");
-const customerController = require("../controllers/admin/customerController")
-const {adminAuth} = require("../middlewares/auth");
 
 router.get("/login", loadLogin);
 router.post("/login", login);
 router.get("/", adminAuth, loadDashboard);
 router.get("/pagenotfound", pageerror);
-router.get("/logout",logout);
+router.get("/logout", logout);
 
-// adminRoutes.js
-router.get('/admin/users', async (req, res) => {
-    const users = await User.find(); 
-    res.render('admin-users', { users });
-});
-
-
-router.get("/users",adminAuth,customerController.customerInfo);
+/* USERS */
+router.get("/users", adminAuth, customerController.customerInfo);
 router.get("/block-user/:id", adminAuth, customerController.blockUser);
 router.get("/unblock-user/:id", adminAuth, customerController.unblockUser);
 
+/* CATEGORY */
+router.get("/category", adminAuth, categoryController.categoryInfo);
+router.patch("/category/status/:id", adminAuth, categoryController.toggleCategoryStatus);
+router.post(
+  "/category/add",
+  adminAuth,
+  upload.single("image"),
+  categoryController.addCategory
+);
 module.exports = router;

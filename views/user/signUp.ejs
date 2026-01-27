@@ -217,6 +217,12 @@
             display: none;
             margin-top: 5px;
         }
+        .footer-text {
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
     </style>
 
 </head>
@@ -237,49 +243,59 @@
                 <h2 class="main-heading">Get started now</h2>
 
                 <form id="signupForm" method="post" action="/signUp">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="form-label">Name</label>
-                            <input type="text" id="name" name="name" class="form-control"
-                                placeholder="Enter your Name" />
-                            <div id="error1" class="error-message"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Email Address</label>
-                            <input type="email" id="email" name="email" class="form-control"
-                                placeholder="Enter your Email">
-                            <div id="error2" class="error-message"></div>
-                        </div>
-                    </div>
+<div class="row g-3">
+  <!-- Name -->
+  <div class="col-md-6">
+    <label class="form-label">Name</label>
+    <input type="text" id="name" name="name" class="form-control"
+           placeholder="Enter your name">
+    <div id="error1" class="error-message"></div>
+  </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="form-label">Phone Number</label>
-                            <input type="text" id="phone" name="phone" class="form-control"
-                                placeholder="Enter your phone number">
-                            <div id="error3" class="error-message"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Referral Code</label>
-                            <input type="text" name="referral" class="form-control"
-                                placeholder="Enter your referral code">
-                        </div>
-                    </div>
+  <!-- Gender -->
+  <div class="col-md-6">
+    <label class="form-label">Gender</label>
+    <select id="gender" name="gender" class="form-control">
+      <option value="">Select gender</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+      <option value="other">Other</option>
+    </select>
+    <div id="error6" class="error-message"></div>
+  </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="form-label">Password</label>
-                            <input type="password" id="password" name="password" class="form-control"
-                                placeholder="Enter your Password">
-                            <div id="error4" class="error-message"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Confirm Password</label>
-                            <input type="password" id="confirm-password" name="confirmPassword" class="form-control"
-                                placeholder="Confirm Password">
-                            <div id="error5" class="error-message"></div>
-                        </div>
-                    </div>
+  <!-- Email -->
+  <div class="col-md-6">
+    <label class="form-label">Email Address</label>
+    <input type="email" id="email" name="email" class="form-control"
+           placeholder="Enter your email">
+    <div id="error2" class="error-message"></div>
+  </div>
+
+  <!-- Phone -->
+  <div class="col-md-6">
+    <label class="form-label">Phone Number</label>
+    <input type="text" id="phone" name="phone" class="form-control"
+           placeholder="Enter your phone number">
+    <div id="error3" class="error-message"></div>
+  </div>
+
+  <!-- Password -->
+  <div class="col-md-6">
+    <label class="form-label">Password</label>
+    <input type="password" id="password" name="password" class="form-control"
+           placeholder="Enter password">
+    <div id="error4" class="error-message"></div>
+  </div>
+
+  <!-- Confirm Password -->
+  <div class="col-md-6">
+    <label class="form-label">Confirm Password</label>
+    <input type="password" id="confirm-password" name="confirmPassword"
+           class="form-control" placeholder="Confirm password">
+    <div id="error5" class="error-message"></div>
+  </div>
+</div>
 
                     <div class="form-check">
                         <input type="checkbox" name="t" class="form-check-input" id="termsCheck">
@@ -292,20 +308,21 @@
                         <span>OR</span>
                     </div>
 
-                    <div class="d-flex gap-2 justify-content-center">
-                     <a href="/auth/google" class="btn social-btn w-50">
-    <i class="bi bi-google"></i> Sign in with Google
-</a>
+                   <!-- Google Signup -->
+<div class="d-flex justify-content-center mt-2">
+  <a href="/auth/google" class="btn social-btn w-75">
+    <i class="bi bi-google"></i> Sign up with Google
+  </a>
+</div>
 
-                        <button type="button" class="btn social-btn w-50">
-                            <i class="bi bi-apple"></i> Sign in with Apple
-                        </button>
-                    </div>
+<!-- Have an account -->
+<div class="d-flex justify-content-center mt-3">
+  <div class="footer-text">
+    Have an account?
+    <a href="/login" class="signin-link">Sign in</a>
+  </div>
+</div>
 
-                    <div class="mt-2">
-                        <span class="footer-text">Have an account? <a href="/login" class="signin-link">Sign
-                                in</a></span>
-                    </div>
                 </form>
 
             </div>
@@ -321,6 +338,7 @@
             const signupForm = document.getElementById("signupForm");
             const nameid = document.getElementById("name");
             const emailid = document.getElementById("email");
+            const genderid = document.getElementById("gender");
             const phoneid = document.getElementById("phone");
             const passid = document.getElementById("password");
             const confoid = document.getElementById("confirm-password");
@@ -329,6 +347,7 @@
             const error3 = document.getElementById("error3");
             const error4 = document.getElementById("error4");
             const error5 = document.getElementById("error5");
+            const error6 = document.getElementById("error6");
 
             function nameValidateChecking() {
                 const nameval = nameid.value;
@@ -345,6 +364,18 @@
                     error1.innerHTML = "";
                 }
             }
+               
+
+             function genderValidateChecking() {
+                   if (genderid.value === "") {
+                          error6.style.display = "block";
+        error6.innerHTML = "Please select your gender";
+    } else {
+        error6.style.display = "none";
+        error6.innerHTML = "";
+    }
+}
+
 
             function emailValidateChecking() {
                 const emailval = emailid.value;
@@ -409,6 +440,7 @@
                 emailValidateChecking();
                 phoneValidateChecking();
                 passValidateChecking();
+                genderValidateChecking();
 
                 // Check if any errors are visible
                 if (
@@ -416,7 +448,8 @@
                     error2.style.display === "block" ||
                     error3.style.display === "block" ||
                     error4.style.display === "block" ||
-                    error5.style.display === "block"
+                    error5.style.display === "block" ||
+                     error6.style.display === "block" 
                 ) {
                     return; // Stop submission if there are errors
                 }
@@ -429,6 +462,7 @@
                     email: formData.get("email"),
                     phone: formData.get("phone"),
                     password: formData.get("password"),
+                    gender: formData.get("gender"),
                     confirmPassword: formData.get("confirmPassword"),
                     referral: formData.get("referral"),
                     t: formData.get("t") ? true : false

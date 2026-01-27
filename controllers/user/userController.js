@@ -48,41 +48,15 @@ function generateOtp() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// async function sendVerificationEmail(email, otp) {
-//     try {
-//         const transporter = nodemailer.createTransport({
 
-//             service: "gmail",
-//             auth: {
-//                 user: process.env.NODEMAILER_EMAIL,
-//                 pass: process.env.NODEMAILER_PASSWORD
-//             }
-//         })
-//         const info = await transporter.sendMail({
-//             from: process.env.NODEMAILER_EMAIL,
-//             to: email,
-//             subject: "veryfy your account",
-//             text: `your otp is ${otp}`,
-//             html: `<b> your OTP: ${otp} </b>`,
 
-//         })
-
-//         return info.accepted.length > 0
-
-//     } catch (error) {
-
-//         console.error("Error sending email", error);
-//         return false;
-
-//     }
-// }
 
 
 
 
 const createUser = async (req, res) => {
     try {
-        const { name, phone, email, password, confirmPassword } = req.body;
+const { name, gender, phone, email, password, confirmPassword } = req.body;
 
         if (password !== confirmPassword) {
             return res.status(400).json({
@@ -118,8 +92,8 @@ const createUser = async (req, res) => {
 
 
         req.session.userOtp = otp;
-        req.session.otpExpiry = Date.now() + 5 * 60 * 1000;
-        req.session.userData = { name, phone, email, password };
+        req.session.otpExpiry = Date.now() + 65 * 1000;
+        req.session.userData = { name, phone, email, password,gender};
 
         return res.status(200).json({
             success: true,
@@ -154,7 +128,7 @@ const verifyOtp = async (req, res) => {
       return res.status(400).json({ message: "Invalid OTP" });
     }
 
-    const { name, phone, email, password } = req.session.userData;
+    const { name, phone, email, password,gender} = req.session.userData;
 
     // ✅ Check if user already exists
     let user = await User.findOne({ $or: [{ email }, { phone }] });
@@ -167,6 +141,7 @@ const verifyOtp = async (req, res) => {
         name,
         phone,
         email,
+        gender,
         password: hashedPassword,
         isVerified: true
       });
@@ -208,7 +183,7 @@ const resendOtp = async (req, res) => {
 
         const otp = generateOtp();
         req.session.userOtp = otp;
-        req.session.otpExpiry = Date.now() + 5 * 60 * 1000;
+        req.session.otpExpiry = Date.now() +  65 * 1000;
 
         const emailSent = await sendVerificationEmail(email, otp);
 
@@ -240,39 +215,36 @@ const loginUser = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(400).json({ message: "User not found" });
+            return res.render("login", { error: "User not found" });
         }
 
         if (!user.password) {
-            return res.status(400).json({
-                message: "Please login using Google"
-            });
+            return res.render("login", { error: "Please login using Google" });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
-            return res.status(400).json({ message: "Wrong password" });
+            return res.render("login", { error: "Wrong password" });
         }
 
         if (user.isBlocked) {
-            return res.status(403).json({ message: "Your account is blocked" });
+            return res.render("login", { error: "Your account is blocked" });
         }
 
-        // ✅ create session manually
+        // ✅ create session
         req.session.user = {
             id: user._id,
             name: user.name,
             email: user.email
         };
 
-        return res.status(200).json({
-            message: "Login success"
-        });
+        // ✅ redirect to home
+        return res.redirect("/");
 
     } catch (error) {
         console.log("login error:", error);
-        res.status(500).json({ message: "Server error" });
+        res.status(500).send("Server error");
     }
 };
 

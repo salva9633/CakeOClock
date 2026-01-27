@@ -11,7 +11,7 @@ const path = require("path");
 
 db();
 
-// session middleware (MUST be first)
+
 app.use(
     session({
         secret: process.env.SESSION_SECRET,
@@ -23,36 +23,35 @@ app.use(
     })
 );
 
-// passport middleware
+
 app.use(passport.initialize());
 app.use(passport.session());
 
-// body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// set locals BEFORE routes ✅
+
 app.use((req, res, next) => {
     res.locals.user = req.session.user || null;
     res.locals.admin = req.session.admin || null;
     next();
 });
 
-// view engine
+
 app.set("view engine", "ejs");
 app.set("views", [
     path.join(__dirname, "views/admin"),
     path.join(__dirname, "views/user")
 ]);
 
-// static files
+
 app.use(express.static(path.join(__dirname, "public")));
 
-// routes
+
 app.use("/", userRouter);
 app.use("/admin", adminRouter);
 
-// 404 handler (LAST)
+
 app.use((req, res) => {
     res.status(404).render("pagenotfound");
 });

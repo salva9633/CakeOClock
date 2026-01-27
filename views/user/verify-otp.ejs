@@ -126,93 +126,93 @@
 <!-- Scripts -->
 <script>
 const inputs = document.querySelectorAll(".otp-field");
-
-inputs.forEach((input, index) => {
-    input.addEventListener("input", () => {
-        if (input.value && index < inputs.length - 1) {
-            inputs[index + 1].focus();
-        }
-    });
-
-    input.addEventListener("keydown", (e) => {
-        if (e.key === "Backspace" && !input.value && index > 0) {
-            inputs[index - 1].focus();
-        }
-    });
-});
-
-document.getElementById("otpForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    let otp = "";
-    inputs.forEach(i => otp += i.value);
-
-    if (otp.length !== 6) {
-        Swal.fire("Invalid OTP", "Enter 6 digit OTP", "warning");
-        return;
-    }
-
-    const res = await fetch("/verify-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ otp })
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-        Swal.fire("Success", "OTP Verified", "success")
-            .then(() => window.location.href = "/login");
-    } else {
-        Swal.fire("Error", data.message, "error");
-    }
-});
-
-document.getElementById("resendOtp").addEventListener("click", async () => {
-    const res = await fetch("/resend-otp", { method: "POST" });
-    const data = await res.json();
-    Swal.fire(data.message);
-});
-</script>
-<script>
-/* ===== OTP RESEND TIMER ===== */
-let timeLeft = 120; // 2 minutes
-const timerEl = document.getElementById("timer");
 const resendSection = document.getElementById("resendSection");
 
-const countdown = setInterval(() => {
+inputs.forEach((input, index) => {
+  input.addEventListener("input", () => {
+    if (input.value && index < inputs.length - 1) {
+      inputs[index + 1].focus();
+    }
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Backspace" && !input.value && index > 0) {
+      inputs[index - 1].focus();
+    }
+  });
+});
+
+/* ===== VERIFY OTP ===== */
+document.getElementById("otpForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  let otp = "";
+  inputs.forEach(i => otp += i.value);
+
+  if (otp.length !== 6) {
+    Swal.fire("Invalid OTP", "Enter 6 digit OTP", "warning");
+    return;
+  }
+
+  const res = await fetch("/verify-otp", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ otp })
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    Swal.fire("Success", "OTP Verified", "success")
+      .then(() => window.location.href = "/");
+  } else {
+    Swal.fire("Error", data.message, "error");
+  }
+});
+
+/* ===== OTP TIMER + RESEND ===== */
+let timeLeft = 65; // ✅ 1 minute 5 seconds
+let timerInterval;
+
+function startTimer() {
+  resendSection.innerHTML = `
+    <span>Resend OTP in <span id="timer">1:05</span></span>
+  `;
+
+  const timerEl = document.getElementById("timer");
+
+  timerInterval = setInterval(() => {
     timeLeft--;
 
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
-
     timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, "0")}`;
 
     if (timeLeft <= 0) {
-        clearInterval(countdown);
-        resendSection.innerHTML = `
-            <a id="resendOtp">Resend OTP</a>
-        `;
-
-        // Re-attach click event after link appears
-        document.getElementById("resendOtp").addEventListener("click", async () => {
-            const res = await fetch("/reseupnd-otp", { method: "POST" });
-            const data = await res.json();
-            Swal.fire(data.message);
-
-            // Restart timer after resend
-            restartTimer();
-        });
+      clearInterval(timerInterval);
+      showResend();
     }
-}, 1000);
-
-function restartTimer() {
-    timeLeft = 120;
-    resendSection.innerHTML = `
-        <span>Resend OTP in <span id="timer">2:00</span></span>
-    `;
-    location.reload(); // simplest & safe restart
+  }, 1000);
 }
+
+function showResend() {
+  resendSection.innerHTML = `<a id="resendOtp">Resend OTP</a>`;
+
+  document.getElementById("resendOtp").addEventListener("click", async () => {
+    const res = await fetch("/resend-otp", { method: "POST" });
+    const data = await res.json();
+
+    if (res.ok) {
+      Swal.fire("Success", data.message, "success");
+      timeLeft = 65;
+      startTimer();
+    } else {
+      Swal.fire("Error", data.message, "error");
+    }
+  });
+}
+
+startTimer();
 </script>
 
 
