@@ -3,6 +3,8 @@ const router = express.Router();
 
 const customerController = require("../controllers/admin/customerController");
 const categoryController = require("../controllers/admin/categoryController");
+const productController = require("../controllers/admin/productController");
+
 const upload = require("../middlewares/multer");
 const { adminAuth } = require("../middlewares/auth");
 
@@ -27,11 +29,33 @@ router.get("/unblock-user/:id", adminAuth, customerController.unblockUser);
 
 /* CATEGORY */
 router.get("/category", adminAuth, categoryController.categoryInfo);
-router.patch("/category/status/:id", adminAuth, categoryController.toggleCategoryStatus);
+
+router.patch(
+  "/category/status/:id",
+  adminAuth,
+  categoryController.toggleCategoryStatus
+);
+
+router.delete(
+  "/category/delete/:id",
+  adminAuth,
+  categoryController.deleteCategory
+);
+
+router.patch(
+  "/category/edit/:id",
+  adminAuth,
+  upload.single("image"),
+  categoryController.editCategory
+);
+
 router.post(
   "/category/add",
   adminAuth,
   upload.single("image"),
   categoryController.addCategory
 );
+
+
+
 module.exports = router;

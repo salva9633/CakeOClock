@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin | Cake O Clock</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Bootstrap -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
+  <!-- Font Awesome -->
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    rel="stylesheet"
+  />
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    .main-content {
+        margin-left: 260px;              /* sidebar width */
+        padding: 30px 30px;              /* breathing space */
+        padding-top: 60px;              /* header height + spacing */
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f5e6e8 0%, #f8d7da 100%);
+        box-sizing: border-box;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <%- include("../partials/admin/header") %>
+
+  <!-- SIDEBAR -->
+  <%- include("../partials/admin/sidebar") %>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <%- body %>
+  </main>
+
+  <!-- Bootstrap JS -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+  ></script>
+
+</body>
+</html>

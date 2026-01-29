@@ -370,6 +370,26 @@ const updatePassword = async (req, res) => {
   }
 };
 
+const Category = require("../../models/categoryModel");
+
+const loadHome = async (req, res) => {
+  try {
+    const categories = await Category.find({
+      isDeleted: false,
+      isActive: true
+    }).sort({ createdAt: -1 });
+
+    res.render("home", { categories });
+
+  } catch (error) {
+    console.log(error);
+    res.redirect("/pagenotfound");
+  }
+};
+
+module.exports = { loadHome };
+
+
 
 
 module.exports = {
@@ -387,5 +407,6 @@ module.exports = {
     verifyForgotOtpPage,
     verifyForgotOtp,
     resetPasswordPage,
-    updatePassword
+    updatePassword,
+    Category 
 };

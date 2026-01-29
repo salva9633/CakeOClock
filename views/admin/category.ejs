@@ -1,375 +1,298 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Categories</title>
-  <%- include("../../views/partials/admin/sidebar") %>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- CATEGORY PAGE -->
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ===== PAGE HEADER ===== */
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
-    }
+  .top-bar h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #4a2b2b;
+  }
 
-    body {
-      background: linear-gradient(180deg, #fdecec, #f7dada);
-      padding: 24px;
-      color: #4a2b2b;
-    }
+  .add-btn {
+    background: #c75c5c;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+  }
 
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
+  /* ===== CONTROLS ===== */
+  .controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+  }
 
-    .top-bar h1 {
-      font-size: 32px;
-      font-weight: 700;
-    }
+  .search-box {
+    display: flex;
+    width: 320px;
+  }
 
-    .add-btn {
-      background: #c75c5c;
-      color: #fff;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 10px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+  .search-box input {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 10px 0 0 10px;
+    border: none;
+    background: #ddb0b0;
+  }
 
-    .controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
-    }
+  .search-box button {
+    border: none;
+    padding: 10px 14px;
+    background: #c75c5c;
+    color: #fff;
+    border-radius: 0 10px 10px 0;
+    cursor: pointer;
+  }
 
-    .controls select {
-      padding: 10px 14px;
-      border-radius: 10px;
-      border: none;
-      background: #ddb0b0;
-    }
+  /* ===== TABLE ===== */
+  .table-wrapper {
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  }
 
-    .search-box {
-      display: flex;
-      width: 320px;
-    }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
 
-    .search-box input {
-      flex: 1;
-      padding: 10px 14px;
-      border-radius: 10px 0 0 10px;
-      border: none;
-      background: #ddb0b0;
-    }
+  thead {
+    background: #b85b5b;
+    color: #fff;
+  }
 
-    .search-box button {
-      border: none;
-      padding: 10px 14px;
-      background: #c75c5c;
-      color: #fff;
-      border-radius: 0 10px 10px 0;
-      cursor: pointer;
-    }
+  th, td {
+    padding: 16px;
+    font-size: 14px;
+    text-align: left;
+  }
 
-    .table-wrapper {
-      background: #fff;
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    }
+  tbody tr {
+    border-bottom: 1px solid #f1f1f1;
+  }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+  .category-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
 
-    thead {
-      background: #b85b5b;
-      color: #fff;
-    }
+  .icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    overflow: hidden;
+  }
 
-    th, td {
-      padding: 16px;
-      font-size: 14px;
-      text-align: left;
-    }
+  .icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
-    tbody tr {
-      border-bottom: 1px solid #f1f1f1;
-    }
+  .category-name {
+    font-weight: 600;
+  }
 
-    .category-cell {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+  .desc {
+    max-width: 350px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #7a5a5a;
+  }
 
-    .icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      background: #f3f3f3;
-      overflow: hidden;
-    }
+  .status {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #b85b5b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    cursor: pointer;
+  }
 
-    .icon img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+  .edit-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+  }
 
-    .category-name {
-      font-weight: 600;
-    }
+  /* ===== MODALS ===== */
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+  }
 
-    .desc {
-      max-width: 350px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      color: #7a5a5a;
-    }
+  .modal-box {
+    background: #fff;
+    width: 560px;
+    border-radius: 14px;
+    overflow: hidden;
+  }
 
-    .status {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: #b85b5b;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      cursor: pointer;
-    }
+  .modal-header {
+    background: #1a9d6f;
+    color: #fff;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-    .offer {
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-    }
+  .modal-body {
+    padding: 18px;
+  }
 
-    .offer.discount {
-      background: #f2994a;
-      color: #fff;
-    }
+  .modal-footer {
+    padding: 14px 18px;
+    text-align: right;
+  }
 
-    .offer.add {
-      background: linear-gradient(135deg, #b85b5b, #2bb0c7);
-      color: #fff;
-      cursor: pointer;
-    }
+  .modal-body label {
+    font-weight: 600;
+    margin-top: 10px;
+    display: block;
+  }
 
-    .edit-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 18px;
-    }
+  .modal-body input,
+  .modal-body textarea,
+  .modal-body select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-top: 6px;
+  }
 
-    .pagination {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 20px;
-    }
+  .modal-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+  }
 
-    .page {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      border: 1px solid #c75c5c;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
+  .image-box {
+    width: 140px;
+    height: 120px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
 
-    .page.active {
-      background: #c75c5c;
-      color: #fff;
-    }
+  .image-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
-    /* MODAL */
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.45);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 3000;
-    }
+  .error {
+    color: red;
+    font-size: 13px;
+    margin-top: 8px;
+  }
+</style>
 
-    .modal-box {
-      background: #fff;
-      width: 560px;
-      border-radius: 14px;
-      overflow: hidden;
-    }
-
-    .modal-header {
-      background: #1a9d6f;
-      color: #fff;
-      padding: 14px 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-body {
-      padding: 18px;
-    }
-
-    .modal-body label {
-      font-weight: 600;
-      margin-top: 10px;
-      display: block;
-    }
-
-    .modal-body input,
-    .modal-body textarea,
-    .modal-body select {
-      width: 100%;
-      padding: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      margin-top: 6px;
-    }
-
-    .modal-row {
-      display: flex;
-      gap: 16px;
-      margin-top: 10px;
-    }
-
-    .image-box {
-      width: 140px;
-      height: 120px;
-      border: 2px dashed #ccc;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      text-align: center;
-    }
-
-    .image-box img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 6px;
-    }
-
-    .modal-footer {
-      padding: 14px 18px;
-      text-align: right;
-    }
-
-    .error {
-      color: red;
-      font-size: 13px;
-      margin-top: 8px;
-    }
-  </style>
-</head>
-
-<body>
-
-<!-- <div class="top-bar">
+<!-- ===== HEADER ===== -->
+<div class="top-bar">
   <h1>Categories</h1>
   <button class="add-btn" onclick="openAddModal()">+ New</button>
-</div> -->
+</div>
 
+<!-- ===== SEARCH ===== -->
 <div class="controls">
-  <select><option>All</option></select>
   <div class="search-box">
     <input type="text" placeholder="Search category name...">
     <button>🔍</button>
   </div>
 </div>
 
+<!-- ===== TABLE ===== -->
 <div class="table-wrapper">
   <table>
     <thead>
       <tr>
         <th>Category Info</th>
         <th>Description</th>
-        <th>Item Count</th>
-        <th>Created Date</th>
+        <th>Created</th>
         <th>Status</th>
-        <th>Offer</th>
         <th>Actions</th>
       </tr>
     </thead>
-   <tbody>
-  <% if (cat && cat.length > 0) { %>
-    <% cat.forEach(item => { %>
-      <tr>
-        <td>
-          <div class="category-cell">
-            <div class="icon">
-              <img src="<%= item.image %>" alt="category">
-            </div>
-            <div class="category-name">
-              <%= item.name %>
-            </div>
-          </div>
-        </td>
+    <tbody>
+      <% if (cat && cat.length) { %>
+        <% cat.forEach(item => { %>
+          <tr>
+          <td>
+  <div class="category-cell">
+    <div class="icon">
+      <img src="<%= item.image || '/images/default-category.png' %>">
+    </div>
+    <div class="category-name"><%= item.name %></div>
+  </div>
+</td>
 
-        <td class="desc">
-          <%= item.description %>
-        </td>
+            <td class="desc"><%= item.description %></td>
+<td><%= new Date(item.createdAt).toLocaleDateString("en-IN", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric"
+}) %></td>
 
-        <td>0</td>
+            <td>
+              <div class="status" onclick="softDeleteCategory('<%= item._id %>')">🗑️</div>
+            </td>
 
-        <td>
-          <%= new Date(item.createdAt).toDateString() %>
-        </td>
-
-        <td>
-          <div class="status">
-            <%= item.isActive ? "✔" : "✖" %>
-          </div>
-        </td>
-
-        <td>—</td>
-
-        <td>
-          <button class="edit-btn">✏️</button>
-        </td>
-      </tr>
-    <% }) %>
-  <% } else { %>
-    <tr>
-      <td colspan="7" style="text-align:center; padding:20px;">
-        No categories found
-      </td>
-    </tr>
-  <% } %>
-</tbody>
-
+            <td>
+              <button
+                class="edit-btn"
+                onclick="openEditModal(
+                  '<%= item._id %>',
+                  '<%= item.name %>',
+                  '<%= item.description %>',
+                  '<%= item.image %>',
+                  '<%= item.isActive %>'
+                )"
+              >
+                ✏️
+              </button>
+            </td>
+          </tr>
+        <% }) %>
+      <% } else { %>
+        <tr>
+          <td colspan="5" style="text-align:center;padding:20px;">
+            No categories found
+          </td>
+        </tr>
+      <% } %>
+    </tbody>
   </table>
 </div>
 
-<div class="pagination">
-  <div class="page">‹</div>
-  <div class="page active">1</div>
-  <div class="page">2</div>
-  <div class="page">›</div>
-</div>
-
-<!-- ADD CATEGORY MODAL -->
+<!-- ===== ADD MODAL ===== -->
 <div class="modal" id="addModal">
   <div class="modal-box">
     <div class="modal-header">
@@ -378,7 +301,7 @@
     </div>
 
     <div class="modal-body">
-      <label>Category Name</label>
+      <label>Name</label>
       <input type="text" id="catName">
 
       <div class="modal-row">
@@ -412,7 +335,55 @@
   </div>
 </div>
 
+<!-- ===== EDIT MODAL ===== -->
+<div class="modal" id="editModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Update Category</h3>
+      <span style="cursor:pointer" onclick="closeEditModal()">×</span>
+    </div>
+
+    <div class="modal-body">
+      <input type="hidden" id="editId">
+
+      <label>Name</label>
+      <input type="text" id="editName">
+
+      <div class="modal-row">
+        <div>
+          <label>Thumbnail</label>
+          <div class="image-box" onclick="editImage.click()">
+            <img id="editPreview">
+          </div>
+          <input type="file" id="editImage" hidden accept="image/*" onchange="previewEditImage(event)">
+        </div>
+
+        <div style="flex:1">
+          <label>Description</label>
+          <textarea id="editDesc"></textarea>
+        </div>
+      </div>
+
+      <label>Status</label>
+      <select id="editStatus">
+        <option value="true">Active</option>
+        <option value="false">Inactive</option>
+      </select>
+
+      <p class="error" id="editError"></p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="add-btn" onclick="updateCategory()">Update Category</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCRIPTS ===== -->
 <script>
+  const addModal = document.getElementById("addModal");
+  const editModal = document.getElementById("editModal");
+
   function openAddModal() {
     addModal.style.display = "flex";
     errorMsg.innerText = "";
@@ -447,17 +418,46 @@
     fetch("/admin/category/add", {
       method: "POST",
       body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (!data.success) {
-        errorMsg.innerText = data.message;
-      } else {
-        location.reload();
-      }
-    });
+    }).then(() => location.reload());
+  }
+
+  function softDeleteCategory(id) {
+    if (!confirm("Delete this category?")) return;
+    fetch(`/admin/category/delete/${id}`, { method: "DELETE" })
+      .then(() => location.reload());
+  }
+
+  function openEditModal(id, name, desc, image, status) {
+    editId.value = id;
+    editName.value = name;
+    editDesc.value = desc;
+    editStatus.value = status;
+    editPreview.src = image;
+    editModal.style.display = "flex";
+  }
+
+  function closeEditModal() {
+    editModal.style.display = "none";
+    editError.innerText = "";
+  }
+
+  function previewEditImage(e) {
+    editPreview.src = URL.createObjectURL(e.target.files[0]);
+  }
+
+  function updateCategory() {
+    const formData = new FormData();
+    formData.append("name", editName.value.trim());
+    formData.append("description", editDesc.value.trim());
+    formData.append("isActive", editStatus.value);
+
+    if (editImage.files[0]) {
+      formData.append("image", editImage.files[0]);
+    }
+
+    fetch(`/admin/category/edit/${editId.value}`, {
+      method: "PATCH",
+      body: formData
+    }).then(() => location.reload());
   }
 </script>
-
-</body>
-</html>

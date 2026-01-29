@@ -9,12 +9,12 @@ const categoryInfo = async (req, res) => {
     const limit = 5;
     const skip = (page - 1) * limit;
 
-    const cat = await Category.find()
+    const cat = await Category.find({ isDeleted: false })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    const totalCategories = await Category.countDocuments();
+    const totalCategories = await Category.countDocuments({ isDeleted: false });
     const totalPages = Math.ceil(totalCategories / limit);
 
     res.render("category", {
@@ -34,6 +34,11 @@ const categoryInfo = async (req, res) => {
 const toggleCategoryStatus = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
+
+    if (!category) {
+      return res.json({ success: false });
+    }
+
     category.isActive = !category.isActive;
     await category.save();
 
@@ -112,7 +117,56 @@ const result = await streamUpload(req.file.buffer);
 };
 
 
+const deleteCategory = async (req, res) => {
+  try {
+    await Category.findByIdAndUpdate(req.params.id, {
+      isDeleted: true
+    });
 
+    res.json({ success: true });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false });
+  }
+};
+
+
+const editCategory = async (req, res) => {
+  try {
+    const { name, description, isActive } = req.body;
+
+    const updateData = {
+      name: name.trim(),
+      description: description.trim(),
+      isActive: isActive === "true"
+    };
+
+    if (req.file) {
+      const streamUpload = (buffer) => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "categories" },
+            (error, result) => {
+              if (result) resolve(result);
+              else reject(error);
+            }
+          );
+          stream.end(buffer);
+        });
+      };
+
+      const result = await streamUpload(req.file.buffer);
+      updateData.image = result.secure_url;
+    }
+
+    await Category.findByIdAndUpdate(req.params.id, updateData);
+
+    res.json({ success: true });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false });
+  }
+};
 
 
 
@@ -122,7 +176,7 @@ const result = await streamUpload(req.file.buffer);
 module.exports = {
   categoryInfo,
   toggleCategoryStatus,
-  addCategory
-  
-
+  addCategory,
+  deleteCategory,
+  editCategory
 };

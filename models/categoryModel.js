@@ -17,7 +17,7 @@ const categorySchema = new mongoose.Schema(
 
     image: {
       type: String,
-      required: true   // Cloudinary URL
+      required: true   
     },
 
     isActive: {
@@ -28,6 +28,10 @@ const categorySchema = new mongoose.Schema(
     offer: {
       type: Number,
       default: 0
+    },
+        isDeleted: {
+      type: Boolean,
+      default: false   
     }
   },
   { timestamps: true }

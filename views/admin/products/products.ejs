@@ -1,0 +1,178 @@
+<!-- PRODUCTS PAGE CONTENT ONLY -->
+
+<style>
+  /* PAGE-SPECIFIC STYLES ONLY */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .page-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #6d3939;
+  }
+
+  .new-btn {
+    background: linear-gradient(135deg, #AF5454, #d97373);
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(175, 84, 84, .3);
+  }
+
+  .table-wrapper {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, .1);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead {
+    background: linear-gradient(135deg, #AF5454, #d97373);
+  }
+
+  thead th {
+    padding: 16px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  tbody td {
+    padding: 16px;
+    font-size: 14px;
+  }
+
+  .product-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid #eee;
+  }
+
+  .custom-modal {
+    background: #FDF2F2;
+    border-radius: 16px;
+  }
+</style>
+
+<div class="page-header">
+  <h1 class="page-title">Products</h1>
+  <button class="new-btn" data-bs-toggle="modal" data-bs-target="#addProductModal">
+    + Add Product
+  </button>
+</div>
+
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th>Image</th>
+        <th>Product Name</th>
+        <th>Category</th>
+        <th>Brand</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% products.forEach(product => { %>
+        <tr>
+          <td>
+            <img src="<%= product.productImages[0] %>" class="product-image">
+          </td>
+          <td><%= product.productName %></td>
+          <td>
+            <%= product.categoryId ? product.categoryId.name : "—" %>
+          </td>
+
+          <td><%= product.brand || "N/A" %></td>
+          <td>
+            <%= product.isListed ? "Listed" : "Unlisted" %>
+          </td>
+          <td>
+            <a href="/admin/products/<%= product._id %>" class="btn btn-sm btn-outline-primary">
+              View
+            </a>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<!-- ADD PRODUCT MODAL -->
+<div class="modal fade" id="addProductModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <form action="/admin/products/add" method="post" enctype="multipart/form-data"
+      class="modal-content custom-modal">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Product</h5>
+      </div>
+
+      <div class="modal-body row g-3">
+        <div class="col-12">
+          <label class="form-label">Product Name</label>
+          <input type="text" name="productName" class="form-control" required>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Short Description</label>
+          <input type="text" name="description" class="form-control" required>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Long Description</label>
+          <textarea name="longDescription" class="form-control"></textarea>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Category</label>
+          <select name="categoryId" class="form-select" required>
+            <% categories.forEach(cat => { %>
+              <option value="<%= cat._id %>"><%= cat.name %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Brand</label>
+          <input
+            type="text"
+            name="brand"
+            class="form-control"
+            placeholder="Eg: Premium, Kids Special"
+          >
+        </div>
+
+
+        <div class="col-12">
+          <input type="file" name="images" multiple required>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary">Save Product</button>
+      </div>
+    </form>
+  </div>
+</div>

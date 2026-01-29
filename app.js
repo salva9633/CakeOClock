@@ -7,6 +7,10 @@ const passport = require("./config/passport");
 const db = require("./config/db");
 const userRouter = require("./routes/userRouter");
 const adminRouter = require("./routes/adminRouter");
+const productRoutes = require("./routes/admin/productRoutes");
+const variantRoutes = require("./routes/admin/variantRoutes");
+const batchRoutes = require("./routes/admin/batchRoutes");
+const expressLayouts = require("express-ejs-layouts");
 const path = require("path");
 
 db();
@@ -44,12 +48,18 @@ app.set("views", [
     path.join(__dirname, "views/user")
 ]);
 
+app.use(expressLayouts);           
+app.set("layout", "layout");  
 
 app.use(express.static(path.join(__dirname, "public")));
 
 
 app.use("/", userRouter);
 app.use("/admin", adminRouter);
+
+app.use("/admin/products", productRoutes);
+app.use("/admin/variants", variantRoutes);
+app.use("/admin/batches", batchRoutes);
 
 
 app.use((req, res) => {
