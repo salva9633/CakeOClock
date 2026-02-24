@@ -27,6 +27,11 @@ const variantSchema = new mongoose.Schema(
       type: Boolean,
       default: true
     },
+    costPrice: {
+      type: Number,
+      required: true
+    },
+
 
     imageUrls: {
       type: [String]

@@ -1,70 +1,159 @@
-<div class="container-fluid p-4">
+<!-- VARIANT DETAILS PAGE -->
 
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h4>
-        <%= variant.productId.productName %>
-        — <span class="text-muted"><%= variant.weight %> g</span>
-      </h4>
+<style>
+  /* REUSED PRODUCT PAGE THEME */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .page-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #6d3939;
+  }
+
+  .variant-subtitle {
+    font-size: 14px;
+    color: #8b5a5a;
+    margin-top: 4px;
+  }
+
+  .new-btn {
+    background: linear-gradient(135deg, #AF5454, #d97373);
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(175, 84, 84, .3);
+  }
+
+  .table-wrapper {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, .1);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead {
+    background: linear-gradient(135deg, #AF5454, #d97373);
+  }
+
+  thead th {
+    padding: 16px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  tbody td {
+    padding: 16px;
+    font-size: 14px;
+  }
+
+  .badge-active {
+    background: #28a745;
+  }
+
+  .badge-expired {
+    background: #dc3545;
+  }
+
+  .badge-exhausted {
+    background: #6c757d;
+  }
+</style>
+
+<!-- HEADER -->
+<div class="page-header">
+  <div>
+    <h1 class="page-title">
+      <%= variant.productId.productName %>
+    </h1>
+    <div class="variant-subtitle">
+      Variant:
+      <b>
+        <%= variant.weight >= 1000
+          ? variant.weight / 1000 + " kg"
+          : variant.weight + " g" %>
+      </b>
+      • Cost ₹<%= variant.costPrice %>
+      • Regular ₹<%= variant.regularPrice %>
+      • Sale ₹<%= variant.salePrice %>
     </div>
-
-    <button
-      class="btn btn-primary"
-      data-bs-toggle="modal"
-      data-bs-target="#addBatchModal"
-    >
-      + Add Batch
-    </button>
   </div>
 
-  <!-- BATCH TABLE -->
-  <div class="table-responsive">
-    <table class="table table-bordered align-middle">
-      <thead class="table-light">
+  <button
+    class="new-btn"
+    data-bs-toggle="modal"
+    data-bs-target="#addBatchModal"
+  >
+    + Add Batch
+  </button>
+</div>
+
+<!-- BATCH TABLE -->
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th>Manufactured</th>
+        <th>Expiry</th>
+        <th>Initial Stock</th>
+        <th>Available Stock</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% if (batches.length === 0) { %>
         <tr>
-          <th>MFD</th>
-          <th>Expiry</th>
-          <th>Available Stock</th>
-          <th>Status</th>
+          <td colspan="5" class="text-center text-muted">
+            No batches added yet
+          </td>
         </tr>
-      </thead>
+      <% } %>
 
-      <tbody>
-        <% if (batches.length === 0) { %>
-          <tr>
-            <td colspan="4" class="text-center text-muted">
-              No batches added yet
-            </td>
-          </tr>
-        <% } else { %>
-          <% batches.forEach(batch => { %>
-            <tr>
-              <td>
-                <%= new Date(batch.manufacturedAt).toDateString() %>
-              </td>
+      <% batches.forEach(batch => { %>
+        <tr>
+          <td><%= batch.manufacturedAt.toDateString() %></td>
+          <td><%= batch.expiryAt.toDateString() %></td>
+          <td><%= batch.initialStock %></td>
+          <td><%= batch.availableStock %></td>
+          <td>
+            <span class="badge
+              <%= batch.status === 'active' ? 'badge-active'
+              : batch.status === 'expired' ? 'badge-expired'
+              : 'badge-exhausted' %>
+            ">
+              <%= batch.status.toUpperCase() %>
+            </span>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
 
-              <td>
-                <%= new Date(batch.expiryAt).toDateString() %>
-              </td>
+<a href="/admin/products" class="btn btn-secondary mt-4">
+  ← Back to Products
+</a>
 
-              <td><%= batch.availableStock %></td>
 
-              <td>
-                <span class="badge 
-                  <%= batch.status === 'active'
-                    ? 'bg-success'
-                    : batch.status === 'expired'
-                    ? 'bg-danger'
-                    : 'bg-warning text-dark'
-                  %>">
-                  <%= batch.status %>
-                </span>
-              </td>
-            </tr>
-          <% }) %>
-        <% } %>
-      </tbody>
-    </table>
   </div>
 </div>
 

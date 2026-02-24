@@ -19,13 +19,20 @@
 
   <!-- Google Fonts -->
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+  />
+  
+  <!-- Cropper CSS -->
+  <link
+  href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.css"
+  rel="stylesheet"
   />
   <style>
     .main-content {
         margin-left: 260px;              /* sidebar width */
-        padding: 30px 30px;              /* breathing space */
+        margin-top: 64px;
+        padding: 30px 30px;             /* breathing space */
         padding-top: 60px;              /* header height + spacing */
         min-height: 100vh;
         background: linear-gradient(135deg, #f5e6e8 0%, #f8d7da 100%);
@@ -47,6 +54,13 @@
   <main class="main-content">
     <%- body %>
   </main>
+
+
+<!-- Cropper JS -->
+<script
+  src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.js">
+</script>
+
 
   <!-- Bootstrap JS -->
   <script

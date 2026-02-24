@@ -7,9 +7,9 @@ const Product = require("../../models/productModel");
 ========================= */
 exports.addVariant = async (req, res) => {
   try {
-    const { productId, weight, regularPrice, salePrice } = req.body;
+    const { productId, weight, costPrice, regularPrice, salePrice } = req.body;
 
-    if (!productId || !weight || !regularPrice || !salePrice) {
+    if (!productId || !weight || !costPrice || !regularPrice || !salePrice) {
       return res.status(400).send("All fields are required");
     }
 
@@ -20,13 +20,12 @@ exports.addVariant = async (req, res) => {
     }
 
     /* ---------- Weight validation ---------- */
-    const allowedWeights = [500, 750, 1000, 2000];
-    const parsedWeight = Number(weight);
+  const allowedWeights = [60, 80, 500, 750, 1000, 2000,3000];
+const parsedWeight = Number(weight);
 
-    if (!allowedWeights.includes(parsedWeight)) {
-      return res.status(400).send("Invalid weight selected");
-    }
-
+if (!allowedWeights.includes(parsedWeight)) {
+  return res.status(400).send("Invalid weight selected");
+}
     /* ---------- Price validation ---------- */
     if (Number(salePrice) > Number(regularPrice)) {
       return res
@@ -34,13 +33,22 @@ exports.addVariant = async (req, res) => {
         .send("Sale price cannot be higher than regular price");
     }
 
+    if (Number(salePrice) < Number(costPrice)) {
+      return res
+        .status(400)
+        .send("Sale price cannot be lower than cost price");
+    }
+
+
     /* ---------- Create Variant ---------- */
     const variant = await Variant.create({
-      productId,
-      weight: parsedWeight,
-      regularPrice: Number(regularPrice),
-      salePrice: Number(salePrice)
-    });
+    productId,
+    weight: parsedWeight,
+    costPrice: Number(costPrice),
+    regularPrice: Number(regularPrice),
+    salePrice: Number(salePrice)
+  });
+
 
     /* ---------- Redirect to Batch Page ---------- */
     res.redirect(`/admin/variants/${variant._id}`);

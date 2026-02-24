@@ -213,6 +213,25 @@
     font-size: 13px;
     margin-top: 8px;
   }
+
+  .status-badge {
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.status-badge.active {
+  background: #e6f4ea;
+  color: #137333;
+}
+
+.status-badge.inactive {
+  background: #fdecea;
+  color: #b71c1c;
+}
+
 </style>
 
 <!-- ===== HEADER ===== -->
@@ -262,8 +281,15 @@
 }) %></td>
 
             <td>
-              <div class="status" onclick="softDeleteCategory('<%= item._id %>')">🗑️</div>
-            </td>
+  <span
+    class="status-badge <%= item.isActive ? 'active' : 'inactive' %>"
+    onclick="toggleStatus('<%= item._id %>')"
+  >
+    <%= item.isActive ? 'Active' : 'Inactive' %>
+  </span>
+</td>
+
+
 
             <td>
               <button
@@ -460,4 +486,10 @@
       body: formData
     }).then(() => location.reload());
   }
+
+  function toggleStatus(id) {
+  fetch(`/admin/category/status/${id}`, { method: "PATCH" })
+    .then(() => location.reload());
+}
+
 </script>

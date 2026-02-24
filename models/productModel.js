@@ -3,16 +3,18 @@ const mongoose = require("mongoose"); // ✅ MISSING LINE
 const productSchema = new mongoose.Schema(
   {
     productName: {
-      type: String,
-      required: true,
-      trim: true
-    },
+  type: String,
+  required: true,
+  unique: true,
+  trim: true
+},
 
     description: {
       type: String,
       required: true
     },
 
+    
     longDescription: {
       type: String
     },

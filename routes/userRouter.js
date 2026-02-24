@@ -1,19 +1,33 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
+const {
+  loadProductsPage
+} = require("../controllers/user/productController");
+
+const {
+  loadProductDetailsPage,
+  getVariantDetails
+} = require("../controllers/user/productDetailsController");
 
 const userController = require("../controllers/user/userController");
 const profileController = require("../controllers/user/profileController"); 
 const { userAuth } = require("../middlewares/auth");
 const upload = require("../middlewares/multer");
 
-router.get("/", userController.loadHomepage);
-router.get("/logout", userController.logout);
+const { loadNearExpiryDeals } =
+  require("../controllers/user/expiryDealsController");
 
-router.get("/signUp", userController.signuppage);
-router.post("/signUp", userController.createUser);
+  
+  
+  router.get("/", userController.loadHomePage);
 
-router.get("/login", userController.loadlogin);
+  router.get("/logout", userController.logout);
+  
+  router.get("/signUp", userController.signuppage);
+  router.post("/signUp", userController.createUser);
+
+  router.get("/login", userController.loadlogin);
 router.post("/login", userController.loginUser);
 
 router.get("/verify-otp", userController.verifyOtpPage);
@@ -62,6 +76,14 @@ router.get(
     res.redirect("/");
   }
 );
+
+
+router.get("/products", loadProductsPage);
+
+
+router.get("/product/:id", loadProductDetailsPage);
+router.get("/variant/:variantId", getVariantDetails);
+router.get("/near-expiry", loadNearExpiryDeals);
 
 // Address management
 router.get("/profile/address", userAuth, profileController.addressPage);

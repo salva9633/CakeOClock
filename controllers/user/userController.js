@@ -3,28 +3,49 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt")
 const env = require("dotenv").config()
 const { sendVerificationEmail } = require("../../utils/email");
+const Batch = require("../../models/batchModel");
 
-const loadHomepage = async (req, res) => {
-    try {
-        if (req.session.user) {
-            const userData = await User.findOne({
-                _id: req.session.user.id
-            });
+const loadHomePage = async (req, res) => {
+  try {
+    /* -------- USER (OPTIONAL) -------- */
+    let userData = null;
 
-            return res.render("home", {
-                user: userData
-            });
-        } else {
-            return res.render("home", {
-                user: null
-            });
-        }
-
-    } catch (error) {
-        console.log("home page not found", error);
-        res.status(500).send("server error");
+    if (req.session.user) {
+      userData = await User.findById(req.session.user.id).lean();
     }
+
+    /* -------- CATEGORIES -------- */
+    const categories = await Category.find({
+      isDeleted: false,
+      isActive: true
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    /* -------- NEAR EXPIRY BANNER -------- */
+    const today = new Date();
+    const twoDaysLater = new Date();
+    twoDaysLater.setDate(today.getDate() + 2);
+
+    const nearExpiryCount = await Batch.countDocuments({
+      expiryAt: { $gte: today, $lte: twoDaysLater },
+      availableStock: { $gt: 0 },
+      status: "active"
+    });
+
+    /* -------- RENDER HOME -------- */
+    res.render("home", {
+      user: userData,
+      categories,
+      showExpiryBanner: nearExpiryCount > 0
+    });
+
+  } catch (error) {
+    console.error("Home page error:", error);
+    res.status(500).send("Server Error");
+  }
 };
+
 
 
 const signuppage = async (req, res) => {
@@ -372,28 +393,15 @@ const updatePassword = async (req, res) => {
 
 const Category = require("../../models/categoryModel");
 
-const loadHome = async (req, res) => {
-  try {
-    const categories = await Category.find({
-      isDeleted: false,
-      isActive: true
-    }).sort({ createdAt: -1 });
 
-    res.render("home", { categories });
 
-  } catch (error) {
-    console.log(error);
-    res.redirect("/pagenotfound");
-  }
-};
 
-module.exports = { loadHome };
 
 
 
 
 module.exports = {
-    loadHomepage,
+    loadHomePage,
     signuppage,
     verifyOtpPage,
     createUser,

@@ -12,7 +12,8 @@ const categoryInfo = async (req, res) => {
     const cat = await Category.find({ isDeleted: false })
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
 
     const totalCategories = await Category.countDocuments({ isDeleted: false });
     const totalPages = Math.ceil(totalCategories / limit);

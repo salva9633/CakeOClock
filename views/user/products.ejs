@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(to right, #fde2d9, #f9c5b5);
+      overflow: hidden; /* IMPORTANT */
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    /* MAIN LAYOUT */
+    .shop-container {
+      display: flex;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      position: fixed;
+      top: 80px; /* navbar height */
+      left: 0;
+      width: 260px;
+      height: calc(100vh - 80px);
+      background: #fbe1d7;
+      padding: 20px;
+      overflow-y: auto;
+      border-right: 1px solid #e3b7a8;
+    }
+
+    .sidebar h5 {
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #7a3e2d;
+    }
+
+    .sidebar label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      cursor: pointer;
+      color: #5c2e22;
+    }
+
+    .sidebar input {
+      margin-right: 8px;
+    }
+
+    .sidebar hr {
+      border-color: #ddb1a3;
+    }
+
+    /* PRODUCTS AREA */
+    .products {
+      margin-left: 260px;
+      padding: 60px;
+      width: calc(100% - 260px);
+      height: calc(100vh - 70px);
+      overflow-y: auto;
+    }
+
+    /* PRODUCT CARD */
+    .product-card {
+      border-radius: 15px;
+      border: none;
+      transition: 0.3s ease;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .product-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+
+    .product-img {
+      height: 200px;
+      object-fit: cover;
+      border-radius: 14px 14px 0 0;
+    }
+
+    .desc {
+      font-size: 0.85rem;
+      color: #6c757d;
+      height: 42px;
+      overflow: hidden;
+    }
+
+    .price {
+      font-weight: bold;
+      color: #198754;
+      font-size: 1.05rem;
+    }
+
+    /* Clickable product card */
+    .product-card-link {
+      cursor: pointer;
+    }
+
+    .product-card-link:hover h6 {
+      color: #AF5454;
+    }
+
+    /* Improve hover feel */
+    .product-card-link:hover .product-img {
+      transform: scale(1.03);
+    }
+
+    .product-img {
+      transition: transform 0.4s ease;
+    }
+
+    
+  </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<%- include("../partials/user/h2") %>
+
+<div class="shop-container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+  <form method="GET" action="/products">
+
+    <h5>Categories</h5>
+    <% categories.forEach(cat => { %>
+      <label>
+        <input type="radio" name="category" value="<%= cat._id %>">
+        <%= cat.name %>
+      </label>
+    <% }) %>
+
+    <hr>
+
+    <h5>Price</h5>
+    <label>
+      <input type="radio" name="price" value="350-599"> ₹350 – ₹599
+    </label>
+    <label>
+      <input type="radio" name="price" value="600-999"> ₹600 – ₹999
+    </label>
+    <label>
+      <input type="radio" name="price" value="1000-99999"> ₹1000+
+    </label>
+
+    <hr>
+
+    <h5>Brands</h5>
+    <% brands.forEach(brand => { %>
+      <label>
+        <input type="radio" name="brand" value="<%= brand %>">
+        <%= brand %>
+      </label>
+    <% }) %>
+
+    <button class="btn btn-dark btn-sm w-100 mt-3">
+      Apply Filters
+    </button>
+
+  </form>
+</aside>
+
+
+  <!-- PRODUCTS -->
+  <main class="products">
+    <div class="d-flex gap-3 align-items-center justify-content-between">
+
+        <div>
+
+        <form method="GET" action="/products" class="d-flex gap-2 mb-4">
+        <input
+            type="text"
+            name="search"
+            value="<%= search || '' %>"
+            class="form-control form-control-sm"
+            placeholder="Search cakes...">
+
+        <button class="btn btn-dark btn-sm">Search</button>
+
+        <% if (search) { %>
+            <a href="/products" class="btn btn-outline-secondary btn-sm">
+            Clear
+            </a>
+        <% } %>
+        </form>
+        </div>
+        <div>
+
+
+        <!-- Sort Dropdown -->
+        <select
+        class="form-select w-auto"
+        id="sortOptions"
+        style="margin-bottom: 50px;"
+        >
+        <option value="">Sort By</option>
+        <option value="priceLowHigh">Price: Low to High</option>
+        <option value="priceHighLow">Price: High to Low</option>
+        <option value="az">A - Z</option>
+        <option value="za">Z - A</option>
+        </select>
+
+        </div>
+
+        </div>
+
+    <div class="row g-4">
+
+      <% if (products.length === 0) { %>
+        <p class="text-center text-muted">No products available</p>
+      <% } %>
+
+      <% products.forEach(product => { %>
+
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+          <a
+            href="/product/<%= product._id %>"
+            class="text-decoration-none text-dark"
+          >
+            <div class="card product-card product-card-link">
+
+              <% if (product.productImages && product.productImages.length > 0) { %>
+                <img src="<%= product.productImages[0] %>" class="product-img">
+              <% } else { %>
+                <img src="https://via.placeholder.com/300x200?text=No+Image" class="product-img">
+              <% } %>
+
+              <div class="card-body d-flex flex-column">
+                <h6 class="fw-semibold mb-1"><%= product.productName %></h6>
+
+                <p class="desc"><%= product.description %></p>
+
+                <div class="mt-auto">
+                  <% if (product.startingPrice !== null) { %>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                      <span class="price">
+                        ₹ <%= product.startingPrice %>
+                      </span>
+
+                      <% if (product.regularPrice && product.regularPrice > product.startingPrice) { %>
+                        <span class="text-muted text-decoration-line-through">
+                          ₹ <%= product.regularPrice %>
+                        </span>
+                      <% } %>
+
+                      <span class="text-muted small">
+                        · Starting price
+                      </span>
+                    </div>
+                  <% } else { %>
+                    <span class="text-danger small">Out of stock</span>
+                  <% } %>
+                </div>
+
+
+              </div>
+            </div>
+          </a>
+        </div>
+
+
+      <% }) %>
+
+    </div>
+    <nav class="mt-4">
+    <ul class="pagination justify-content-center" style="margin-right: 260px;">
+  
+      <% for (let i = 1; i <= totalPages; i++) { %>
+        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+          <a
+            class="page-link"
+            href="?page=<%= i %>&search=<%= search || '' %>&sort=<%= sort || '' %>">
+            <%= i %>
+          </a>
+        </li>
+      <% } %>
+  
+    </ul>
+  </nav>
+  </main>
+
+
+</div>
+<script>
+  const sortSelect = document.getElementById("sortOptions");
+
+  // Preserve selected value after reload
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("sort")) {
+    sortSelect.value = params.get("sort");
+  }
+
+  // Auto-submit on change
+  sortSelect.addEventListener("change", function () {
+    const params = new URLSearchParams(window.location.search);
+
+    if (this.value) {
+      params.set("sort", this.value);
+    } else {
+      params.delete("sort");
+    }
+
+    window.location.search = params.toString();
+  });
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

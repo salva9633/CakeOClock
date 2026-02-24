@@ -1,5 +1,31 @@
 <%-include("../../views/partials/user/header")%>
+<style>
+    #promoCarousel .carousel-control-prev,
+#promoCarousel .carousel-control-next {
+  width: 4%;
+  z-index: 1; /* behind content */
+}
 
+#promoCarousel .carousel-item {
+  position: relative;
+  z-index: 2;
+}
+
+/* Ensure buttons always clickable */
+#promoCarousel a.btn {
+  position: relative;
+  z-index: 5;
+}
+
+/* Optional: move arrows slightly outside */
+#promoCarousel .carousel-control-prev {
+  left: -20px;
+}
+
+#promoCarousel .carousel-control-next {
+  right: -20px;
+}
+</style>
 <body>
 <%-include("../../views/partials/user/navbar")%>
 
@@ -8,7 +34,7 @@
     <div class="container-fluid text-center pb-3">
         <ul class="nav justify-content-center gap-5">
             <li class="nav-item"><a class="nav-link text-uppercase text-dark small" href="#">Home</a></li>
-            <li class="nav-item"><a class="nav-link text-uppercase text-dark small" href="#">Shop</a></li>
+            <li class="nav-item"><a class="nav-link text-uppercase text-dark small" href="/products">Shop</a></li>
             <li class="nav-item"><a class="nav-link text-uppercase text-dark small" href="#">About Us</a></li>
             <li class="nav-item"><a class="nav-link text-uppercase text-dark small" href="#">Contact Us</a></li>
             <li class="nav-item"><a class="nav-link text-uppercase text-dark small" href="#">Customer Support</a></li>
@@ -119,34 +145,126 @@
         </div>
     </section>
     <!-- Seasonal Sales -->
-    <section class="container py-5 mb-4">
-        <div class="seasonal-box position-relative overflow-hidden">
-            <div class="p-5 pb-0"> <!-- Padding for text, no bottom padding for image -->
-                <div class="row mb-4">
-                    <div class="col-md-6 mb-4 mb-md-0">
-                        <h3 class="display-4 mb-4"
-                            style="font-family: 'Dancing Script', cursive;color:#AF5454; font-weight: 700;">
-                            Seasonal Sales</h3>
-                        <div class="d-flex align-items-center gap-4">
-                            <span class="text-uppercase fw-bold" style="letter-spacing: 1px;">Limited Time Only</span>
-                            <a href="#" class="btn btn-outline-custom">Check out &rarr;</a>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <p class="mb-0" style="color: #AF5454; text-align: justify; font-size: 1rem; line-height: 1.6;">
-                            Celebrate the
-                            season with something sweet! Enjoy exclusive discounts on our wedding cakes and cupcakes for
-                            a limited time. Don't miss this chance to make your celebration even sweeter—order now
-                            before the season's best deals disappear.</p>
-                    </div>
-                </div>
+    <!-- 🔁 Seasonal / Deals Rotating Banner -->
+<section class="container py-5 mb-4">
+
+  <div
+    id="promoCarousel"
+    class="carousel slide"
+    data-bs-ride="carousel"
+    data-bs-interval="3500"
+    data-bs-pause="hover"
+  >
+
+    <div class="carousel-inner rounded-4 shadow-sm overflow-hidden">
+
+      <!-- 🟡 SLIDE 1: SEASONAL OFFER -->
+      <div class="carousel-item active">
+        <div
+          class="p-5 position-relative"
+          style="background: linear-gradient(90deg, #fde2d9, #f9c5b5);"
+        >
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <h3
+                class="display-4 mb-3"
+                style="font-family: 'Dancing Script', cursive; color:#AF5454;"
+              >
+                Seasonal Sales
+              </h3>
+
+              <p style="color:#AF5454;">
+                Celebrate the season with something sweet!  
+                Exclusive discounts on wedding cakes & cupcakes.
+              </p>
+
+              <a
+                href="/products"
+                class="btn btn-outline-dark position-relative z-3"
+              >
+                Explore Offers →
+              </a>
             </div>
-            <div class="w-100">
-                <img src="media/cake_slice.png" class="img-fluid w-100" alt="Seasonal Sales"
-                    style="height: 300px; object-fit: cover;">
+
+            <div class="col-md-6 text-center">
+              <img
+                src="media/cake_slice.png"
+                class="img-fluid"
+                style="max-height: 250px; object-fit: contain;"
+                alt="Seasonal Sale"
+              >
             </div>
+          </div>
         </div>
-    </section>
+      </div>
+
+      <!-- 🔴 SLIDE 2: NEAR EXPIRY DEALS -->
+      <% if (showExpiryBanner) { %>
+      <div class="carousel-item">
+        <div
+          class="p-5 position-relative"
+          style="background: linear-gradient(90deg, #ffe5e5, #ffc1c1);"
+        >
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <h3
+                class="display-4 mb-3"
+                style="font-family: 'Dancing Script', cursive; color:#7a1f1f;"
+              >
+                Fresh & Expiry-Coming Deals
+              </h3>
+
+              <p style="color:#7a1f1f;">
+                Cakes expiring soon at unbeatable prices.  
+                Limited stock • Save up to <b>40%</b>
+              </p>
+
+              <a
+                href="/near-expiry"
+                class="btn btn-dark position-relative z-3"
+              >
+                Shop Deals →
+              </a>
+            </div>
+
+            <div class="col-md-6 text-center">
+              <img
+                src="media/offer_cake.png"
+                class="img-fluid"
+                style="max-height: 250px; object-fit: contain;"
+                alt="Expiry Deals"
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+    </div>
+
+    <!-- Controls -->
+    <button
+      class="carousel-control-prev"
+      type="button"
+      data-bs-target="#promoCarousel"
+      data-bs-slide="prev"
+    >
+      <span class="carousel-control-prev-icon"></span>
+    </button>
+
+    <button
+      class="carousel-control-next"
+      type="button"
+      data-bs-target="#promoCarousel"
+      data-bs-slide="next"
+    >
+      <span class="carousel-control-next-icon"></span>
+    </button>
+
+  </div>
+</section>
+
+
 
     <!-- Our Baked Goods -->
     <section class="container py-5 mb-4">

@@ -1,10 +1,19 @@
 const express = require("express");
 const router = express.Router();
 
+const expressLayouts = require("express-ejs-layouts");
+
+// ✅ Enable layouts ONLY for admin
+router.use(expressLayouts);
+
+router.use((req, res, next) => {
+  res.locals.layout = "layout";
+  next();
+});
+
 const customerController = require("../controllers/admin/customerController");
 const categoryController = require("../controllers/admin/categoryController");
 const productController = require("../controllers/admin/productController");
-
 const upload = require("../middlewares/multer");
 const { adminAuth } = require("../middlewares/auth");
 
@@ -56,6 +65,39 @@ router.post(
   categoryController.addCategory
 );
 
+/* PRODUCT */
+
+router.get(
+  "/products",
+  adminAuth,
+  productController.getProducts
+);
+
+router.post(
+  "/products/add",
+  adminAuth,
+  upload.array("images", 5),
+  productController.addProduct
+);
+
+router.get(
+  "/products/:productId",
+  adminAuth,
+  productController.getProductDetail
+);
+
+router.post(
+  "/products/edit/:productId",
+  adminAuth,
+  upload.array("images", 5),   // 🔥 VERY IMPORTANT
+  productController.editProduct
+);
+
+router.patch(
+  "/products/toggle/:productId",
+  adminAuth,
+  productController.toggleProductListing
+);
 
 
 module.exports = router;

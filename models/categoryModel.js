@@ -24,6 +24,7 @@ const categorySchema = new mongoose.Schema(
       type: Boolean,
       default: true
     },
+    
 
     offer: {
       type: Number,
