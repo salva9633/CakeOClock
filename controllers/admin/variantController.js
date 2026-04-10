@@ -96,3 +96,28 @@ exports.getVariantDetail = async (req, res) => {
     res.status(500).send("Variant detail error");
   }
 };
+exports.updateVariant = async (req, res) => {
+  try {
+
+    const { variantId } = req.params
+    const { weight, costPrice, regularPrice, salePrice } = req.body
+
+    const variant = await Variant.findByIdAndUpdate(
+      variantId,
+      {
+        weight,
+        costPrice,
+        regularPrice,
+        salePrice
+      },
+      { new: true }
+    )
+
+    // redirect to product detail page
+    res.redirect(`/admin/products/${variant.productId}`)
+
+  } catch (error) {
+    console.error("UPDATE VARIANT ERROR:", error)
+    res.status(500).send("Update failed")
+  }
+}

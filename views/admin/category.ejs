@@ -30,12 +30,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 18px;
+    margin-bottom: 25px;
   }
 
   .search-box {
     display: flex;
     width: 320px;
+    margin-bottom: 25px;
   }
 
   .search-box input {
@@ -152,7 +153,7 @@
   }
 
   .modal-header {
-    background: #1a9d6f;
+    background: #b85b5b;
     color: #fff;
     padding: 14px 18px;
     display: flex;
@@ -231,7 +232,39 @@
   background: #fdecea;
   color: #b71c1c;
 }
+input.error-border, textarea.error-border {
+  border: 1px solid red;
+}
 
+.error {
+  color: red;
+  font-size: 13px;
+  display: block;
+  margin-top: 4px;
+}
+.image-box.error-border {
+  border: 2px solid red;
+}
+
+.image-box.success-border {
+  border: 2px solid #28a745;
+}
+
+.error {
+  color: #e53935;
+  font-size: 13px;
+  margin-top: 5px;
+}
+.image-box {
+  transition: all 0.3s ease;
+}
+ .swal2-container {
+    z-index: 9999 !important;
+  }
+  #clearBtn {
+  display: none; /* hidden initially */
+  margin-left: 8px;
+}
 </style>
 
 <!-- ===== HEADER ===== -->
@@ -241,12 +274,20 @@
 </div>
 
 <!-- ===== SEARCH ===== -->
-<div class="controls">
-  <div class="search-box">
-    <input type="text" placeholder="Search category name...">
-    <button>🔍</button>
-  </div>
-</div>
+<form method="GET" action="/admin/category" class="search-box">
+  <input 
+    type="text" 
+    name="search" 
+    id="searchInput"
+    placeholder="Search category name..." 
+    value="<%= search || '' %>"
+  >
+
+  <button type="submit">Search</button>
+
+  <!-- 👇 Clear button (hidden initially) -->
+  <button type="button" id="clearBtn" onclick="clearSearch()">Clear</button>
+</form>
 
 <!-- ===== TABLE ===== -->
 <div class="table-wrapper">
@@ -267,7 +308,7 @@
           <td>
   <div class="category-cell">
     <div class="icon">
-      <img src="<%= item.image || '/images/default-category.png' %>">
+      <img src="<%= item.image ||'/images/default-category.png' %>">
     </div>
     <div class="category-name"><%= item.name %></div>
   </div>
@@ -318,6 +359,31 @@
   </table>
 </div>
 
+<div class="d-flex justify-content-center mt-4">
+  <ul class="pagination">
+
+    <!-- PREVIOUS -->
+    <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+      <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search || '' %>">Previous</a>
+    </li>
+
+    <!-- PAGE NUMBERS -->
+    <% for (let i = 1; i <= totalPages; i++) { %>
+      <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+        <a class="page-link" href="?page=<%= i %>&search=<%= search || '' %>">
+          <%= i %>
+        </a>
+      </li>
+    <% } %>
+
+    <!-- NEXT -->
+    <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+      <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search || '' %>">Next</a>
+    </li>
+
+  </ul>
+</div>
+
 <!-- ===== ADD MODAL ===== -->
 <div class="modal" id="addModal">
   <div class="modal-box">
@@ -329,20 +395,25 @@
     <div class="modal-body">
       <label>Name</label>
       <input type="text" id="catName">
+      <small id="nameError" class="error"></small>
 
       <div class="modal-row">
         <div>
           <label>Image</label>
-          <div class="image-box" onclick="catImage.click()">
-            <span id="imgText">+ Add Image</span>
+<div id="imageBox" class="image-box" onclick="catImage.click()">   
+           <span id="imgText">+ Add Image</span>
             <img id="preview" style="display:none">
+
           </div>
+                        <small id="imgError" class="error"></small>
+
           <input type="file" id="catImage" hidden accept="image/*" onchange="previewImage(event)">
         </div>
 
         <div style="flex:1">
           <label>Description</label>
           <textarea id="catDesc"></textarea>
+          <small id="descError" class="error"></small>
         </div>
       </div>
 
@@ -351,9 +422,7 @@
         <option value="true">Active</option>
         <option value="false">Inactive</option>
       </select>
-
-      <p class="error" id="errorMsg"></p>
-    </div>
+   </div>
 
     <div class="modal-footer">
       <button class="add-btn" onclick="submitCategory()">Add Category</button>
@@ -372,24 +441,26 @@
     <div class="modal-body">
       <input type="hidden" id="editId">
 
-      <label>Name</label>
-      <input type="text" id="editName">
+<label>Name</label>
+<input type="text" id="editName">
+<small id="editNameError" class="error"></small>
 
-      <div class="modal-row">
-        <div>
-          <label>Thumbnail</label>
-          <div class="image-box" onclick="editImage.click()">
-            <img id="editPreview">
-          </div>
-          <input type="file" id="editImage" hidden accept="image/*" onchange="previewEditImage(event)">
-        </div>
+<div class="modal-row">
+  <div>
+    <label>Thumbnail</label>
+    <div id="editImageBox" class="image-box" onclick="editImage.click()">
+      <img id="editPreview">
+    </div>
+    <small id="editImgError" class="error"></small>
+    <input type="file" id="editImage" hidden accept="image/*" onchange="previewEditImage(event)">
+  </div>
 
-        <div style="flex:1">
-          <label>Description</label>
-          <textarea id="editDesc"></textarea>
-        </div>
-      </div>
-
+  <div style="flex:1">
+    <label>Description</label>
+    <textarea id="editDesc"></textarea>
+    <small id="editDescError" class="error"></small>
+  </div>
+</div>
       <label>Status</label>
       <select id="editStatus">
         <option value="true">Active</option>
@@ -406,47 +477,120 @@
 </div>
 
 <!-- ===== SCRIPTS ===== -->
+ <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   const addModal = document.getElementById("addModal");
   const editModal = document.getElementById("editModal");
 
   function openAddModal() {
     addModal.style.display = "flex";
-    errorMsg.innerText = "";
+  
   }
 
   function closeAddModal() {
     addModal.style.display = "none";
   }
 
-  function previewImage(e) {
-    preview.src = URL.createObjectURL(e.target.files[0]);
-    preview.style.display = "block";
-    imgText.style.display = "none";
+
+
+ function submitCategory() {
+
+  const name = catName.value.trim();
+  const desc = catDesc.value.trim();
+  const image = catImage.files[0];
+
+  let isValid = true;
+
+  // RESET
+  nameError.innerText = "";
+  descError.innerText = "";
+  imgError.innerText = "";
+
+  catName.classList.remove("error-border");
+  catDesc.classList.remove("error-border");
+
+  // NAME
+  if (!name) {
+    nameError.innerText = "Category name required";
+    catName.classList.add("error-border");
+    isValid = false;
+  } else if (name.length < 3) {
+    nameError.innerText = "Minimum 3 characters";
+    catName.classList.add("error-border");
+    isValid = false;
   }
 
-  function submitCategory() {
-    const name = catName.value.trim();
-    const desc = catDesc.value.trim();
-    const image = catImage.files[0];
+  // DESCRIPTION
+  if (!desc) {
+    descError.innerText = "Description required";
+    catDesc.classList.add("error-border");
+    isValid = false;
+  }
 
-    if (!name || !desc || !image) {
-      errorMsg.innerText = "All fields are required";
+// IMAGE VALIDATION
+const imageBox = document.getElementById("imageBox");
+
+// reset border
+imageBox.classList.remove("error-border", "success-border");
+
+if (!image) {
+  imgError.innerText = "Image required";
+  imageBox.classList.add("error-border");
+  isValid = false;
+} else {
+  const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+
+  if (!validTypes.includes(image.type)) {
+    imgError.innerText = "Only JPG/PNG allowed";
+    imageBox.classList.add("error-border");
+    isValid = false;
+  } else if (image.size > 2 * 1024 * 1024) {
+    imgError.innerText = "Max size 2MB";
+    imageBox.classList.add("error-border");
+    isValid = false;
+  } else {
+    // ✅ SUCCESS STYLE
+    imageBox.classList.add("success-border");
+    imgError.innerText = "";
+  }
+}
+  if (!isValid) return;
+
+  // SEND DATA
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("description", desc);
+  formData.append("image", image);
+  formData.append("isActive", catStatus.value);
+
+  fetch("/admin/category/add", {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+
+    if (!data.success) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: data.message
+      });
       return;
     }
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("description", desc);
-    formData.append("image", image);
-    formData.append("isActive", catStatus.value);
+    Swal.fire({
+      icon: "success",
+      title: "Success",
+      text: "Category added successfully",
+      timer: 1500,
+      showConfirmButton: false
+    }).then(() => {
+      location.reload();
+    });
 
-    fetch("/admin/category/add", {
-      method: "POST",
-      body: formData
-    }).then(() => location.reload());
-  }
-
+  });
+}
   function softDeleteCategory(id) {
     if (!confirm("Delete this category?")) return;
     fetch(`/admin/category/delete/${id}`, { method: "DELETE" })
@@ -472,24 +616,142 @@
   }
 
   function updateCategory() {
-    const formData = new FormData();
-    formData.append("name", editName.value.trim());
-    formData.append("description", editDesc.value.trim());
-    formData.append("isActive", editStatus.value);
+  const name = editName.value.trim();
+  const desc = editDesc.value.trim();
+  const image = editImage.files[0];
 
-    if (editImage.files[0]) {
-      formData.append("image", editImage.files[0]);
-    }
+  let isValid = true;
 
-    fetch(`/admin/category/edit/${editId.value}`, {
-      method: "PATCH",
-      body: formData
-    }).then(() => location.reload());
+  // RESET
+  document.getElementById("editNameError").innerText = "";
+  document.getElementById("editDescError").innerText = "";
+  document.getElementById("editImgError").innerText = "";
+  editName.classList.remove("error-border");
+  editDesc.classList.remove("error-border");
+  document.getElementById("editImageBox").classList.remove("error-border", "success-border");
+
+  // NAME
+  if (!name) {
+    document.getElementById("editNameError").innerText = "Category name required";
+    editName.classList.add("error-border");
+    isValid = false;
+  } else if (name.length < 3) {
+    document.getElementById("editNameError").innerText = "Minimum 3 characters";
+    editName.classList.add("error-border");
+    isValid = false;
   }
+
+  // DESCRIPTION
+  if (!desc) {
+    document.getElementById("editDescError").innerText = "Description required";
+    editDesc.classList.add("error-border");
+    isValid = false;
+  }
+
+  // IMAGE — only validate if a new file is selected
+  if (image) {
+    const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+    if (!validTypes.includes(image.type)) {
+      document.getElementById("editImgError").innerText = "Only JPG/PNG allowed";
+      document.getElementById("editImageBox").classList.add("error-border");
+      isValid = false;
+    } else if (image.size > 2 * 1024 * 1024) {
+      document.getElementById("editImgError").innerText = "Max size 2MB";
+      document.getElementById("editImageBox").classList.add("error-border");
+      isValid = false;
+    } else {
+      document.getElementById("editImageBox").classList.add("success-border");
+    }
+  }
+
+  if (!isValid) return;
+
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("description", desc);
+  formData.append("isActive", editStatus.value);
+  if (image) formData.append("image", editImage.files[0]);
+
+  fetch(`/admin/category/edit/${editId.value}`, {
+    method: "PATCH",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!data.success) {
+      Swal.fire({ icon: "error", title: "Error", text: data.message });
+      return;
+    }
+    Swal.fire({
+      icon: "success",
+      title: "Updated",
+      text: "Category updated successfully",
+      timer: 1500,
+      showConfirmButton: false
+    }).then(() => location.reload());
+  });
+}
+function previewEditImage(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  editPreview.src = URL.createObjectURL(file);
+  document.getElementById("editImgError").innerText = "";
+  document.getElementById("editImageBox").classList.remove("error-border");
+}
 
   function toggleStatus(id) {
   fetch(`/admin/category/status/${id}`, { method: "PATCH" })
     .then(() => location.reload());
 }
 
+function previewImage(e) {
+  const file = e.target.files[0];
+
+  if (!file) return;
+
+  preview.src = URL.createObjectURL(file);
+  preview.style.display = "block";
+  imgText.style.display = "none";
+
+  // remove error UI
+  imgError.innerText = "";
+  document.getElementById("imageBox").classList.remove("error-border");
+}
+</script>
+<script>
+  // 👇 ADD THIS AT THE END
+
+  document.querySelector(".search-box").addEventListener("submit", function(e) {
+    const input = this.querySelector("input[name='search']");
+    
+    if (!input.value.trim()) {
+      e.preventDefault(); // stop submit
+      window.location.href = "/admin/category"; // reset page
+    }
+  });
+
+</script>
+<script>
+// show/hide clear button
+const searchInput = document.getElementById("searchInput");
+const clearBtn = document.getElementById("clearBtn");
+
+// when page loads
+if (searchInput.value.trim() !== "") {
+  clearBtn.style.display = "inline-block";
+}
+
+// when typing
+searchInput.addEventListener("input", function () {
+  if (this.value.trim() !== "") {
+    clearBtn.style.display = "inline-block";
+  } else {
+    clearBtn.style.display = "none";
+  }
+});
+
+// clear function
+function clearSearch() {
+  window.location.href = "/admin/category";
+}
 </script>

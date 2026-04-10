@@ -1,145 +1,157 @@
 <!-- PRODUCTS PAGE CONTENT ONLY -->
-
 <style>
-  /* PAGE-SPECIFIC STYLES ONLY */
-  .page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-    flex-wrap: wrap;
-    gap: 20px;
-  }
+/* PAGE-SPECIFIC STYLES ONLY */
 
-  .page-title {
-    font-size: 32px;
-    font-weight: 700;
-    color: #6d3939;
-  }
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
 
-  .new-btn {
-    background: linear-gradient(135deg, #AF5454, #d97373);
-    color: #fff;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 2px 8px rgba(175, 84, 84, .3);
-  }
+.page-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #6d3939;
+}
 
-  .table-wrapper {
-    background: #fff;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, .1);
-  }
+.new-btn {
+  background: linear-gradient(135deg, #AF5454, #d97373);
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(175, 84, 84, .3);
+}
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
+.table-wrapper {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, .1);
+}
 
-  thead {
-    background: linear-gradient(135deg, #AF5454, #d97373);
-  }
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
 
-  thead th {
-    padding: 16px;
-    color: #fff;
-    font-size: 14px;
-    font-weight: 600;
-  }
+thead {
+  background: linear-gradient(135deg, #AF5454, #d97373);
+}
 
-  tbody td {
-    padding: 16px;
-    font-size: 14px;
-  }
+thead th {
+  padding: 16px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
 
-  .product-image {
-    width: 40px;
-    height: 40px;
-    border-radius: 6px;
-    object-fit: cover;
-    border: 1px solid #eee;
-  }
+tbody td {
+  padding: 16px;
+  font-size: 14px;
+}
 
-  .custom-modal {
-    background: #FDF2F2;
-    border-radius: 16px;
-  }
+.product-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid #eee;
+}
 
-  .image-slot {
-    width: 100px;
-    height: 100px;
-    border: 2px dashed #ccc;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    position: relative;
-    background: #fff;
-  }
+.custom-modal {
+  background: #FDF2F2;
+  border-radius: 16px;
+}
 
-  .image-slot span {
-    font-size: 28px;
-    color: #aaa;
-  }
+.image-slot {
+  width: 100px;
+  height: 100px;
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  background: #fff;
+}
 
-  .image-slot img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 8px;
-  }
+.image-slot span {
+  font-size: 28px;
+  color: #aaa;
+}
 
-  /* ===== Crop Modal Viewport Fix ===== */
+.image-slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* ===== Crop Modal Layout ===== */
+
 #cropModal .modal-dialog {
-  max-width: 90vw;
-  max-height: 90vh;
+  max-width: 95vw;
+  margin: 0 auto;
 }
 
 #cropModal .modal-content {
-  height: 90vh;
+  height: 95vh;
+  background: #000;
+  color: #fff;
 }
 
 #cropModal .modal-body {
   display: flex;
   align-items: center;
   justify-content: center;
-  max-height: calc(90vh - 120px); /* header + footer space */
+  flex: 1;
   overflow: hidden;
+  padding: 0;
 }
 
-  #cropModal .modal-content {
-    background: #000;
-    color: #fff;
-  }
+#cropModal .modal-header,
+#cropModal .modal-footer {
+  background: #111;
+  border: none;
+}
 
-  #cropModal .modal-header,
-  #cropModal .modal-footer {
-    background: #111;
-    border: none;
-  }
+#cropModal .btn-close {
+  filter: invert(1);
+}
 
-  #cropModal .btn-close {
-    filter: invert(1);
-  }
-
-  .cropper-container {
-    max-height: 100vh !important;
-  }
-
-
-
+.cropper-container {
+  max-height: 80vh !important;
+}
 </style>
 
 <div class="page-header">
   <h1 class="page-title">Products</h1>
+
+  <form method="GET" action="/admin/products" class="d-flex gap-2">
+    <input
+      type="text"
+      name="search"
+      value="<%= search %>"
+      placeholder="Search products..."
+      class="form-control"
+      style="width: 250px;"
+    >
+    <button type="submit" class="btn btn-secondary">Search</button>
+    <% if (search) { %>
+      <a href="/admin/products" class="btn btn-outline-secondary">Clear</a>
+    <% } %>
+  </form>
+
   <button class="new-btn" data-bs-toggle="modal" data-bs-target="#addProductModal">
     + Add Product
   </button>
@@ -147,99 +159,103 @@
 
 <div class="table-wrapper">
   <table>
-  <thead>
-    <tr>
-      <th>Image</th>
-      <th>Product Name</th>
-      <th>Category</th>
-      <th>Brand</th>
-      <th>Visibility</th>
-      <th>View</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% products.forEach(product => { %>
+    <thead>
       <tr>
-
-        <!-- Image -->
-        <td>
-          <img
-            src="<%= product.productImages[0] %>"
-            class="product-image"
-            alt="<%= product.productName %>"
-          >
-        </td>
-
-        <!-- Name -->
-        <td><%= product.productName %></td>
-
-        <!-- Category -->
-        <td>
-          <%= product.categoryId ? product.categoryId.name : "—" %>
-        </td>
-
-        <!-- Brand -->
-        <td><%= product.brand || "N/A" %></td>
-
-        <!-- Visibility Toggle -->
-        <td>
-          <div class="form-check form-switch">
-            <input
-              class="form-check-input listing-toggle"
-              type="checkbox"
-              <%= product.isListed ? "checked" : "" %>
-              data-id="<%= product._id %>"
-              data-name="<%= product.productName %>"
-            >
-          </div>
-        </td>
-
-        <!-- View -->
-        <td>
-          <a
-            href="/admin/products/<%= product._id %>"
-            class="btn btn-sm btn-outline-secondary">
-            View
-          </a>
-        </td>
-
-        <!-- Actions -->
-        <td>
-          <button
-  type="button"
-  class="btn btn-sm btn-outline-primary edit-btn"
-  data-id="<%= product._id %>"
-  data-name="<%= product.productName %>"
-  data-desc="<%= product.description %>"
-  data-longdesc="<%= product.longDescription || '' %>"
-  data-brand="<%= product.brand || '' %>"
-  data-category="<%= product.categoryId ? product.categoryId._id : '' %>"
-  data-images='<%- JSON.stringify(product.productImages || []) %>'
->
-  Edit
-</button>
-
-        </td>
-
+        <th>Image</th>
+        <th>Product Name</th>
+        <th>Category</th>
+        <th>Brand</th>
+        <th>Visibility</th>
+        <th>View</th>
+        <th>Actions</th>
       </tr>
-    <% }) %>
-  </tbody>
-</table>
+    </thead>
 
+    <tbody>
+      <% products.forEach(product=> { %>
+        <tr>
+
+          <!-- Image -->
+          <td>
+<img src="<%= product.productImages?.[0] || '/placeholder.png' %>" class="product-image">          </td>
+
+          <!-- Name -->
+          <td>
+            <%= product.productName %>
+          </td>
+
+          <!-- Category -->
+          <td>
+            <%= product.categoryId ? product.categoryId.name : "—" %>
+          </td>
+
+          <!-- Brand -->
+          <td>
+            <%= product.brand || "N/A" %>
+          </td>
+
+          <!-- Visibility Toggle -->
+          <td>
+            <div class="form-check form-switch">
+              <input class="form-check-input listing-toggle" type="checkbox" <%=product.isListed ? "checked" : "" %>
+              data-id="<%= product._id %>"
+                data-name="<%= product.productName %>"
+                  >
+            </div>
+          </td>
+
+          <!-- View -->
+          <td>
+            <a href="/admin/products/<%= product._id %>" class="btn btn-sm btn-outline-secondary">
+              View
+            </a>
+          </td>
+
+          <!-- Actions -->
+          <td>
+            <button type="button" class="btn btn-sm btn-outline-primary edit-btn" data-id="<%= product._id %>"
+              data-name="<%= product.productName %>" data-desc="<%= product.description %>"
+              data-longdesc="<%= product.longDescription || '' %>" data-brand="<%= product.brand || '' %>"
+              data-category="<%= product.categoryId ? product.categoryId._id : '' %>"
+              data-images='<%- JSON.stringify(product.productImages || []) %>'>
+              Edit
+            </button>
+
+          </td>
+
+        </tr>
+        <% }) %>
+    </tbody>
+  </table>
+
+</div>  
+
+<!-- PAGINATION -->
+<div class="d-flex justify-content-center mt-4">
+  <ul class="pagination">
+
+    <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+      <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">Previous</a>
+    </li>
+
+    <% for (let i = 1; i <= totalPages; i++) { %>
+      <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+        <a class="page-link" href="?page=<%= i %>&search=<%= search %>"><%= i %></a>
+      </li>
+    <% } %>
+
+    <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+      <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">Next</a>
+    </li>
+
+  </ul>
 </div>
 
 <!-- ADD PRODUCT MODAL -->
 <div class="modal fade" id="addProductModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
-    <form
-      id="addProductForm"
-      action="/admin/products/add"
-      method="post"
-      enctype="multipart/form-data"
-      class="modal-content custom-modal"
-    >
+    <form id="addProductForm" action="/admin/products/add" method="post" enctype="multipart/form-data"
+      class="modal-content custom-modal">
 
       <div class="modal-header">
         <h5 class="modal-title">Add New Product</h5>
@@ -248,61 +264,68 @@
       <div class="modal-body row g-3">
         <div class="col-12">
           <label class="form-label">Product Name</label>
-          <input type="text" name="productName" class="form-control" required>
+          <input type="text" name="productName" id="productName" class="form-control">
+<small id="nameError" class="text-danger"></small>
         </div>
 
         <div class="col-12">
           <label class="form-label">Short Description</label>
-          <input type="text" name="description" class="form-control" required>
+          <input type="text" name="description" id="description" class="form-control">
+<small id="descError" class="text-danger"></small>
         </div>
 
         <div class="col-12">
           <label class="form-label">Long Description</label>
-          <textarea name="longDescription" class="form-control"></textarea>
+          <textarea name="longDescription" id="longDescription" class="form-control"></textarea>
+<small id="longDescError" class="text-danger"></small>
         </div>
 
         <div class="col-md-6">
-          <label class="form-label">Category</label>
-          <select name="categoryId" class="form-select" required>
-            <% categories.forEach(cat => { %>
-              <option value="<%= cat._id %>"><%= cat.name %></option>
-            <% }) %>
-          </select>
+<label class="form-label">Category</label>
+
+<select name="categoryId" id="categoryId" class="form-select">
+
+  <% categories.forEach(cat => { %>
+    <option value="<%= cat._id %>">
+      <%= cat.name %>
+    </option>
+  <% }) %>
+</select>
+
+<small id="categoryError" class="text-danger"></small>
         </div>
 
         <div class="col-md-6">
           <label class="form-label">Brand</label>
-          <input
-            type="text"
-            name="brand"
-            class="form-control"
-            placeholder="Eg: Premium, Kids Special"
-          >
+<input type="text" name="brand" id="brand" class="form-control">
+<small id="brandError" class="text-danger"></small>
         </div>
+
+
 
         <div class="col-12">
           <label class="form-label">Product Images (Max 5)</label>
 
           <div class="d-flex gap-3 flex-wrap" id="imageSlots">
-            <% for (let i = 0; i < 5; i++) { %>
+            <% for (let i=0; i < 5; i++) { %>
               <div class="image-slot" data-index="<%= i %>">
                 <span>+</span>
                 <img hidden>
               </div>
-            <% } %>
+              <% } %>
           </div>
 
           <!-- Hidden file input -->
-          <input type="file" id="imageInput" accept="image/*" hidden>
+<input type="file" id="imageInput" accept="image/*" hidden multiple>
         </div>
       </div>
-
+      
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           Cancel
         </button>
-        <button class="btn btn-primary">
-          Save Product
+<button type="submit" class="btn btn-primary">
+            Save Product
         </button>
       </div>
 
@@ -317,24 +340,18 @@
 
       <div class="modal-header">
         <h5 class="modal-title">Crop Image</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal">
+        <button type="button" class="btn-close" data-bs-dismiss="modal">
         </button>
       </div>
 
       <div class="modal-body d-flex justify-content-center align-items-center p-0">
         <div style="width:100%; height:100%;">
-          <img
-            id="cropImage"
-            style="
+          <img id="cropImage" style="
               max-width:100%;
               max-height:100vh;
               display:block;
               margin:auto;
-            "
-          />
+            " />
         </div>
       </div>
 
@@ -354,14 +371,9 @@
 
 
 <!-- Edit Modal -->
- <div class="modal fade" id="editProductModal" tabindex="-1">
+<div class="modal fade" id="editProductModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
-    <form
-      id="editProductForm"
-      method="post"
-        enctype="multipart/form-data"
-      class="modal-content custom-modal"
-    >
+    <form id="editProductForm" method="post" enctype="multipart/form-data" class="modal-content custom-modal">
 
       <div class="modal-header">
         <h5 class="modal-title">Edit Product</h5>
@@ -369,7 +381,7 @@
 
       <div class="modal-body row g-3">
 
-        <input type="hidden" name="productId" id="editProductId">
+      
 
         <div class="col-12">
           <label class="form-label">Product Name</label>
@@ -389,9 +401,11 @@
         <div class="col-md-6">
           <label class="form-label">Category</label>
           <select id="editCategory" name="categoryId" class="form-select" required>
-            <% categories.forEach(cat => { %>
-              <option value="<%= cat._id %>"><%= cat.name %></option>
-            <% }) %>
+            <% categories.forEach(cat=> { %>
+              <option value="<%= cat._id %>">
+                <%= cat.name %>
+              </option>
+              <% }) %>
           </select>
         </div>
 
@@ -400,21 +414,20 @@
           <input id="editBrand" name="brand" class="form-control">
         </div>
 
-<div class="col-12">
-  <label class="form-label">Product Images (Max 5)</label>
+        <div class="col-12">
+          <label class="form-label">Product Images (Max 5)</label>
 
-  <div class="d-flex gap-3 flex-wrap" id="editImageSlots">
-    <% for (let i = 0; i < 5; i++) { %>
-      <div class="image-slot edit-slot" data-index="<%= i %>">
-        <span>+</span>
-        <img hidden>
-      </div>
-    <% } %>
-  </div>
+          <div class="d-flex gap-3 flex-wrap" id="editImageSlots">
+            <% for (let i=0; i < 5; i++) { %>
+              <div class="image-slot edit-slot" data-index="<%= i %>">
+                <span>+</span>
+                <img hidden>
+              </div>
+              <% } %>
+          </div>
 
-  <!-- Hidden file input -->
-  <input type="file" id="editImageInput" accept="image/*" hidden>
-</div>
+          <!-- Hidden file input -->
+<input type="file" id="editImageInput" accept="image/*" hidden multiple>
       </div>
 
       <div class="modal-footer">
@@ -428,7 +441,6 @@
 
 <!-- Confirmation Modal -->
 
-<div class="modal fade" id="confirmToggleModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
 
@@ -454,101 +466,89 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<!-- Cropper CSS -->
-<link
-  href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.css"
-  rel="stylesheet"
-/>
+<!-- Cropper.js CSS + JS -->
+<link href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.js"></script>
 <script>
+
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  // ✅ THE REAL FIX — watch body and kill padding-right the moment Bootstrap adds it
+
   let selectedProductId = null;
   let selectedCheckbox = null;
+  let confirmed = false;
 
+ 
   document.querySelectorAll(".listing-toggle").forEach(toggle => {
     toggle.addEventListener("change", function () {
+
       selectedProductId = this.dataset.id;
       selectedCheckbox = this;
 
       const productName = this.dataset.name;
       const action = this.checked ? "list" : "unlist";
 
-      document.getElementById("confirmText").innerText =
-        `Are you sure you want to ${action} "${productName}"?`;
-
-      const modal = new bootstrap.Modal(
-        document.getElementById("confirmToggleModal")
-      );
-
-      modal.show();
-    });
-  });
-
-  document.getElementById("confirmToggleBtn").addEventListener("click", async () => {
-    try {
-      await fetch(`/admin/products/toggle/${selectedProductId}`, {
-        method: "PATCH"
+      // ✅ Close ALL open modals first
+      document.querySelectorAll(".modal.show").forEach(openModal => {
+        const instance = bootstrap.Modal.getInstance(openModal);
+        if (instance) instance.hide();
       });
-      location.reload();
-    } catch (err) {
-      alert("Something went wrong");
-      selectedCheckbox.checked = !selectedCheckbox.checked;
-    }
-  });
 
-  document
-  .getElementById("confirmToggleModal")
-  .addEventListener("hidden.bs.modal", () => {
-    if (selectedCheckbox) {
-      selectedCheckbox.checked = !selectedCheckbox.checked;
-    }
-    selectedCheckbox = null;
-    selectedProductId = null;
-  });
+      // ✅ Use SweetAlert2 instead of Bootstrap modal — no conflict
+      Swal.fire({
+        title: "Confirm Action",
+        text: `Are you sure you want to ${action} "${productName}"?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#AF5454",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Confirm",
+        cancelButtonText: "Cancel"
+      }).then(async (result) => {
 
-</script>
-<script>
-document.querySelectorAll(".edit-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
+        if (result.isConfirmed) {
+          try {
+            const res = await fetch(`/admin/products/toggle/${selectedProductId}`, {
+              method: "PATCH",
+              credentials: "same-origin",
+              headers: { "Content-Type": "application/json" }
+            });
 
-    editCroppedImages.length = 0; // 🔥 reset previous images
+            const data = await res.json();
 
-    document.getElementById("editProductName").value = btn.dataset.name;
-    document.getElementById("editDescription").value = btn.dataset.desc;
-    document.getElementById("editLongDescription").value = btn.dataset.longdesc;
-    document.getElementById("editBrand").value = btn.dataset.brand;
-    document.getElementById("editCategory").value = btn.dataset.category;
+            if (!data.success) throw new Error("Toggle failed");
 
-    const form = document.getElementById("editProductForm");
-    form.action = `/admin/products/edit/${btn.dataset.id}`;
+            location.reload();
 
-    const images = JSON.parse(btn.dataset.images || "[]");
+          } catch (err) {
+            Swal.fire("Error", "Toggle failed. Please try again.", "error");
+            selectedCheckbox.checked = !selectedCheckbox.checked;
+          }
 
-    document.querySelectorAll(".edit-slot").forEach((slot, index) => {
-      const img = slot.querySelector("img");
-      const plus = slot.querySelector("span");
+        } else {
+          // ✅ User cancelled — revert checkbox
+          selectedCheckbox.checked = !selectedCheckbox.checked;
+        }
 
-      if (images[index]) {
-        img.src = images[index];
-        img.hidden = false;
-        plus.style.display = "none";
-      } else {
-        img.hidden = true;
-        plus.style.display = "block";
-      }
+      });
+
     });
-
-    new bootstrap.Modal(
-      document.getElementById("editProductModal")
-    ).show();
   });
+  
+
 });
-
+   
 </script>
-
-
 <script>
+  // ===================================================
+//  SHARED STATE
+// ===================================================
 let cropper = null;
-let currentMode = null; // "add" or "edit"
+let currentMode = null;
 let activeIndex = null;
+let cropperReady = false;
 
 const croppedImages = [];
 const editCroppedImages = [];
@@ -556,69 +556,218 @@ const editCroppedImages = [];
 const imageInput = document.getElementById("imageInput");
 const editImageInput = document.getElementById("editImageInput");
 const cropImage = document.getElementById("cropImage");
-const cropModalEl = document.getElementById("cropModal");
 
-/* ---------- ADD IMAGE SLOT ---------- */
+const addForm = document.getElementById("addProductForm");
+const nameInput = document.getElementById("productName");
+const descInput = document.getElementById("description");
+const longDescInput = document.getElementById("longDescription");
+const categoryInput = document.getElementById("categoryId");
+const brandInput = document.getElementById("brand");
+
+const nameError = document.getElementById("nameError");
+const descError = document.getElementById("descError");
+const longDescError = document.getElementById("longDescError");
+const categoryError = document.getElementById("categoryError");
+const brandError = document.getElementById("brandError");
+
+const cropModalEl = document.getElementById("cropModal");
+const editModalEl = document.getElementById("editProductModal");
+
+let editModalInstance = null;
+let cropModalInstance = null;
+
+
+// ===================================================
+// EDIT BUTTON
+// ===================================================
+document.querySelectorAll(".edit-btn").forEach(btn => {
+
+  btn.addEventListener("click", function () {
+
+    editCroppedImages.length = 0;
+
+    document.getElementById("editProductName").value = this.dataset.name;
+    document.getElementById("editDescription").value = this.dataset.desc;
+    document.getElementById("editLongDescription").value = this.dataset.longdesc;
+    document.getElementById("editBrand").value = this.dataset.brand;
+    document.getElementById("editCategory").value = this.dataset.category;
+
+    document.getElementById("editProductForm").action =
+      `/admin/products/edit/${this.dataset.id}`;
+
+    const images = JSON.parse(this.dataset.images || "[]");
+
+    document.querySelectorAll(".edit-slot").forEach((slot, i) => {
+
+      const img = slot.querySelector("img");
+      const plus = slot.querySelector("span");
+
+      img.hidden = true;
+      img.src = "";
+      plus.style.display = "block";
+
+      if (images[i]) {
+        img.src = images[i];
+        img.hidden = false;
+        plus.style.display = "none";
+      }
+
+    });
+
+    const modal = bootstrap.Modal.getOrCreateInstance(editModalEl);
+    modal.show();
+    editModalInstance = modal;
+
+  });
+
+});
+
+
+// ===================================================
+// IMAGE SLOT CLICK
+// ===================================================
 document.querySelectorAll(".image-slot:not(.edit-slot)").forEach(slot => {
+
   slot.addEventListener("click", () => {
+
     currentMode = "add";
     activeIndex = Number(slot.dataset.index);
+
     imageInput.value = "";
     imageInput.click();
+
   });
+
 });
 
-/* ---------- EDIT IMAGE SLOT ---------- */
+
 document.querySelectorAll(".edit-slot").forEach(slot => {
+
   slot.addEventListener("click", () => {
+
     currentMode = "edit";
     activeIndex = Number(slot.dataset.index);
+
     editImageInput.value = "";
     editImageInput.click();
+
   });
+
 });
 
-/* ---------- ADD IMAGE SELECT ---------- */
+
+// ===================================================
+// FILE INPUT
+// ===================================================
 imageInput.addEventListener("change", e => {
-  handleImageSelect(e.target.files[0]);
+
+  if (e.target.files[0]) {
+    handleImageSelect(e.target.files[0]);
+  }
+
 });
 
-/* ---------- EDIT IMAGE SELECT ---------- */
 editImageInput.addEventListener("change", e => {
-  handleImageSelect(e.target.files[0]);
+
+  if (e.target.files[0]) {
+    handleImageSelect(e.target.files[0]);
+  }
+
 });
 
-/* ---------- HANDLE IMAGE ---------- */
+
+// ===================================================
+// IMAGE SELECT
+// ===================================================
 function handleImageSelect(file) {
-  if (!file) return;
 
   const reader = new FileReader();
+
   reader.onload = () => {
+
     cropImage.src = reader.result;
+    cropperReady = false;
 
-    const cropModal = new bootstrap.Modal(cropModalEl);
-    cropModal.show();
+    // hide edit modal first
+    if (currentMode === "edit" && editModalInstance) {
+      editModalInstance.hide();
+    }
 
-    cropModalEl.addEventListener("shown.bs.modal", () => {
-      if (cropper) cropper.destroy();
+    cropModalInstance = new bootstrap.Modal(cropModalEl);
+    cropModalInstance.show();
 
-      cropper = new Cropper(cropImage, {
-        aspectRatio: 1,
-        viewMode: 2,
-        autoCropArea: 1,
-        responsive: true,
-        background: false,
-        zoomable: true,
-        movable: true
-      });
-    }, { once: true });
   };
 
   reader.readAsDataURL(file);
+
 }
 
-/* ---------- SAVE CROPPED IMAGE ---------- */
+
+// ===================================================
+// CROP MODAL OPEN
+// ===================================================
+cropModalEl.addEventListener("shown.bs.modal", () => {
+
+  if (cropperReady) return;
+
+  if (cropper) {
+    cropper.destroy();
+    cropper = null;
+  }
+
+  cropper = new Cropper(cropImage, {
+
+    aspectRatio: 1,
+    viewMode: 2,
+    autoCropArea: 1,
+    responsive: true,
+    background: false,
+    zoomable: true,
+    movable: true
+
+  });
+
+  cropperReady = true;
+
+});
+
+
+// ===================================================
+// CROP MODAL CLOSE
+// ===================================================
+cropModalEl.addEventListener("hidden.bs.modal", () => {
+
+  if (cropper) {
+    cropper.destroy();
+    cropper = null;
+  }
+
+  cropperReady = false;
+
+  // restore edit modal
+  if (currentMode === "edit" && editModalInstance) {
+
+    setTimeout(() => {
+
+      editModalInstance.show();
+
+    }, 200);
+
+  }
+
+  // cleanup extra backdrops
+  document.querySelectorAll(".modal-backdrop").forEach((backdrop, i) => {
+    if (i > 0) backdrop.remove();
+  });
+
+});
+
+
+// ===================================================
+// CROP SAVE
+// ===================================================
 document.getElementById("cropSaveBtn").addEventListener("click", async () => {
+
   if (!cropper) return;
 
   const canvas = cropper.getCroppedCanvas({
@@ -626,11 +775,13 @@ document.getElementById("cropSaveBtn").addEventListener("click", async () => {
     height: 800
   });
 
-  const blob = await new Promise(resolve =>
-    canvas.toBlob(resolve, "image/jpeg", 0.9)
+  const blob = await new Promise(res =>
+    canvas.toBlob(res, "image/jpeg", 0.9)
   );
 
+
   if (currentMode === "add") {
+
     croppedImages[activeIndex] = blob;
 
     const slot = document.querySelector(
@@ -638,12 +789,17 @@ document.getElementById("cropSaveBtn").addEventListener("click", async () => {
     );
 
     const img = slot.querySelector("img");
+
     img.src = URL.createObjectURL(blob);
     img.hidden = false;
+
     slot.querySelector("span").style.display = "none";
+
   }
 
+
   if (currentMode === "edit") {
+
     editCroppedImages[activeIndex] = blob;
 
     const slot = document.querySelector(
@@ -651,53 +807,257 @@ document.getElementById("cropSaveBtn").addEventListener("click", async () => {
     );
 
     const img = slot.querySelector("img");
+
     img.src = URL.createObjectURL(blob);
     img.hidden = false;
+
     slot.querySelector("span").style.display = "none";
+
   }
 
-  cropper.destroy();
-  cropper = null;
 
-  bootstrap.Modal.getInstance(cropModalEl).hide();
+  if (cropModalInstance) {
+    cropModalInstance.hide();
+  }
+
 });
-</script>
 
 
-<script>
-const editForm = document.getElementById("editProductForm");
-
-editForm.addEventListener("submit", async e => {
+// ===================================================
+// ADD PRODUCT
+// ===================================================
+addForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const formData = new FormData(editForm);
+let isValid = true;
 
-editCroppedImages.forEach((img, index) => {
-  if (img) {
-    formData.append("images", img);
-    formData.append("imageIndexes[]", index);
-  }
-});
+// NAME
+const name = nameInput.value.trim();
+if (name === "") {
+  nameError.innerText = "Product name required";
+  nameInput.classList.add("is-invalid");
+  isValid = false;
+} else {
+  nameError.innerText = "";
+  nameInput.classList.remove("is-invalid");
+}
 
-  const res = await fetch(editForm.action, {
-    method: "POST",
-    body: formData
+// DESCRIPTION
+const desc = descInput.value.trim();
+if (desc === "") {
+  descError.innerText = "Description required";
+  descInput.classList.add("is-invalid");
+  isValid = false;
+} else {
+  descError.innerText = "";
+  descInput.classList.remove("is-invalid");
+}
+
+// LONG DESCRIPTION REQUIRED
+const longDesc = longDescInput.value.trim();
+
+if (longDesc === "") {
+  longDescError.innerText = "Long description required";
+  longDescInput.classList.add("is-invalid");
+  isValid = false;
+} else if (longDesc.length < 10) {
+  longDescError.innerText = "Minimum 10 characters required";
+  longDescInput.classList.add("is-invalid");
+  isValid = false;
+} else {
+  longDescError.innerText = "";
+  longDescInput.classList.remove("is-invalid");
+}
+// CATEGORY
+const category = categoryInput.value;
+if (!category) {
+  categoryError.innerText = "Select category";
+  categoryInput.classList.add("is-invalid");
+  isValid = false;
+} else {
+  categoryError.innerText = "";
+  categoryInput.classList.remove("is-invalid");
+}
+
+// BRAND
+const brand = brandInput.value.trim();
+if (brand && brand.length < 2) {
+  brandError.innerText = "Min 2 characters";
+  brandInput.classList.add("is-invalid");
+  isValid = false;
+} else {
+  brandError.innerText = "";
+  brandInput.classList.remove("is-invalid");
+}
+
+// IMAGE
+const hasImage = croppedImages.some(img => img);
+if (!hasImage) {
+  Swal.fire("Error", "Add at least one image", "error");
+  isValid = false;
+}
+
+// FINAL
+if (!isValid) return;
+
+
+  // ✅ If all valid → continue submit
+  const formData = new FormData();
+
+  formData.append("productName", name);
+  formData.append("description", desc);
+  formData.append("longDescription", addForm.longDescription.value);
+  formData.append("categoryId", category);
+  formData.append("brand", addForm.brand.value);
+
+  croppedImages.forEach((blob, index) => {
+    if (blob) {
+      formData.append("images", blob, `image_${index}.jpg`);
+    }
   });
 
-  if (res.ok) {
-    Swal.fire({
-      icon: "success",
-      title: "Product Updated",
-      timer: 1500,
-      showConfirmButton: false
-    }).then(() => {
-      location.reload();
+  try {
+    const res = await fetch(addForm.action, {
+      method: "POST",
+      body: formData
     });
-  } else {
-    Swal.fire({
-      icon: "error",
-      title: "Update Failed"
-    });
+
+    const data = await res.json();
+
+   if (data.success) {
+  window.location.href = data.redirectUrl;
+} else {
+  Swal.fire({
+    icon: "error",
+    title: "Error",
+    text: data.message || "Product already exists"
+  });
+}
+  } catch (err) {
+    console.log(err);
+    alert("Something went wrong");
   }
 });
+
+// ===================================================
+// EDIT PRODUCT
+// ===================================================
+const editForm = document.getElementById("editProductForm");
+
+editForm.addEventListener("submit", async (e) => {
+
+  e.preventDefault();
+
+  let isValid = true;
+
+const name = editForm.productName.value.trim();
+const desc = editForm.description.value.trim();
+const longDesc = editForm.longDescription.value.trim();
+const category = editForm.categoryId.value;
+const brand = editForm.brand.value.trim();
+
+// NAME
+if (name === "") {
+  Swal.fire("Error", "Product name required", "error");
+  isValid = false;
+}
+
+// DESCRIPTION
+if (desc === "") {
+  Swal.fire("Error", "Description required", "error");
+  isValid = false;
+}
+
+// LONG DESCRIPTION
+if (longDesc === "") {
+  Swal.fire("Error", "Long description required", "error");
+  isValid = false;
+} else if (longDesc.length < 10) {
+  Swal.fire("Error", "Minimum 10 characters required", "error");
+  isValid = false;
+}
+
+// CATEGORY
+if (!category) {
+  Swal.fire("Error", "Select category", "error");
+  isValid = false;
+}
+
+// BRAND
+if (brand && brand.length < 2) {
+  Swal.fire("Error", "Brand must be at least 2 characters", "error");
+  isValid = false;
+}
+
+// IMAGE (optional in edit)
+const hasNewImages = editCroppedImages.some(img => img);
+const hasExistingImages = document.querySelectorAll("#editImageSlots img:not([hidden])").length > 0;
+
+if (!hasNewImages && !hasExistingImages) {
+  Swal.fire("Error", "Add at least one image", "error");
+  isValid = false;
+}
+
+// FINAL STOP
+if (!isValid) return;
+
+  const formData = new FormData();
+
+  formData.append("productName", editForm.productName.value);
+  formData.append("description", editForm.description.value);
+  formData.append("longDescription", editForm.longDescription.value);
+  formData.append("categoryId", editForm.categoryId.value);
+  formData.append("brand", editForm.brand.value);
+
+  editCroppedImages.forEach((blob, index) => {
+
+    if (blob) {
+
+      formData.append("images", blob, `image_${index}.jpg`);
+      formData.append("imageIndexes[]", String(index));
+
+    }
+
+  });
+
+  try {
+
+    const res = await fetch(editForm.action, {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await res.json();
+
+   if (res.ok && data.success) {
+
+  
+  Swal.fire({
+    icon: "success",
+    title: "Success",
+    text: "Product updated successfully"
+  }).then(() => {
+    window.location.href = "/admin/products";
+  });
+
+} else {
+
+  
+  Swal.fire({
+    icon: "error",
+    title: "Error",
+    text: data.message || "Update failed"
+  });
+
+}
+
+  } catch (err) {
+
+    console.error(err);
+
+  }
+
+});
+
+
 </script>

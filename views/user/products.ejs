@@ -79,11 +79,7 @@
       box-shadow: 0 12px 30px rgba(0,0,0,0.15);
     }
 
-    .product-img {
-      height: 200px;
-      object-fit: cover;
-      border-radius: 14px 14px 0 0;
-    }
+    
 
     .desc {
       font-size: 0.85rem;
@@ -111,10 +107,35 @@
     .product-card-link:hover .product-img {
       transform: scale(1.03);
     }
+   .image-wrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px 14px 0 0;
+}
 
-    .product-img {
-      transition: transform 0.4s ease;
-    }
+.product-img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.offer-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #ff4d4f;
+  color: white;
+  padding: 5px 12px;
+  font-size: 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  z-index: 10;
+}
+.product-card {
+  border-radius: 16px;
+  overflow: hidden;
+}
+    
 
     
   </style>
@@ -129,8 +150,7 @@
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-  <form method="GET" action="/products">
-
+<form method="GET" action="/products" id="filterForm">
     <h5>Categories</h5>
     <% categories.forEach(cat => { %>
       <label>
@@ -142,6 +162,9 @@
     <hr>
 
     <h5>Price</h5>
+     <label>
+      <input type="radio" name="price" value="50-349"> ₹50 – ₹349
+    </label>
     <label>
       <input type="radio" name="price" value="350-599"> ₹350 – ₹599
     </label>
@@ -162,6 +185,9 @@
       </label>
     <% }) %>
 
+ <input type="hidden" name="search" id="hiddenSearch">
+    <input type="hidden" name="sort" id="hiddenSort">
+
     <button class="btn btn-dark btn-sm w-100 mt-3">
       Apply Filters
     </button>
@@ -169,29 +195,26 @@
   </form>
 </aside>
 
-
   <!-- PRODUCTS -->
   <main class="products">
     <div class="d-flex gap-3 align-items-center justify-content-between">
 
         <div>
 
-        <form method="GET" action="/products" class="d-flex gap-2 mb-4">
-        <input
-            type="text"
-            name="search"
-            value="<%= search || '' %>"
-            class="form-control form-control-sm"
-            placeholder="Search cakes...">
+<div class="d-flex gap-2 mb-4">
+  <input
+    type="text"
+    id="searchInput"
+    value="<%= search || '' %>"
+    class="form-control form-control-sm"
+    placeholder="Search cakes...">
 
-        <button class="btn btn-dark btn-sm">Search</button>
+  <button type="button" class="btn btn-dark btn-sm" onclick="applyAll()">Search</button>
 
-        <% if (search) { %>
-            <a href="/products" class="btn btn-outline-secondary btn-sm">
-            Clear
-            </a>
-        <% } %>
-        </form>
+  <% if (search) { %>
+    <a href="/products" class="btn btn-outline-secondary btn-sm">Clear</a>
+  <% } %>
+</div>
         </div>
         <div>
 
@@ -201,6 +224,7 @@
         class="form-select w-auto"
         id="sortOptions"
         style="margin-bottom: 50px;"
+        onchange="applyAll()"
         >
         <option value="">Sort By</option>
         <option value="priceLowHigh">Price: Low to High</option>
@@ -229,8 +253,18 @@
             <div class="card product-card product-card-link">
 
               <% if (product.productImages && product.productImages.length > 0) { %>
-                <img src="<%= product.productImages[0] %>" class="product-img">
-              <% } else { %>
+<div class="image-wrapper">
+
+  <% if (product.startingPrice && product.regularPrice) { %>
+    <span class="offer-badge">
+      <%= Math.round((product.regularPrice - product.startingPrice) / product.regularPrice * 100) %>% OFF
+    </span>
+  <% } %>
+
+  <img src="<%= product.productImages[0] %>" class="product-img">
+
+</div>
+<% } else { %>
                 <img src="https://via.placeholder.com/300x200?text=No+Image" class="product-img">
               <% } %>
 
@@ -239,27 +273,29 @@
 
                 <p class="desc"><%= product.description %></p>
 
-                <div class="mt-auto">
-                  <% if (product.startingPrice !== null) { %>
-                    <div class="d-flex align-items-center gap-2 flex-wrap">
-                      <span class="price">
-                        ₹ <%= product.startingPrice %>
-                      </span>
+                <div class="mt-auto d-flex align-items-center gap-2">
 
-                      <% if (product.regularPrice && product.regularPrice > product.startingPrice) { %>
-                        <span class="text-muted text-decoration-line-through">
-                          ₹ <%= product.regularPrice %>
-                        </span>
-                      <% } %>
+  <% if (product.startingPrice) { %>
 
-                      <span class="text-muted small">
-                        · Starting price
-                      </span>
-                    </div>
-                  <% } else { %>
-                    <span class="text-danger small">Out of stock</span>
-                  <% } %>
-                </div>
+    <!-- NEW PRICE -->
+    <span class="price text-danger fw-bold">
+      ₹ <%= product.startingPrice %>
+    </span>
+
+    <!-- OLD PRICE -->
+    <span class="text-muted text-decoration-line-through small">
+      ₹ <%= product.regularPrice %>
+    </span>
+
+
+
+  <% } else { %>
+
+    <span class="text-danger small">Out of stock</span>
+
+  <% } %>
+
+</div>
 
 
               </div>
@@ -277,8 +313,8 @@
       <% for (let i = 1; i <= totalPages; i++) { %>
         <li class="page-item <%= currentPage === i ? 'active' : '' %>">
           <a
-            class="page-link"
-            href="?page=<%= i %>&search=<%= search || '' %>&sort=<%= sort || '' %>">
+           class="page-link"
+            href="?page=<%= i %>&search=<%= search || '' %>&sort=<%= sort || '' %>&category=<%= category || '' %>&price=<%= price || '' %>&brand=<%= brand || '' %>">
             <%= i %>
           </a>
         </li>
@@ -291,28 +327,43 @@
 
 </div>
 <script>
-  const sortSelect = document.getElementById("sortOptions");
-
-  // Preserve selected value after reload
   const params = new URLSearchParams(window.location.search);
-  if (params.get("sort")) {
-    sortSelect.value = params.get("sort");
+
+  // Restore sort
+  if (params.get("sort"))
+    document.getElementById("sortOptions").value = params.get("sort");
+
+  // Restore category radio
+  if (params.get("category")) {
+    const el = document.querySelector(`input[name="category"][value="${params.get("category")}"]`);
+    if (el) el.checked = true;
   }
 
-  // Auto-submit on change
-  sortSelect.addEventListener("change", function () {
-    const params = new URLSearchParams(window.location.search);
+  // Restore price radio
+  if (params.get("price")) {
+    const el = document.querySelector(`input[name="price"][value="${params.get("price")}"]`);
+    if (el) el.checked = true;
+  }
 
-    if (this.value) {
-      params.set("sort", this.value);
-    } else {
-      params.delete("sort");
-    }
+  // Restore brand radio
+  if (params.get("brand")) {
+    const el = document.querySelector(`input[name="brand"][value="${params.get("brand")}"]`);
+    if (el) el.checked = true;
+  }
 
-    window.location.search = params.toString();
+  // Central submit function
+  function applyAll() {
+    document.getElementById("hiddenSearch").value = document.getElementById("searchInput").value.trim();
+    document.getElementById("hiddenSort").value   = document.getElementById("sortOptions").value;
+    document.getElementById("filterForm").submit();
+  }
+
+  // Intercept Apply Filters button too
+  document.getElementById("filterForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    applyAll();
   });
 </script>
-
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

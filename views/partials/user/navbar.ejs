@@ -22,13 +22,15 @@
         <!-- Icons -->
         <div class="d-flex align-items-center gap-4">
 
-            <a href="#" class="text-reset">
-                <img width="25" height="25" src="media/icons8-cart-50.png" alt="cart" />
-            </a>
+            <a href="#" class="text-reset header-icon">
+    <img width="25" height="25" src="media/icons8-cart-50.png" alt="cart" />
+</a>
+
+
  
           <% if (locals.user) { %>
   <div class="dropdown">
-    <a class="nav-link dropdown-toggle fw-bold"
+    <a class="nav-link dropdown-toggle fw-bold header-action"
        href="#"
        role="button"
        data-bs-toggle="dropdown"
@@ -44,12 +46,12 @@
 
             <% } else { %>
                 <!-- Guest user -->
-                <a href="/signUp" class="text-reset" style="color:#AF5454 !important;">
-                    <span class="small fw-bold">Sign Up</span>
-                </a>
-                <a href="/login" class="text-reset" style="color:#AF5454 !important;">
-                    <span class="small fw-bold">Log In</span>
-                </a>
+                <a href="/signUp" class="text-reset header-action">
+    <span class="small fw-bold">Sign Up</span>
+</a>
+<a href="/login" class="text-reset header-action">
+    <span class="small fw-bold">Log In</span>
+</a>
             <% } %>
 
             <a href="#" class="text-reset"

@@ -581,21 +581,38 @@
                             <span class="rating-badge">
                                 <i class="fas fa-star"></i> 4.8
                             </span>
-                            <span class="text-muted">
-                                <%= product.reviewCount || 24 %> Reviews
-                            </span>
-                            <span class="text-success fw-medium"><i class="fas fa-check-circle me-1"></i> In
-                                Stock</span>
-                        </div>
+     <span class="text-muted">
+    <%= product.reviewCount || 24 %> Reviews
+</span>
 
-                        <div class="price-container">
-                            <span class="price">₹ <span id="current-price">
-                                    <%= selectedVariant.salePrice %>
-                                </span></span>
-                            <span class="old-price" id="old-price">₹ <%= selectedVariant.regularPrice %></span>
-                        </div>
+<span id="stock-status" class="fw-medium text-success">
+<i class="fas fa-check-circle me-1"></i> In Stock
+</span>
+                        
+</div>
 
-                        <div class="description-text">
+<div class="price-container">
+
+    <!-- SALE PRICE -->
+    <span class="price">
+        ₹ <span id="current-price">
+            <%= selectedVariant.salePrice %>
+        </span>
+    </span>
+
+    <!-- ORIGINAL PRICE -->
+    <span class="old-price" id="old-price">
+        ₹ <%= selectedVariant.regularPrice %>
+    </span>
+
+    <!-- DISCOUNT % -->
+    <span style="color: red; font-weight: 600;" id="discount-percent">
+        (<%= Math.round((selectedVariant.regularPrice - selectedVariant.salePrice) / selectedVariant.regularPrice * 100) %>% OFF)
+    </span>
+
+</div>
+
+<div class="description-text">
                             <%= product.longDescription || product.description %>
                         </div>
 
@@ -615,9 +632,9 @@
 
                         <!-- Actions -->
                         <div class="action-group">
-                            <button class="btn btn-buy">
-                                <i class="fas fa-shopping-bag me-2"></i> Add to Cart
-                            </button>
+                          <button id="add-to-cart-btn" class="btn btn-buy">
+<i class="fas fa-shopping-bag me-2"></i> Add to Cart
+</button>
                             <button class="btn btn-wishlist" title="Add to Wishlist">
                                 <i class="far fa-heart"></i>
                             </button>
@@ -735,7 +752,7 @@
             const weightButtons = document.querySelectorAll(".weight-btn");
             const priceEl = document.getElementById("current-price"); // Changed selector to ID for specificity
             const oldPriceEl = document.querySelector(".old-price");
-
+               const discountEl = document.getElementById("discount-percent");
             weightButtons.forEach(btn => {
                 btn.addEventListener("click", async (e) => {
                     e.preventDefault();
@@ -751,14 +768,38 @@
                         const res = await fetch(`/variant/${variantId}`);
                         const data = await res.json();
 
-                        if (data.success) {
-                            priceEl.innerText = `${data.salePrice}`;
-                            oldPriceEl.innerText = `₹ ${data.regularPrice}`;
+             if (data.success) {
 
-                            // Optional: Animate price change
-                            priceEl.parentElement.style.opacity = '0.5';
-                            setTimeout(() => priceEl.parentElement.style.opacity = '1', 200);
-                        }
+priceEl.innerText = `${data.salePrice}`;
+oldPriceEl.innerText = `₹ ${data.regularPrice}`;
+
+const discount = Math.round((data.regularPrice - data.salePrice) / data.regularPrice * 100);
+discountEl.innerText = `(${discount}% OFF)`;
+
+  const stockEl = document.getElementById("stock-status");
+  const cartBtn = document.getElementById("add-to-cart-btn");
+
+if(data.stock === 0){
+
+    stockEl.innerHTML = `<i class="fas fa-times-circle me-1"></i> Out of Stock`;
+    stockEl.classList.remove("text-success");
+    stockEl.classList.add("text-danger");
+
+    cartBtn.disabled = true;
+    cartBtn.innerText = "Out of Stock";
+
+}else{
+
+    stockEl.innerHTML = `<i class="fas fa-check-circle me-1"></i> In Stock`;
+    stockEl.classList.remove("text-danger");
+    stockEl.classList.add("text-success");
+
+    cartBtn.disabled = false;
+    cartBtn.innerHTML = `<i class="fas fa-shopping-bag me-2"></i> Add to Cart`;
+
+}
+
+}
                     } catch (err) {
                         console.error("Error fetching variant:", err);
                     }

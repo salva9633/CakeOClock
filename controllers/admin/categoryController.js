@@ -5,25 +5,34 @@ const cloudinary = require("../../config/cloudinary");
 /* ================= CATEGORY PAGE ================= */
 const categoryInfo = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = 5;
-    const skip = (page - 1) * limit;
+const page = parseInt(req.query.page) || 1;
+const limit = 5;
+const skip = (page - 1) * limit;
 
-    const cat = await Category.find({ isDeleted: false })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean();
+const search = req.query.search || "";
 
-    const totalCategories = await Category.countDocuments({ isDeleted: false });
-    const totalPages = Math.ceil(totalCategories / limit);
+let filter = { isDeleted: { $ne: true } };
 
-    res.render("category", {
-      cat,
-      currentPage: page,
-      totalPages
-    });
+if (search && search.trim() !== "") {
+  filter.name = { $regex: search.trim(), $options: "i" };
+}
 
+const totalCategories = await Category.countDocuments(filter);
+
+const cat = await Category.find(filter)
+  .sort({ createdAt: -1 })
+  .skip(skip)
+  .limit(limit)
+  .lean();
+
+const totalPages = Math.ceil(totalCategories / limit);
+
+res.render("category", {
+  cat,
+  currentPage: page,
+  totalPages,
+  search   // ✅ IMPORTANT
+});
   } catch (error) {
     console.log(error);
     res.redirect("/admin/pagenotfound");

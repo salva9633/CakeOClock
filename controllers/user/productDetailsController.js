@@ -11,10 +11,14 @@ const loadProductDetailsPage = async (req, res) => {
     const selectedVariantId = req.query.variant;
 
     /* -------- Product -------- */
-    const product = await Product.findById(productId).lean();
-    if (!product || !product.isListed) {
-      return res.status(404).render("404");
-    }
+  const product = await Product.findOne({
+  _id: productId,
+  isListed: true
+}).lean();
+
+if (!product) {
+  return res.status(404).render("404");
+}
 
     /* -------- Variants -------- */
     const variants = await Variant.find({
@@ -94,24 +98,28 @@ const getVariantDetails = async (req, res) => {
     }
 
     /* Stock from batches */
-    const batches = await Batch.find({
-      variantId,
-      status: "active",
-      availableStock: { $gt: 0 }
-    }).lean();
+   const batches = await Batch.find({
+  variantId,
+  status: "active",
+  expiryAt: { $gt: new Date() },   // ignore expired batches
+  availableStock: { $gt: 0 }
+}).lean();
 
     const totalStock = batches.reduce(
       (sum, b) => sum + b.availableStock,
       0
     );
 
-    res.json({
-      success: true,
-      salePrice: variant.salePrice,
-      regularPrice: variant.regularPrice,
-      weight: variant.weight,
-      stock: totalStock
-    });
+    const stockStatus = totalStock > 0 ? "In Stock" : "Out of Stock";
+
+   res.json({
+  success: true,
+  salePrice: variant.salePrice,
+  regularPrice: variant.regularPrice,
+  weight: variant.weight,
+  stock: totalStock,
+  stockStatus
+});
 
   } catch (error) {
     console.error(error);

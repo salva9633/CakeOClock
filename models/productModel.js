@@ -8,6 +8,14 @@ const productSchema = new mongoose.Schema(
   unique: true,
   trim: true
 },
+// price: {
+//   type: Number,
+//   required: true
+// },
+// discount: {
+//   type: Number,
+//   default: 0   // percentage (example: 20)
+// },
 
     description: {
       type: String,
@@ -30,10 +38,10 @@ const productSchema = new mongoose.Schema(
       trim: true
     },
 
-    productImages: {
-      type: [String],
-      required: true
-    },
+ productImages: {
+  type: [String],
+  default: []
+},
 
     isListed: {
       type: Boolean,

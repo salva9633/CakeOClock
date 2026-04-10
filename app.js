@@ -7,33 +7,22 @@ const passport = require("./config/passport");
 const db = require("./config/db");
 const userRouter = require("./routes/userRouter");
 const adminRouter = require("./routes/adminRouter");
-const productRoutes = require("./routes/admin/productRoutes");
-const variantRoutes = require("./routes/admin/variantRoutes");
-const batchRoutes = require("./routes/admin/batchRoutes");
 const expressLayouts = require("express-ejs-layouts");
 const path = require("path");
 
 db();
 
-app.use(
-    session({
-        secret: process.env.SESSION_SECRET,
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            maxAge: 24 * 60 * 60 * 1000
-        }
-    })
-);
-
-
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 24 * 60 * 60 * 1000 }
+}));
 
 app.use(passport.initialize());
 app.use(passport.session());
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 
 app.use((req, res, next) => {
     res.locals.user = req.session.user || null;
@@ -41,32 +30,20 @@ app.use((req, res, next) => {
     next();
 });
 
-
-
-
-
 app.set("view engine", "ejs");
 app.set("views", [
     path.join(__dirname, "views/admin"),
     path.join(__dirname, "views/user")
 ]);
 
-
 app.use(express.static(path.join(__dirname, "public")));
 
-
 app.use("/", userRouter);
-app.use("/admin", adminRouter);
-
-app.use("/admin/products", productRoutes);
-app.use("/admin/variants", variantRoutes);
-app.use("/admin/batches", batchRoutes);
-
+app.use("/admin", adminRouter); // ✅ all admin routes here
 
 app.use((req, res) => {
     res.status(404).render("pagenotfound");
 });
-
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

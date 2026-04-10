@@ -3,21 +3,28 @@ const express = require("express");
 const router = express.Router();
 const productController = require("../../controllers/admin/productController");
 
+// ADD PRODUCT
 router.post(
   "/add",
   upload.array("images", 5),
   productController.addProduct
 );
 
-router.get("/:productId", productController.getProductDetail);
+// EDIT PRODUCT  ✅ FIXED
+router.post(
+  "/edit/:productId",
+  upload.array("images", 5),
+  productController.editProduct
+);
 
-// list products
+// LIST PRODUCTS
+// LIST PRODUCTS
 router.get("/", productController.getProducts);
 
-router.patch("/toggle/:productId", productController.toggleProductListing);
+// TOGGLE VISIBILITY
+router.patch("/toggle/:id", productController.toggleProductListing);
 
-router.post("/edit/:productId", productController.editProduct);
-
+// PRODUCT DETAILS
+router.get("/:productId", productController.getProductDetail);
 
 module.exports = router;
-

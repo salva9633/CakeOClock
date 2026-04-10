@@ -9,18 +9,38 @@ const Batch = require("../../models/batchModel");
 ========================= */
 exports.getProducts = async (req, res) => {
   try {
-    const products = await Product.find()
+    const page = parseInt(req.query.page) || 1;
+    const limit = 8;
+    const skip = (page - 1) * limit;
+    const search = req.query.search || "";
+
+    const filter = {};
+    if (search) {
+      filter.productName = { $regex: search, $options: "i" };
+    }
+
+    const totalProducts = await Product.countDocuments(filter);
+    const totalPages = Math.ceil(totalProducts / limit);
+
+    const products = await Product.find(filter)
       .populate("categoryId", "name")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
       .lean();
 
     const categories = await Category.find({ isActive: true }).lean();
 
     res.render("products/products", {
       products,
-      categories
+      categories,
+      currentPage: page,
+      totalPages,
+      search
     });
+
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).send("Server Error");
   }
 };
@@ -30,12 +50,19 @@ exports.getProducts = async (req, res) => {
 ========================= */
 exports.addProduct = async (req, res) => {
   try {
-    const { productName, description, longDescription, categoryId, brand } = req.body;
+
+const { productName, description, longDescription, categoryId, brand, price, discount } = req.body;
+    if (!productName || !description || !categoryId) {
+      return res.status(400).json({
+        success: false,
+        message: "Required fields missing"
+      });
+    }
 
     const cleanName = productName.trim();
 
     const existingProduct = await Product.findOne({
-      productName: { $regex: new RegExp("^" + cleanName + "$", "i") }
+      productName: { $regex: `^${cleanName}$`, $options: "i" }
     });
 
     if (existingProduct) {
@@ -47,82 +74,84 @@ exports.addProduct = async (req, res) => {
 
     const imageUrls = [];
 
-    for (const file of req.files) {
-      const result = await cloudinary.uploader.upload(
-        `data:${file.mimetype};base64,${file.buffer.toString("base64")}`,
-        { folder: "cake_oclock/products" }
-      );
-      imageUrls.push(result.secure_url);
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const uploadResult = await cloudinary.uploader.upload(
+          `data:${file.mimetype};base64,${file.buffer.toString("base64")}`,
+          { folder: "cake_oclock/products" }
+        );
+        imageUrls.push(uploadResult.secure_url);
+      }
     }
 
-    const product = await Product.create({
-      productName: cleanName,
-      description,
-      longDescription,
-      categoryId,
-      brand,
-      productImages: imageUrls
-    });
+   const product = await Product.create({
+  productName: cleanName,
+  description,
+  longDescription,
+  categoryId,
+  brand,
+  price,
+  discount,
+  productImages: imageUrls,
+  isListed: true
+});
 
-    res.json({
+    return res.json({
       success: true,
       redirectUrl: `/admin/products/${product._id}`
     });
 
   } catch (error) {
     console.error("ADD PRODUCT ERROR:", error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Add product failed"
     });
   }
 };
 
+
 /* =========================
-   EDIT PRODUCT (WITH IMAGE UPDATE)
+   EDIT PRODUCT
 ========================= */
 exports.editProduct = async (req, res) => {
   try {
+
     const { productId } = req.params;
     const { productName, description, longDescription, categoryId, brand } = req.body;
 
     const product = await Product.findById(productId);
+
     if (!product) {
       return res.status(404).json({ success: false });
     }
 
-    // Update text fields
     product.productName = productName.trim();
     product.description = description;
     product.longDescription = longDescription;
     product.categoryId = categoryId;
     product.brand = brand;
 
-    // Ensure 5 slots
     while (product.productImages.length < 5) {
-      product.productImages.push(null);
+      product.productImages.push("");
     }
 
-    // Update images
     if (req.files && req.files.length > 0) {
 
-      let indexes = req.body["imageIndexes[]"] || [];
+      let indexes =
+        req.body["imageIndexes[]"] ||
+        req.body.imageIndexes ||
+        [];
 
-      if (!Array.isArray(indexes)) {
-        indexes = [indexes];
-      }
+      if (!Array.isArray(indexes)) indexes = [indexes];
 
       for (let i = 0; i < req.files.length; i++) {
-
         const file = req.files[i];
-
         const result = await cloudinary.uploader.upload(
           `data:${file.mimetype};base64,${file.buffer.toString("base64")}`,
           { folder: "cake_oclock/products" }
         );
-
         const index = parseInt(indexes[i]);
-
         if (!isNaN(index)) {
           product.productImages[index] = result.secure_url;
         }
@@ -131,25 +160,34 @@ exports.editProduct = async (req, res) => {
 
     await product.save();
 
-    res.json({ success: true });
+    return res.json({ success: true });
 
   } catch (err) {
     console.error("EDIT PRODUCT ERROR:", err);
-    res.status(500).json({ success: false });
+    return res.status(500).json({ success: false });
   }
 };
+
+
 /* =========================
-   PRODUCT DETAILS
+   PRODUCT DETAILS (ADMIN)
+   ✅ Admin can view ALL products regardless of isListed
 ========================= */
 exports.getProductDetail = async (req, res) => {
   try {
+
     const { productId } = req.params;
 
     await Batch.markExpiredBatches();
 
+    // ✅ Admin sees ALL products - no isListed filter here
     const product = await Product.findById(productId)
       .populate("categoryId", "name")
       .lean();
+
+    if (!product) {
+      return res.status(404).send("Product not found");
+    }
 
     const variants = await Variant.find({ productId }).lean();
 
@@ -158,17 +196,13 @@ exports.getProductDetail = async (req, res) => {
         variantId: variant._id,
         status: "active"
       });
-
       variant.totalStock = batches.reduce(
         (sum, b) => sum + b.availableStock,
         0
       );
     }
 
-    res.render("products/productDetails", {
-      product,
-      variants
-    });
+    res.render("products/productDetails", { product, variants });
 
   } catch (error) {
     console.error("PRODUCT DETAIL ERROR:", error);
@@ -176,23 +210,38 @@ exports.getProductDetail = async (req, res) => {
   }
 };
 
+
 /* =========================
-   TOGGLE LISTING
+   TOGGLE PRODUCT LISTING
+   ✅ Single clean function - no duplicates
 ========================= */
 exports.toggleProductListing = async (req, res) => {
   try {
-    const { productId } = req.params;
-    const product = await Product.findById(productId);
+
+    console.log("TOGGLE ROUTE HIT");
+    console.log("PRODUCT ID:", req.params.id);
+
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.json({ success: false });
+    }
+
+    console.log("OLD STATUS:", product.isListed);
 
     product.isListed = !product.isListed;
+
     await product.save();
 
-    res.json({ success: true });
+    console.log("NEW STATUS:", product.isListed);
+
+    res.json({
+      success: true,
+      isListed: product.isListed
+    });
 
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to update product visibility"
-    });
+    console.error(error);
+    res.json({ success: false });
   }
 };

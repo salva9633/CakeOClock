@@ -25,6 +25,116 @@
 #promoCarousel .carousel-control-next {
   right: -20px;
 }
+a:hover,
+button:hover {
+  transform: scale(1.05);
+  transition: 0.3s;
+  opacity: 0.9;
+}
+.nav-link:hover {
+  color: #AF5454 !important;
+  letter-spacing: 1px;
+  transition: 0.3s;
+}.hero-img,
+.card-img-top,
+.img-fluid {
+  transition: 0.4s;
+}
+
+.hero-img:hover,
+.card-img-top:hover,
+.img-fluid:hover {
+  transform: scale(1.05);
+  filter: brightness(90%);
+}.category-item:hover {
+  transform: translateY(-5px);
+  transition: 0.3s;
+}
+
+.category-img-wrapper:hover {
+  background-color: #AF5454;
+}.card:hover {
+  transform: scale(1.02);
+  box-shadow: 0px 10px 25px rgba(0,0,0,0.1);
+  transition: 0.3s;
+}.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  transform: scale(1.2);
+  transition: 0.3s;
+}.btn:hover {
+  background-color: #AF5454 !important;
+  color: white !important;
+  transition: 0.3s;
+}* {
+  transition: all 0.3s ease;
+}
+/* ===== NAVBAR FULL EFFECT ===== */
+.nav-link {
+  position: relative;
+  color: #8c3b3b;
+  padding: 8px 15px;
+  border-radius: 20px;
+}
+
+
+
+/* ===== ICON EFFECT ===== */
+.header-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-icon:hover {
+  transform: scale(1.2) rotate(5deg);
+  color: #AF5454;
+}
+
+/* ===== LOGIN / SIGNUP ===== */
+.header-action {
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+.header-action:hover {
+  background-color: rgba(175, 84, 84, 0.1);
+  transform: scale(1.1);
+}
+
+/* ===== SEARCH BAR EFFECT ===== */
+form input:focus {
+  outline: none;
+  box-shadow: 0 0 8px rgba(175, 84, 84, 0.5);
+  transform: scale(1.03);
+}
+.active {
+  color: #AF5454 !important;
+  font-weight: bold;
+}
+
+.card,
+.category-item {
+  opacity: 0;
+  transform: translateY(50px);
+}
+.nav-link:hover {
+  color: #AF5454 !important;
+  transform: scale(1.1);
+  background: linear-gradient(90deg, #fde2d9, #f9c5b5);
+}
+/* subtle page feel */
+body {
+  scroll-behavior: smooth;
+}
+
+/* section spacing animation */
+section {
+  transition: all 0.4s ease;
+}
+video {
+  border-radius: 12px;
+  box-shadow: 0px 10px 25px rgba(0,0,0,0.2);
+}
 </style>
 <body>
 <%-include("../../views/partials/user/navbar")%>
@@ -33,11 +143,11 @@
     <!-- Secondary Nav Links -->
     <div class="container-fluid text-center pb-3">
         <ul class="nav justify-content-center gap-5">
-            <li class="nav-item"><a class="nav-link text-uppercase text-dark small" href="#">Home</a></li>
-            <li class="nav-item"><a class="nav-link text-uppercase text-dark small" href="/products">Shop</a></li>
-            <li class="nav-item"><a class="nav-link text-uppercase text-dark small" href="#">About Us</a></li>
-            <li class="nav-item"><a class="nav-link text-uppercase text-dark small" href="#">Contact Us</a></li>
-            <li class="nav-item"><a class="nav-link text-uppercase text-dark small" href="#">Customer Support</a></li>
+            <li class="nav-item"><a class="nav-link text-uppercase small active" href="#">Home</a></li>
+            <li class="nav-item"><a class="nav-link text-uppercase small" href="/products">Shop</a></li>
+            <li class="nav-item"><a class="nav-link text-uppercase  small" href="#">About Us</a></li>
+            <li class="nav-item"><a class="nav-link text-uppercase  small" href="#">Contact Us</a></li>
+            <li class="nav-item"><a class="nav-link text-uppercase small" href="#">Customer Support</a></li>
         </ul>
     </div>
 
@@ -108,42 +218,36 @@
     </section>
 
     <!-- Shop by Category -->
-    <section class="container py-5 mb-4 text-center">
-        <h2 class="display-4 mb-5" style="color:  #AF5454;font-weight: 900;">Shop by Category</h2>
-        <div class="d-flex justify-content-center flex-wrap gap-5">
-            <!-- Category Item -->
-            <div class="category-item">
-                <div class="category-img-wrapper rounded-circle p-1" style="background-color: var(--primary-color);">
-                    <img src="media/flavours.jpg" class="rounded-circle img-fluid" alt="Brownies">
+<!-- Shop by Category -->
+<section class="container py-5 mb-4 text-center">
+    <h2 class="display-4 mb-5" style="color: #AF5454; font-weight: 900;">Shop by Category</h2>
+    <div class="d-flex justify-content-center flex-wrap gap-5">
+
+        <% if (categories && categories.length > 0) { %>
+            <% categories.forEach(category => { %>
+                <div class="category-item">
+                    <a href="/products?category=<%= category._id %>" class="text-decoration-none">
+                        <div class="category-img-wrapper rounded-circle p-1"
+                            style="background-color: var(--primary-color);">
+                            <img
+                                src="<%= category.image %>"
+                                class="rounded-circle img-fluid"
+                                alt="<%= category.name %>"
+                                style="width: 120px; height: 120px; object-fit: cover;"
+                            >
+                        </div>
+                        <p class="mt-2 fw-bold small" style="color: #AF5454;">
+                            <%= category.name %>
+                        </p>
+                    </a>
                 </div>
-                <p class="mt-2 fw-bold small" style="color:  #AF5454;">Flavours</p>
-            </div>
-            <div class="category-item">
-                <div class="category-img-wrapper rounded-circle p-1" style="background-color: var(--primary-color);">
-                    <img src="media/occations.jpg" class="rounded-circle img-fluid" alt="Chocolate">
-                </div>
-                <p class="mt-2 fw-bold small" style="color:  #AF5454;">Occations</p>
-            </div>
-            <div class="category-item">
-                <div class="category-img-wrapper rounded-circle p-1" style="background-color: var(--primary-color);">
-                    <img src="media/kids.jpg" class="rounded-circle img-fluid" alt="Fruit Cakes">
-                </div>
-                <p class="mt-2 fw-bold small" style="color:  #AF5454;">kids</p>
-            </div>
-            <div class="category-item">
-                <div class="category-img-wrapper rounded-circle p-1" style="background-color: var(--primary-color);">
-                    <img src="media/cupcakes.jpg" class="rounded-circle img-fluid" alt="Cupcakes">
-                </div>
-                <p class="mt-2 fw-bold small" style="color:  #AF5454;">Cupcakes</p>
-            </div>
-            <div class="category-item">
-                <div class="category-img-wrapper rounded-circle p-1" style="background-color: var(--primary-color);">
-                    <img src="media/custo.jpg" class="rounded-circle img-fluid" alt="Customized">
-                </div>
-                <p class="mt-2 fw-bold small" style="color:  #AF5454;">Customized</p>
-            </div>
-        </div>
-    </section>
+            <% }) %>
+        <% } else { %>
+            <p style="color: #AF5454;">No categories available.</p>
+        <% } %>
+
+    </div>
+</section>
     <!-- Seasonal Sales -->
     <!-- 🔁 Seasonal / Deals Rotating Banner -->
 <section class="container py-5 mb-4">
@@ -228,13 +332,25 @@
             </div>
 
             <div class="col-md-6 text-center">
-              <img
-                src="media/offer_cake.png"
-                class="img-fluid"
-                style="max-height: 250px; object-fit: contain;"
-                alt="Expiry Deals"
-              >
-            </div>
+  <% if (cloudinaryVideo) { %>
+    <video
+      class="img-fluid"
+      style="max-height: 250px; object-fit: contain; border-radius:10px;"
+      autoplay
+      muted
+      loop
+      playsinline
+    >
+      <source src="<%= cloudinaryVideo %>" type="video/mp4">
+    </video>
+  <% } else { %>
+    <img
+      src="/media/offer_cake.png"
+      class="img-fluid"
+      style="max-height: 250px; object-fit: contain;"
+    >
+  <% } %>
+</div>
           </div>
         </div>
       </div>
@@ -266,53 +382,7 @@
 
 
 
-    <!-- Our Baked Goods -->
-    <section class="container py-5 mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-5">
-            <h2 class="display-4" style="color: #AF5454;">Our Baked Goods</h2>
-            <a href="#" class="small text-decoration-none" style="color: #AF5454;">Explore the Full
-                Collection -></a>
-        </div>
-
-        <div class="row g-5">
-            <!-- Item 1 -->
-            <div class="col-md-6">
-                <div class="card border-0 bg-transparent">
-                    <div class="img-wrapper mb-3 p-2 bg-white rounded-3 shadow-sm">
-                        <img src="media/wedding.jpg" class="card-img-top rounded-3" alt="Children's Cakes"
-                            style="height: 300px; object-fit: cover;">
-                    </div>
-                    <div class="card-body px-0 text-center">
-                        <h3 class="h2 mb-3" style="color:  #AF5454; font-family: var(--font-heading);">Wedding Cakes
-                        </h3>
-                        <p class="card-text text-start" style="color: #AF5454;">Children's cakes are designed to bring
-                            joy, color, and
-                            imagination to every celebration. Made with playful themes, bright decorations, and flavors
-                            kids love, each cake adds excitement to birthdays. From cartoon characters to creative
-                            shapes, our carefully crafted cakes make every moment special.</p>
-                    </div>
-                </div>
-            </div>
-            <!-- Item 2 -->
-            <div class="col-md-6">
-                <div class="card border-0 bg-transparent">
-                    <div class="img-wrapper mb-3 p-2 bg-white rounded-3 shadow-sm">
-                        <img src="media/child.jpg" class="card-img-top rounded-3" alt="Wedding Cakes"
-                            style="height: 300px; object-fit: cover;">
-                    </div>
-                    <div class="card-body px-0 text-center">
-                        <h3 class="h2 mb-3" style="color:  #AF5454; font-family: var(--font-heading);">Children's Cakes
-                        </h3>
-                        <p class="card-text text-start" style="color: #AF5454;">Wedding cakes are crafted to bring
-                            elegance, beauty, and
-                            sweetness to your special day. Designed with delicate details, smooth finishes, and
-                            meaningful themes, each cake reflects the couple's style. Made with premium ingredients and
-                            flawless artistry, our wedding cakes add charm to every celebration.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+ 
     <!-- Gallery / Slideshow -->
     <section class="container py-5 mb-5">
         <div id="cakeGallery" class="carousel slide" data-bs-ride="carousel">
@@ -360,12 +430,24 @@
    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
-    <script>
-        // Main Javascript file
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('Cake O Clock loaded!');
-        });
-    </script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  const elements = document.querySelectorAll('.card, .category-item');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = "1";
+        entry.target.style.transform = "translateY(0)";
+      }
+    });
+  }, { threshold: 0.2 });
+
+  elements.forEach(el => observer.observe(el));
+
+});
+</script>
 </body>
 
 </html>

@@ -43,25 +43,28 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, .1);
   }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
 
   thead {
     background: linear-gradient(135deg, #AF5454, #d97373);
   }
 
   thead th {
-    padding: 16px;
+    padding: 18px;
     color: #fff;
     font-size: 14px;
     font-weight: 600;
+    text-align: center;
   }
 
   tbody td {
-    padding: 16px;
+    padding: 20px;
     font-size: 14px;
+     text-align: center;
     vertical-align: middle;
   }
 
@@ -77,6 +80,52 @@
     font-size: 13px;
     color: #6c757d;
   }
+ td {
+  text-align: center;
+  vertical-align: middle;
+}
+  th:nth-child(5),
+  th:nth-child(6),
+  td:nth-child(5),
+  td:nth-child(6){
+    width:120px;
+  }
+  tbody tr:hover{
+  background:#f7f7f7;
+}
+.price-box {
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.price-box .regular {
+  color: #6c757d;
+}
+
+.price-box .cost {
+  color: #6c757d;
+  font-size: 13px;
+}
+.action-buttons{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+}
+/* FIX VALIDATION UI */
+.form-control.is-invalid,
+.form-select.is-invalid {
+  background-image: none !important; /* remove bootstrap icon overlap */
+}
+
+small.text-danger {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+}
+
+.modal-body label {
+  font-weight: 500;
+}
 </style>
 
 <!-- HEADER -->
@@ -97,77 +146,99 @@
 
 <!-- VARIANTS TABLE -->
 <div class="table-wrapper">
-  <table>
-    <thead>
-      <tr>
-        <th>Weight</th>
-        <th>Pricing</th>
-        <th>Total Stock</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-    </thead>
+<table>
 
-    <tbody>
-      <% if (variants.length === 0) { %>
-        <tr>
-          <td colspan="5" class="text-center text-muted">
-            No variants added yet
-          </td>
-        </tr>
-      <% } else { %>
+<thead>
+<tr>
+<th>Weight</th>
+<th>Pricing</th>
+<th>Total Stock</th>
+<th>Status</th>
+<th>View</th>
+<th>Action</th>
+</tr>
+</thead>
 
-        <% variants.forEach(variant => { %>
-          <tr>
-            <td>
-              <b>
-                <%= variant.weight >= 1000
-                  ? (variant.weight / 1000) + " kg"
-                  : variant.weight + " g" %>
-              </b>
-            </td>
+<tbody>
 
-            <td>
-              <div>Sale: ₹ <%= variant.salePrice %></div>
-              <div class="price-small">Regular: ₹ <%= variant.regularPrice %></div>
-              <div class="price-small">Cost: ₹ <%= variant.costPrice %></div>
-            </td>
+<% if (variants.length === 0) { %>
 
-            <td><%= variant.totalStock %></td>
+<tr>
+<td colspan="6" class="text-center text-muted">
+No variants added yet
+</td>
+</tr>
 
-            <td>
-              <span class="badge
-                <%= variant.totalStock > 0 ? 'badge-available' : 'badge-out' %>
-              ">
-                <%= variant.totalStock > 0 ? "Available" : "Out of Stock" %>
-              </span>
-            </td>
+<% } else { %>
 
-            <td>
-              <a
-                href="/admin/variants/<%= variant._id %>"
-                class="btn btn-sm btn-outline-primary"
-              >
-                Manage Batches
-              </a>
-            </td>
-          </tr>
-        <% }) %>
+<% variants.forEach(variant => { %>
 
-      <% } %>
-    </tbody>
-  </table>
+<tr>
+
+<td>
+<b>
+<%= variant.weight >= 1000
+? (variant.weight / 1000) + " kg"
+: variant.weight + " g" %>
+</b>
+</td>
+
+<td>
+<div class="price-box">
+<div><b>₹ <%= variant.salePrice %></b></div>
+<div class="regular">Regular ₹ <%= variant.regularPrice %></div>
+<div class="cost">Cost ₹ <%= variant.costPrice %></div>
 </div>
+</td>
 
+<td>
+<%= variant.totalStock %>
+</td>
+
+<td>
+<span class="badge <%= variant.totalStock > 0 ? 'badge-available' : 'badge-out' %>">
+<%= variant.totalStock > 0 ? "Available" : "Out of Stock" %>
+</span>
+</td>
+
+<td>
+<a href="/admin/variants/<%= variant._id %>" class="btn btn-sm btn-outline-primary">
+Batches
+</a>
+</td>
+
+<td>
+<button
+class="btn btn-sm btn-outline-warning edit-variant-btn"
+data-id="<%= variant._id %>"
+data-weight="<%= variant.weight %>"
+data-cost="<%= variant.costPrice %>"
+data-regular="<%= variant.regularPrice %>"
+data-sale="<%= variant.salePrice %>"
+>
+Edit
+</button>
+</td>
+
+</tr>
+
+<% }) %>
+
+<% } %>
+
+</tbody>
+
+</table>
+</div>
 <a href="/admin/products" class="btn btn-secondary mt-4">
   ← Back to Products
 </a>
 
+
 <!-- ADD VARIANT MODAL -->
 <div class="modal fade" id="addVariantModal" tabindex="-1">
   <div class="modal-dialog">
-    <form action="/admin/variants/add" method="post" class="modal-content custom-modal">
-
+<form id="addVariantForm" action="/admin/variants/add" method="post" class="modal-content custom-modal">
       <input type="hidden" name="productId" value="<%= product._id %>">
 
       <div class="modal-header">
@@ -178,32 +249,37 @@
       <div class="modal-body">
 
         <label>Weight</label>
-        <select name="weight" class="form-select" required>
-  <option disabled selected>Select weight</option>
 
-  <!-- Small sizes -->
-  <option value="60">60 g</option>
-  <option value="80">80 g</option>
+        <!-- ✅ FIXED SELECT -->
+        <select name="weight" id="weight" class="form-select">
+          <option disabled selected>Select weight</option>
 
-  <!-- Medium sizes -->
-  <option value="500">500 g</option>
-  <option value="750">750 g</option>
+          <!-- Small sizes -->
+          <option value="60">60 g</option>
+          <option value="80">80 g</option>
 
-  <!-- Large sizes -->
-  <option value="1000">1 kg</option>
-  <option value="2000">2 kg</option>
-  <option value="3000">3 kg</option>
-</select>
+          <!-- Medium sizes -->
+          <option value="500">500 g</option>
+          <option value="750">750 g</option>
+
+          <!-- Large sizes -->
+          <option value="1000">1 kg</option>
+          <option value="2000">2 kg</option>
+          <option value="3000">3 kg</option>
+        </select>
+
+<small id="weightError" class="text-danger d-none"></small>
 
         <label class="mt-3">Cost Price (Production Cost)</label>
-        <input type="number" name="costPrice" class="form-control" required min="1">
-
+       <input type="number" name="costPrice" id="costPrice" class="form-control" min="1">
+<small id="costError" class="text-danger d-none"></small>
         <label class="mt-3">Regular Price</label>
-        <input type="number" name="regularPrice" class="form-control" required>
+        <input type="number" name="regularPrice" id="regularPrice" class="form-control">
+<small id="regularError" class="text-danger d-none"></small>
 
         <label class="mt-3">Sale Price</label>
-        <input type="number" name="salePrice" class="form-control" required>
-
+<input type="number" name="salePrice" id="salePrice" class="form-control">
+<small id="saleError" class="text-danger d-none"></small>
       </div>
 
       <div class="modal-footer">
@@ -218,3 +294,254 @@
     </form>
   </div>
 </div>
+
+<div class="modal fade" id="editVariantModal" tabindex="-1">
+  <div class="modal-dialog">
+    <form id="editVariantForm" method="post" class="modal-content custom-modal">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Variant</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Weight -->
+        <label>Weight</label>
+        <select name="weight" id="editWeight" class="form-select">
+          <option value="">Select weight</option>
+          <option value="60">60 g</option>
+          <option value="80">80 g</option>
+          <option value="500">500 g</option>
+          <option value="750">750 g</option>
+          <option value="1000">1 kg</option>
+          <option value="2000">2 kg</option>
+          <option value="3000">3 kg</option>
+        </select>
+        <small id="editWeightError" class="text-danger d-none"></small>
+
+        <!-- Cost -->
+        <label class="mt-3">Cost Price</label>
+        <input id="editCostPrice" name="costPrice" class="form-control" type="number">
+        <small id="editCostError" class="text-danger d-none"></small>
+
+        <!-- Regular -->
+        <label class="mt-3">Regular Price</label>
+        <input id="editRegularPrice" name="regularPrice" class="form-control" type="number">
+        <small id="editRegularError" class="text-danger d-none"></small>
+
+        <!-- Sale -->
+        <label class="mt-3">Sale Price</label>
+        <input id="editSalePrice" name="salePrice" class="form-control" type="number">
+        <small id="editSaleError" class="text-danger d-none"></small>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+          Update Variant
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  function showError(input, errorElement, message) {
+  input.classList.add("is-invalid");
+  errorElement.innerText = message;
+  errorElement.classList.remove("d-none");
+}
+
+function clearError(input, errorElement) {
+  input.classList.remove("is-invalid");
+  errorElement.innerText = "";
+  errorElement.classList.add("d-none");
+}
+
+
+const editModal = new bootstrap.Modal(document.getElementById("editVariantModal"));
+
+document.querySelectorAll(".edit-variant-btn").forEach(btn => {
+
+  btn.addEventListener("click", function(){
+
+    const id = this.dataset.id;
+
+    document.getElementById("editWeight").value = this.dataset.weight;
+    document.getElementById("editCostPrice").value = this.dataset.cost;
+    document.getElementById("editRegularPrice").value = this.dataset.regular;
+    document.getElementById("editSalePrice").value = this.dataset.sale;
+
+    document.getElementById("editVariantForm").action =
+      `/admin/variants/edit/${id}`;
+
+    editModal.show();
+
+  });
+
+});
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+const addVariantForm = document.getElementById("addVariantForm");
+
+addVariantForm.addEventListener("submit", function(e){
+
+  let isValid = true;
+
+  const weight = document.getElementById("weight");
+  const cost = document.getElementById("costPrice");
+  const regular = document.getElementById("regularPrice");
+  const sale = document.getElementById("salePrice");
+
+  const weightError = document.getElementById("weightError");
+  const costError = document.getElementById("costError");
+  const regularError = document.getElementById("regularError");
+  const saleError = document.getElementById("saleError");
+
+  // RESET
+clearError(weight, weightError);
+clearError(cost, costError);
+clearError(regular, regularError);
+clearError(sale, saleError);
+  // WEIGHT
+// WEIGHT
+if (!weight.value) {
+  showError(weight, weightError, "Weight required");
+  isValid = false;
+}
+
+// COST
+if (!cost.value || cost.value <= 0) {
+  showError(cost, costError, "Enter valid cost");
+  isValid = false;
+}
+
+// REGULAR
+if (!regular.value || regular.value <= 0) {
+  showError(regular, regularError, "Enter valid regular price");
+  isValid = false;
+}
+
+// SALE
+if (!sale.value || sale.value <= 0) {
+  showError(sale, saleError, "Enter valid sale price");
+  isValid = false;
+}
+
+// LOGIC
+// REGULAR > COST
+// REGULAR > COST
+if (Number(regular.value) <= Number(cost.value)) {
+  showError(regular, regularError, "Regular must be greater than cost");
+  isValid = false;
+}
+
+// SALE > COST
+if (Number(sale.value) <= Number(cost.value)) {
+  showError(sale, saleError, "Sale must be greater than cost");
+  isValid = false;
+}
+
+// SALE ≤ REGULAR
+if (Number(sale.value) > Number(regular.value)) {
+  showError(sale, saleError, "Sale must be ≤ regular");
+  isValid = false;
+}
+  if (!isValid) {
+    e.preventDefault();
+    Swal.fire("Error", "Fix errors", "error");
+  }
+
+});
+
+</script>
+<script>
+  const editVariantForm = document.getElementById("editVariantForm");
+
+editVariantForm.addEventListener("submit", function(e){
+
+  let isValid = true;
+
+  const weight = document.getElementById("editWeight");
+  const cost = document.getElementById("editCostPrice");
+  const regular = document.getElementById("editRegularPrice");
+  const sale = document.getElementById("editSalePrice");
+
+  const weightError = document.getElementById("editWeightError");
+  const costError = document.getElementById("editCostError");
+  const regularError = document.getElementById("editRegularError");
+  const saleError = document.getElementById("editSaleError");
+
+  // RESET
+  clearError(weight, weightError);
+  clearError(cost, costError);
+  clearError(regular, regularError);
+  clearError(sale, saleError);
+
+  // VALIDATION
+  if (!weight.value) {
+    showError(weight, weightError, "Weight required");
+    isValid = false;
+  }
+
+  if (!cost.value || cost.value <= 0) {
+    showError(cost, costError, "Enter valid cost");
+    isValid = false;
+  }
+
+  if (!regular.value || regular.value <= 0) {
+    showError(regular, regularError, "Enter valid regular price");
+    isValid = false;
+  }
+
+  if (!sale.value || sale.value <= 0) {
+    showError(sale, saleError, "Enter valid sale price");
+    isValid = false;
+  }
+
+ // REGULAR > COST
+if (Number(regular.value) <= Number(cost.value)) {
+  showError(regular, regularError, "Regular must be greater than cost");
+  isValid = false;
+}
+
+// SALE > COST
+if (Number(sale.value) <= Number(cost.value)) {
+  showError(sale, saleError, "Sale must be greater than cost");
+  isValid = false;
+}
+
+// SALE ≤ REGULAR
+if (Number(sale.value) > Number(regular.value)) {
+  showError(sale, saleError, "Sale must be ≤ regular");
+  isValid = false;
+}
+
+  // STOP if error
+  if (!isValid) {
+    e.preventDefault();
+    Swal.fire("Error", "Fix errors", "error");
+    return;
+  }
+
+  
+// STOP default submit first
+e.preventDefault();
+
+// SHOW SUCCESS
+Swal.fire({
+  title: "Success",
+  text: "Variant updated successfully",
+  icon: "success",
+  confirmButtonText: "OK"
+}).then(() => {
+  editVariantForm.submit(); // submit after user clicks OK
+});
+});
+</script>

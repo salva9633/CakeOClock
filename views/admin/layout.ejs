@@ -29,6 +29,20 @@
   rel="stylesheet"
   />
   <style>
+    /* ✅ FIX 1: Lock body background so it never changes */
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #f5e6e8 !important;
+      overflow-x: hidden;
+    }
+
+    /* ✅ FIX 2: Stop Bootstrap adding padding-right on modal open */
+    body.modal-open {
+      padding-right: 0 !important;
+      overflow-y: hidden !important;
+    }
+
     .main-content {
         margin-left: 260px;              /* sidebar width */
         margin-top: 64px;

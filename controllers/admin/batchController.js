@@ -25,10 +25,51 @@ exports.addBatch = async (req, res) => {
       status: "active"
     });
 
-    res.redirect(`/admin/products/${productId}`);
-
+res.redirect(`/admin/variants/${variantId}`);
   } catch (error) {
     console.log(error);
     res.status(500).send("Add batch failed");
   }
+};
+
+// UPDATE BATCH
+
+exports.updateBatch = async (req,res)=>{
+
+try{
+
+const { batchId } = req.params;
+const { manufacturedAt, expiryDays, initialStock } = req.body;
+
+const batch = await Batch.findById(batchId);
+
+const mfd = new Date(manufacturedAt);
+
+const expiryAt = new Date(mfd);
+expiryAt.setDate(expiryAt.getDate() + Number(expiryDays));
+
+/* stock difference logic */
+
+const difference = Number(initialStock) - batch.initialStock;
+
+const newAvailableStock = batch.availableStock + difference;
+
+await Batch.findByIdAndUpdate(batchId,{
+manufacturedAt: mfd,
+expiryAt,
+initialStock: Number(initialStock),
+availableStock: newAvailableStock
+},{ new:true });
+
+/* redirect to variant page */
+
+res.redirect(`/admin/variants/${batch.variantId}`);
+
+}catch(err){
+
+console.log(err);
+res.status(500).send("Batch update failed");
+
+}
+
 };
