@@ -328,6 +328,42 @@
 </div>
 <script>
   const params = new URLSearchParams(window.location.search);
+  
+// debounce
+function debounce(func, delay) {
+  let timer;
+  return function () {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func();
+    }, delay);
+  };
+}
+
+const debouncedSearch = debounce(() => {
+  applyAll();
+}, 500);
+
+// ✅ KEEP ONLY ONE applyAll
+function applyAll() {
+  document.getElementById("hiddenSearch").value =
+    document.getElementById("searchInput").value.trim();
+  document.getElementById("hiddenSort").value =
+    document.getElementById("sortOptions").value;
+  document.getElementById("filterForm").submit();
+}
+
+// event
+let lastValue = "";
+
+document.getElementById("searchInput").addEventListener("input", function () {
+  const currentValue = this.value.trim();
+
+  if (currentValue !== lastValue) {
+    lastValue = currentValue;
+    debouncedSearch();
+  }
+}); 
 
   // Restore sort
   if (params.get("sort"))
@@ -351,13 +387,7 @@
     if (el) el.checked = true;
   }
 
-  // Central submit function
-  function applyAll() {
-    document.getElementById("hiddenSearch").value = document.getElementById("searchInput").value.trim();
-    document.getElementById("hiddenSort").value   = document.getElementById("sortOptions").value;
-    document.getElementById("filterForm").submit();
-  }
-
+  
   // Intercept Apply Filters button too
   document.getElementById("filterForm").addEventListener("submit", function (e) {
     e.preventDefault();

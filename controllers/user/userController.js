@@ -217,38 +217,53 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // ✅ 1. EMPTY CHECK (ADD THIS)
+    if (!email || !password) {
+      return res.render("login", {
+        error: "Please enter email and password"
+      });
+    }
+
+    // ✅ 2. FIND USER
     const user = await User.findOne({ email });
+
     if (!user) {
       return res.render("login", { error: "User not found" });
     }
 
-    if (!user.password) {
-      return res.render("login", { error: "Please login using Google" });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.render("login", { error: "Wrong password" });
-    }
-
+    // ✅ 3. BLOCK CHECK (MOVE THIS UP)
     if (user.isBlocked) {
       return res.render("login", { error: "Your account is blocked" });
     }
 
+    // ✅ 4. GOOGLE LOGIN CHECK
+    if (!user.password) {
+      return res.render("login", {
+        error: "Please login using Google"
+      });
+    }
+
+    // ✅ 5. PASSWORD CHECK
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.render("login", { error: "Wrong password" });
+    }
+
+    // ✅ 6. SESSION (KEEP CONSISTENT)
     req.session.user = {
       id: user._id,
       name: user.name,
       email: user.email
     };
 
-    return res.redirect("/");
+    return res.redirect(303, "/");
 
   } catch (error) {
     console.log("login error:", error);
     res.status(500).send("Server error");
   }
 };
-
 const logout = async (req, res) => {
   try {
     req.session.destroy((err) => {

@@ -721,14 +721,7 @@ function previewImage(e) {
 <script>
   // 👇 ADD THIS AT THE END
 
-  document.querySelector(".search-box").addEventListener("submit", function(e) {
-    const input = this.querySelector("input[name='search']");
-    
-    if (!input.value.trim()) {
-      e.preventDefault(); // stop submit
-      window.location.href = "/admin/category"; // reset page
-    }
-  });
+ 
 
 </script>
 <script>
@@ -754,4 +747,43 @@ searchInput.addEventListener("input", function () {
 function clearSearch() {
   window.location.href = "/admin/category";
 }
+
+
+// =======================
+// DEBOUNCED SEARCH
+// =======================
+
+function debounce(func, delay) {
+  let timer;
+  return function () {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func();
+    }, delay);
+  };
+}
+
+const form = document.querySelector(".search-box");
+const input = document.getElementById("searchInput");
+
+const debouncedSearch = debounce(() => {
+  if (input.value.trim() === "") {
+    window.location.href = "/admin/category"; // reset
+  } else {
+    form.submit();
+  }
+}, 500);
+
+// trigger on typing
+input.addEventListener("input", () => {
+  debouncedSearch();
+});
+
+// prevent instant submit
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  debouncedSearch();
+});
+
+
 </script>

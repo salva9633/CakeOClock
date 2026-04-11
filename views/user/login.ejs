@@ -133,13 +133,14 @@
 
 <div class="mb-3">
     <label class="form-label">Email</label>
-    <input type="email" id="email" name="email" class="form-control" placeholder="Enter email">
-
+<input type="email" id="email" name="email" class="form-control" required>
+<div id="emailError" class="error-text"></div>
 </div>
 
 <div class="mb-3">
     <label class="form-label">Password</label>
-<input type="password" id="password" name="password" class="form-control" placeholder="Enter password">
+<input type="password" id="password" name="password" class="form-control" required>
+<div id="passwordError" class="error-text"></div>
 </div>
                 <div class="text-end">
                     <a href="/forgotPassword" class="text-primary" style="font-size: 0.8rem;">Forgot password?</a>
@@ -182,24 +183,38 @@ form.addEventListener("submit", function (e) {
     const email = document.getElementById("email");
     const password = document.getElementById("password");
 
-    document.getElementById("emailError").style.display = "none";
-    document.getElementById("passwordError").style.display = "none";
+    const emailError = document.getElementById("emailError");
+    const passwordError = document.getElementById("passwordError");
 
-    if (email.value.trim() === "") {
-        document.getElementById("emailError").innerText = "Email is required";
-        document.getElementById("emailError").style.display = "block";
+    emailError.style.display = "none";
+    passwordError.style.display = "none";
+
+    // ✅ Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email.value.trim()) {
+        emailError.innerText = "Email is required";
+        emailError.style.display = "block";
+        valid = false;
+    } else if (!emailRegex.test(email.value)) {
+        emailError.innerText = "Invalid email format";
+        emailError.style.display = "block";
         valid = false;
     }
 
-    if (password.value.trim() === "") {
-        document.getElementById("passwordError").innerText = "Password is required";
-        document.getElementById("passwordError").style.display = "block";
+    // ✅ Password validation
+    if (!password.value.trim()) {
+        passwordError.innerText = "Password is required";
+        passwordError.style.display = "block";
+        valid = false;
+    } else if (password.value.length < 6) {
+        passwordError.innerText = "Password must be at least 6 characters";
+        passwordError.style.display = "block";
         valid = false;
     }
 
-    if (!valid) e.preventDefault(); 
+    if (!valid) e.preventDefault();
 });
 </script>
-
 </body>
 </html>

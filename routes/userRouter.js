@@ -12,7 +12,7 @@ const {
 
 const userController = require("../controllers/user/userController");
 const profileController = require("../controllers/user/profileController"); 
-const { userAuth } = require("../middlewares/auth");
+const { userAuth, userNotLoggedIn } = require("../middlewares/auth");
 const upload = require("../middlewares/multer");
 
 const { loadNearExpiryDeals } =
@@ -27,7 +27,7 @@ const { loadNearExpiryDeals } =
   router.get("/signUp", userController.signuppage);
   router.post("/signUp", userController.createUser);
 
-  router.get("/login", userController.loadlogin);
+  router.get("/login", userNotLoggedIn, userController.loadlogin);
 router.post("/login", userController.loginUser);
 
 router.get("/verify-otp", userController.verifyOtpPage);
@@ -67,11 +67,15 @@ router.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/login" }),
   (req, res) => {
+    if (req.user.isBlocked) {
+      return res.redirect("/login");
+    }
+
     req.session.user = {
       id: req.user._id,
       name: req.user.name,
       email: req.user.email,
-      phone:req.user.phone
+      phone: req.user.phone
     };
     res.redirect("/");
   }

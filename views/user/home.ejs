@@ -448,6 +448,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 </script>
+<script>
+  if (window.history.replaceState) {
+    window.history.replaceState(null, null, window.location.href);
+  }
+</script>
+<script>
+  window.history.pushState(null, null, window.location.href);
+
+  window.onpopstate = function () {
+    window.location.href = "/";
+  };
+</script>
 </body>
 
 </html>

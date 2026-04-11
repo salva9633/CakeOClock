@@ -8,14 +8,14 @@ const productSchema = new mongoose.Schema(
   unique: true,
   trim: true
 },
-// price: {
-//   type: Number,
-//   required: true
-// },
-// discount: {
-//   type: Number,
-//   default: 0   // percentage (example: 20)
-// },
+price: {
+  type: Number,
+  required: true
+},
+discount: {
+  type: Number,
+  default: 0   
+},
 
     description: {
       type: String,

@@ -140,13 +140,14 @@ tbody td {
   <form method="GET" action="/admin/products" class="d-flex gap-2">
     <input
       type="text"
+      id="adminSearchInput"
       name="search"
       value="<%= search %>"
       placeholder="Search products..."
       class="form-control"
       style="width: 250px;"
     >
-    <button type="submit" class="btn btn-secondary">Search</button>
+    <!-- <button type="submit" class="btn btn-secondary">Search</button> -->
     <% if (search) { %>
       <a href="/admin/products" class="btn btn-outline-secondary">Clear</a>
     <% } %>
@@ -1057,6 +1058,39 @@ if (!isValid) return;
 
   }
 
+});
+
+
+// =======================
+// DEBOUNCED SEARCH
+// =======================
+
+function debounce(func, delay) {
+  let timer;
+  return function () {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func();
+    }, delay);
+  };
+}
+
+const searchForm = document.querySelector('form[action="/admin/products"]');
+const searchInput = document.getElementById("adminSearchInput");
+
+const debouncedSubmit = debounce(() => {
+  searchForm.submit();
+}, 500);
+
+// typing → debounce trigger
+searchInput.addEventListener("input", () => {
+  debouncedSubmit();
+});
+
+// prevent instant submit spam
+searchForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  debouncedSubmit();
 });
 
 
