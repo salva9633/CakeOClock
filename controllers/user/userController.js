@@ -1,10 +1,12 @@
-const User = require("../../models/userModel");
-const nodemailer = require("nodemailer");
-const bcrypt = require("bcrypt");
-const env = require("dotenv").config();
-const { sendVerificationEmail } = require("../../utils/email");
-const Batch = require("../../models/batchModel");
-const Category = require("../../models/categoryModel");
+import User from "../../models/userModel.js";
+import nodemailer from "nodemailer";
+import bcrypt from "bcrypt";
+import dotenv from "dotenv";
+import { sendVerificationEmail } from "../../utils/email.js";
+import Batch from "../../models/batchModel.js";
+import Category from "../../models/categoryModel.js";
+
+dotenv.config();
 
 // ─────────────────────────────────────────
 // HOME PAGE
@@ -23,8 +25,6 @@ const loadHomePage = async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
-      
-
     const today = new Date();
     const twoDaysLater = new Date();
     twoDaysLater.setDate(today.getDate() + 2);
@@ -35,12 +35,12 @@ const loadHomePage = async (req, res) => {
       status: "active"
     });
 
-   res.render("home", {
-  user: userData,
-  categories,
-  showExpiryBanner: nearExpiryCount > 0,
-  cloudinaryVideo:"https://res.cloudinary.com/dtfzp8rwt/video/upload/v1775533742/5318759-uhd_4096_2160_30fps_itjqje.mp4"
-});
+    res.render("home", {
+      user: userData,
+      categories,
+      showExpiryBanner: nearExpiryCount > 0,
+      cloudinaryVideo:"https://res.cloudinary.com/dtfzp8rwt/video/upload/v1775533742/5318759-uhd_4096_2160_30fps_itjqje.mp4"
+    });
   } catch (error) {
     console.error("Home page error:", error);
     res.status(500).send("Server Error");
@@ -216,41 +216,36 @@ const loadlogin = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+    
 
-    // ✅ 1. EMPTY CHECK (ADD THIS)
     if (!email || !password) {
-      return res.render("login", {
-        error: "Please enter email and password"
-      });
+      return res.render("login", { error: "Please enter email and password" });
     }
 
-    // ✅ 2. FIND USER
     const user = await User.findOne({ email });
 
     if (!user) {
       return res.render("login", { error: "User not found" });
     }
 
-    // ✅ 3. BLOCK CHECK (MOVE THIS UP)
+    
+    if (user.isAdmin) {
+      return res.render("login", { error: "Access denied" });
+    }
+
     if (user.isBlocked) {
       return res.render("login", { error: "Your account is blocked" });
     }
 
-    // ✅ 4. GOOGLE LOGIN CHECK
     if (!user.password) {
-      return res.render("login", {
-        error: "Please login using Google"
-      });
+      return res.render("login", { error: "Please login using Google" });
     }
 
-    // ✅ 5. PASSWORD CHECK
     const isMatch = await bcrypt.compare(password, user.password);
-
     if (!isMatch) {
       return res.render("login", { error: "Wrong password" });
     }
 
-    // ✅ 6. SESSION (KEEP CONSISTENT)
     req.session.user = {
       id: user._id,
       name: user.name,
@@ -261,9 +256,10 @@ const loginUser = async (req, res) => {
 
   } catch (error) {
     console.log("login error:", error);
-    res.status(500).send("Server error");
+    return res.status(500).send("Server error");
   }
 };
+
 const logout = async (req, res) => {
   try {
     req.session.destroy((err) => {
@@ -384,13 +380,13 @@ const updatePassword = async (req, res) => {
 // ─────────────────────────────────────────
 // EXPORTS
 // ─────────────────────────────────────────
-module.exports = {
+export {
   loadHomePage,
   signuppage,
   verifyOtpPage,
   createUser,
   verifyOtp,
-  resendOtp,
+  resendOtp,  
   loadlogin,
   loginUser,
   logout,

@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const categorySchema = new mongoose.Schema(
   {
@@ -17,25 +17,25 @@ const categorySchema = new mongoose.Schema(
 
     image: {
       type: String,
-      required: true   
+      required: true
     },
 
     isActive: {
       type: Boolean,
       default: true
     },
-    
+
 
     offer: {
       type: Number,
       default: 0
     },
-        isDeleted: {
+    isDeleted: {
       type: Boolean,
-      default: false   
+      default: false
     }
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Category", categorySchema);
+export default mongoose.model("Category", categorySchema);

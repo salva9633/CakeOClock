@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema(
       required: true
     },
 
-  
+
     phone: {
       type: String,
       unique: true,
@@ -66,66 +66,66 @@ const userSchema = new mongoose.Schema(
       default: false
     },
 
-    
-addresses: [
-  {
-    name: {
-      type: String,
-      required: true
-    },
 
-    phone: {
-      type: String,
-      required: true
-    },
+    addresses: [
+      {
+        name: {
+          type: String,
+          required: true
+        },
 
-    altPhone: {
-      type: String,
-      default: null
-    },
+        phone: {
+          type: String,
+          required: true
+        },
 
-    street: {
-      type: String,
-      required: true
-    },
+        altPhone: {
+          type: String,
+          default: null
+        },
 
-    address: {
-      type: String,
-      default: null
-    },
+        street: {
+          type: String,
+          required: true
+        },
 
-    landmark: {
-      type: String,
-      default: null
-    },
+        address: {
+          type: String,
+          default: null
+        },
 
-    city: {
-      type: String,
-      required: true
-    },
+        landmark: {
+          type: String,
+          default: null
+        },
 
-    state: {
-      type: String,
-      required: true
-    },
+        city: {
+          type: String,
+          required: true
+        },
 
-    pincode: {
-      type: String,
-      required: true
-    },
+        state: {
+          type: String,
+          required: true
+        },
 
-    type: {
-      type: String,
-      enum: ["HOME", "WORK", "FAMILY", "FRIEND"],
-      default: "HOME"
-    },
+        pincode: {
+          type: String,
+          required: true
+        },
 
-    isDefault: {
-      type: Boolean,
-      default: false
-    }
-  }
-]
+        type: {
+          type: String,
+          enum: ["HOME", "WORK", "FAMILY", "FRIEND"],
+          default: "HOME"
+        },
+
+        isDefault: {
+          type: Boolean,
+          default: false
+        }
+      }
+    ]
 
 
 
@@ -135,4 +135,4 @@ addresses: [
   }
 );
 
-module.exports = mongoose.model("User", userSchema);
+export default mongoose.model("User", userSchema);

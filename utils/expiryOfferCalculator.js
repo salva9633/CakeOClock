@@ -22,4 +22,4 @@ function calculateSafeOffer(variant) {
   };
 }
 
-module.exports = calculateSafeOffer;
+export default calculateSafeOffer;

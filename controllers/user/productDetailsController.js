@@ -1,7 +1,7 @@
-const Product = require("../../models/productModel");
-const Variant = require("../../models/variantModel");
-const Batch = require("../../models/batchModel");
-
+import Product from "../../models/productModel.js";
+import Variant from "../../models/variantModel.js";
+import Batch from "../../models/batchModel.js";
+import Review from "../../models/reviewModel.js";
 /* ===============================
    LOAD PRODUCT DETAILS PAGE
 ================================ */
@@ -11,14 +11,14 @@ const loadProductDetailsPage = async (req, res) => {
     const selectedVariantId = req.query.variant;
 
     /* -------- Product -------- */
-  const product = await Product.findOne({
-  _id: productId,
-  isListed: true
-}).lean();
+    const product = await Product.findOne({
+      _id: productId,
+      isListed: true
+    }).lean();
 
-if (!product) {
-  return res.status(404).render("404");
-}
+    if (!product) {
+      return res.status(404).render("404");
+    }
 
     /* -------- Variants -------- */
     const variants = await Variant.find({
@@ -71,13 +71,27 @@ if (!product) {
       })
     );
 
+    /* -------- Reviews -------- */
+// 🔥 ALL REVIEWS (for count / future use)
+const allReviews = await Review.find({ productId })
+  .populate("userId", "name")
+  .sort({ createdAt: -1 })
+  .lean();
+
+// ✅ ONLY LAST 3 REVIEWS
+const reviews = allReviews.slice(0, 3);
+
+// ✅ TOTAL COUNT
+const totalReviews = allReviews.length;
     /* -------- Render -------- */
-    res.render("productDetails", {
-      product,
-      variants,
-      selectedVariant,
-      relatedProducts
-    });
+res.render("productDetails", {
+  product,
+  variants,
+  selectedVariant,
+  relatedProducts,
+  reviews,
+  totalReviews
+});
 
   } catch (error) {
     console.error(error);
@@ -98,12 +112,12 @@ const getVariantDetails = async (req, res) => {
     }
 
     /* Stock from batches */
-   const batches = await Batch.find({
-  variantId,
-  status: "active",
-  expiryAt: { $gt: new Date() },   // ignore expired batches
-  availableStock: { $gt: 0 }
-}).lean();
+    const batches = await Batch.find({
+      variantId,
+      status: "active",
+      expiryAt: { $gt: new Date() },   // ignore expired batches
+      availableStock: { $gt: 0 }
+    }).lean();
 
     const totalStock = batches.reduce(
       (sum, b) => sum + b.availableStock,
@@ -111,15 +125,15 @@ const getVariantDetails = async (req, res) => {
     );
 
     const stockStatus = totalStock > 0 ? "In Stock" : "Out of Stock";
-
-   res.json({
-  success: true,
-  salePrice: variant.salePrice,
-  regularPrice: variant.regularPrice,
-  weight: variant.weight,
-  stock: totalStock,
-  stockStatus
-});
+    
+    res.json({
+      success: true,
+      salePrice: variant.salePrice,
+      regularPrice: variant.regularPrice,
+      weight: variant.weight,
+      stock: totalStock,
+      stockStatus
+    });
 
   } catch (error) {
     console.error(error);
@@ -127,7 +141,7 @@ const getVariantDetails = async (req, res) => {
   }
 };
 
-module.exports = {
+export {
   loadProductDetailsPage,
   getVariantDetails
 };

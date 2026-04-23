@@ -302,6 +302,7 @@ tbody td {
 <small id="brandError" class="text-danger"></small>
         </div>
 
+       
 
 
         <div class="col-12">
@@ -882,6 +883,7 @@ if (!category) {
 
 // BRAND
 const brand = brandInput.value.trim();
+
 if (brand && brand.length < 2) {
   brandError.innerText = "Min 2 characters";
   brandInput.classList.add("is-invalid");

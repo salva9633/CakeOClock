@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const variantSchema = new mongoose.Schema(
   {
@@ -43,4 +43,4 @@ const variantSchema = new mongoose.Schema(
 /* Prevent duplicate weights for same product */
 variantSchema.index({ productId: 1, weight: 1 }, { unique: true });
 
-module.exports = mongoose.model("Variant", variantSchema);
+export default mongoose.model("Variant", variantSchema);

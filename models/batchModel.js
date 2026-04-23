@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const batchSchema = new mongoose.Schema(
   {
@@ -63,6 +63,4 @@ batchSchema.index({ variantId: 1, manufacturedAt: 1 });
 batchSchema.index({ expiryAt: 1 });
 
 
-
-module.exports = mongoose.model("Batch", batchSchema);
-
+export default mongoose.model("Batch", batchSchema);

@@ -1,5 +1,5 @@
-const Batch = require("../../models/batchModel");
-const calculateSafeOffer = require("../../utils/expiryOfferCalculator");
+import Batch from "../../models/batchModel.js";
+import calculateSafeOffer from "../../utils/expiryOfferCalculator.js";
 
 const loadNearExpiryDeals = async (req, res) => {
   try {
@@ -16,20 +16,20 @@ const loadNearExpiryDeals = async (req, res) => {
       .populate("variantId")
       .lean();
 
-const deals = batches
-  .filter(b => b.productId && b.productId.isListed)
-  .map(batch => {
-    const offer = calculateSafeOffer(batch.variantId);
+    const deals = batches
+      .filter(b => b.productId && b.productId.isListed)
+      .map(batch => {
+        const offer = calculateSafeOffer(batch.variantId);
 
-    return {
-      product: batch.productId,
-      variant: batch.variantId,
-      expiryAt: batch.expiryAt,
-      offerPrice: offer.offerPrice,
-      discountPercent: offer.discountPercent,
-      stock: batch.availableStock
-    };
-  });
+        return {
+          product: batch.productId,
+          variant: batch.variantId,
+          expiryAt: batch.expiryAt,
+          offerPrice: offer.offerPrice,
+          discountPercent: offer.discountPercent,
+          stock: batch.availableStock
+        };
+      });
 
 
     res.render("near-expiry", { deals });
@@ -40,4 +40,4 @@ const deals = batches
   }
 };
 
-module.exports = { loadNearExpiryDeals };
+export { loadNearExpiryDeals };

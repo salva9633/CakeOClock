@@ -1,14 +1,10 @@
-const express = require("express");
+import express from "express";
+import { addVariant, getVariantDetail, updateVariant } from "../../controllers/admin/variantController.js";
+
 const router = express.Router();
-const variantController = require("../../controllers/admin/variantController");
 
-// add variant
-router.post("/add", variantController.addVariant);
+router.post("/add", addVariant);
+router.get("/:variantId", getVariantDetail);
+router.post("/edit/:variantId", updateVariant);
 
-// variant detail
-router.get("/:variantId", variantController.getVariantDetail);
-
-// update variant
-router.post("/edit/:variantId", variantController.updateVariant);
-
-module.exports = router;
+export default router;

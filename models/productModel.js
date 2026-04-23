@@ -1,28 +1,24 @@
-const mongoose = require("mongoose"); // ✅ MISSING LINE
+import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema(
   {
     productName: {
-  type: String,
-  required: true,
-  unique: true,
-  trim: true
-},
-price: {
-  type: Number,
-  required: true
-},
-discount: {
-  type: Number,
-  default: 0   
-},
+      type: String,
+      required: true,
+      unique: true,
+      trim: true
+    },
+    discount: {
+      type: Number,
+      default: 0
+    },
 
     description: {
       type: String,
       required: true
     },
 
-    
+
     longDescription: {
       type: String
     },
@@ -38,10 +34,10 @@ discount: {
       trim: true
     },
 
- productImages: {
-  type: [String],
-  default: []
-},
+    productImages: {
+      type: [String],
+      default: []
+    },
 
     isListed: {
       type: Boolean,
@@ -61,4 +57,4 @@ discount: {
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Product", productSchema);
+export default mongoose.model("Product", productSchema);

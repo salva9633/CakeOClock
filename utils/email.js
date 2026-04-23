@@ -1,4 +1,4 @@
-const nodemailer = require("nodemailer");
+import nodemailer from "nodemailer";
 
 const sendVerificationEmail = async (email, otp) => {
   try {
@@ -24,4 +24,4 @@ const sendVerificationEmail = async (email, otp) => {
   }
 };
 
-module.exports = { sendVerificationEmail };
+export { sendVerificationEmail };

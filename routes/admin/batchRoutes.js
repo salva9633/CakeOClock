@@ -1,11 +1,9 @@
-const express = require("express");
+import express from "express";
+import { addBatch, updateBatch } from "../../controllers/admin/batchController.js";
+
 const router = express.Router();
-const batchController = require("../../controllers/admin/batchController");
 
-// add batch
-router.post("/add", batchController.addBatch);
+router.post("/add", addBatch);
+router.post("/edit/:batchId", updateBatch);
 
-// update batch
-router.post("/edit/:batchId", batchController.updateBatch);
-
-module.exports = router;
+export default router;

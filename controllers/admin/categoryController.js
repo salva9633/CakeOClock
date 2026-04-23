@@ -1,53 +1,54 @@
-const Category = require("../../models/categoryModel");
-const cloudinary = require("../../config/cloudinary");
+import Category from "../../models/categoryModel.js";
+import cloudinary from "../../config/cloudinary.js";
 
+// reusable stream upload helper
+const streamUpload = (buffer, folder = "categories") => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder },
+      (error, result) => {
+        if (result) resolve(result);
+        else reject(error);
+      }
+    );
+    stream.end(buffer);
+  });
+};
 
 /* ================= CATEGORY PAGE ================= */
 const categoryInfo = async (req, res) => {
   try {
-const page = parseInt(req.query.page) || 1;
-const limit = 5;
-const skip = (page - 1) * limit;
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5;
+    const skip = (page - 1) * limit;
+    const search = req.query.search || "";
 
-const search = req.query.search || "";
+    let filter = { isDeleted: { $ne: true } };
+    if (search && search.trim() !== "") {
+      filter.name = { $regex: search.trim(), $options: "i" };
+    }
 
-let filter = { isDeleted: { $ne: true } };
+    const totalCategories = await Category.countDocuments(filter);
+    const cat = await Category.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
 
-if (search && search.trim() !== "") {
-  filter.name = { $regex: search.trim(), $options: "i" };
-}
+    const totalPages = Math.ceil(totalCategories / limit);
 
-const totalCategories = await Category.countDocuments(filter);
-
-const cat = await Category.find(filter)
-  .sort({ createdAt: -1 })
-  .skip(skip)
-  .limit(limit)
-  .lean();
-
-const totalPages = Math.ceil(totalCategories / limit);
-
-res.render("category", {
-  cat,
-  currentPage: page,
-  totalPages,
-  search   // ✅ IMPORTANT
-});
+    res.render("category", { cat, currentPage: page, totalPages, search });
   } catch (error) {
     console.log(error);
     res.redirect("/admin/pagenotfound");
   }
 };
 
-
 /* ================= TOGGLE STATUS ================= */
 const toggleCategoryStatus = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
-
-    if (!category) {
-      return res.json({ success: false });
-    }
+    if (!category) return res.json({ success: false });
 
     category.isActive = !category.isActive;
     await category.save();
@@ -59,23 +60,15 @@ const toggleCategoryStatus = async (req, res) => {
   }
 };
 
-
 /* ================= ADD CATEGORY ================= */
-
 const addCategory = async (req, res) => {
   try {
-    console.log("REQ BODY:", req.body);
-    console.log("REQ FILE:", req.file);
-
     const name = req.body?.name;
     const description = req.body?.description;
     const isActive = req.body?.isActive;
 
     if (!name || !description || !req.file) {
-      return res.json({
-        success: false,
-        message: "All fields are required"
-      });
+      return res.json({ success: false, message: "All fields are required" });
     }
 
     const exists = await Category.findOne({
@@ -83,27 +76,10 @@ const addCategory = async (req, res) => {
     });
 
     if (exists) {
-      return res.json({
-        success: false,
-        message: "Category already exists"
-      });
+      return res.json({ success: false, message: "Category already exists" });
     }
 
-  const streamUpload = (buffer) => {
-  return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      { folder: "categories" },
-      (error, result) => {
-        if (result) resolve(result);
-        else reject(error);
-      }
-    );
-    stream.end(buffer);
-  });
-};
-
-const result = await streamUpload(req.file.buffer);
-
+    const result = await streamUpload(req.file.buffer);
 
     await Category.create({
       name: name.trim(),
@@ -112,27 +88,17 @@ const result = await streamUpload(req.file.buffer);
       isActive: isActive === "true"
     });
 
-    res.json({
-      success: true,
-      message: "Category added successfully"
-    });
-
+    res.json({ success: true, message: "Category added successfully" });
   } catch (error) {
     console.log(error);
-    res.json({
-      success: false,
-      message: "Something went wrong"
-    });
+    res.json({ success: false, message: "Something went wrong" });
   }
 };
 
-
+/* ================= DELETE CATEGORY ================= */
 const deleteCategory = async (req, res) => {
   try {
-    await Category.findByIdAndUpdate(req.params.id, {
-      isDeleted: true
-    });
-
+    await Category.findByIdAndUpdate(req.params.id, { isDeleted: true });
     res.json({ success: true });
   } catch (error) {
     console.log(error);
@@ -140,7 +106,7 @@ const deleteCategory = async (req, res) => {
   }
 };
 
-
+/* ================= EDIT CATEGORY ================= */
 const editCategory = async (req, res) => {
   try {
     const { name, description, isActive } = req.body;
@@ -152,25 +118,11 @@ const editCategory = async (req, res) => {
     };
 
     if (req.file) {
-      const streamUpload = (buffer) => {
-        return new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream(
-            { folder: "categories" },
-            (error, result) => {
-              if (result) resolve(result);
-              else reject(error);
-            }
-          );
-          stream.end(buffer);
-        });
-      };
-
       const result = await streamUpload(req.file.buffer);
       updateData.image = result.secure_url;
     }
 
     await Category.findByIdAndUpdate(req.params.id, updateData);
-
     res.json({ success: true });
   } catch (error) {
     console.log(error);
@@ -178,12 +130,7 @@ const editCategory = async (req, res) => {
   }
 };
 
-
-
-
-
-
-module.exports = {
+export {
   categoryInfo,
   toggleCategoryStatus,
   addCategory,

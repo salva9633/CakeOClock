@@ -1,8 +1,7 @@
-const User = require("../../models/userModel");
-const cloudinary = require("../../config/cloudinary");
-const bcrypt = require("bcrypt");
-const { sendVerificationEmail } = require("../../utils/email");
-
+import User from "../../models/userModel.js";
+import cloudinary from "../../config/cloudinary.js";
+import bcrypt from "bcrypt";
+import { sendVerificationEmail } from "../../utils/email.js";
 
 /* ================= PROFILE PAGE ================= */
 const userProfile = async (req, res) => {
@@ -55,6 +54,7 @@ const editProfilePost = async (req, res) => {
     if (email && email !== user.email) {
 
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      console.log(otp)
 
       req.session.emailChangeOtp = otp;
       req.session.emailChangeExpiry = Date.now() + 5 * 60 * 1000;
@@ -62,7 +62,7 @@ const editProfilePost = async (req, res) => {
 
       await sendVerificationEmail(email, otp);
 
-      // ⛔ stop execution until OTP verified
+      //  stop execution until OTP verified
       return res.redirect("/verifyEmailOtp");
     }
 
@@ -137,12 +137,6 @@ const addressPage = async (req, res) => {
   }
 };
 
-
-
-
-
-
-
 /* ================= ADD ADDRESS ================= */
 const addAddress = async (req, res) => {
   try {
@@ -182,15 +176,6 @@ const addAddress = async (req, res) => {
   }
 };
 
-
-
-
-
-
-
-
-
-
 /* ================= DELETE ADDRESS ================= */
 const deleteAddress = async (req, res) => {
   try {
@@ -219,7 +204,6 @@ const editAddressPage = async (req, res) => {
   }
 };
 
-
 const updateAddress = async (req, res) => {
   try {
     const {    name,
@@ -234,7 +218,7 @@ const updateAddress = async (req, res) => {
       type } = req.body;
 
     await User.updateOne(
-      { 
+      {
         _id: req.session.user.id,
         "addresses._id": req.params.id
       },
@@ -248,8 +232,8 @@ const updateAddress = async (req, res) => {
           "addresses.$.pincode": pincode,
           "addresses.$.type": type,
           "addresses.$.address": address || null,
-"addresses.$.landmark": landmark || null,
-"addresses.$.altPhone": altPhone || null
+          "addresses.$.landmark": landmark || null,
+          "addresses.$.altPhone": altPhone || null
 
         }
       }
@@ -261,7 +245,6 @@ const updateAddress = async (req, res) => {
     res.redirect("/pageNotFound");
   }
 };
-
 
 const loadChangePassword = async (req, res) => {
   try {
@@ -300,14 +283,13 @@ const changePassword = async (req, res) => {
 
     // 🚫 No password set
     if (!user.password) {
-  return res.render("user/changePassword", {
-    user,
-    error: null,
-    success: null,
-    noPassword: true   // 👈 FLAG
-  });
-}
-
+      return res.render("user/changePassword", {
+        user,
+        error: null,
+        success: null,
+        noPassword: true   // 👈 FLAG
+      });
+    }
 
     // 🚫 Empty fields
     if (!currentPassword || !newPassword || !confirmPassword) {
@@ -371,7 +353,6 @@ const changePassword = async (req, res) => {
   }
 };
 
-
 /* ================= CHECK CURRENT PASSWORD (AJAX) ================= */
 const checkCurrentPassword = async (req, res) => {
   try {
@@ -398,12 +379,7 @@ const checkCurrentPassword = async (req, res) => {
   }
 };
 
-
-
-
-
-
-module.exports = {
+export {
   userProfile,
   editProfileLoad,
   editProfilePost,
@@ -417,6 +393,4 @@ module.exports = {
   verifyEmailOtpPage,
   verifyEmailOtp,
   checkCurrentPassword
-
-
 };

@@ -1,13 +1,13 @@
-const Product = require("../../models/productModel");
-const Variant = require("../../models/variantModel");
-const Category = require("../../models/categoryModel");
-const cloudinary = require("../../config/cloudinary");
-const Batch = require("../../models/batchModel");
+import Product from "../../models/productModel.js";
+import Variant from "../../models/variantModel.js";
+import Category from "../../models/categoryModel.js";
+import cloudinary from "../../config/cloudinary.js";
+import Batch from "../../models/batchModel.js";
 
 /* =========================
    GET PRODUCTS LIST
 ========================= */
-exports.getProducts = async (req, res) => {
+export const getProducts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = 8;
@@ -20,6 +20,7 @@ exports.getProducts = async (req, res) => {
     }
 
     const totalProducts = await Product.countDocuments(filter);
+   
     const totalPages = Math.ceil(totalProducts / limit);
 
     const products = await Product.find(filter)
@@ -38,7 +39,6 @@ exports.getProducts = async (req, res) => {
       totalPages,
       search
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
@@ -48,15 +48,13 @@ exports.getProducts = async (req, res) => {
 /* =========================
    ADD PRODUCT
 ========================= */
-exports.addProduct = async (req, res) => {
+export const addProduct = async (req, res) => {
   try {
+const { productName, description, longDescription, categoryId, brand, discount } = req.body;
 
-const { productName, description, longDescription, categoryId, brand, price, discount } = req.body;
+
     if (!productName || !description || !categoryId) {
-      return res.status(400).json({
-        success: false,
-        message: "Required fields missing"
-      });
+      return res.status(400).json({ success: false, message: "Required fields missing" });
     }
 
     const cleanName = productName.trim();
@@ -66,10 +64,7 @@ const { productName, description, longDescription, categoryId, brand, price, dis
     });
 
     if (existingProduct) {
-      return res.status(400).json({
-        success: false,
-        message: "Product already exists"
-      });
+      return res.status(400).json({ success: false, message: "Product already exists" });
     }
 
     const imageUrls = [];
@@ -84,39 +79,29 @@ const { productName, description, longDescription, categoryId, brand, price, dis
       }
     }
 
-   const product = await Product.create({
-  productName: cleanName,
-  description,
-  longDescription,
-  categoryId,
-  brand,
-  price,
-  discount,
-  productImages: imageUrls,
-  isListed: true
-});
-
-    return res.json({
-      success: true,
-      redirectUrl: `/admin/products/${product._id}`
+    const product = await Product.create({
+      productName: cleanName,
+      description,
+      longDescription,
+      categoryId,
+      brand,
+      discount,
+      productImages: imageUrls,
+      isListed: true
     });
 
+    return res.json({ success: true, redirectUrl: `/admin/products/${product._id}` });
   } catch (error) {
     console.error("ADD PRODUCT ERROR:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Add product failed"
-    });
+    return res.status(500).json({ success: false, message: "Add product failed" });
   }
 };
-
 
 /* =========================
    EDIT PRODUCT
 ========================= */
-exports.editProduct = async (req, res) => {
+export const editProduct = async (req, res) => {
   try {
-
     const { productId } = req.params;
     const { productName, description, longDescription, categoryId, brand } = req.body;
 
@@ -137,12 +122,7 @@ exports.editProduct = async (req, res) => {
     }
 
     if (req.files && req.files.length > 0) {
-
-      let indexes =
-        req.body["imageIndexes[]"] ||
-        req.body.imageIndexes ||
-        [];
-
+      let indexes = req.body["imageIndexes[]"] || req.body.imageIndexes || [];
       if (!Array.isArray(indexes)) indexes = [indexes];
 
       for (let i = 0; i < req.files.length; i++) {
@@ -159,28 +139,22 @@ exports.editProduct = async (req, res) => {
     }
 
     await product.save();
-
     return res.json({ success: true });
-
   } catch (err) {
     console.error("EDIT PRODUCT ERROR:", err);
     return res.status(500).json({ success: false });
   }
 };
 
-
 /* =========================
    PRODUCT DETAILS (ADMIN)
-   ✅ Admin can view ALL products regardless of isListed
 ========================= */
-exports.getProductDetail = async (req, res) => {
+export const getProductDetail = async (req, res) => {
   try {
-
     const { productId } = req.params;
 
     await Batch.markExpiredBatches();
 
-    // ✅ Admin sees ALL products - no isListed filter here
     const product = await Product.findById(productId)
       .populate("categoryId", "name")
       .lean();
@@ -192,53 +166,34 @@ exports.getProductDetail = async (req, res) => {
     const variants = await Variant.find({ productId }).lean();
 
     for (let variant of variants) {
-      const batches = await Batch.find({
-        variantId: variant._id,
-        status: "active"
-      });
-      variant.totalStock = batches.reduce(
-        (sum, b) => sum + b.availableStock,
-        0
-      );
+      const batches = await Batch.find({ variantId: variant._id, status: "active" });
+      variant.totalStock = batches.reduce((sum, b) => sum + b.availableStock, 0);
     }
 
     res.render("products/productDetails", { product, variants });
-
   } catch (error) {
     console.error("PRODUCT DETAIL ERROR:", error);
     res.status(500).send("Product detail error");
   }
 };
 
-
 /* =========================
    TOGGLE PRODUCT LISTING
-   ✅ Single clean function - no duplicates
 ========================= */
-exports.toggleProductListing = async (req, res) => {
+export const toggleProductListing = async (req, res) => {
   try {
-
-    console.log("TOGGLE ROUTE HIT");
-    console.log("PRODUCT ID:", req.params.id);
-
     const product = await Product.findById(req.params.id);
 
     if (!product) {
       return res.json({ success: false });
     }
 
-    console.log("OLD STATUS:", product.isListed);
-
     product.isListed = !product.isListed;
 
-    await product.save();
+    
+    await product.save({ validateBeforeSave: false });
 
-    console.log("NEW STATUS:", product.isListed);
-
-    res.json({
-      success: true,
-      isListed: product.isListed
-    });
+    res.json({ success: true, isListed: product.isListed });
 
   } catch (error) {
     console.error(error);
