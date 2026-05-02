@@ -1,6 +1,6 @@
 import Batch from "../../models/batchModel.js";
 
-// ADD BATCH
+
 export const addBatch = async (req, res) => {
   try {
     const { productId, variantId, manufacturedAt, expiryDays, initialStock } = req.body;
@@ -38,7 +38,7 @@ export const updateBatch = async (req, res) => {
     const expiryAt = new Date(mfd);
     expiryAt.setDate(expiryAt.getDate() + Number(expiryDays));
 
-    // stock difference logic
+    
     const difference = Number(initialStock) - batch.initialStock;
     const newAvailableStock = batch.availableStock + difference;
 

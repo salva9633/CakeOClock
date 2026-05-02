@@ -596,15 +596,19 @@
                         </h1>
 
                         <div class="product-meta">
-                            <span class="rating-badge">
-                                <i class="fas fa-star"></i> 4.8
-                            </span>
+                          <span class="rating-badge">
+  <i class="fas fa-star"></i> <%= avgRating %>
+</span>
      <span class="text-muted">
-    <%= product.reviewCount || 24 %> Reviews
+<%= totalReviews %> Reviews
 </span>
 
-<span id="stock-status" class="fw-medium text-success">
-<i class="fas fa-check-circle me-1"></i> In Stock
+<span id="stock-status" class="fw-medium <%= initialStock > 0 ? 'text-success' : 'text-danger' %>">
+  <% if (initialStock > 0) { %>
+    <i class="fas fa-check-circle me-1"></i> In Stock
+  <% } else { %>
+    <i class="fas fa-times-circle me-1"></i> Out of Stock
+  <% } %>
 </span>
                         
 </div>

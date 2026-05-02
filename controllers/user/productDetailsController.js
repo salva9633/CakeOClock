@@ -25,7 +25,7 @@ const loadProductDetailsPage = async (req, res) => {
       productId,
       isAvailable: true
     })
-      .sort({ salePrice: 1 }) // lowest first
+      .sort({ salePrice: 1 }) 
       .lean();
 
     if (variants.length === 0) {
@@ -45,6 +45,16 @@ const loadProductDetailsPage = async (req, res) => {
     if (!selectedVariant) {
       selectedVariant = variants[0];
     }
+
+    /* -------- Initial Stock -------- */
+const batches = await Batch.find({
+  variantId: selectedVariant._id,
+  status: "active",
+  expiryAt: { $gt: new Date() },
+  availableStock: { $gt: 0 }
+}).lean();
+
+const initialStock = batches.reduce((sum, b) => sum + b.availableStock, 0);
 
     /* -------- Related Products -------- */
     const relatedProductsRaw = await Product.find({
@@ -83,6 +93,11 @@ const reviews = allReviews.slice(0, 3);
 
 // ✅ TOTAL COUNT
 const totalReviews = allReviews.length;
+
+const avgRating = totalReviews > 0
+  ? (allReviews.reduce((sum, r) => sum + (r.rating || 0), 0) / totalReviews).toFixed(1)
+  : "0.0";
+
     /* -------- Render -------- */
 res.render("productDetails", {
   product,
@@ -90,7 +105,11 @@ res.render("productDetails", {
   selectedVariant,
   relatedProducts,
   reviews,
-  totalReviews
+  totalReviews,
+  avgRating,
+  initialStock 
+  
+  
 });
 
   } catch (error) {

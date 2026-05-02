@@ -15,7 +15,8 @@ const loadProductsPage = async (req, res) => {
 
     let productFilter = {
       isListed: true,
-      categoryId: { $in: activeCategoryIds }
+      categoryId: { $in: activeCategoryIds },
+
     };
 
     if (search) {

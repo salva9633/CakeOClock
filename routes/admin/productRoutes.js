@@ -4,10 +4,12 @@ import { addProduct, editProduct, getProducts, toggleProductListing, getProductD
 
 const router = express.Router();
 
+router.get("/", getProducts);
 router.post("/add", upload.array("images", 5), addProduct);
 router.post("/edit/:productId", upload.array("images", 5), editProduct);
-router.get("/", getProducts);
 router.patch("/toggle/:id", toggleProductListing);
 router.get("/:productId", getProductDetail);
 
 export default router;
+
+
