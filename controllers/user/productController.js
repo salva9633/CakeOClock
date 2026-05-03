@@ -16,6 +16,7 @@ const loadProductsPage = async (req, res) => {
     let productFilter = {
       isListed: true,
       categoryId: { $in: activeCategoryIds },
+      
 
     };
 
@@ -33,10 +34,10 @@ const loadProductsPage = async (req, res) => {
       productFilter.brand = brand;
     }
 
-    const allProducts = await Product.find({ ...productFilter, isListed: true })
-      .populate("categoryId")
-      .lean();
-      
+   const allProducts = await Product.find({ ...productFilter, isListed: true })
+  .sort({ createdAt: -1 }) 
+  .populate("categoryId")
+  .lean();
     /* ================= PRICE FILTER (VARIANT) ================= */
     let priceFilter = {};
 
@@ -76,7 +77,7 @@ const loadProductsPage = async (req, res) => {
         };
       })
     );
-    // ✅ Filter nulls only - isListed already handled in DB query
+    // Filter nulls only - isListed already handled in DB query
     productsWithPrice = productsWithPrice.filter(Boolean);
 
     /* ================= SORTING ================= */
@@ -99,7 +100,7 @@ const loadProductsPage = async (req, res) => {
     const paginatedProducts = productsWithPrice.slice(skip, skip + limit);
 
     /* ================= SIDEBAR DATA ================= */
-    // ✅ Only show active categories in sidebar
+    //Only show active categories in sidebar
     const brands = await Product.distinct("brand", { isListed: true });
     res.render("products", {
       products: paginatedProducts,

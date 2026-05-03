@@ -82,16 +82,16 @@ const initialStock = batches.reduce((sum, b) => sum + b.availableStock, 0);
     );
 
     /* -------- Reviews -------- */
-// 🔥 ALL REVIEWS (for count / future use)
+//  ALL REVIEWS (for count / future use)
 const allReviews = await Review.find({ productId })
   .populate("userId", "name")
   .sort({ createdAt: -1 })
   .lean();
 
-// ✅ ONLY LAST 3 REVIEWS
+//  ONLY LAST 3 REVIEWS
 const reviews = allReviews.slice(0, 3);
 
-// ✅ TOTAL COUNT
+//  TOTAL COUNT
 const totalReviews = allReviews.length;
 
 const avgRating = totalReviews > 0
@@ -134,7 +134,7 @@ const getVariantDetails = async (req, res) => {
     const batches = await Batch.find({
       variantId,
       status: "active",
-      expiryAt: { $gt: new Date() },   // ignore expired batches
+      expiryAt: { $gt: new Date() },   
       availableStock: { $gt: 0 }
     }).lean();
 
