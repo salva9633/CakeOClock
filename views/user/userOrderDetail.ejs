@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Order Details – Cake O'Clock</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Lato:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --rose:#AF5454; --rose-dk:#8c3535; --cream:#fdf6f0; --border:#f0e0dc; }
+    body { font-family:'Lato',sans-serif; background:var(--cream); }
+    h2,h4 { font-family:'Playfair Display',serif; }
+
+    .section-card {
+      background:#fff; border-radius:14px; padding:22px;
+      margin-bottom:20px; box-shadow:0 2px 10px rgba(0,0,0,.05);
+      border:1px solid var(--border);
+    }
+    .section-title {
+      font-size:.9rem; font-weight:700; color:var(--rose);
+      border-bottom:2px solid #f5e8e8; padding-bottom:8px; margin-bottom:14px;
+    }
+    .item-img { width:64px; height:64px; object-fit:cover; border-radius:10px; }
+
+    /* ── STATUS BADGES ── */
+    .status-badge {
+      font-size:.72rem; border-radius:20px;
+      padding:3px 12px; font-weight:700; display:inline-block;
+    }
+    .status-Pending    { background:#fff3cd; color:#856404; }
+    .status-Processing { background:#cff4fc; color:#0a58ca; }
+    .status-Shipped    { background:#d0efff; color:#0a3d62; }
+    .status-Delivered  { background:#d4edda; color:#155724; }
+    .status-Cancelled  { background:#f8d7da; color:#721c24; }
+    .status-Returned   { background:#e2d9f3; color:#432874; }
+
+    .price-row { display:flex; justify-content:space-between; font-size:.92rem; margin-bottom:6px; }
+    .price-row.total {
+      font-weight:700; font-size:1.05rem;
+      border-top:2px solid #f0e8e8; padding-top:10px; margin-top:8px;
+    }
+    .addr-box { background:#fff5f5; border-radius:10px; padding:14px; font-size:.9rem; }
+    .strike { text-decoration:line-through; color:#aaa; font-size:.82rem; }
+
+    .btn-rose {
+      background:var(--rose); color:#fff; border:none; border-radius:9px;
+      padding:9px 20px; font-weight:600; font-size:.88rem;
+      text-decoration:none; display:inline-block; transition:background .2s;
+    }
+    .btn-rose:hover { background:var(--rose-dk); color:#fff; }
+
+    /* ── LIVE TOAST ── */
+    #live-toast {
+      position:fixed; top:24px; right:24px;
+      background:var(--rose-dk); color:#fff;
+      padding:13px 22px; border-radius:12px;
+      font-size:.85rem; font-weight:600;
+      box-shadow:0 8px 30px rgba(140,53,53,.3);
+      z-index:9999; display:none;
+      animation:slideIn .3s ease;
+    }
+    @keyframes slideIn {
+      from { transform:translateX(40px); opacity:0; }
+      to   { transform:translateX(0);    opacity:1; }
+    }
+  </style>
+</head>
+<body>
+
+<%- include("../partials/user/h2") %>
+
+<div class="container py-4">
+
+  <!-- ── ORDER HEADER ── -->
+  <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
+    <a href="/orders" style="color:var(--rose);text-decoration:none;font-size:.9rem">← Back to Orders</a>
+    <h2 class="mb-0"><%= order.orderId %></h2>
+
+    <!-- ✅ id="order-status-badge" — polling updates this -->
+    <span id="order-status-badge" class="status-badge status-<%= order.status %>">
+      <%= order.status %>
+    </span>
+
+    <a href="/orders/<%= order._id %>/invoice" class="btn-rose ms-auto">📄 Download Invoice</a>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-8">
+
+      <!-- ── ITEMS ── -->
+      <div class="section-card">
+        <div class="section-title">Items Ordered</div>
+
+        <% order.items.forEach(item => { %>
+          <div class="d-flex gap-3 mb-4 pb-4 border-bottom">
+            <img
+              src="<%= item.productImage || 'https://placehold.co/64x64/fde2d9/AF5454?text=🎂' %>"
+              class="item-img" alt="<%= item.productName %>">
+
+            <div class="flex-grow-1">
+              <div class="fw-bold"><%= item.productName %></div>
+              <div class="text-muted" style="font-size:.82rem"><%= item.weight %>g · Qty: <%= item.quantity %></div>
+              <div class="mt-1">
+                <% if (item.regularPrice > item.price) { %>
+                  <span class="strike">₹<%= item.regularPrice %></span>
+                <% } %>
+                <span class="fw-bold">₹<%= item.price %></span>
+              </div>
+              <div class="text-muted" style="font-size:.82rem">
+                Subtotal: <strong>₹<%= (item.price * item.quantity).toLocaleString('en-IN') %></strong>
+              </div>
+
+              <!-- ✅ class includes "item-status-badge" — polling finds and updates these -->
+              <span class="status-badge status-<%= item.status %> item-status-badge mt-1">
+                <%= item.status %>
+              </span>
+
+              <% if (item.cancelReason) { %>
+                <div class="text-muted mt-1" style="font-size:.8rem">
+                  Cancel reason: <%= item.cancelReason %>
+                </div>
+              <% } %>
+              <% if (item.returnReason) { %>
+                <div class="mt-1" style="font-size:.8rem;color:#6a2fc2">
+                  Return reason: <%= item.returnReason %>
+                </div>
+              <% } %>
+            </div>
+
+            <div class="d-flex flex-column gap-2 align-items-end">
+              <% if (['Pending','Processing'].includes(item.status)) { %>
+                <button class="btn btn-sm btn-outline-danger" style="border-radius:8px;font-size:.8rem"
+                  onclick="cancelItem('<%= order._id %>','<%= item._id %>','<%= item.productName %>')">
+                  Cancel Item
+                </button>
+              <% } %>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+
+    </div>
+
+    <div class="col-lg-4">
+
+      <!-- ── PRICE SUMMARY ── -->
+      <div class="section-card">
+        <div class="section-title">Price Summary</div>
+        <div class="price-row">
+          <span>Item Total</span>
+          <span>₹<%= order.itemTotal.toLocaleString('en-IN') %></span>
+        </div>
+        <% if (order.discount > 0) { %>
+          <div class="price-row">
+            <span>Discount</span>
+            <span class="text-success">− ₹<%= order.discount.toLocaleString('en-IN') %></span>
+          </div>
+        <% } %>
+        <% if (order.tax > 0) { %>
+          <div class="price-row">
+            <span>Tax</span>
+            <span>₹<%= order.tax.toLocaleString('en-IN') %></span>
+          </div>
+        <% } %>
+        <div class="price-row">
+          <span>Shipping</span>
+          <span><%= order.shippingCharge === 0 ? 'FREE' : '₹' + order.shippingCharge %></span>
+        </div>
+        <div class="price-row total">
+          <span>Total Paid</span>
+          <span style="color:var(--rose)">₹<%= order.finalTotal.toLocaleString('en-IN') %></span>
+        </div>
+        <div class="mt-2 text-muted" style="font-size:.82rem">
+          Payment: <%= order.paymentMethod %> · <%= order.paymentStatus %>
+        </div>
+      </div>
+
+      <!-- ── DELIVERY ADDRESS ── -->
+      <div class="section-card">
+        <div class="section-title">Delivery Address</div>
+        <div class="addr-box">
+          <div class="fw-bold"><%= order.address.name %></div>
+          <div class="text-muted" style="font-size:.85rem"><%= order.address.phone %></div>
+          <div class="mt-1" style="font-size:.88rem;line-height:1.6">
+            <%= order.address.street %>
+            <% if (order.address.address) { %>, <%= order.address.address %><% } %>
+            <% if (order.address.landmark) { %><br><%= order.address.landmark %><% } %>
+            <br><%= order.address.city %>, <%= order.address.state %> – <%= order.address.pincode %>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ACTIONS ── -->
+      <div class="section-card">
+        <div class="section-title">Actions</div>
+
+        <!-- ✅ id="actions-wrap" — polling updates buttons inside here -->
+        <div class="d-flex flex-column gap-2" id="actions-wrap">
+
+          <% if (['Pending','Processing'].includes(order.status)) { %>
+            <button class="btn btn-outline-danger w-100 cancel-order-btn" style="border-radius:9px"
+              onclick="cancelFullOrder('<%= order._id %>','<%= order.orderId %>')">
+              ✕ Cancel Full Order
+            </button>
+          <% } %>
+
+          <% if (order.status === 'Delivered') { %>
+            <button class="btn w-100 return-order-btn"
+              style="background:#e2d9f3;color:#432874;border-radius:9px"
+              onclick="returnFullOrder('<%= order._id %>')">
+              ↩ Return Order
+            </button>
+          <% } %>
+
+          <% if (order.status === 'Returned') { %>
+            <div class="return-info"
+              style="background:#e2d9f3;color:#432874;border-radius:9px;padding:10px;font-size:.85rem;text-align:center">
+              ↩ Return Requested<br>
+              <small style="opacity:.8"><%= order.returnReason %></small>
+            </div>
+          <% } %>
+
+          <a href="/orders/<%= order._id %>/invoice"
+            class="btn w-100" style="background:#f0f0f0;border-radius:9px">
+            📄 Download Invoice
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ✅ Live toast -->
+<div id="live-toast"></div>
+
+<%- include("../partials/user/footer") %>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+const ORDER_ID      = '<%= order._id %>';
+let lastKnownStatus = '<%= order.status %>';
+
+/* ════ POLLING – every 10 seconds ════ */
+async function pollStatus() {
+  try {
+    const res  = await fetch(`/orders/${ORDER_ID}/status`);
+    const data = await res.json();
+    if (data.success && data.status !== lastKnownStatus) {
+      lastKnownStatus = data.status;
+      updateStatusUI(data.status);
+      showLiveToast(`📦 Order status updated to "${data.status}"`);
+    }
+  } catch (err) { /* silent */ }
+}
+setInterval(pollStatus, 10000);
+
+/* ════ UPDATE ALL UI ════ */
+function updateStatusUI(newStatus) {
+
+  // 1. ✅ Header badge
+  const badge = document.getElementById('order-status-badge');
+  if (badge) {
+    badge.className   = `status-badge status-${newStatus}`;
+    badge.textContent = newStatus;
+  }
+
+  // 2. ✅ Item badges — skip Cancelled/Returned items
+  document.querySelectorAll('.item-status-badge').forEach(el => {
+    const current = el.textContent.trim();
+    if (!['Cancelled', 'Returned'].includes(current)) {
+      el.className   = `status-badge status-${newStatus} item-status-badge mt-1`;
+      el.textContent = newStatus;
+    }
+  });
+
+  // 3. ✅ Actions panel
+  const wrap = document.getElementById('actions-wrap');
+  if (wrap) {
+
+    // Remove cancel button if order moved past Processing
+    if (!['Pending', 'Processing'].includes(newStatus)) {
+      wrap.querySelector('.cancel-order-btn')?.remove();
+    }
+
+    // Add Return button when Delivered
+    if (newStatus === 'Delivered' && !wrap.querySelector('.return-order-btn')) {
+      const btn = document.createElement('button');
+      btn.className   = 'btn w-100 return-order-btn';
+      btn.style.cssText = 'background:#e2d9f3;color:#432874;border-radius:9px';
+      btn.textContent = '↩ Return Order';
+      btn.onclick     = () => returnFullOrder(ORDER_ID);
+      wrap.prepend(btn);
+    }
+
+    // Show Return Requested info when Returned
+    if (newStatus === 'Returned') {
+      wrap.querySelector('.return-order-btn')?.remove();
+      if (!wrap.querySelector('.return-info')) {
+        const div = document.createElement('div');
+        div.className = 'return-info';
+        div.style.cssText = 'background:#e2d9f3;color:#432874;border-radius:9px;padding:10px;font-size:.85rem;text-align:center';
+        div.textContent = '↩ Return Requested';
+        wrap.prepend(div);
+      }
+    }
+  }
+}
+
+/* ════ TOAST ════ */
+function showLiveToast(msg) {
+  const t = document.getElementById('live-toast');
+  t.textContent     = msg;
+  t.style.display   = 'block';
+  t.style.animation = 'none';
+  void t.offsetWidth;
+  t.style.animation = '';
+  setTimeout(() => { t.style.display = 'none'; }, 4000);
+}
+
+/* ════ CANCEL ITEM ════ */
+async function cancelItem(orderId, itemId, name) {
+  const { value: reason, isConfirmed } = await Swal.fire({
+    title: 'Cancel Item?',
+    html:  `Cancel <strong>"${name}"</strong>?`,
+    icon:  'warning',
+    input: 'text',
+    inputPlaceholder:   'Reason (optional)',
+    showCancelButton:   true,
+    confirmButtonColor: '#AF5454',
+    cancelButtonColor:  '#9a7070',
+    confirmButtonText:  'Yes, Cancel',
+    cancelButtonText:   'Keep'
+  });
+  if (!isConfirmed) return;
+  const res  = await fetch('/orders/item/cancel', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ orderId, itemId, reason: reason || '' })
+  });
+  const data = await res.json();
+  if (data.success) {
+    Swal.fire({ icon:'success', title:'Cancelled', text:data.message, confirmButtonColor:'#AF5454' })
+      .then(() => location.reload());
+  } else {
+    Swal.fire({ icon:'error', title:'Failed', text:data.message, confirmButtonColor:'#AF5454' });
+  }
+}
+
+/* ════ CANCEL FULL ORDER ════ */
+async function cancelFullOrder(id, orderId) {
+  const { value: reason, isConfirmed } = await Swal.fire({
+    title: 'Cancel Full Order?',
+    html:  `Cancel all items in <strong>${orderId}</strong>?`,
+    icon:  'warning',
+    input: 'text',
+    inputPlaceholder:   'Reason (optional)',
+    showCancelButton:   true,
+    confirmButtonColor: '#AF5454',
+    cancelButtonColor:  '#9a7070',
+    confirmButtonText:  'Yes, Cancel Order',
+    cancelButtonText:   'Keep Order'
+  });
+  if (!isConfirmed) return;
+  const res  = await fetch(`/orders/${id}/cancel`, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ reason: reason || '' })
+  });
+  const data = await res.json();
+  if (data.success) {
+    Swal.fire({ icon:'success', title:'Cancelled', text:data.message, confirmButtonColor:'#AF5454' })
+      .then(() => location.reload());
+  } else {
+    Swal.fire({ icon:'error', title:'Failed', text:data.message, confirmButtonColor:'#AF5454' });
+  }
+}
+
+/* ════ RETURN FULL ORDER ════ */
+async function returnFullOrder(id) {
+  const { value: reason, isConfirmed } = await Swal.fire({
+    title: 'Return Order',
+    text:  'Please provide a reason for your return.',
+    icon:  'question',
+    input: 'textarea',
+    inputPlaceholder:   'Enter reason (required)',
+    showCancelButton:   true,
+    confirmButtonColor: '#AF5454',
+    cancelButtonColor:  '#9a7070',
+    confirmButtonText:  'Submit Return',
+    preConfirm: (val) => {
+      if (!val || val.trim().length < 5) {
+        Swal.showValidationMessage('Please enter a reason (min 5 characters)');
+        return false;
+      }
+    }
+  });
+  if (!isConfirmed) return;
+  const res  = await fetch(`/orders/${id}/return`, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ reason })
+  });
+  const data = await res.json();
+  if (data.success) {
+    Swal.fire({ icon:'success', title:'Return Submitted', text:data.message, confirmButtonColor:'#AF5454' })
+      .then(() => location.reload());
+  } else {
+    Swal.fire({ icon:'error', title:'Failed', text:data.message, confirmButtonColor:'#AF5454' });
+  }
+}
+</script>
+</body>
+</html>

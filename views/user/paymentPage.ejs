@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout – CakeOClock</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --cream:       #FDF6EE;
+      --blush:       #F5C5BE;
+      --rose:        #D4736A;
+      --rose-dark:   #B85A50;
+      --caramel:     #C9945A;
+      --brown:       #4A2C2A;
+      --soft-pink:   #FAE8E0;
+      --white:       #FFFFFF;
+      --muted:       #9B7B77;
+      --border:      #EDD9D0;
+      --shadow:      rgba(74, 44, 42, 0.10);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      min-height: 100vh;
+      color: var(--brown);
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.55rem;
+      color: var(--brown);
+      letter-spacing: 0.02em;
+    }
+    .nav-brand span { color: var(--rose); }
+    .nav-links {
+      display: flex;
+      gap: 2.2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--brown);
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--rose); }
+    .nav-right { display: flex; align-items: center; gap: 1rem; }
+    .nav-icon {
+      font-size: 1.2rem;
+      cursor: pointer;
+      position: relative;
+    }
+    .badge {
+      position: absolute;
+      top: -6px; right: -8px;
+      background: var(--rose);
+      color: #fff;
+      font-size: 0.6rem;
+      font-weight: 700;
+      border-radius: 50%;
+      width: 16px; height: 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-user {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--brown);
+    }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb {
+      background: var(--soft-pink);
+      padding: 0.75rem 2.5rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb strong { color: var(--brown); }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 1100px;
+      margin: 2.5rem auto;
+      padding: 0 1.5rem;
+    }
+
+    #checkoutForm{
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 2rem;
+      align-items: start;
+      width: 100%;
+    }
+
+    @media(max-width: 768px){
+      #checkoutForm{
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ── SECTION TITLES ── */
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--brown);
+      margin-bottom: 1.4rem;
+    }
+
+    /* ── PAYMENT CARD ── */
+    .payment-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 2rem;
+      box-shadow: 0 4px 24px var(--shadow);
+    }
+
+    .payment-option {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: var(--cream);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 0.85rem;
+      cursor: pointer;
+      transition: border-color .2s, background .2s, box-shadow .2s;
+      position: relative;
+    }
+    .payment-option:hover {
+      border-color: var(--blush);
+      background: var(--soft-pink);
+    }
+    .payment-option.selected {
+      border-color: var(--rose);
+      background: var(--soft-pink);
+      box-shadow: 0 0 0 3px rgba(212,115,106,.13);
+    }
+
+    /* hide native radio */
+    .payment-option input[type="radio"] { display: none; }
+
+    .radio-dot {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: border-color .2s;
+    }
+    .payment-option.selected .radio-dot {
+      border-color: var(--rose);
+    }
+    .radio-dot::after {
+      content: '';
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--rose);
+      transform: scale(0);
+      transition: transform .2s;
+    }
+    .payment-option.selected .radio-dot::after { transform: scale(1); }
+
+    .payment-label {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--brown);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .payment-icon { font-size: 1.1rem; }
+
+    /* wallet sub-text */
+    .wallet-balance {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ── ORDER SUMMARY CARD ── */
+    .summary-card {
+      background: var(--soft-pink);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 2rem;
+      box-shadow: 0 4px 24px var(--shadow);
+      position: sticky;
+      top: 88px;
+    }
+
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      font-size: 0.9rem;
+      padding: 0.55rem 0;
+      border-bottom: 1px dashed var(--border);
+      gap: 1rem;
+    }
+    .summary-item:last-of-type { border-bottom: none; }
+    .item-name { color: var(--brown); line-height: 1.4; flex: 1; }
+    .item-price { font-weight: 600; color: var(--brown); white-space: nowrap; }
+
+    .divider {
+      border: none;
+      border-top: 1.5px solid var(--border);
+      margin: 1rem 0;
+    }
+
+    .summary-total {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--brown);
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── PLACE ORDER BTN ── */
+    .btn-order {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--rose), var(--caramel));
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(212,115,106,.35);
+      transition: transform .15s, box-shadow .15s;
+    }
+    .btn-order:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(212,115,106,.45);
+    }
+    .btn-order:active { transform: translateY(0); }
+
+    .secure-note {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+    }
+
+    /* ── SUCCESS MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(74,44,42,.45);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-box {
+      background: var(--white);
+      border-radius: 22px;
+      padding: 3rem 2.5rem;
+      text-align: center;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(74,44,42,.25);
+      animation: pop .35s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes pop {
+      from { transform: scale(.8); opacity: 0; }
+      to   { transform: scale(1);  opacity: 1; }
+    }
+    .modal-icon { font-size: 3.5rem; margin-bottom: 1rem; }
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      color: var(--brown);
+      margin-bottom: 0.5rem;
+    }
+    .modal-msg {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+    .btn-continue {
+      padding: 0.85rem 2rem;
+      background: linear-gradient(135deg, var(--rose), var(--caramel));
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform .15s;
+    }
+    .btn-continue:hover { transform: translateY(-2px); }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAVBAR ── -->
+  <nav>
+    <div class="nav-brand">Cake<span>O</span>Clock</div>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/shop">Shop</a></li>
+    </ul>
+    <div class="nav-right">
+      <div class="nav-icon">
+        🤍
+      </div>
+      <div class="nav-icon">
+        🛒
+        <span class="badge"><%= cartCount || 0 %></span>
+      </div>
+      <div class="nav-user"><%= user ? user.name : 'Guest' %></div>
+    </div>
+  </nav>
+
+  <!-- ── BREADCRUMB ── -->
+  <div class="breadcrumb">
+    <a href="/">Home</a> / <strong>Checkout</strong>
+  </div>
+
+  <!-- ── MAIN ── -->
+<main>
+
+  <form id="checkoutForm" action="/checkout/place" method="POST">
+
+    <input type="hidden" name="addressId" value="<%= addressId %>">
+
+    <input
+      type="hidden"
+      name="paymentMethod"
+      id="paymentMethodInput"
+      value="Online"
+    />
+
+    <!-- LEFT: Payment Methods -->
+    <div class="payment-card">
+
+      <h2 class="section-title">Select payment method</h2>
+
+      <!-- Razorpay -->
+      <label
+        class="payment-option selected"
+        onclick="selectPayment(this, 'Online')"
+      >
+
+        <input type="radio" name="payment" value="Online" checked />
+
+        <div class="radio-dot"></div>
+
+        <div>
+          <div class="payment-label">
+            <span class="payment-icon">💳</span>
+            Razorpay
+          </div>
+        </div>
+
+      </label>
+
+      <!-- Wallet -->
+      <label
+        class="payment-option"
+        onclick="selectPayment(this, 'Online')"
+      >
+
+        <input type="radio" name="payment" value="Online" />
+
+        <div class="radio-dot"></div>
+
+        <div>
+          <div class="payment-label">
+            <span class="payment-icon">👜</span>
+            Wallet
+          </div>
+
+          <div class="wallet-balance">
+            Balance:
+            ₹<%= user && user.walletBalance
+              ? user.walletBalance.toFixed(2)
+              : '0.00' %>
+          </div>
+        </div>
+
+      </label>
+
+      <!-- COD -->
+      <label
+        class="payment-option"
+        onclick="selectPayment(this, 'COD')"
+      >
+
+        <input type="radio" name="payment" value="COD" />
+
+        <div class="radio-dot"></div>
+
+        <div>
+          <div class="payment-label">
+            <span class="payment-icon">🎂</span>
+            Cash on Delivery
+          </div>
+        </div>
+
+      </label>
+
+    </div>
+
+    <!-- RIGHT: Order Summary -->
+    <div class="summary-card">
+
+      <h2 class="section-title">Order summary</h2>
+
+      <% if (cartItems && cartItems.length > 0) { %>
+
+        <% cartItems.forEach(function(item) { %>
+
+          <div class="summary-item">
+
+            <span class="item-name">
+              <%= item.productId.productName %> × <%= item.quantity %>
+            </span>
+
+            <span class="item-price">
+              ₹<%= (item.price * item.quantity).toLocaleString('en-IN') %>
+            </span>
+
+          </div>
+
+        <% }) %>
+
+      <% } else { %>
+
+        <div class="summary-item">
+          <span class="item-name">No items in cart</span>
+        </div>
+
+      <% } %>
+
+      <div class="summary-item">
+
+        <span class="item-name">Delivery charge</span>
+
+        <span class="item-price">
+
+          <% if (deliveryCharge && deliveryCharge > 0) { %>
+
+            ₹<%= deliveryCharge %>
+
+          <% } else { %>
+
+            FREE
+
+          <% } %>
+
+        </span>
+
+      </div>
+
+      <hr class="divider"/>
+
+      <div class="summary-total">
+
+        <span>Total</span>
+
+        <span>
+          ₹<%= totalAmount
+            ? totalAmount.toLocaleString('en-IN')
+            : '0' %>
+        </span>
+
+      </div>
+
+      <!-- SUBMIT BUTTON -->
+      <button type="submit" class="btn-order">
+        Place Order
+      </button>
+
+      <p class="secure-note">
+        🔒 Safe and secure payments
+      </p>
+
+    </div>
+
+  </form>
+
+</main>
+  <!-- ── SUCCESS MODAL ── -->
+  <div class="modal-overlay" id="successModal">
+    <div class="modal-box">
+      <div class="modal-icon">🎉</div>
+      <div class="modal-title">Order Placed!</div>
+      <p class="modal-msg">
+        Your sweet treats are on their way!<br/>
+        You'll receive a confirmation soon.
+      </p>
+      <button class="btn-continue" onclick="window.location.href='/'">Continue Shopping</button>
+    </div>
+  </div>
+
+  <script>
+    // Highlight the selected payment option
+    function selectPayment(el, value) {
+      document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+      document.getElementById('paymentMethodInput').value = value;
+    }
+
+  </script>
+
+</body>
+</html>

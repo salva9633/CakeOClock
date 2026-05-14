@@ -3,15 +3,15 @@
     
     <div class="container-fluid px-5">
 
-        <a class="navbar-brand fs-2 text-dark" href="#">Cake O Clock</a>
+        <a class="navbar-brand fs-2 text-dark" href="/">Cake O Clock</a>
 
         <!-- Search Bar -->
-<form class="d-flex mx-auto" action="/products" method="GET" style="width: 400px; position: relative;">
-                <input class="form-control rounded-pill px-4 py-2"
+        <form class="d-flex mx-auto" action="/products" method="GET" style="width: 400px; position: relative;">
+            <input class="form-control rounded-pill px-4 py-2"
                 type="search"
-name="search"
-placeholder="search"
-aria-label="Search"
+                name="search"
+                placeholder="search"
+                aria-label="Search"
                 style="color:#AF5454; background-color: rgba(232, 158, 158, 0.3); border: none;">
             <button class="btn position-absolute end-0 top-0 h-100 pe-4"
                 type="submit"
@@ -23,48 +23,49 @@ aria-label="Search"
         <!-- Icons -->
         <div class="d-flex align-items-center gap-4">
 
-            <a href="#" class="text-reset header-icon">
-    <img width="25" height="25" src="media/icons8-cart-50.png" alt="cart" />
-</a>
+            <!-- 🛒 Cart Icon -->
+            <a href="/cart" class="text-reset header-icon" title="My Cart">
+                <img width="25" height="25" src="media/icons8-cart-50.png" alt="cart" />
+            </a>
 
+            <!-- ❤ Wishlist Icon -->
+            <a href="/wishlist" class="text-reset header-icon" title="My Wishlist"
+               style="color:#AF5454 !important; width:30px; height:30px; display:flex; align-items:center; justify-content:center;">
+                <i class="fas fa-heart fa-lg" style="color:#AF5454;"></i>
+            </a>
 
- 
-          <% if (locals.user) { %>
-  <div class="dropdown">
-    <a class="nav-link dropdown-toggle fw-bold header-action"
-       href="#"
-       role="button"
-       data-bs-toggle="dropdown"
-       style="color:#AF5454;">
-       <%= locals.user.name %>
-    </a>
+            <!-- User Dropdown / Auth Links -->
+            <% if (locals.user) { %>
+                <div class="dropdown">
+                    <a class="nav-link dropdown-toggle fw-bold header-action"
+                       href="#"
+                       role="button"
+                       data-bs-toggle="dropdown"
+                       style="color:#AF5454;">
+                        <%= locals.user.name %>
+                    </a>
 
-    <ul class="dropdown-menu dropdown-menu-end custom-dropdown">
-      <li><a class="dropdown-item" href="/profile">Profile</a></li>
-      <li><a class="dropdown-item" href="/logout">Logout</a></li>
-    </ul>
-  </div>
+                    <ul class="dropdown-menu dropdown-menu-end custom-dropdown">
+                        <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                        <li><a class="dropdown-item" href="/wishlist">Wishlist</a></li>
+                        <li><a class="dropdown-item" href="/cart">My Cart</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/logout" style="color:#c0392b;">Logout</a></li>
+                    </ul>
+                </div>
 
             <% } else { %>
-                <!-- Guest user -->
+                <!-- Guest Links -->
                 <a href="/signUp" class="text-reset header-action">
-    <span class="small fw-bold">Sign Up</span>
-</a>
-<a href="/login" class="text-reset header-action">
-    <span class="small fw-bold">Log In</span>
-</a>
+                    <span class="small fw-bold">Sign Up</span>
+                </a>
+                <a href="/login" class="text-reset header-action">
+                    <span class="small fw-bold">Log In</span>
+                </a>
             <% } %>
-
-            <a href="#" class="text-reset"
-               style="color:#AF5454 !important; width:30px; height:30px; padding-top:5px;">
-               <!-- Bootstrap JS Bundle (includes Popper) -->
-
-
-                <i class="fas fa-heart fa-lg"></i>
-            </a>
 
         </div>
 
-    </div> <!-- ✅ container-fluid closed -->
-    
+    </div> <!-- container-fluid -->
+
 </nav>

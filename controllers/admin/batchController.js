@@ -27,6 +27,7 @@ export const addBatch = async (req, res) => {
 };
 
 // UPDATE BATCH
+// UPDATE BATCH
 export const updateBatch = async (req, res) => {
   try {
     const { batchId } = req.params;
@@ -38,15 +39,25 @@ export const updateBatch = async (req, res) => {
     const expiryAt = new Date(mfd);
     expiryAt.setDate(expiryAt.getDate() + Number(expiryDays));
 
-    
+    const now = new Date();
+    const isExpired = expiryAt < now;
+
+    // ✅ Calculate difference based on original initialStock
     const difference = Number(initialStock) - batch.initialStock;
-    const newAvailableStock = batch.availableStock + difference;
+
+    // ✅ If batch was expired (availableStock forced to 0), base it on initialStock instead
+    const baseAvailable = batch.status === "expired" ? 0 : batch.availableStock;
+    const newAvailableStock = Math.max(0, baseAvailable + difference);
+
+    // ✅ Reset status: if new expiry is in the future, make it active again
+    const newStatus = isExpired ? "expired" : (newAvailableStock === 0 ? "exhausted" : "active");
 
     await Batch.findByIdAndUpdate(batchId, {
       manufacturedAt: mfd,
       expiryAt,
       initialStock: Number(initialStock),
-      availableStock: newAvailableStock
+      availableStock: isExpired ? 0 : newAvailableStock,
+      status: newStatus
     }, { new: true });
 
     res.redirect(`/admin/variants/${batch.variantId}`);

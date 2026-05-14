@@ -1,23 +1,22 @@
 import Product from "../../models/productModel.js";
 import Variant from "../../models/variantModel.js";
 import Category from "../../models/categoryModel.js";
-import Review from "../../models/reviewModel.js";
+
 const loadProductsPage = async (req, res) => {
   try {
     const { search, category, brand, price, sort, page = 1 } = req.query;
 
     const limit = 8;
-    const skip = (page - 1) * limit;
+    const skip  = (page - 1) * limit;
 
-    const activeCategories = await Category.find({ isActive: true }).lean();
+    // ── 1. ACTIVE CATEGORIES ──────────────────────────────
+    const activeCategories  = await Category.find({ isActive: true }).lean();
     const activeCategoryIds = activeCategories.map(c => c._id);
 
-
-    let productFilter = {
-      isListed: true,
+    // ── 2. PRODUCT FILTER ─────────────────────────────────
+    const productFilter = {
+      isListed:   true,
       categoryId: { $in: activeCategoryIds },
-      
-
     };
 
     if (search) {
@@ -25,99 +24,110 @@ const loadProductsPage = async (req, res) => {
     }
 
     if (category) {
-      productFilter.categoryId = {
-        $in: activeCategoryIds.filter(id => id.toString() === category)
-      };
+      // ✅ Only filter to that category if it's actually active
+      const matched = activeCategoryIds.filter(id => id.toString() === category);
+      if (matched.length) {
+        productFilter.categoryId = { $in: matched };
+      }
     }
 
     if (brand) {
       productFilter.brand = brand;
     }
 
-   const allProducts = await Product.find({ ...productFilter, isListed: true })
-  .sort({ createdAt: -1 }) 
-  .populate("categoryId")
-  .lean();
-    /* ================= PRICE FILTER (VARIANT) ================= */
-    let priceFilter = {};
+    // ── 3. FETCH ALL MATCHING PRODUCTS (no DB sort — JS will sort) ──
+    const allProducts = await Product.find(productFilter)
+      .populate("categoryId")
+      .lean();
+
+    // ── 4. PRICE FILTER ON VARIANTS (single query, not N queries) ──
+    const priceFilter = { isAvailable: true };
 
     if (price) {
-      const [min, max] = price.split("-");
-      priceFilter.salePrice = { $gte: Number(min), $lte: Number(max) };
+      const [min, max] = price.split("-").map(Number);
+      priceFilter.salePrice = { $gte: min, $lte: max };
     }
 
-    let productsWithPrice = await Promise.all(
-      allProducts.map(async (product) => {
+    const productIds = allProducts.map(p => p._id);
 
-      
-        if (!product.isListed) return null;
+    // ✅ ONE query for all variants instead of one per product
+    const allVariants = await Variant.find({
+      productId: { $in: productIds },
+      ...priceFilter
+    })
+      .sort({ salePrice: 1 })
+      .lean();
 
-        const variants = await Variant.find({
-          productId: product._id,
-          isAvailable: true,
-          ...priceFilter
-        })
-          .sort({ salePrice: 1 })
-          .lean();
+    // ✅ Group variants by productId for O(1) lookup
+    const variantMap = {};
+    for (const variant of allVariants) {
+      const key = variant.productId.toString();
+      if (!variantMap[key]) {
+        variantMap[key] = variant; // first = cheapest (sorted above)
+      }
+    }
 
-        if (!variants.length) return null;
+    // ── 5. BUILD PRODUCTS WITH PRICE ──────────────────────
+    let productsWithPrice = allProducts
+      .map(product => {
+        const variant = variantMap[product._id.toString()];
+        if (!variant) return null; // no available variant in price range
 
-        const salePrice = variants[0].salePrice;
-        const regularPrice = variants[0].regularPrice;
-
-        const discount = Math.round(
-          ((regularPrice - salePrice) / regularPrice) * 100
-        );
+        const { salePrice, regularPrice } = variant;
+        const discount = regularPrice > 0
+          ? Math.round(((regularPrice - salePrice) / regularPrice) * 100)
+          : 0;
 
         return {
           ...product,
           startingPrice: salePrice,
-          regularPrice: regularPrice,
-          discount: discount
+          regularPrice,
+          discount
         };
       })
-    );
-    // Filter nulls only - isListed already handled in DB query
-    productsWithPrice = productsWithPrice.filter(Boolean);
+      .filter(Boolean);
 
-    /* ================= SORTING ================= */
-    if (sort === "priceLowHigh") {
-      productsWithPrice.sort((a, b) => a.startingPrice - b.startingPrice);
-    }
-    if (sort === "priceHighLow") {
-      productsWithPrice.sort((a, b) => b.startingPrice - a.startingPrice);
-    }
-    if (sort === "az") {
-      productsWithPrice.sort((a, b) => a.productName.localeCompare(b.productName));
-    }
-    if (sort === "za") {
-      productsWithPrice.sort((a, b) => b.productName.localeCompare(a.productName));
+    // ── 6. SORTING ────────────────────────────────────────
+    const sorters = {
+      priceLowHigh: (a, b) => a.startingPrice - b.startingPrice,
+      priceHighLow: (a, b) => b.startingPrice - a.startingPrice,
+      az:           (a, b) => a.productName.localeCompare(b.productName),
+      za:           (a, b) => b.productName.localeCompare(a.productName),
+      newest:       (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+    };
+
+    if (sorters[sort]) {
+      productsWithPrice.sort(sorters[sort]);
+    } else {
+      // ✅ Default — newest first
+      productsWithPrice.sort(sorters.newest);
     }
 
-    /* ================= PAGINATION ================= */
-    const totalProducts = productsWithPrice.length;
-    const totalPages = Math.ceil(totalProducts / limit);
+    // ── 7. PAGINATION (after sort) ────────────────────────
+    const totalProducts     = productsWithPrice.length;
+    const totalPages        = Math.ceil(totalProducts / limit);
     const paginatedProducts = productsWithPrice.slice(skip, skip + limit);
 
-    /* ================= SIDEBAR DATA ================= */
-    //Only show active categories in sidebar
+    // ── 8. SIDEBAR DATA ───────────────────────────────────
     const brands = await Product.distinct("brand", { isListed: true });
-    res.render("products", {
-      products: paginatedProducts,
-      categories: activeCategories,
+
+    return res.render("products", {
+      products:     paginatedProducts,
+      categories:   activeCategories,
       brands,
-      currentPage: Number(page),
+      currentPage:  Number(page),
       totalPages,
-      search:   search   || "",
-      sort:     sort     || "",
-      category: category || "",
-      price:    price    || "",
-      brand:    brand    || ""
+      totalProducts,
+      search:       search   || "",
+      sort:         sort     || "",
+      category:     category || "",
+      price:        price    || "",
+      brand:        brand    || "",
     });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Server Error");
+    console.error("loadProductsPage error:", error);
+    return res.status(500).send("Server Error");
   }
 };
 

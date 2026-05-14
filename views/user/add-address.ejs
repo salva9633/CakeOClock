@@ -142,7 +142,7 @@
 </head>
 
 <body>
-<%- include("../../views/partials/user/h2") %>
+<%- include("../partials/user/h2") %>
 <div class="dashboard-container">
 
   
@@ -151,8 +151,7 @@
   <main class="main-content">
     <h1 class="page-title">Add a new address</h1>
 
-    <form action="/add-address" method="POST" class="address-form">
-
+<form action="/add-address?from=<%= locals.from || '' %>" method="POST" class="address-form">
       <div class="form-group">
         <label>Name</label>
         <input type="text" id="name" name="name" placeholder="Enter your name">
@@ -251,6 +250,17 @@
   Object.values(fields).forEach(f => {
     document.getElementById(f.id).addEventListener("input", () => validate(f));
   });
+
+  // Add this after the existing script
+document.querySelector('form').addEventListener('submit', function(e) {
+  let isValid = true;
+
+  Object.values(fields).forEach(f => {
+    if (!validate(f)) isValid = false;
+  });
+
+  if (!isValid) e.preventDefault(); // block submit if any field invalid
+});
 </script>
 
 </body>

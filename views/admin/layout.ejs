@@ -30,29 +30,48 @@
   />
   <style>
     /* ✅ FIX 1: Lock body background so it never changes */
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: #f5e6e8 !important;
-      overflow-x: hidden;
-    }
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  background: #f5e6e8;
+  font-family: 'Inter', sans-serif;
+}
 
-    /* ✅ FIX 2: Stop Bootstrap adding padding-right on modal open */
-    body.modal-open {
-      padding-right: 0 !important;
-      overflow-y: hidden !important;
-    }
+body {
+  display: flex;
+  flex-direction: column;
+}
 
-    .main-content {
-        margin-left: 260px;              /* sidebar width */
-        margin-top: 64px;
-        padding: 30px 30px;             /* breathing space */
-        padding-top: 60px;              /* header height + spacing */
-        min-height: 100vh;
-        background: linear-gradient(135deg, #f5e6e8 0%, #f8d7da 100%);
-        box-sizing: border-box;
-    }
+body.modal-open {
+  padding-right: 0 !important;
+}
 
+.main-content {
+  margin-left: 260px;
+  margin-top: 64px;
+
+  width: calc(100% - 260px);
+  min-height: calc(100vh - 64px);
+
+  padding: 24px 30px;
+  box-sizing: border-box;
+
+  background: linear-gradient(135deg, #f5e6e8 0%, #f8d7da 100%);
+
+  overflow-x: hidden;
+}
+
+@media (max-width: 992px) {
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+    padding: 16px;
+  }
+}
   </style>
 </head>
 

@@ -262,11 +262,9 @@ const loginUser = async (req, res) => {
 
 const logout = async (req, res) => {
   try {
-    req.session.destroy((err) => {
-      if (err) {
-        console.log("Session destruction error", err.message);
-        return res.redirect("/pageNotFound");
-      }
+    req.session.destroy((err) => {        // ✅ destroy fully
+      if (err) console.log("Session destruction error", err.message);
+      res.clearCookie("user_sid");        // ✅ correct cookie name
       return res.redirect("/login");
     });
   } catch (error) {
@@ -274,7 +272,6 @@ const logout = async (req, res) => {
     res.redirect("/pageNotFound");
   }
 };
-
 // ─────────────────────────────────────────
 // FORGOT PASSWORD
 // ─────────────────────────────────────────

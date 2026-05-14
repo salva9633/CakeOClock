@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Wishlist – Cake O'Clock</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --rose:#AF5454; --rose-dk:#8c3535; --rose-lt:#f8ece8;
+      --cream:#fdf8f5; --border:#edd8d0; --ink:#2b1515;
+      --muted:#9a7070; --white:#fff; --r:16px;
+      --sh: 0 4px 24px rgba(175,84,84,.10);
+      --sh-h:0 12px 36px rgba(175,84,84,.18);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Lato',sans-serif;background:var(--cream);color:var(--ink)}
+    a{text-decoration:none;color:inherit}
+
+    .bc{background:var(--white);border-bottom:1px solid var(--border);padding:13px 40px;
+      font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+    .bc a{color:var(--muted);transition:color .2s}.bc a:hover{color:var(--rose)}
+    .bc .sep{color:var(--border)}.bc .cur{color:var(--rose);font-weight:700}
+
+    .page{max-width:1200px;margin:40px auto 80px;padding:0 24px}
+
+    .ph{display:flex;align-items:baseline;justify-content:space-between;
+      margin-bottom:32px;flex-wrap:wrap;gap:12px}
+    .ph h1{font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:900;color:var(--rose)}
+    .ph .ct{font-size:.85rem;color:var(--muted)}.ph .ct strong{color:var(--rose)}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:24px}
+
+    .wc{background:var(--white);border-radius:var(--r);box-shadow:var(--sh);
+      overflow:hidden;display:flex;flex-direction:column;
+      transition:box-shadow .3s,transform .3s;animation:up .42s ease both}
+    .wc:hover{box-shadow:var(--sh-h);transform:translateY(-4px)}
+    @keyframes up{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+    .wc:nth-child(2){animation-delay:.07s}.wc:nth-child(3){animation-delay:.14s}
+    .wc:nth-child(4){animation-delay:.21s}.wc:nth-child(5){animation-delay:.28s}
+
+    .wimg{position:relative;height:220px;background:var(--rose-lt);overflow:hidden}
+    .wimg img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+    .wc:hover .wimg img{transform:scale(1.06)}
+
+    .rm-btn{position:absolute;top:10px;left:10px;width:34px;height:34px;
+      background:rgba(255,255,255,.92);border:none;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;cursor:pointer;
+      box-shadow:0 2px 8px rgba(0,0,0,.14);z-index:2;transition:background .2s,transform .2s}
+    .rm-btn svg{width:15px;height:15px;fill:var(--rose);stroke:var(--rose);
+      stroke-width:1.5;transition:fill .2s,stroke .2s}
+    .rm-btn:hover{background:var(--rose);transform:scale(1.12)}
+    .rm-btn:hover svg{fill:#fff;stroke:#fff}
+
+    .wbody{padding:15px 16px 18px;display:flex;flex-direction:column;flex:1}
+    .wname{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;
+      color:var(--ink);margin-bottom:5px;line-height:1.3;
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+      transition:color .2s}
+    .wc:hover .wname{color:var(--rose)}
+    .wdesc{font-size:.77rem;color:var(--muted);line-height:1.5;margin-bottom:12px;flex:1;
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .wpr{display:flex;align-items:baseline;gap:8px;margin-bottom:13px}
+    .wpnow{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--rose)}
+    .wpold{font-size:.78rem;color:#c0a0a0;text-decoration:line-through}
+
+    .atcb{width:100%;padding:10px 14px;background:var(--rose-dk);color:#fff;
+      border:none;border-radius:11px;font-family:'Lato',sans-serif;
+      font-size:.83rem;font-weight:700;letter-spacing:.05em;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;gap:7px;
+      transition:background .2s,transform .15s,box-shadow .2s;
+      box-shadow:0 4px 14px rgba(175,84,84,.25)}
+    .atcb:hover{background:var(--rose);transform:translateY(-1px);box-shadow:0 6px 20px rgba(175,84,84,.32)}
+    .atcb.oos{background:#ede0de;color:#b09090;cursor:not-allowed;box-shadow:none}
+
+    /* empty */
+    .empty{text-align:center;padding:100px 20px}
+    .empty .ei{font-size:4rem;margin-bottom:18px;display:block;
+      animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+    .empty h2{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--rose);margin-bottom:10px}
+    .empty p{font-size:.9rem;color:var(--muted);margin-bottom:28px}
+
+    .obtn{display:inline-flex;align-items:center;gap:8px;padding:12px 26px;
+      border-radius:30px;font-family:'Lato',sans-serif;font-size:.87rem;font-weight:700;
+      letter-spacing:.05em;cursor:pointer;transition:background .2s,transform .15s}
+    .obtn.solid{background:var(--rose);color:#fff;box-shadow:0 6px 20px rgba(175,84,84,.3);border:none}
+    .obtn.solid:hover{background:var(--rose-dk);transform:translateY(-1px);color:#fff}
+    .obtn.outline{background:transparent;color:var(--rose);
+      border:2px solid var(--rose);box-shadow:none}
+    .obtn.outline:hover{background:rgba(175,84,84,.06)}
+
+    /* toast */
+    #trk{position:fixed;bottom:24px;right:24px;z-index:9999;
+      display:flex;flex-direction:column;gap:8px;pointer-events:none}
+    .tpill{background:var(--rose-dk);color:#fff;padding:12px 20px;border-radius:50px;
+      font-size:.83rem;font-weight:600;box-shadow:0 8px 24px rgba(175,84,84,.28);
+      animation:popIn .3s cubic-bezier(.34,1.56,.64,1) both,
+                fadeOut .35s ease 2.3s both}
+    @keyframes popIn{from{transform:translateY(16px) scale(.85);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+    @keyframes fadeOut{to{transform:translateY(10px) scale(.9);opacity:0}}
+  </style>
+</head>
+<body>
+
+<%- include("../partials/user/h2") %>
+
+<div class="bc">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+  <a href="/">Home</a><span class="sep">›</span>
+  <span class="cur">My Wishlist</span>
+</div>
+
+<div class="page">
+  <div class="ph">
+    <h1>My Wishlist</h1>
+    <% if (products && products.length > 0) { %>
+      <span class="ct"><strong><%= products.length %></strong> item<%= products.length !== 1 ? 's' : '' %> saved</span>
+    <% } %>
+  </div>
+
+  <% if (!products || products.length === 0) { %>
+    <div class="empty">
+      <span class="ei">🤍</span>
+      <h2>Your wishlist is empty</h2>
+      <p>Save your favourite cakes here — they'll wait for you!</p>
+      <a href="/products" class="obtn solid">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        Browse Cakes
+      </a>
+    </div>
+  <% } else { %>
+
+    <div class="grid">
+      <% products.forEach(product => { %>
+        <div class="wc" id="wc-<%= product._id %>">
+          <div class="wimg">
+<button 
+  class="rm-btn"
+  onclick="removeWish(
+    this,
+    '<%= product._id %>',
+    '<%= product.variantId %>',
+    '<%= product.productName %>'
+  )"
+  title="Remove"
+>              <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </button>
+            <a href="/product/<%= product._id %>">
+              <% if (product.productImages && product.productImages[0]) { %>
+                <img src="<%= product.productImages[0] %>" alt="<%= product.productName %>" loading="lazy">
+              <% } else { %>
+                <img src="https://placehold.co/400x280/fde2d9/AF5454?text=🎂" alt="No image">
+              <% } %>
+            </a>
+          </div>
+          <div class="wbody">
+            <a href="/product/<%= product._id %>"><div class="wname"><%= product.productName %></div></a>
+            <div class="wdesc"><%= product.description %></div>
+            <div class="wpr">
+              <% if (product.startingPrice) { %>
+                <span class="wpnow">₹<%= product.startingPrice %></span>
+                <% if (product.regularPrice > product.startingPrice) { %>
+                  <span class="wpold">₹<%= product.regularPrice %></span>
+                <% } %>
+              <% } else { %>
+                <span style="font-size:.78rem;color:#b09090">No variants</span>
+              <% } %>
+            </div>
+       <% if (product.isBlocked) { %>
+              <button class="atcb oos" disabled>
+                🚫 Unavailable
+              </button>
+            <% } else if (!product.startingPrice) { %>
+              <button class="atcb oos" disabled>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                Out of Stock
+              </button>
+            <% } else { %>
+              <button
+                class="atcb"
+                data-id="<%= product._id %>"
+                data-variant-id="<%= product.variantId %>"
+                data-name="<%= product.productName %>"
+                onclick="addToCart(this)"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                Add to Cart
+              </button>
+            <% } %>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <div style="margin-top:40px;text-align:center">
+      <a href="/products" class="obtn outline">← Continue Shopping</a>
+    </div>
+  <% } %>
+</div>
+
+<div id="trk"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<script>
+
+function removeWish(btn, productId, variantId, name) {
+
+  fetch('/wishlist/toggle', {
+    method: 'POST',
+
+    headers: {
+      'Content-Type': 'application/json'
+    },
+
+    body: JSON.stringify({
+      productId,
+      variantId
+    })
+  })
+
+  .then(r => r.json())
+
+  .then(() => {
+
+    const card = document.getElementById('wc-' + productId);
+
+    if (card) {
+
+      card.style.transition = 'all .35s ease';
+      card.style.transform  = 'scale(.85)';
+      card.style.opacity    = '0';
+
+      setTimeout(() => {
+        card.remove();
+
+        // reload if empty
+        if(document.querySelectorAll('.wc').length === 0){
+          location.reload();
+        }
+
+      }, 380);
+    }
+
+    toast('🤍 "' + name + '" removed from wishlist');
+  })
+
+  .catch(() => {
+    toast('Removed from wishlist');
+  });
+}
+
+
+
+function addToCart(btn) {
+
+  const productId = btn.dataset.id;
+  const variantId = btn.dataset.variantId;
+  const name      = btn.dataset.name;
+
+  fetch('/cart/add', {
+
+    method: 'POST',
+
+    headers: {
+      'Content-Type': 'application/json'
+    },
+
+    body: JSON.stringify({
+      productId,
+      variantId,
+      quantity: 1
+    })
+
+  })
+
+  .then(r => r.json())
+
+  .then(data => {
+
+    if (data.redirectUrl) {
+      window.location.href = data.redirectUrl;
+      return;
+    }
+if (!data.success) {
+      toast('❌ ' + (data.message || 'Failed to add to cart'));
+      // Remove card if product is blocked/unavailable
+      if (data.message && data.message.includes('no longer available')) {
+        const card = document.getElementById('wc-' + productId);
+        if (card) {
+          card.style.transition = 'all .35s ease';
+          card.style.transform  = 'scale(.85)';
+          card.style.opacity    = '0';
+          setTimeout(() => card.remove(), 380);
+        }
+      }
+      return;
+    }
+    toast('🛒 "' + name + '" added to cart!');
+
+    // remove wishlist card after cart add
+    const card = document.getElementById('wc-' + productId);
+
+    if(card){
+
+      card.style.transition = 'all .35s ease';
+      card.style.transform  = 'scale(.85)';
+      card.style.opacity    = '0';
+
+      setTimeout(() => {
+
+        card.remove();
+
+        if(document.querySelectorAll('.wc').length === 0){
+          location.reload();
+        }
+
+      }, 380);
+    }
+
+  })
+
+  .catch(() => {
+    toast('Something went wrong');
+  });
+}
+
+
+
+function toast(msg){
+
+  const wrap = document.getElementById('trk');
+
+  const el = document.createElement('div');
+
+  el.className = 'tpill';
+
+  el.textContent = msg;
+
+  wrap.appendChild(el);
+
+  setTimeout(() => {
+    el.remove();
+  }, 2800);
+}
+
+</script>
+
+</body>
+</html>

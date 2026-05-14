@@ -1,0 +1,62 @@
+<!-- ══════════════════════════════════
+     VARIANT MODAL — standalone partial
+     Save as: views/partials/user/variantModal.ejs
+     Include ONLY from shop.ejs / product pages
+     DO NOT include anything inside this file
+════════════════════════════════════ -->
+
+<div class="modal fade" id="variantModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:420px;">
+    <div class="modal-content" style="border-radius:20px;border:none;overflow:hidden;">
+
+      <!-- Header -->
+      <div class="modal-header" style="background:#8c3535;border:none;padding:18px 24px;">
+        <div>
+          <h5 class="modal-title" style="color:#fff;font-family:'Playfair Display',serif;font-size:1.1rem;margin:0;">
+            Choose Variant
+          </h5>
+          <p id="vm-name-price"
+             style="color:rgba(255,255,255,.75);font-size:.78rem;margin:3px 0 0;"></p>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body" style="padding:20px 24px;">
+
+        <!-- Variant options injected by JS -->
+        <div id="vm-variants" style="display:flex;flex-direction:column;gap:8px;"></div>
+
+        <!-- Price display -->
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid #f0e8e8;
+                    display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:.82rem;color:#9a7070;font-weight:600;">Total</span>
+          <span id="vm-price-display"
+                style="font-size:1.3rem;font-weight:800;color:#AF5454;
+                       font-family:'Playfair Display',serif;">
+            ₹0.00
+          </span>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer" style="border:none;padding:0 24px 22px;gap:10px;">
+        <button type="button"
+                data-bs-dismiss="modal"
+                style="flex:1;padding:11px;border:1.5px solid #ddd;border-radius:12px;
+                       background:#fff;color:#5a3535;font-weight:700;font-size:.85rem;cursor:pointer;">
+          Cancel
+        </button>
+        <button type="button"
+                onclick="confirmAddToCart()"
+                style="flex:2;padding:11px;border:none;border-radius:12px;
+                       background:linear-gradient(135deg,#8c3535,#AF5454);
+                       color:#fff;font-weight:700;font-size:.85rem;cursor:pointer;
+                       box-shadow:0 4px 14px rgba(175,84,84,.35);">
+          🛒 Add to Cart
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

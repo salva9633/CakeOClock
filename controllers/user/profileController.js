@@ -141,41 +141,30 @@ const addressPage = async (req, res) => {
 const addAddress = async (req, res) => {
   try {
     const {
-      name,
-      phone,
-      altPhone,
-      street,
-      address,
-      landmark,
-      city,
-      state,
-      pincode,
-      type
+      name, phone, altPhone, street,
+      address, landmark, city, state, pincode, type
     } = req.body;
+
+    const from = req.query.from; // ✅ declare INSIDE try, BEFORE using it
 
     await User.findByIdAndUpdate(req.session.user.id, {
       $push: {
         addresses: {
-          name,
-          phone,
-          street,
-          city,
-          state,
-          pincode,
-          type,
+          name, phone, street, city, state, pincode, type,
           address: address || null,
           landmark: landmark || null,
           altPhone: altPhone || null
         }
       }
     });
-    res.redirect("/address");
+
+    res.redirect(from === "checkout" ? "/checkout" : "/address"); // ✅ now works
+
   } catch (error) {
     console.error(error);
     res.redirect("/pageNotFound");
   }
 };
-
 /* ================= DELETE ADDRESS ================= */
 const deleteAddress = async (req, res) => {
   try {
@@ -197,13 +186,14 @@ const editAddressPage = async (req, res) => {
 
     if (!address) return res.redirect("/address");
 
-    res.render("editAddress", { address });
+    const redirect = req.query.redirect || "/address"; // ← add this
+
+    res.render("editAddress", { address, redirect }); // ← pass it
   } catch (error) {
     console.error(error);
     res.redirect("/pageNotFound");
   }
 };
-
 const updateAddress = async (req, res) => {
   try {
     const {    name,
@@ -239,7 +229,8 @@ const updateAddress = async (req, res) => {
       }
     );
 
-    res.redirect("/address");
+const redirect = req.query.redirect || "/address";
+    res.redirect(redirect);
   } catch (error) {
     console.error(error);
     res.redirect("/pageNotFound");
