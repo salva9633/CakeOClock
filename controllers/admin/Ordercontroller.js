@@ -1,5 +1,5 @@
 import Order from "../../models/orderModel.js";
- 
+ import Wallet from "../../models/walletModel.js";
 // ─────────────────────────────────────────
 // GET /admin/orders
 // ─────────────────────────────────────────
@@ -97,7 +97,7 @@ export const updateOrderStatus = async (req, res) => {
     const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
  
-    // ✅ Prevent changing locked statuses
+    
     const LOCKED = ['Delivered', 'Cancelled', 'Returned'];
     if (LOCKED.includes(order.status)) {
       return res.status(400).json({
@@ -106,7 +106,7 @@ export const updateOrderStatus = async (req, res) => {
       });
     }
  
-    // ✅ Prevent backward movement
+    
     const currentIdx = STATUS_ORDER.indexOf(order.status);
     const newIdx     = STATUS_ORDER.indexOf(status);
     if (newIdx < currentIdx) {
@@ -116,10 +116,10 @@ export const updateOrderStatus = async (req, res) => {
       });
     }
  
-    // ✅ Update order-level status
+    
     order.status = status;
  
-    // ✅ Sync every active item to the new status
+  
     order.items.forEach(item => {
       if (!['Cancelled', 'Returned'].includes(item.status)) {
         item.status = status;
@@ -159,7 +159,7 @@ export const updateItemStatus = async (req, res) => {
     if (status === 'Cancelled') item.cancelReason = reason || null;
     if (status === 'Returned')  item.returnReason  = reason || null;
  
-    // ✅ Reflect on order-level if all items match
+
     const allCancelled = order.items.every(i => i.status === 'Cancelled');
     const allReturned  = order.items.every(i => i.status === 'Returned');
     if (allCancelled) order.status = 'Cancelled';
@@ -189,5 +189,137 @@ export const pollOrderStatus = async (req, res) => {
   } catch (error) {
     console.error('pollOrderStatus error:', error);
     return res.status(500).json({ success: false });
+  }
+};
+
+// LOAD RETURN REQUESTS
+export const loadReturnRequests = async (req, res) => {
+
+  try {
+
+    const orders = await Order.find({
+      "items.status": "Return Requested"
+    }).populate("userId");
+
+    res.render("returnRequests", {
+      orders,
+      title: "Return Requests",
+    });
+
+  } catch (error) {
+
+    console.log(error);
+    res.redirect("/admin/pageerror");
+  }
+};
+
+
+// APPROVE RETURN
+export const approveReturnRequest = async (req, res) => {
+  try {
+    const { orderId, itemId } = req.body;
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.json({ success: false, message: "Order not found" });
+    }
+
+    const item = order.items.id(itemId);
+    if (!item) {
+      return res.json({ success: false, message: "Item not found" });
+    }
+
+    // already refunded
+    if (item.status === "Returned") {
+      return res.json({ success: false, message: "Already refunded" });
+    }
+
+    // must be Return Requested to approve
+    if (item.status !== "Return Requested") {
+      return res.json({ success: false, message: "Item is not in Return Requested state" });
+    }
+
+    // ✅ update item status to Returned
+    item.status = "Returned";
+
+    // refund amount
+    const refundAmount = item.price * item.quantity;
+
+    // find or create wallet
+    let wallet = await Wallet.findOne({ userId: order.userId });
+    if (!wallet) {
+      wallet = new Wallet({ userId: order.userId, balance: 0, transactions: [] });
+    }
+
+    wallet.balance += refundAmount;
+    wallet.transactions.push({
+      amount: refundAmount,
+      type: "Credit",
+      description: `Refund for ${item.productName} (Order: ${order.orderId})`,
+    });
+
+    await wallet.save();
+
+    // ✅ update order-level status
+    const allDone = order.items.every(
+      i => i.status === "Returned" || i.status === "Cancelled"
+    );
+    const anyStillRequested = order.items.some(
+      i => i.status === "Return Requested"
+    );
+
+    if (allDone) {
+      order.status = "Returned";
+    } else if (!anyStillRequested) {
+      order.status = "Delivered";
+    }
+    // if anyStillRequested remains, keep order.status as "Return Requested"
+
+    await order.save();
+
+    return res.json({
+      success: true,
+      message: "Return approved and refunded to wallet",
+    });
+
+  } catch (error) {
+    console.log(error);
+    return res.json({ success: false, message: "Server error" });
+  }
+};
+// REJECT RETURN
+export const rejectReturnRequest = async (req, res) => {
+  try {
+    const { orderId, itemId } = req.body;
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.json({ success: false, message: "Order not found" });
+    }
+
+    const item = order.items.id(itemId);
+    if (!item) {
+      return res.json({ success: false, message: "Item not found" });
+    }
+
+    // ✅ set item back to Delivered
+    item.status = "Return Rejected";   // user sees "Return Rejected"
+    item.returnReason = null;
+
+    // ✅ fix order-level status
+    const anyStillRequested = order.items.some(
+      i => i.status === "Return Requested"
+    );
+    if (!anyStillRequested) {
+      order.status = "Delivered";
+    }
+
+    await order.save();
+
+    return res.json({ success: true, message: "Return request rejected" });
+
+  } catch (error) {
+    console.log(error);
+    return res.json({ success: false, message: "Server error" });
   }
 };

@@ -1,465 +1,1120 @@
-<%-include("../../views/partials/user/header")%>
+<%- include("../../views/partials/user/header") %>
+
 <style>
-    #promoCarousel .carousel-control-prev,
-#promoCarousel .carousel-control-next {
-  width: 4%;
-  z-index: 1; /* behind content */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Dancing+Script:wght@700&display=swap');
+
+:root {
+  --rose:       #C97B8A;
+  --rose-dk:    #A85F6E;
+  --rose-lt:    #FAE8ED;
+  --blush:      #FDF0F3;
+  --petal:      #FBE4EC;
+  --lavender:   #F0E8F8;
+  --mint:       #E8F6F0;
+  --peach:      #FEF0E8;
+  --cream:      #FDF8F5;
+  --warm-white: #FFFCFA;
+  --caramel:    #D4A574;
+  --brown:      #5C3A3A;
+  --brown-lt:   #8A6060;
+  --muted:      #B08A8A;
+  --border:     #F5D8E0;
+  --burgundy:   #8B4A5A;
+  --white:      #FFFFFF;
 }
 
-#promoCarousel .carousel-item {
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--blush);
+  color: var(--brown);
+  overflow-x: hidden;
+}
+
+a { text-decoration: none; color: inherit; }
+img { display: block; }
+
+/* ── SECONDARY NAV ── */
+.secondary-nav {
+  background: var(--warm-white);
+  border-bottom: 1px solid var(--border);
+}
+.secondary-nav ul {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.secondary-nav li a {
+  display: block;
+  padding: 14px 22px;
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: color .2s, border-bottom-color .2s;
+  border-bottom: 2px solid transparent;
+}
+.secondary-nav li a:hover,
+.secondary-nav li a.active {
+  color: var(--rose-dk);
+  border-bottom-color: var(--rose-dk);
+}
+
+/* ══════════════════════════════════════
+   HERO — Soft Pink Split
+══════════════════════════════════════ */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 90vh;
+  overflow: hidden;
+  background: var(--blush);
+}
+
+.hero-left {
+  background: linear-gradient(145deg, #FAE0E8 0%, #F5C8D8 40%, #FBDDE8 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 72px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-left::before {
+  content: '';
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 380px; height: 380px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.35);
+}
+.hero-left::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; left: -60px;
+  width: 240px; height: 240px;
+  border-radius: 50%;
+  background: rgba(212,165,116,.12);
+}
+
+.hero-eyebrow {
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .20em;
+  text-transform: uppercase;
+  color: var(--rose-dk);
+  margin-bottom: 20px;
+  opacity: 0;
+  animation: heroUp .6s ease .1s forwards;
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.8rem, 5.5vw, 5rem);
+  font-weight: 700;
+  color: var(--brown);
+  line-height: 1.08;
+  margin-bottom: 14px;
+  opacity: 0;
+  animation: heroUp .6s ease .2s forwards;
+}
+.hero-title em {
+  font-style: italic;
+  color: var(--rose-dk);
+}
+
+.hero-subtitle {
+  font-size: .98rem;
+  color: var(--brown-lt);
+  line-height: 1.75;
+  margin-bottom: 40px;
+  max-width: 380px;
+  opacity: 0;
+  animation: heroUp .6s ease .3s forwards;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: heroUp .6s ease .4s forwards;
+}
+
+.btn-hero-primary {
+  padding: 15px 34px;
+  background: linear-gradient(135deg, var(--rose-dk) 0%, #8B4A5A 100%);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .9rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  cursor: pointer;
+  box-shadow: 0 8px 28px rgba(168,95,110,.35);
+  transition: transform .2s, box-shadow .2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-hero-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 36px rgba(168,95,110,.45);
+  color: #fff;
+}
+
+.btn-hero-ghost {
+  padding: 13px 26px;
+  border: 1.5px solid rgba(92,58,58,.25);
+  color: var(--brown-lt);
+  border-radius: 50px;
+  font-size: .88rem;
+  font-weight: 600;
+  transition: border-color .2s, color .2s, background .2s;
+  background: rgba(255,255,255,.5);
+}
+.btn-hero-ghost:hover {
+  border-color: var(--rose-dk);
+  color: var(--rose-dk);
+  background: rgba(255,255,255,.8);
+}
+
+.hero-trust {
+  margin-top: 52px;
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  opacity: 0;
+  animation: heroUp .6s ease .5s forwards;
+}
+.trust-item { text-align: center; }
+.trust-number {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--rose-dk);
+  line-height: 1;
+}
+.trust-label {
+  font-size: .68rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.trust-divider {
+  width: 1px;
+  height: 36px;
+  background: rgba(168,95,110,.2);
+}
+
+/* Hero Right — Mosaic */
+.hero-right {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  position: relative;
+  background: var(--petal);
+}
+.hero-img-cell { overflow: hidden; position: relative; }
+.hero-img-cell img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .6s ease;
+}
+.hero-img-cell:hover img { transform: scale(1.06); }
+.hero-img-cell.tall { grid-row: 1 / 3; }
+
+.hero-badge {
+  position: absolute;
+  bottom: 28px; right: 28px;
+  background: var(--white);
+  border-radius: 18px;
+  padding: 14px 20px;
+  box-shadow: 0 8px 32px rgba(168,95,110,.18);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 10;
+  animation: badgePop .5s cubic-bezier(.34,1.56,.64,1) .8s both;
+  border: 1px solid var(--border);
+}
+.badge-icon { font-size: 1.5rem; }
+.badge-text-top { font-size: .68rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+.badge-text-bottom { font-size: .88rem; font-weight: 700; color: var(--brown); margin-top: 2px; }
+
+@keyframes heroUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes badgePop {
+  from { opacity: 0; transform: scale(.7); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ══════════════════════════════════════
+   MARQUEE STRIP — Soft Rose
+══════════════════════════════════════ */
+.marquee-strip {
+  background: linear-gradient(90deg, var(--rose-dk) 0%, #BE6E7E 50%, var(--rose-dk) 100%);
+  padding: 14px 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.marquee-inner {
+  display: inline-flex;
+  animation: marquee 24s linear infinite;
+}
+.marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 28px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.92);
+}
+.marquee-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.5);
+  flex-shrink: 0;
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ══════════════════════════════════════
+   ABOUT — Warm Pastel
+══════════════════════════════════════ */
+.about-section {
+  padding: 110px 0;
+  background: var(--warm-white);
+}
+.about-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 60px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.about-eyebrow {
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--rose-dk);
+  margin-bottom: 18px;
+}
+.about-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.2rem, 3.5vw, 3.5rem);
+  font-weight: 700;
+  color: var(--brown);
+  line-height: 1.15;
+  margin-bottom: 24px;
+}
+.about-title em { font-style: italic; color: var(--rose-dk); }
+.about-body {
+  font-size: .96rem;
+  line-height: 1.85;
+  color: var(--muted);
+  margin-bottom: 32px;
+}
+.about-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.about-feat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: .86rem;
+  font-weight: 600;
+  color: var(--brown);
+  padding: 10px 14px;
+  background: var(--rose-lt);
+  border-radius: 10px;
+}
+.feat-icon { font-size: 1rem; }
+
+.about-img-stack { position: relative; padding-bottom: 32px; }
+.about-img-main {
+  border-radius: 28px;
+  overflow: hidden;
+  aspect-ratio: 4/5;
+  box-shadow: 0 20px 60px rgba(168,95,110,.18);
+}
+.about-img-main img { width: 100%; height: 100%; object-fit: cover; }
+.about-img-float {
+  position: absolute;
+  bottom: 0; left: -36px;
+  width: 180px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0,0,0,.15);
+  border: 4px solid var(--white);
+}
+.about-img-float img { width: 100%; height: 130px; object-fit: cover; }
+
+/* ══════════════════════════════════════
+   CATEGORIES — Cream Pastel
+══════════════════════════════════════ */
+.categories-section {
+  padding: 110px 0;
+  background: var(--cream);
+  position: relative;
+  overflow: hidden;
+}
+.categories-section::before {
+  content: '';
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: rgba(240,232,248,.6);
+  pointer-events: none;
+}
+.categories-section::after {
+  content: '';
+  position: absolute;
+  bottom: -80px; left: -80px;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: rgba(232,246,240,.6);
+  pointer-events: none;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 64px;
+  position: relative;
+  z-index: 2;
+}
+.section-eyebrow {
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .20em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 700;
+  color: var(--brown);
+}
+.section-title em { font-style: italic; color: var(--rose-dk); }
+
+.categories-grid {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  justify-content: center;
+  gap: 44px;
+  flex-wrap: wrap;
   position: relative;
   z-index: 2;
 }
 
-/* Ensure buttons always clickable */
-#promoCarousel a.btn {
+.category-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.category-card.visible { opacity: 1; transform: translateY(0); }
+.category-card:hover { transform: translateY(-10px) !important; }
+
+.cat-ring {
+  width: 136px; height: 136px;
+  border-radius: 50%;
+  padding: 4px;
+  background: linear-gradient(135deg, #F5C0CC 0%, #E8A8B8 50%, #D4A574 100%);
+  box-shadow: 0 8px 30px rgba(201,123,138,.25);
+  transition: box-shadow .3s, transform .3s;
+}
+.category-card:hover .cat-ring {
+  box-shadow: 0 18px 48px rgba(201,123,138,.40);
+}
+.cat-ring img {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--white);
+}
+.cat-name {
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--brown-lt);
+  transition: color .2s;
+}
+.category-card:hover .cat-name { color: var(--rose-dk); }
+
+/* ══════════════════════════════════════
+   PROMO CAROUSEL — Pastel Pink
+══════════════════════════════════════ */
+.promo-section {
+  padding: 80px 60px;
+  background: var(--blush);
+}
+.promo-carousel-wrap {
+  max-width: 1180px;
+  margin: 0 auto;
   position: relative;
-  z-index: 5;
+}
+#promoCarousel .carousel-inner { border-radius: 28px; overflow: hidden; }
+
+.promo-slide {
+  min-height: 380px;
+  display: flex;
+  align-items: center;
+}
+.promo-slide-1 {
+  background: linear-gradient(135deg, #FCE4EF 0%, #F8CEDD 100%);
+}
+.promo-slide-2 {
+  background: linear-gradient(135deg, #FCEEE4 0%, #F8D8C4 100%);
 }
 
-/* Optional: move arrows slightly outside */
-#promoCarousel .carousel-control-prev {
-  left: -20px;
+.promo-content { flex: 1; padding: 60px 64px; }
+
+.promo-tag {
+  display: inline-block;
+  background: var(--rose-dk);
+  color: #fff;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  padding: 6px 18px;
+  border-radius: 50px;
+  margin-bottom: 22px;
+}
+.promo-tag-peach {
+  background: var(--caramel);
 }
 
-#promoCarousel .carousel-control-next {
-  right: -20px;
+.promo-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--brown);
+  line-height: 1.1;
+  margin-bottom: 16px;
 }
-a:hover,
-button:hover {
-  transform: scale(1.05);
-  transition: 0.3s;
-  opacity: 0.9;
+.promo-body {
+  font-size: .92rem;
+  color: var(--muted);
+  line-height: 1.65;
+  margin-bottom: 30px;
+  max-width: 320px;
 }
-.nav-link:hover {
-  color: #AF5454 !important;
-  letter-spacing: 1px;
-  transition: 0.3s;
-}.hero-img,
-.card-img-top,
-.img-fluid {
-  transition: 0.4s;
-}
-
-.hero-img:hover,
-.card-img-top:hover,
-.img-fluid:hover {
-  transform: scale(1.05);
-  filter: brightness(90%);
-}.category-item:hover {
-  transform: translateY(-5px);
-  transition: 0.3s;
-}
-
-.category-img-wrapper:hover {
-  background-color: #AF5454;
-}.card:hover {
-  transform: scale(1.02);
-  box-shadow: 0px 10px 25px rgba(0,0,0,0.1);
-  transition: 0.3s;
-}.carousel-control-prev:hover,
-.carousel-control-next:hover {
-  transform: scale(1.2);
-  transition: 0.3s;
-}.btn:hover {
-  background-color: #AF5454 !important;
-  color: white !important;
-  transition: 0.3s;
-}* {
-  transition: all 0.3s ease;
-}
-/* ===== NAVBAR FULL EFFECT ===== */
-.nav-link {
-  position: relative;
-  color: #8c3b3b;
-  padding: 8px 15px;
-  border-radius: 20px;
-}
-
-
-
-/* ===== ICON EFFECT ===== */
-.header-icon {
+.btn-promo {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
+  padding: 14px 30px;
+  background: var(--rose-dk);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .18s, box-shadow .18s;
+  box-shadow: 0 6px 20px rgba(168,95,110,.3);
+  text-decoration: none;
+}
+.btn-promo:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(168,95,110,.42);
+  color: #fff;
+}
+.btn-promo-caramel { background: var(--caramel); box-shadow: 0 6px 20px rgba(212,165,116,.35); }
+.btn-promo-caramel:hover { box-shadow: 0 10px 30px rgba(212,165,116,.45); color: #fff; }
+
+.promo-img-side {
+  width: 420px;
+  flex-shrink: 0;
+  padding: 28px 36px 28px 0;
+}
+.promo-img-card {
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 12px 44px rgba(168,95,110,.14);
+  aspect-ratio: 4/3;
+  background: var(--white);
+  border: 1px solid rgba(245,216,224,.5);
+}
+.promo-img-card img,
+.promo-img-card video {
+  width: 100%; height: 100%;
+  object-fit: cover;
 }
 
-.header-icon:hover {
-  transform: scale(1.2) rotate(5deg);
-  color: #AF5454;
+/* Carousel controls */
+.carousel-control-prev,
+.carousel-control-next {
+  width: 48px; height: 48px;
+  background: var(--white) !important;
+  border-radius: 50%;
+  top: 50%; transform: translateY(-50%);
+  box-shadow: 0 4px 18px rgba(168,95,110,.18);
+  opacity: 1 !important;
+  transition: transform .2s, box-shadow .2s;
+  border: 1px solid var(--border) !important;
+}
+.carousel-control-prev { left: -24px; }
+.carousel-control-next { right: -24px; }
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 8px 26px rgba(168,95,110,.28);
+}
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  filter: invert(0.35) sepia(1) saturate(3) hue-rotate(300deg);
+  width: 16px; height: 16px;
 }
 
-/* ===== LOGIN / SIGNUP ===== */
-.header-action {
-  padding: 6px 12px;
+/* ══════════════════════════════════════
+   GALLERY — Pastel Lavender / Dusty Rose
+══════════════════════════════════════ */
+.gallery-section {
+  background: linear-gradient(145deg, #F5E8F2 0%, #EDE0F0 35%, #F2E0E8 70%, #F0E8F5 100%);
+  padding: 100px 60px;
+  position: relative;
+  overflow: hidden;
+}
+.gallery-section::before {
+  content: '';
+  position: absolute;
+  top: -100px; left: -100px;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.25);
+  pointer-events: none;
+}
+.gallery-section::after {
+  content: '';
+  position: absolute;
+  bottom: -80px; right: -80px;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: rgba(255,220,235,.2);
+  pointer-events: none;
+}
+
+.gallery-header {
+  text-align: center;
+  margin-bottom: 52px;
+  position: relative;
+  z-index: 2;
+}
+.gallery-eyebrow {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--rose-dk);
+  opacity: .75;
+  margin-bottom: 14px;
+}
+.gallery-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 700;
+  color: var(--brown);
+  line-height: 1.1;
+}
+.gallery-title em { font-style: italic; color: var(--rose-dk); }
+
+.gallery-carousel-wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+#cakeGallery .carousel-inner { border-radius: 24px; overflow: hidden; }
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.gallery-item {
+  border-radius: 20px;
+  overflow: hidden;
+  aspect-ratio: 3/4;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(168,95,110,.12);
+}
+.gallery-item img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .5s ease;
+}
+.gallery-item:hover img { transform: scale(1.08); }
+.gallery-item-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(139,74,90,.35) 0%, transparent 55%);
+  opacity: 0;
+  transition: opacity .3s;
   border-radius: 20px;
 }
+.gallery-item:hover .gallery-item-overlay { opacity: 1; }
 
-.header-action:hover {
-  background-color: rgba(175, 84, 84, 0.1);
-  transform: scale(1.1);
+/* Gallery carousel controls */
+#cakeGallery .carousel-control-prev,
+#cakeGallery .carousel-control-next {
+  background: rgba(255,255,255,.7) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(245,216,224,.8) !important;
+  box-shadow: 0 4px 16px rgba(168,95,110,.15);
 }
 
-/* ===== SEARCH BAR EFFECT ===== */
-form input:focus {
-  outline: none;
-  box-shadow: 0 0 8px rgba(175, 84, 84, 0.5);
-  transform: scale(1.03);
+/* ══════════════════════════════════════
+   FEATURES STRIP
+══════════════════════════════════════ */
+.features-strip {
+  background: var(--warm-white);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 50px 60px;
 }
-.active {
-  color: #AF5454 !important;
-  font-weight: bold;
+.features-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+}
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+}
+.feature-icon-wrap {
+  width: 64px; height: 64px;
+  border-radius: 20px;
+  background: var(--rose-lt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  box-shadow: 0 4px 16px rgba(201,123,138,.15);
+  transition: transform .2s, box-shadow .2s;
+}
+.feature-item:hover .feature-icon-wrap {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(201,123,138,.25);
+}
+.feature-label {
+  font-size: .88rem;
+  font-weight: 700;
+  color: var(--brown);
+}
+.feature-desc {
+  font-size: .78rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-top: -4px;
 }
 
-.card,
-.category-item {
+/* ══════════════════════════════════════
+   SCROLL REVEAL
+══════════════════════════════════════ */
+.reveal {
   opacity: 0;
-  transform: translateY(50px);
+  transform: translateY(40px);
+  transition: opacity .7s ease, transform .7s ease;
 }
-.nav-link:hover {
-  color: #AF5454 !important;
-  transform: scale(1.1);
-  background: linear-gradient(90deg, #fde2d9, #f9c5b5);
-}
-/* subtle page feel */
-body {
-  scroll-behavior: smooth;
-}
+.reveal.visible { opacity: 1; transform: translateY(0); }
 
-/* section spacing animation */
-section {
-  transition: all 0.4s ease;
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .hero { grid-template-columns: 1fr; min-height: auto; }
+  .hero-left { padding: 64px 36px; }
+  .hero-right { height: 50vw; }
+  .about-inner { grid-template-columns: 1fr; gap: 48px; padding: 0 28px; }
+  .about-img-float { display: none; }
+  .promo-slide { flex-direction: column; }
+  .promo-img-side { width: 100%; padding: 0 32px 32px; }
+  .features-inner { grid-template-columns: repeat(2, 1fr); }
+  .gallery-section { padding: 70px 24px; }
+  .promo-section { padding: 60px 24px; }
 }
-video {
-  border-radius: 12px;
-  box-shadow: 0px 10px 25px rgba(0,0,0,0.2);
+@media (max-width: 640px) {
+  .hero-right { display: none; }
+  .hero-left { min-height: 80vh; }
+  .categories-grid { gap: 20px; }
+  .cat-ring { width: 100px; height: 100px; }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .promo-content { padding: 32px 24px; }
+  .promo-heading { font-size: 2rem; }
+  .features-inner { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .about-section { padding: 70px 0; }
+  .about-inner { padding: 0 20px; }
+  .features-strip { padding: 40px 20px; }
 }
 </style>
+
 <body>
-<%-include("../../views/partials/user/navbar")%>
 
+<%- include("../../views/partials/user/navbar") %>
 
-    <!-- Secondary Nav Links -->
-    <div class="container-fluid text-center pb-3">
-        <ul class="nav justify-content-center gap-5">
-            <li class="nav-item"><a class="nav-link text-uppercase small active" href="#">Home</a></li>
-            <li class="nav-item"><a class="nav-link text-uppercase small" href="/products">Shop</a></li>
-            <li class="nav-item"><a class="nav-link text-uppercase  small" href="#">About Us</a></li>
-            <li class="nav-item"><a class="nav-link text-uppercase  small" href="#">Contact Us</a></li>
-            <li class="nav-item"><a class="nav-link text-uppercase small" href="#">Customer Support</a></li>
-        </ul>
+<!-- ── SECONDARY NAV ── -->
+<nav class="secondary-nav">
+  <ul>
+    <li><a href="/" class="active">Home</a></li>
+    <li><a href="/products">Shop</a></li>
+    <li><a href="#">About Us</a></li>
+    <li><a href="#">Contact Us</a></li>
+    <li><a href="#">Customer Support</a></li>
+  </ul>
+</nav>
+
+<!-- ══════════════════════════════════════
+     HERO
+══════════════════════════════════════ -->
+<section class="hero">
+
+  <div class="hero-left">
+    <div class="hero-eyebrow">✦ Handcrafted with love · Est. 2020</div>
+    <h1 class="hero-title">
+      Every Moment<br>Deserves <em>Sweet</em><br>Perfection
+    </h1>
+    <p class="hero-subtitle">
+      Cake O'Clock creates beautifully handcrafted custom cakes for your happiest celebrations. Fresh baked, lovingly designed, delivered to your door.
+    </p>
+    <div class="hero-actions">
+      <a href="/products" class="btn-hero-primary">
+        Order Now
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#about" class="btn-hero-ghost">Our Story</a>
     </div>
-
-    <!-- Hero Section -->
-    <section class="container text-center py-5">
-        <h1 class="display-1 pacifico-regular hero-title mb-0">Cake O Clock</h1>
-
-
-        <div style="color: #AF5454; font-size: 1.5rem;"
-            class="akaya-kanadaka-regular font-weight-bold row justify-content-center mb-5">
-            <div class="col-lg-8">
-                <p> The Taste That Makes Every Moment Sweet.<br>
-                    Cake O'Clock has the perfect recipe for your happiest celebrations.<br>
-                    Order your cakes and cupcakes for any special event,<br>
-                    or stop by to enjoy a freshly baked treat.<br>
-                    Visit us today for a delicious and memorable experience!</p>
-            </div>
-        </div>
-
-        <!-- Hero Images Grid -->
-        <div class="row g-4 mb-4 align-items-end">
-            <div class="col-md-3">
-                <div class="hero-img-wrapper">
-                    <img src="/media/1.jpg" class="img-fluid hero-img" alt="Wedding Cake"
-                        style="height: 480px; object-fit: cover;">
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="hero-img-wrapper">
-                    <img src="media\2.png" class="img-fluid hero-img" alt="Decorating Cake"
-                        style="height: 360px; object-fit: cover;">
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="hero-img-wrapper">
-                    <img src="media/3.jpg" class="img-fluid hero-img" alt="Floral Cake"
-                        style="height: 480px; object-fit: cover;">
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="hero-img-wrapper">
-                    <img src="media/4.png" class="img-fluid hero-img" alt="Macarons"
-                        style="height: 360px; object-fit: cover;">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section class="container py-5 mb-4">
-        <div class="row align-items-center">
-            <div class="col-lg-5">
-                <h1 class="mb-5" style="color: #AF5454; font-weight: 900;">About Us</h1>
-                <p class="about-text" style="color:#AF5454; font-weight: 500;">
-                    Cake O'Clock creates beautifully handcrafted and fully customized cakes made to match your design,
-                    flavor, and style. Every cake is made fresh with quality ingredients and creative detailing. From
-                    birthdays and weddings to any special moment, we make your celebrations sweeter and more
-                    meaningful.<br>
-                    <span class="d-block mt-3" style="font-weight: 500;">Cake O'Clock - where your imagination becomes a
-                        cake.</span>
-                </p>
-            </div>
-            <div class="col-lg-7">
-                <img src="media/5png.png" class="img-fluid rounded-4 shadow-sm" alt="Team Baking"
-                    style="width: 100%; object-fit: cover; height: 500px;">
-            </div>
-        </div>
-    </section>
-
-    <!-- Shop by Category -->
-<!-- Shop by Category -->
-<section class="container py-5 mb-4 text-center">
-    <h2 class="display-4 mb-5" style="color: #AF5454; font-weight: 900;">Shop by Category</h2>
-    <div class="d-flex justify-content-center flex-wrap gap-5">
-
-        <% if (categories && categories.length > 0) { %>
-            <% categories.forEach(category => { %>
-                <div class="category-item">
-                    <a href="/products?category=<%= category._id %>" class="text-decoration-none">
-                        <div class="category-img-wrapper rounded-circle p-1"
-                            style="background-color: var(--primary-color);">
-                            <img
-                                src="<%= category.image %>"
-                                class="rounded-circle img-fluid"
-                                alt="<%= category.name %>"
-                                style="width: 120px; height: 120px; object-fit: cover;"
-                            >
-                        </div>
-                        <p class="mt-2 fw-bold small" style="color: #AF5454;">
-                            <%= category.name %>
-                        </p>
-                    </a>
-                </div>
-            <% }) %>
-        <% } else { %>
-            <p style="color: #AF5454;">No categories available.</p>
-        <% } %>
-
+    <div class="hero-trust">
+      <div class="trust-item">
+        <div class="trust-number">5K+</div>
+        <div class="trust-label">Happy Customers</div>
+      </div>
+      <div class="trust-divider"></div>
+      <div class="trust-item">
+        <div class="trust-number">50+</div>
+        <div class="trust-label">Cake Varieties</div>
+      </div>
+      <div class="trust-divider"></div>
+      <div class="trust-item">
+        <div class="trust-number">4.9★</div>
+        <div class="trust-label">Avg Rating</div>
+      </div>
     </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-img-cell tall">
+      <img src="/media/1.jpg" alt="Wedding Cake" loading="eager">
+    </div>
+    <div class="hero-img-cell">
+      <img src="/media/2.png" alt="Cake Detail" loading="eager">
+    </div>
+    <div class="hero-img-cell">
+      <img src="/media/3.jpg" alt="Floral Cake" loading="eager">
+    </div>
+    <div class="hero-badge">
+      <div class="badge-icon">🎂</div>
+      <div>
+        <div class="badge-text-top">Same Day</div>
+        <div class="badge-text-bottom">Delivery Available</div>
+      </div>
+    </div>
+  </div>
+
 </section>
-    <!-- Seasonal Sales -->
-    <!-- 🔁 Seasonal / Deals Rotating Banner -->
-<section class="container py-5 mb-4">
 
-  <div
-    id="promoCarousel"
-    class="carousel slide"
-    data-bs-ride="carousel"
-    data-bs-interval="3500"
-    data-bs-pause="hover"
-  >
-
-    <div class="carousel-inner rounded-4 shadow-sm overflow-hidden">
-
-      <!-- 🟡 SLIDE 1: SEASONAL OFFER -->
-      <div class="carousel-item active">
-        <div
-          class="p-5 position-relative"
-          style="background: linear-gradient(90deg, #fde2d9, #f9c5b5);"
-        >
-          <div class="row align-items-center">
-            <div class="col-md-6">
-              <h3
-                class="display-4 mb-3"
-                style="font-family: 'Dancing Script', cursive; color:#AF5454;"
-              >
-                Seasonal Sales
-              </h3>
-
-              <p style="color:#AF5454;">
-                Celebrate the season with something sweet!  
-                Exclusive discounts on wedding cakes & cupcakes.
-              </p>
-
-              <a
-                href="/products"
-                class="btn btn-outline-dark position-relative z-3"
-              >
-                Explore Offers →
-              </a>
-            </div>
-
-            <div class="col-md-6 text-center">
-              <img
-                src="media/cake_slice.png"
-                class="img-fluid"
-                style="max-height: 250px; object-fit: contain;"
-                alt="Seasonal Sale"
-              >
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 🔴 SLIDE 2: NEAR EXPIRY DEALS -->
-      <% if (showExpiryBanner) { %>
-      <div class="carousel-item">
-        <div
-          class="p-5 position-relative"
-          style="background: linear-gradient(90deg, #ffe5e5, #ffc1c1);"
-        >
-          <div class="row align-items-center">
-            <div class="col-md-6">
-              <h3
-                class="display-4 mb-3"
-                style="font-family: 'Dancing Script', cursive; color:#7a1f1f;"
-              >
-                Fresh & Expiry-Coming Deals
-              </h3>
-
-              <p style="color:#7a1f1f;">
-                Cakes expiring soon at unbeatable prices.  
-                Limited stock • Save up to <b>40%</b>
-              </p>
-
-              <a
-                href="/near-expiry"
-                class="btn btn-dark position-relative z-3"
-              >
-                Shop Deals →
-              </a>
-            </div>
-
-            <div class="col-md-6 text-center">
-  <% if (cloudinaryVideo) { %>
-    <video
-      class="img-fluid"
-      style="max-height: 250px; object-fit: contain; border-radius:10px;"
-      autoplay
-      muted
-      loop
-      playsinline
-    >
-      <source src="<%= cloudinaryVideo %>" type="video/mp4">
-    </video>
-  <% } else { %>
-    <img
-      src="/media/offer_cake.png"
-      class="img-fluid"
-      style="max-height: 250px; object-fit: contain;"
-    >
-  <% } %>
+<!-- ── MARQUEE ── -->
+<div class="marquee-strip">
+  <div class="marquee-inner">
+    <% for(let i = 0; i < 2; i++) { %>
+    <span class="marquee-item"><span class="marquee-dot"></span> Custom Cakes</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Wedding Specials</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Free Delivery</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Birthday Cakes</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Fresh Baked Daily</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Premium Ingredients</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> 100% Customizable</span>
+    <span class="marquee-item"><span class="marquee-dot"></span> Order Online</span>
+    <% } %>
+  </div>
 </div>
-          </div>
-        </div>
-      </div>
-      <% } %>
 
+<!-- ── FEATURES STRIP ── -->
+<div class="features-strip reveal">
+  <div class="features-inner">
+    <div class="feature-item">
+      <div class="feature-icon-wrap">🎂</div>
+      <div class="feature-label">Custom Designs</div>
+      <div class="feature-desc">Made exactly to your vision and style</div>
     </div>
+    <div class="feature-item">
+      <div class="feature-icon-wrap">🚚</div>
+      <div class="feature-label">Free Delivery</div>
+      <div class="feature-desc">On all orders above ₹500</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon-wrap">🌸</div>
+      <div class="feature-label">Fresh Daily</div>
+      <div class="feature-desc">Baked fresh every morning</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon-wrap">⭐</div>
+      <div class="feature-label">4.9★ Rated</div>
+      <div class="feature-desc">Loved by 5000+ customers</div>
+    </div>
+  </div>
+</div>
 
-    <!-- Controls -->
-    <button
-      class="carousel-control-prev"
-      type="button"
-      data-bs-target="#promoCarousel"
-      data-bs-slide="prev"
-    >
-      <span class="carousel-control-prev-icon"></span>
-    </button>
-
-    <button
-      class="carousel-control-next"
-      type="button"
-      data-bs-target="#promoCarousel"
-      data-bs-slide="next"
-    >
-      <span class="carousel-control-next-icon"></span>
-    </button>
-
+<!-- ══════════════════════════════════════
+     ABOUT
+══════════════════════════════════════ -->
+<section class="about-section reveal" id="about">
+  <div class="about-inner">
+    <div>
+      <div class="about-eyebrow">Our Story</div>
+      <h2 class="about-title">Where Your Imagination<br>Becomes <em>a Cake</em></h2>
+      <p class="about-body">
+        Cake O'Clock creates beautifully handcrafted and fully customized cakes made to match your design, flavor, and style. Every cake is made fresh with quality ingredients and creative detailing.
+        <br><br>
+        From birthdays and weddings to any special moment, we make your celebrations sweeter and more meaningful — one slice at a time.
+      </p>
+      <div class="about-features">
+        <div class="about-feat"><div class="feat-icon">🌿</div> Fresh Ingredients</div>
+        <div class="about-feat"><div class="feat-icon">🎨</div> Custom Designs</div>
+        <div class="about-feat"><div class="feat-icon">⚡</div> Same-Day Delivery</div>
+        <div class="about-feat"><div class="feat-icon">🍰</div> 50+ Flavours</div>
+      </div>
+    </div>
+    <div class="about-img-stack">
+      <div class="about-img-main">
+        <img src="/media/5png.png" alt="Team Baking" loading="lazy">
+      </div>
+      <div class="about-img-float">
+        <img src="/media/4.png" alt="Cake Detail" loading="lazy">
+      </div>
+    </div>
   </div>
 </section>
 
-
-
- 
-    <!-- Gallery / Slideshow -->
-    <section class="container py-5 mb-5">
-        <div id="cakeGallery" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-inner rounded-3">
-                <div class="carousel-item active">
-                    <div class="row g-2">
-                        <div class="col-3"><img src="/media/n1.png" class="img-fluid rounded-4" alt="Rose Cake"></div>
-                        <div class="col-3"><img src="/media/n5.png" class="img-fluid rounded-4" alt="Wedding Couple">
-                        </div>
-                        <div class="col-3"><img src="media/baby copy.jpg" class="img-fluid rounded-4"
-                                alt="Hand holding box"></div>
-                        <div class="col-3"><img src="media/n4.jpg" class="img-fluid rounded-4" alt="Cupcake"></div>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                    <div class="row g-2">
-                        <div class="col-3"><img src="media/s1.png" class="img-fluid rounded-4" alt="Cake Slice"></div>
-                        <div class="col-3"><img src="media/s2.png" class="img-fluid rounded-4" alt="White Cake"></div>
-                        <div class="col-3"><img src="media/s3.png" class="img-fluid rounded-4" alt="Pink Cake"></div>
-                        <div class="col-3"><img src="media/s4.png" class="img-fluid rounded-4" alt="Chocolate"></div>
-                    </div>
-                </div>
+<!-- ══════════════════════════════════════
+     CATEGORIES
+══════════════════════════════════════ -->
+<section class="categories-section reveal">
+  <div class="section-header">
+    <div class="section-eyebrow">Browse by Type</div>
+    <h2 class="section-title">Shop by <em>Category</em></h2>
+  </div>
+  <div class="categories-grid">
+    <% if (categories && categories.length > 0) { %>
+      <% categories.forEach((category, i) => { %>
+        <div class="category-card" style="transition-delay: <%= i * 0.1 %>s">
+          <a href="/products?category=<%= category._id %>"
+             style="display:flex;flex-direction:column;align-items:center;gap:16px;text-decoration:none">
+            <div class="cat-ring">
+              <img src="<%= category.image %>" alt="<%= category.name %>">
             </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#cakeGallery" data-bs-slide="prev"
-                style="width: 5%;">
-                <span class="carousel-control-prev-icon bg-dark rounded-circle p-2" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#cakeGallery" data-bs-slide="next"
-                style="width: 5%;">
-                <span class="carousel-control-next-icon bg-dark rounded-circle p-2" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
+            <span class="cat-name"><%= category.name %></span>
+          </a>
         </div>
-    </section>
+      <% }) %>
+    <% } else { %>
+      <p style="color:var(--muted);grid-column:1/-1;text-align:center">No categories available.</p>
+    <% } %>
+  </div>
+</section>
 
+<!-- ══════════════════════════════════════
+     PROMO CAROUSEL
+══════════════════════════════════════ -->
+<section class="promo-section reveal">
+  <div class="promo-carousel-wrap">
+    <div id="promoCarousel" class="carousel slide"
+         data-bs-ride="carousel" data-bs-interval="4000" data-bs-pause="hover">
+      <div class="carousel-inner">
 
-<%-include("../../views/partials/user/footer")%>
+        <div class="carousel-item active">
+          <div class="promo-slide promo-slide-1">
+            <div class="promo-content">
+              <div class="promo-tag">Limited Time</div>
+              <h3 class="promo-heading">Seasonal Sweet<br>Deals Are Here</h3>
+              <p class="promo-body">
+                Celebrate the season with something extraordinary. Exclusive discounts on wedding cakes and cupcake towers.
+              </p>
+              <a href="/products" class="btn-promo">Explore Offers →</a>
+            </div>
+            <div class="promo-img-side">
+              <div class="promo-img-card">
+                <img src="/media/cake_slice.png" alt="Seasonal Sale" loading="lazy">
+              </div>
+            </div>
+          </div>
+        </div>
 
+        <% if (showExpiryBanner) { %>
+        <div class="carousel-item">
+          <div class="promo-slide promo-slide-2">
+            <div class="promo-content">
+              <div class="promo-tag promo-tag-peach">Flash Deals</div>
+              <h3 class="promo-heading">Fresh &amp;<br>Expiry Deals</h3>
+              <p class="promo-body">
+                Cakes expiring soon at unbeatable prices. Limited stock — save up to <strong>40%</strong> today.
+              </p>
+              <a href="/near-expiry" class="btn-promo btn-promo-caramel">Shop Deals →</a>
+            </div>
+            <div class="promo-img-side">
+              <div class="promo-img-card">
+                <% if (cloudinaryVideo) { %>
+                  <video style="width:100%;height:100%;object-fit:cover" autoplay muted loop playsinline>
+                    <source src="<%= cloudinaryVideo %>" type="video/mp4">
+                  </video>
+                <% } else { %>
+                  <img src="/media/offer_cake.png" alt="Deals" loading="lazy">
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% } %>
 
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#promoCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#promoCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+      </button>
+    </div>
+  </div>
+</section>
 
+<!-- ══════════════════════════════════════
+     GALLERY — Pastel Lavender
+══════════════════════════════════════ -->
+<section class="gallery-section reveal">
+  <div class="gallery-header">
+    <div class="gallery-eyebrow">Our Creations</div>
+    <h2 class="gallery-title">A Taste of <em>Our Work</em></h2>
+  </div>
+  <div class="gallery-carousel-wrap">
+    <div id="cakeGallery" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3200">
+      <div class="carousel-inner">
 
+        <div class="carousel-item active">
+          <div class="gallery-grid">
+            <div class="gallery-item">
+              <img src="/media/n1.png" alt="Rose Cake" loading="lazy">
+              <div class="gallery-item-overlay"></div>
+            </div>
+            <div class="gallery-item">
+              <img src="/media/n5.png" alt="Wedding" loading="lazy">
+              <div class="gallery-item-overlay"></div>
+            </div>
+            <div class="gallery-item">
+              <img src="/media/baby copy.jpg" alt="Gift Box" loading="lazy">
+              <div class="gallery-item-overlay"></div>
+            </div>
+            <div class="gallery-item">
+              <img src="/media/n4.jpg" alt="Cupcake" loading="lazy">
+              <div class="gallery-item-overlay"></div>
+            </div>
+          </div>
+        </div>
 
+        <div class="carousel-item">
+          <div class="gallery-grid">
+            <div class="gallery-item">
+              <img src="/media/s1.png" alt="Cake Slice" loading="lazy">
+              <div class="gallery-item-overlay"></div>
+            </div>
+            <div class="gallery-item">
+              <img src="/media/s2.png" alt="White Cake" loading="lazy">
+              <div class="gallery-item-overlay"></div>
+            </div>
+            <div class="gallery-item">
+              <img src="/media/s3.png" alt="Pink Cake" loading="lazy">
+              <div class="gallery-item-overlay"></div>
+            </div>
+            <div class="gallery-item">
+              <img src="/media/s4.png" alt="Chocolate" loading="lazy">
+              <div class="gallery-item-overlay"></div>
+            </div>
+          </div>
+        </div>
 
-   
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS -->
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#cakeGallery" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#cakeGallery" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<%- include("../../views/partials/user/footer") %>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+/* Scroll reveal */
+const reveals = document.querySelectorAll('.reveal, .category-card');
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+reveals.forEach(el => obs.observe(el));
 
-  const elements = document.querySelectorAll('.card, .category-item');
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.style.opacity = "1";
-        entry.target.style.transform = "translateY(0)";
-      }
-    });
-  }, { threshold: 0.2 });
-
-  elements.forEach(el => observer.observe(el));
-
-});
-</script>
-<script>
-  if (window.history.replaceState) {
-    window.history.replaceState(null, null, window.location.href);
-  }
-</script>
-<script>
-  window.history.pushState(null, null, window.location.href);
-
-  window.onpopstate = function () {
-    window.location.href = "/";
-  };
+/* History fix */
+if (window.history.replaceState) {
+  window.history.replaceState(null, null, window.location.href);
+}
+window.history.pushState(null, null, window.location.href);
+window.onpopstate = () => window.location.href = '/';
 </script>
 </body>
-
 </html>

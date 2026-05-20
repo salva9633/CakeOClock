@@ -226,7 +226,8 @@
               <th style="text-align:center">Qty</th>
               <th>Price</th>
               <th>Subtotal</th>
-              <th>Status</th>
+<th>Status</th>
+<th>Return Action</th>
             </tr>
           </thead>
           <tbody>
@@ -251,7 +252,22 @@
               <td>₹<%= item.price.toLocaleString('en-IN') %></td>
               <td style="font-weight:600">₹<%= (item.price * item.quantity).toLocaleString('en-IN') %></td>
 <td><span class="badge b-<%= item.status %> item-status-badge"><%= item.status %></span></td>
-            </tr>
+<td>
+  <% if (item.status === 'Return Requested') { %>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button
+        style="background:#d4edda;color:#155724;border:none;border-radius:7px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer"
+        onclick="handleReturn('<%= order._id %>', '<%= item._id %>', 'approve', '<%= item.productName %>')">
+        ✓ Approve
+      </button>
+      <button
+        style="background:#f8d7da;color:#721c24;border:none;border-radius:7px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer"
+        onclick="handleReturn('<%= order._id %>', '<%= item._id %>', 'reject', '<%= item.productName %>')">
+        ✗ Reject
+      </button>
+    </div>
+  <% } %>
+</td>            </tr>
             <% }) %>
           </tbody>
         </table>
@@ -430,7 +446,7 @@ function showToast(msg, type = 'success') {
   setTimeout(() => { t.className = 'toast'; }, 3000);
 }
 
-/* ════ MANUAL UPDATE (existing Update Status button) ════ */
+/* ════ MANUAL UPDATE ════ */
 async function submitStatusUpdate() {
   const sel    = document.getElementById('status-select');
   const btn    = document.getElementById('update-btn');
@@ -459,6 +475,29 @@ async function submitStatusUpdate() {
   }
 }
 
+/* ════ APPROVE / REJECT RETURN ════ */
+async function handleReturn(orderId, itemId, action, name) {
+  const url = action === 'approve' ? '/admin/approve-return' : '/admin/reject-return';
+  try {
+    const res  = await fetch(url, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ orderId, itemId })
+    });
+    const data = await res.json();
+    console.log('handleReturn response:', data);
+    if (data.success) {
+      showToast(data.message, 'success');
+      setTimeout(() => location.reload(), 1200);
+    } else {
+      showToast(data.message || 'Failed', 'error');
+    }
+  } catch (err) {
+    console.error('handleReturn error:', err);
+    showToast('Network error', 'error');
+  }
+}
+
 /* ════ POLLING – every 8 seconds ════ */
 async function pollAdminStatus() {
   try {
@@ -475,32 +514,26 @@ setInterval(pollAdminStatus, 8000);
 
 /* ════ UPDATE ALL UI ════ */
 function updateAdminDetailUI(newStatus) {
-
-  // 1. Header order status badge
   const badge = document.getElementById('current-badge');
   if (badge) {
     badge.textContent = newStatus;
     badge.className   = `badge b-${newStatus}`;
   }
-
-  // 2. All item badges except Cancelled/Returned
   document.querySelectorAll('.item-status-badge').forEach(el => {
     const current = el.textContent.trim();
-    if (!['Cancelled', 'Returned'].includes(current)) {
+    if (!['Cancelled','Returned'].includes(current)) {
       el.textContent = newStatus;
       el.className   = `badge b-${newStatus} item-status-badge`;
     }
   });
-
-  // 3. Status select dropdown — update value and disable backward options
   const sel = document.getElementById('status-select');
   if (sel) {
     sel.value = newStatus;
     const currentIdx = STATUS_ORDER.indexOf(newStatus);
     const isLocked   = LOCKED.includes(newStatus);
     Array.from(sel.options).forEach(opt => {
-      const optIdx  = STATUS_ORDER.indexOf(opt.value);
-      opt.disabled  = isLocked || optIdx < currentIdx;
+      const optIdx = STATUS_ORDER.indexOf(opt.value);
+      opt.disabled = isLocked || optIdx < currentIdx;
     });
     if (isLocked) {
       sel.style.opacity       = '0.6';

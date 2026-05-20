@@ -4,31 +4,44 @@ import Wishlist from "../models/wishlistModel.js";
 export const injectBadgeCounts = async (req, res, next) => {
   try {
 
+    // Default values
     res.locals.cartCount = 0;
     res.locals.wishlistCount = 0;
 
-    if (req.session.user) {
+    // No user logged in
+    if (!req.session.user) {
+      return next();
+    }
 
-      const userId = req.session.user.id;
+    const userId = req.session.user.id;
 
-      const cart = await Cart.findOne({ userId });
+    // Get cart
+    const cart = await Cart.findOne({ userId }).lean();
 
-      if (cart && cart.items) {
-        res.locals.cartCount =
-          cart.items.reduce((total, item) => total + item.quantity, 0);
-      }
+    // Get wishlist
+    const wishlist = await Wishlist.findOne({ userId }).lean();
 
-      const wishlist = await Wishlist.findOne({ userId });
+    // Cart count
+    if (cart && cart.items.length > 0) {
+      res.locals.cartCount = cart.items.reduce(
+        (sum, item) => sum + item.quantity,
+        0
+      );
+    }
 
-      if (wishlist && wishlist.products) {
-        res.locals.wishlistCount = wishlist.products.length;
-      }
+    // Wishlist count
+    if (wishlist && wishlist.products.length > 0) {
+      res.locals.wishlistCount = wishlist.products.length;
     }
 
     next();
 
-  } catch (error) {
-    console.log("injectBadgeCounts error", error);
+  } catch (err) {
+    console.error("BADGE COUNT ERROR:", err);
+
+    res.locals.cartCount = 0;
+    res.locals.wishlistCount = 0;
+
     next();
   }
 };

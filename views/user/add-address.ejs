@@ -2,248 +2,294 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Add New Address</title>
-
-  <!-- Google Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+  <title>Add New Address – Cake O'Clock</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/cake.css">
   <style>
-    body {
-      background: #dba39a;
-      font-family: 'Outfit', sans-serif;
+    body { background: linear-gradient(135deg, #f5e0dd 0%, #fdf3ef 100%); }
+
+    .address-shell {
+      max-width: 860px;
+      margin: 36px auto 60px;
+      background: #fff;
+      border-radius: var(--r-xl);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      animation: fadeUp .45s ease both;
     }
 
-    .dashboard-container {
+    .address-header {
+      background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dk) 100%);
+      padding: 32px 44px;
       display: flex;
-      width: 98%;
-      height: 85vh;
-      margin: 20px auto;
-      background: #feebe7;
-      border-radius: 30px;
-    }
-    .main-content {
-      flex: 1;
-      padding: 40px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
       align-items: center;
+      gap: 16px;
+    }
+    .address-header-icon {
+      width: 52px; height: 52px;
+      background: rgba(255,255,255,.2);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+    }
+    .address-header h1 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      margin: 0;
+    }
+    .address-header p {
+      font-size: .82rem;
+      color: rgba(255,255,255,.8);
+      margin: 3px 0 0;
     }
 
-    .page-title {
-      font-size: 1.6rem;
-      color: #AF5454;
-      margin-bottom: 30px;
-      width: 100%;
-      max-width: 900px;
-    }
+    .address-body { padding: 44px; }
 
-    /* FORM */
-    .address-form {
+    .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 25px;
-      max-width: 900px;
-       width: 100%;
+      gap: 22px;
     }
+    .full-col { grid-column: 1 / -1; }
 
-    .full-width {
-      grid-column: 1 / -1;
+    .field-group { display: flex; flex-direction: column; gap: 7px; }
+    .field-group label {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+      color: var(--brown-lt);
     }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    label {
-      color: #7a2e2e;
-      font-weight: 500;
-    }
-
-    input,
-    textarea,
-    select {
-      padding: 12px;
-      border: none;
-      border-radius: 6px;
-      background: #d9a3a0;
-      color: #7a2e2e;
-      font-size: 0.95rem;
-    }
-
-    input::placeholder,
-    textarea::placeholder {
-      color: #7a2e2e;
-      opacity: 0.7;
-    }
-
-    input:focus,
-    textarea:focus {
+    .field-input {
+      width: 100%;
+      background: var(--rose-lt);
+      border: 1.5px solid transparent;
+      border-radius: var(--r-sm);
+      padding: 13px 16px;
+      font-family: var(--font-body);
+      font-size: .92rem;
+      color: var(--brown);
       outline: none;
-      box-shadow: 0 0 0 2px rgba(175, 84, 84, 0.3);
+      transition: border-color .2s, background .2s, box-shadow .2s;
     }
-
-    textarea {
-      resize: none;
-      min-height: 110px;
+    .field-input::placeholder { color: var(--muted); opacity: .7; }
+    .field-input:focus {
+      background: #fff;
+      border-color: var(--rose-mid);
+      box-shadow: 0 0 0 4px rgba(175,84,84,.09);
     }
+    .field-input.error { border-color: #e05555 !important; }
+    .field-input.success { border-color: #4caf50 !important; }
 
-    /* RADIO + SAVE */
-    .form-actions {
-      grid-column: 1 / -1;
+    textarea.field-input { resize: none; min-height: 100px; }
+
+    .error-text { font-size: .74rem; color: #e05555; }
+
+    /* Address Type */
+    .type-section { margin-top: 8px; }
+    .type-label {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+      color: var(--brown-lt);
+      margin-bottom: 12px;
+      display: block;
+    }
+    .type-options { display: flex; gap: 10px; flex-wrap: wrap; }
+    .type-option { position: relative; }
+    .type-option input[type="radio"] { display: none; }
+    .type-option label {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-top: 10px;
+      gap: 7px;
+      padding: 9px 18px;
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      font-size: .83rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .2s;
     }
+    .type-option label:hover { border-color: var(--rose-mid); color: var(--rose); }
+    .type-option input:checked + label {
+      border-color: var(--rose);
+      background: var(--rose-lt);
+      color: var(--rose);
+    }
+    .type-option label span { font-size: 1rem; }
 
-    .radio-group {
+    .form-actions {
       display: flex;
-      gap: 20px;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
     }
 
-    .radio-group label {
-      font-size: 0.95rem;
-      color: #7a2e2e;
+    .btn-cancel {
+      padding: 12px 26px;
+      background: #f5f0f0;
+      color: var(--muted);
+      border: none;
+      border-radius: 50px;
+      font-family: var(--font-body);
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
     }
+    .btn-cancel:hover { background: #ede8e8; }
 
-    button {
-      background: #AF5454;
+    .btn-save {
+      padding: 12px 32px;
+      background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dk) 100%);
       color: #fff;
       border: none;
-      padding: 10px 28px;
-      border-radius: 8px;
-      font-size: 0.95rem;
+      border-radius: 50px;
+      font-family: var(--font-body);
+      font-size: .88rem;
+      font-weight: 700;
       cursor: pointer;
+      transition: transform .18s, box-shadow .18s;
+      box-shadow: 0 6px 20px rgba(175,84,84,.28);
     }
+    .btn-save:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(175,84,84,.36); }
 
-    button:hover {
-      background: #963f3f;
-    }
-
-    /* VALIDATION */
-    .error-text {
-      color: red;
-      font-size: 0.85rem;
-    }
-
-    input.error {
-      border: 2px solid red;
-    }
-
-    input.success {
-      border: 2px solid green;
+    @media (max-width: 640px) {
+      .address-shell { margin: 0; border-radius: 0; }
+      .address-header { padding: 24px 20px; }
+      .address-body { padding: 24px 20px; }
+      .form-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
-
 <body>
+
 <%- include("../partials/user/h2") %>
-<div class="dashboard-container">
 
-  
- 
+<div class="address-shell">
 
-  <main class="main-content">
-    <h1 class="page-title">Add a new address</h1>
+  <!-- Header -->
+  <div class="address-header">
+    <div class="address-header-icon">📍</div>
+    <div>
+      <h1>Add New Address</h1>
+      <p>Fill in your delivery details below</p>
+    </div>
+  </div>
 
-<form action="/add-address?from=<%= locals.from || '' %>" method="POST" class="address-form">
-      <div class="form-group">
-        <label>Name</label>
-        <input type="text" id="name" name="name" placeholder="Enter your name">
+  <!-- Body -->
+  <div class="address-body">
+    <form action="/add-address?from=<%= locals.from || '' %>" method="POST" class="form-grid">
+
+      <div class="field-group">
+        <label>Full Name</label>
+        <input type="text" id="name" name="name" class="field-input" placeholder="Enter your name">
         <span class="error-text" id="nameError"></span>
       </div>
 
-      <div class="form-group">
+      <div class="field-group">
         <label>Mobile Number</label>
-        <input type="tel" id="phone" name="phone" placeholder="Enter your mobile number">
+        <input type="tel" id="phone" name="phone" class="field-input" placeholder="10-digit number">
         <span class="error-text" id="phoneError"></span>
       </div>
 
-      <div class="form-group">
+      <div class="field-group">
         <label>Pincode</label>
-        <input type="text" id="pincode" name="pincode" placeholder="Enter pincode">
+        <input type="text" id="pincode" name="pincode" class="field-input" placeholder="6-digit pincode">
         <span class="error-text" id="pincodeError"></span>
       </div>
 
-      <div class="form-group">
-        <label>Locality</label>
-        <input type="text" id="street" name="street" placeholder="Enter locality">
+      <div class="field-group">
+        <label>Locality / Street</label>
+        <input type="text" id="street" name="street" class="field-input" placeholder="Area, street, sector">
         <span class="error-text" id="streetError"></span>
       </div>
 
-      <div class="form-group full-width">
-        <label>Address</label>
-        <textarea name="address" placeholder="Address (House name/number)"></textarea>
+      <div class="field-group full-col">
+        <label>Full Address</label>
+        <textarea name="address" class="field-input" placeholder="House no., Building, Floor, etc."></textarea>
       </div>
 
-      <div class="form-group">
+      <div class="field-group">
         <label>City / District / Town</label>
-        <input type="text" id="city" name="city" placeholder="Enter city">
+        <input type="text" id="city" name="city" class="field-input" placeholder="Your city">
         <span class="error-text" id="cityError"></span>
       </div>
 
-      <div class="form-group">
+      <div class="field-group">
         <label>State</label>
-        <input type="text" id="state" name="state" placeholder="Select state">
+        <input type="text" id="state" name="state" class="field-input" placeholder="Your state">
         <span class="error-text" id="stateError"></span>
       </div>
 
-      <div class="form-group">
-        <label>Landmark</label>
-        <input type="text" name="landmark" placeholder="Enter landmark (optional)">
+      <div class="field-group">
+        <label>Landmark <span style="color:var(--muted);font-weight:400">(Optional)</span></label>
+        <input type="text" name="landmark" class="field-input" placeholder="Near school, temple, etc.">
       </div>
 
-      <div class="form-group">
-        <label>Alternate phone number</label>
-        <input type="tel" name="altPhone" placeholder="Alternate mobile number">
+      <div class="field-group">
+        <label>Alternate Phone <span style="color:var(--muted);font-weight:400">(Optional)</span></label>
+        <input type="tel" name="altPhone" class="field-input" placeholder="Alternate number">
       </div>
 
-      <!-- Bottom Row -->
-      <div class="form-actions">
-        <div class="radio-group">
-          <label><input type="radio" name="type" value="HOME" checked> Home</label>
-          <label><input type="radio" name="type" value="WORK"> Work</label>
-          <label><input type="radio" name="type" value="FAMILY"> Family</label>
-          <label><input type="radio" name="type" value="FRIEND"> Friend</label>
+      <!-- Address Type -->
+      <div class="full-col type-section">
+        <span class="type-label">Address Type</span>
+        <div class="type-options">
+          <div class="type-option">
+            <input type="radio" name="type" value="HOME" id="type-home" checked>
+            <label for="type-home"><span>🏠</span> Home</label>
+          </div>
+          <div class="type-option">
+            <input type="radio" name="type" value="WORK" id="type-work">
+            <label for="type-work"><span>💼</span> Work</label>
+          </div>
+          <div class="type-option">
+            <input type="radio" name="type" value="FAMILY" id="type-family">
+            <label for="type-family"><span>👨‍👩‍👧</span> Family</label>
+          </div>
+          <div class="type-option">
+            <input type="radio" name="type" value="FRIEND" id="type-friend">
+            <label for="type-friend"><span>🤝</span> Friend</label>
+          </div>
         </div>
+      </div>
 
-        <button type="submit">Save</button>
+      <!-- Actions -->
+      <div class="form-actions full-col">
+        <a href="/address"><button type="button" class="btn-cancel">Cancel</button></a>
+        <button type="submit" class="btn-save">Save Address</button>
       </div>
 
     </form>
-  </main>
+  </div>
 </div>
 
-<!-- VALIDATION SCRIPT -->
 <script>
   const fields = {
-    name: { id: "name", error: "nameError", regex: /^[A-Za-z ]{3,}$/, msg: "Min 3 letters" },
-    phone: { id: "phone", error: "phoneError", regex: /^[6-9][0-9]{9}$/, msg: "Invalid phone" },
-    pincode: { id: "pincode", error: "pincodeError", regex: /^[0-9]{6}$/, msg: "6 digit pincode" },
-    street: { id: "street", error: "streetError", regex: /^.{3,}$/, msg: "Required" },
-    city: { id: "city", error: "cityError", regex: /^[A-Za-z ]{2,}$/, msg: "Invalid city" },
-    state: { id: "state", error: "stateError", regex: /^[A-Za-z ]{2,}$/, msg: "Invalid state" }
+    name:    { id: "name",    error: "nameError",    regex: /^[A-Za-z ]{3,}$/, msg: "Min 3 letters" },
+    phone:   { id: "phone",   error: "phoneError",   regex: /^[6-9][0-9]{9}$/, msg: "Invalid phone number" },
+    pincode: { id: "pincode", error: "pincodeError", regex: /^[0-9]{6}$/, msg: "6-digit pincode required" },
+    street:  { id: "street",  error: "streetError",  regex: /^.{3,}$/, msg: "Required" },
+    city:    { id: "city",    error: "cityError",    regex: /^[A-Za-z ]{2,}$/, msg: "Invalid city" },
+    state:   { id: "state",   error: "stateError",   regex: /^[A-Za-z ]{2,}$/, msg: "Invalid state" }
   };
 
   function validate(field) {
     const input = document.getElementById(field.id);
     const error = document.getElementById(field.error);
-
     if (!field.regex.test(input.value.trim())) {
-      input.classList.add("error");
-      input.classList.remove("success");
-      error.textContent = field.msg;
-      return false;
+      input.classList.add("error"); input.classList.remove("success");
+      error.textContent = field.msg; return false;
     } else {
-      input.classList.remove("error");
-      input.classList.add("success");
-      error.textContent = "";
-      return true;
+      input.classList.remove("error"); input.classList.add("success");
+      error.textContent = ""; return true;
     }
   }
 
@@ -251,17 +297,11 @@
     document.getElementById(f.id).addEventListener("input", () => validate(f));
   });
 
-  // Add this after the existing script
-document.querySelector('form').addEventListener('submit', function(e) {
-  let isValid = true;
-
-  Object.values(fields).forEach(f => {
-    if (!validate(f)) isValid = false;
+  document.querySelector('form').addEventListener('submit', function(e) {
+    let isValid = true;
+    Object.values(fields).forEach(f => { if (!validate(f)) isValid = false; });
+    if (!isValid) e.preventDefault();
   });
-
-  if (!isValid) e.preventDefault(); // block submit if any field invalid
-});
 </script>
-
 </body>
 </html>

@@ -4,144 +4,342 @@
   <meta charset="UTF-8">
   <title>My Orders – Cake O'Clock</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Lato:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/cake.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { --rose:#AF5454; --cream:#fdf6f0; }
-    body { font-family:'Lato',sans-serif; background:var(--cream); }
-    h2 { font-family:'Playfair Display',serif; }
-    .order-card { background:#fff; border-radius:14px; padding:20px; margin-bottom:16px; box-shadow:0 2px 10px rgba(0,0,0,.05); transition:.2s; }
-    .order-card:hover { box-shadow:0 4px 18px rgba(175,84,84,.12); }
-    .order-id { font-weight:700; color:var(--rose); font-size:.95rem; }
-    .status-badge { font-size:.75rem; border-radius:20px; padding:3px 12px; font-weight:700; }
-    .status-Pending    { background:#fff3cd; color:#856404; }
-    .status-Processing { background:#cff4fc; color:#0a58ca; }
-    .status-Shipped    { background:#d0efff; color:#0a3d62; }
-    .status-Delivered  { background:#d4edda; color:#155724; }
-    .status-Cancelled  { background:#f8d7da; color:#721c24; }
-    .status-Returned   { background:#e2d9f3; color:#432874; }
-    .item-img { width:50px; height:50px; object-fit:cover; border-radius:8px; }
-    .search-input { border:2px solid #e8dada; border-radius:10px; padding:10px 16px; width:100%; max-width:360px; font-size:.9rem; }
-    .search-input:focus { outline:none; border-color:var(--rose); }
-    .btn-rose { background:var(--rose); color:#fff; border:none; border-radius:8px; padding:8px 16px; font-weight:600; font-size:.85rem; cursor:pointer; }
-    .btn-rose:hover { background:#8c3a3a; color:#fff; }
-    .empty-state { text-align:center; padding:60px 20px; color:#aaa; }
-    .page-link { color:var(--rose); }
-    .page-item.active .page-link { background:var(--rose); border-color:var(--rose); color:#fff; }
+    :root {
+      --burgundy:    #8B4A5A;
+      --burgundy-dk: #6e3547;
+      --blush:       #f7e0e8;
+      --blush-mid:   #f0c4d4;
+      --blush-pale:  #fdf5f8;
+      --blush-card:  #fff8fb;
+    }
+
+    body { background: linear-gradient(135deg, #f9e8ef 0%, #fdf5f8 100%); }
+
+    .dash-wrap {
+      display: flex;
+      width: 97%;
+      min-height: 85vh;
+      margin: 20px auto;
+      background: #fff;
+      border-radius: var(--r-xl);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+    .dash-sidebar {
+      width: 260px;
+      min-width: 260px;
+      background: linear-gradient(180deg, #fff5f7 0%, #ffeef3 100%);
+      border-right: 1px solid var(--blush-mid);
+      padding: 28px 22px;
+    }
+    .dash-main {
+      flex: 1;
+      padding: 36px 40px;
+      overflow-y: auto;
+    }
+
+    /* ── Page header ── */
+    .page-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .page-topbar h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: var(--burgundy);
+    }
+
+    /* ── Search ── */
+    .search-form { display: flex; gap: 8px; align-items: center; }
+    .search-input {
+      border: 1.5px solid var(--blush-mid);
+      border-radius: 50px;
+      padding: 9px 18px;
+      font-size: .84rem;
+      font-family: 'Nunito', sans-serif;
+      background: var(--blush-pale);
+      color: #3a2030;
+      width: 200px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .search-input::placeholder { color: #c9a0b0; }
+    .search-input:focus {
+      outline: none;
+      border-color: var(--burgundy);
+      box-shadow: 0 0 0 3px rgba(139,74,90,.10);
+    }
+    .btn-search {
+      background: linear-gradient(135deg, var(--burgundy), var(--burgundy-dk));
+      color: #fff; border: none; border-radius: 50px;
+      width: 38px; height: 38px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(139,74,90,.25);
+      transition: transform .18s, box-shadow .18s;
+    }
+    .btn-search:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(139,74,90,.32); }
+    .btn-clear { font-size: .8rem; color: #b08090; text-decoration: none; transition: color .2s; }
+    .btn-clear:hover { color: var(--burgundy); }
+
+    /* ── Order cards ── */
+    .orders-list { display: flex; flex-direction: column; gap: 16px; }
+
+    .order-card {
+      background: var(--blush-card);
+      border: 1.5px solid var(--blush-mid);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: box-shadow .22s, transform .22s, border-color .22s;
+      animation: fadeUp .38s ease both;
+    }
+    .order-card:nth-child(1){ animation-delay:.04s }
+    .order-card:nth-child(2){ animation-delay:.09s }
+    .order-card:nth-child(3){ animation-delay:.14s }
+    .order-card:nth-child(4){ animation-delay:.19s }
+    .order-card:hover {
+      border-color: var(--blush-mid);
+      box-shadow: 0 6px 24px rgba(139,74,90,.12);
+      transform: translateY(-2px);
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(12px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .card-head {
+      padding: 14px 20px;
+      background: linear-gradient(90deg, var(--blush) 0%, #fff8fb 100%);
+      border-bottom: 1px solid var(--blush-mid);
+    }
+    .order-id { font-size: .82rem; font-weight: 700; color: var(--burgundy); letter-spacing: .3px; }
+    .order-meta { font-size: .76rem; color: #b08090; margin-top: 2px; }
+
+    .items-list { padding: 0 20px; }
+    .item-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 13px 0; border-bottom: 1px solid #faeef3;
+    }
+    .item-row:last-child { border-bottom: none; }
+    .item-img {
+      width: 56px; height: 56px; object-fit: cover;
+      border-radius: 10px; flex-shrink: 0;
+      border: 1.5px solid var(--blush-mid); background: var(--blush);
+    }
+    .item-info { flex: 1; min-width: 0; }
+    .item-name {
+      font-size: .9rem; font-weight: 700; color: #2d1520;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .item-price { font-size: .86rem; font-weight: 700; color: var(--burgundy); margin-top: 2px; }
+    .item-qty { font-size: .76rem; color: #b08090; margin-top: 1px; }
+
+    .card-foot {
+      padding: 12px 20px;
+      background: var(--blush);
+      border-top: 1px solid var(--blush-mid);
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    }
+    .order-total { font-size: .92rem; font-weight: 700; color: #2d1520; }
+    .order-total span { font-size: .76rem; font-weight: 500; color: #b08090; margin-right: 4px; }
+    .card-actions { display: flex; gap: 8px; align-items: center; }
+
+    .btn-details {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: linear-gradient(135deg, var(--burgundy) 0%, var(--burgundy-dk) 100%);
+      color: #fff; border: none; border-radius: 50px; padding: 8px 22px;
+      font-size: .83rem; font-weight: 700; font-family: 'Nunito', sans-serif;
+      cursor: pointer; text-decoration: none; letter-spacing: .3px;
+      box-shadow: 0 4px 14px rgba(139,74,90,.25);
+      transition: transform .18s, box-shadow .18s;
+    }
+    .btn-details:hover { transform: translateY(-2px); box-shadow: 0 7px 20px rgba(139,74,90,.35); color: #fff; }
+
+    .btn-return {
+      background: #fff; color: var(--burgundy);
+      border: 1.5px solid var(--blush-mid); border-radius: 50px;
+      padding: 7px 18px; font-size: .83rem; font-weight: 700;
+      font-family: 'Nunito', sans-serif; cursor: pointer;
+      transition: background .2s, border-color .2s;
+    }
+    .btn-return:hover { background: var(--blush); border-color: var(--burgundy); }
+
+    /* ── Empty state ── */
+    .empty-state { text-align: center; padding: 70px 20px; }
+    .empty-icon { font-size: 3.5rem; margin-bottom: 14px; }
+    .empty-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--burgundy); margin-bottom: 8px; }
+    .empty-sub { font-size: .88rem; color: #b08090; margin-bottom: 20px; }
+
+    /* ── Pagination ── */
+    .pagination-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+    .pg-btn {
+      min-width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid var(--blush-mid);
+      background: #fff;
+      color: var(--burgundy);
+      font-size: .85rem;
+      font-weight: 700;
+      font-family: 'Nunito', sans-serif;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none;
+      transition: background .18s, border-color .18s, color .18s, box-shadow .18s;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+    .pg-btn:hover:not(.disabled) {
+      background: var(--blush);
+      border-color: var(--burgundy);
+      color: var(--burgundy);
+    }
+    .pg-btn.active {
+      background: linear-gradient(135deg, var(--burgundy), var(--burgundy-dk));
+      border-color: var(--burgundy);
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(139,74,90,.30);
+    }
+    .pg-btn.disabled {
+      opacity: .35;
+      pointer-events: none;
+      cursor: default;
+    }
+    .pg-info {
+      font-size: .8rem;
+      color: #b08090;
+      font-family: 'Nunito', sans-serif;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 860px) {
+      .dash-wrap { flex-direction: column; width: 100%; border-radius: 0; margin: 0; }
+      .dash-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--blush-mid); }
+      .dash-main { padding: 20px 16px; }
+    }
   </style>
 </head>
 <body>
 
-<%- include("../partials/user/h2") %>
+<%- include("../../views/partials/user/h2") %>
 
-<div class="container py-4">
-  <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
-    <h2 class="mb-0">My Orders</h2>
-    <form method="GET" action="/orders" class="d-flex gap-2">
-      <input type="text" name="search" class="search-input" placeholder="Search by Order ID…" value="<%= search %>">
-      <button type="submit" class="btn-rose">Search</button>
-      <% if (search) { %><a href="/orders" class="btn btn-outline-secondary btn-sm align-self-center">Clear</a><% } %>
-    </form>
-  </div>
+<div class="dash-wrap">
+  <aside class="dash-sidebar">
+    <%- include("../../views/partials/user/sider") %>
+  </aside>
 
-  <% if (!orders || orders.length === 0) { %>
-    <div class="empty-state">
-      <p class="fs-5 fw-bold">No orders found</p>
-      <a href="/products" class="btn-rose mt-2 d-inline-block" style="border-radius:8px;padding:10px 24px;text-decoration:none">Start Shopping</a>
+  <main class="dash-main">
+    <div class="page-topbar">
+      <h2>My Orders</h2>
+      <form method="GET" action="/orders" class="search-form">
+        <input type="text" name="search" class="search-input" placeholder="Search by Order ID…" value="<%= search %>">
+        <button type="submit" class="btn-search" aria-label="Search">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/>
+          </svg>
+        </button>
+        <% if (search) { %>
+          <a href="/orders" class="btn-clear">✕ Clear</a>
+        <% } %>
+      </form>
     </div>
-  <% } else { %>
-    <% orders.forEach(order => { %>
-      <div class="order-card">
-        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
-          <div>
-            <div class="order-id"><%= order.orderId %></div>
-            <div class="text-muted" style="font-size:.8rem">
-              <%= new Date(order.createdAt).toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'}) %>
-            </div>
-          </div>
-          <span class="status-badge status-<%= order.status %>"><%= order.status %></span>
+
+    <div class="orders-list">
+      <% if (!orders || orders.length === 0) { %>
+        <div class="empty-state">
+          <div class="empty-icon">🛍️</div>
+          <div class="empty-title">No orders yet</div>
+          <div class="empty-sub">Looks like you haven't placed any orders.</div>
+          <a href="/products" class="btn-details">Start Shopping</a>
         </div>
 
-        <div class="d-flex gap-2 flex-wrap mb-2">
-          <% order.items.slice(0,2).forEach(item => { %>
-            <div class="d-flex align-items-center gap-2">
-              <img src="<%= item.productImage || '/img/placeholder.png' %>" class="item-img" alt="">
-              <div>
-                <div style="font-size:.88rem;font-weight:600"><%= item.productName %></div>
-                <div class="text-muted" style="font-size:.78rem"><%= item.weight %>g × <%= item.quantity %></div>
+      <% } else { %>
+        <% orders.forEach(order => { %>
+          <div class="order-card">
+
+            <div class="card-head">
+              <div class="order-id">Order ID: <%= order.orderId %></div>
+              <div class="order-meta">
+                Ordered on <%= new Date(order.createdAt).toLocaleDateString('en-IN', {day:'numeric', month:'long', year:'numeric'}) %>
+                <% if (order.paymentMethod) { %>&nbsp;·&nbsp; Payment: <%= order.paymentMethod %><% } %>
               </div>
             </div>
-          <% }) %>
-          <% if (order.items.length > 2) { %>
-            <div class="d-flex align-items-center text-muted" style="font-size:.82rem">+<%= order.items.length - 2 %> more</div>
-          <% } %>
-        </div>
 
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-          <div class="fw-bold" style="color:var(--rose)">₹<%= order.finalTotal.toLocaleString('en-IN') %></div>
-          <div class="d-flex gap-2 flex-wrap">
-            <a href="/orders/<%= order._id %>" class="btn btn-sm btn-outline-secondary" style="border-radius:8px">View Details</a>
-            <% if (['Pending','Processing'].includes(order.status)) { %>
-              <button class="btn btn-sm btn-outline-danger" style="border-radius:8px"
-                onclick="cancelOrder('<%= order._id %>', '<%= order.orderId %>')">Cancel</button>
-            <% } %>
-            <% if (order.status === 'Delivered') { %>
-              <button class="btn btn-sm" style="background:#e2d9f3;color:#432874;border-radius:8px"
-                onclick="returnOrder('<%= order._id %>')">Return</button>
-            <% } %>
-            <a href="/orders/<%= order._id %>/invoice" class="btn btn-sm" style="background:#f0f0f0;border-radius:8px">📄 Invoice</a>
+            <div class="items-list">
+              <% order.items.forEach(item => { %>
+                <div class="item-row">
+                  <img src="<%= item.productImage || '/img/placeholder.png' %>" class="item-img" alt="<%= item.productName %>">
+                  <div class="item-info">
+                    <div class="item-name"><%= item.productName %></div>
+                    <div class="item-price">₹ <%= (item.price * item.quantity).toLocaleString('en-IN') %></div>
+                    <div class="item-qty">Qty: <%= item.quantity %><% if (item.weight) { %>&nbsp;·&nbsp;<%= item.weight %>g<% } %></div>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+
+            <div class="card-foot">
+              <div class="order-total"><span>Total</span>₹<%= order.finalTotal.toLocaleString('en-IN') %></div>
+              <div class="card-actions">
+                <% if (order.status === 'Delivered') { %>
+                  <button class="btn-return" onclick="returnOrder('<%= order._id %>')">Return</button>
+                <% } %>
+                <a href="/orders/<%= order._id %>" class="btn-details">Details</a>
+              </div>
+            </div>
+
           </div>
-        </div>
-      </div>
-    <% }) %>
+        <% }) %>
+      <% } %>
+    </div>
 
-    <% if (totalPages > 1) { %>
-      <nav class="mt-4">
-        <ul class="pagination justify-content-center">
-          <% for(let p=1; p<=totalPages; p++) { %>
-            <li class="page-item <%= currentPage===p ? 'active' : '' %>">
-              <a class="page-link" href="/orders?page=<%= p %><%= search ? '&search='+search : '' %>"><%= p %></a>
-            </li>
-          <% } %>
-        </ul>
-      </nav>
+    <!-- ── Pagination (always shown when orders exist) ── -->
+    <% if (orders && orders.length > 0) { %>
+      <div class="pagination-wrap">
+
+        <!-- Prev -->
+        <a class="pg-btn <%= currentPage <= 1 ? 'disabled' : '' %>"
+           href="/orders?page=<%= currentPage - 1 %><%= search ? '&search=' + search : '' %>">
+          ‹
+        </a>
+
+        <!-- Page numbers -->
+        <% for (let p = 1; p <= totalPages; p++) { %>
+          <a class="pg-btn <%= currentPage === p ? 'active' : '' %>"
+             href="/orders?page=<%= p %><%= search ? '&search=' + search : '' %>">
+            <%= p %>
+          </a>
+        <% } %>
+
+        <!-- Next -->
+        <a class="pg-btn <%= currentPage >= totalPages ? 'disabled' : '' %>"
+           href="/orders?page=<%= currentPage + 1 %><%= search ? '&search=' + search : '' %>">
+          ›
+        </a>
+
+        <span class="pg-info">Page <%= currentPage %> of <%= totalPages %></span>
+      </div>
     <% } %>
-  <% } %>
+
+  </main>
 </div>
 
-<%- include("../partials/user/footer") %>
+<%- include("../../views/partials/user/footer") %>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-async function cancelOrder(id, orderId) {
-  const { value: reason, isConfirmed } = await Swal.fire({
-    title: 'Cancel Order?',
-    text: `Cancel order ${orderId}?`,
-    icon: 'warning',
-    input: 'text',
-    inputPlaceholder: 'Reason (optional)',
-    showCancelButton: true,
-    confirmButtonColor: '#AF5454',
-    cancelButtonColor: '#9a7070',
-    confirmButtonText: 'Yes, Cancel Order',
-    cancelButtonText: 'Keep Order'
-  });
-  if (!isConfirmed) return;
-  const res  = await fetch(`/orders/${id}/cancel`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ reason: reason || '' })
-  });
-  const data = await res.json();
-  if (data.success) {
-    Swal.fire({ icon: 'success', title: 'Cancelled', text: data.message, confirmButtonColor: '#AF5454' })
-      .then(() => location.reload());
-  } else {
-    Swal.fire({ icon: 'error', title: 'Failed', text: data.message, confirmButtonColor: '#AF5454' });
-  }
-}
-
 async function returnOrder(id) {
   const { value: reason, isConfirmed } = await Swal.fire({
     title: 'Return Order',
@@ -150,8 +348,8 @@ async function returnOrder(id) {
     input: 'textarea',
     inputPlaceholder: 'Enter reason for return (required)',
     showCancelButton: true,
-    confirmButtonColor: '#AF5454',
-    cancelButtonColor: '#9a7070',
+    confirmButtonColor: '#8B4A5A',
+    cancelButtonColor: '#b08090',
     confirmButtonText: 'Submit Return',
     preConfirm: (val) => {
       if (!val || val.trim().length < 5) {
@@ -168,13 +366,12 @@ async function returnOrder(id) {
   });
   const data = await res.json();
   if (data.success) {
-    Swal.fire({ icon: 'success', title: 'Return Requested', text: data.message, confirmButtonColor: '#AF5454' })
+    Swal.fire({ icon:'success', title:'Return Requested', text:data.message, confirmButtonColor:'#8B4A5A' })
       .then(() => location.reload());
   } else {
-    Swal.fire({ icon: 'error', title: 'Failed', text: data.message, confirmButtonColor: '#AF5454' });
+    Swal.fire({ icon:'error', title:'Failed', text:data.message, confirmButtonColor:'#8B4A5A' });
   }
 }
 </script>
 </body>
 </html>
-

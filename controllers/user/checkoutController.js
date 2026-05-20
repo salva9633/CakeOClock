@@ -5,7 +5,7 @@ import Batch from "../../models/batchModel.js";
 import Order from "../../models/orderModel.js";
 import User from "../../models/userModel.js";
  
-const TAX_RATE      = 0;      // e.g. 0.05 for 5% GST
+const TAX_RATE      = 0;     
 const SHIPPING_FREE_ABOVE = 499;
 const SHIPPING_CHARGE     = 49;
  
@@ -25,7 +25,7 @@ export const loadCheckout = async (req, res) => {
       return res.redirect("/cart");
     }
  
-    // Filter only available items
+    
     const items = cart.items.filter(item =>
       item.productId?.isListed &&
       item.variantId?.isAvailable
@@ -138,7 +138,7 @@ export const placeOrder = async (req, res) => {
       return res.send("Cart is empty");
     }
  
-    // Validate stock via batches (FIFO)
+    
     const orderItems = [];
     for (const item of cart.items) {
       if (!item.productId?.isListed || !item.variantId?.isAvailable) continue;
@@ -172,7 +172,7 @@ export const placeOrder = async (req, res) => {
       return res.send("No valid items to order");
     }
  
-    // Deduct stock FIFO
+    
     for (const item of orderItems) {
       let remaining = item.quantity;
       const batches = await Batch.find({
@@ -220,7 +220,7 @@ export const placeOrder = async (req, res) => {
       finalTotal
     });
  
-    // Clear cart
+    
     await Cart.findOneAndUpdate({ userId }, { items: [], totalPrice: 0 });
  
     return res.redirect(`/order-success/${order._id}`);

@@ -39,18 +39,18 @@ const editProfilePost = async (req, res) => {
     const user = await User.findById(req.session.user.id);
     if (!user) return res.redirect("/login");
 
-    // update non-sensitive fields
+  
     user.name = name;
     user.phone = phone;
     user.gender = gender;
 
-    // 🚫 GOOGLE USERS: EMAIL CHANGE BLOCKED
+    
     if (user.authType === "google") {
       await user.save();
       return res.redirect("/profile");
     }
 
-    // 🔐 LOCAL USERS: EMAIL CHANGE WITH OTP
+    
     if (email && email !== user.email) {
 
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -62,11 +62,11 @@ const editProfilePost = async (req, res) => {
 
       await sendVerificationEmail(email, otp);
 
-      //  stop execution until OTP verified
+      
       return res.redirect("/verifyEmailOtp");
     }
 
-    // profile image upload
+    
     if (req.file) {
       const result = await cloudinary.uploader.upload(
         `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
@@ -104,12 +104,12 @@ const verifyEmailOtp = async (req, res) => {
     return res.render("verifyEmailOtp", { error: "Invalid OTP" });
   }
 
-  // ✅ update email only now
+  
   await User.findByIdAndUpdate(req.session.user.id, {
     email: req.session.newEmail
   });
 
-  // cleanup
+  
   delete req.session.emailChangeOtp;
   delete req.session.emailChangeExpiry;
   delete req.session.newEmail;
@@ -145,7 +145,7 @@ const addAddress = async (req, res) => {
       address, landmark, city, state, pincode, type
     } = req.body;
 
-    const from = req.query.from; // ✅ declare INSIDE try, BEFORE using it
+    const from = req.query.from; 
 
     await User.findByIdAndUpdate(req.session.user.id, {
       $push: {
@@ -158,7 +158,7 @@ const addAddress = async (req, res) => {
       }
     });
 
-    res.redirect(from === "checkout" ? "/checkout" : "/address"); // ✅ now works
+    res.redirect(from === "checkout" ? "/checkout" : "/address"); 
 
   } catch (error) {
     console.error(error);
@@ -186,9 +186,9 @@ const editAddressPage = async (req, res) => {
 
     if (!address) return res.redirect("/address");
 
-    const redirect = req.query.redirect || "/address"; // ← add this
+    const redirect = req.query.redirect || "/address"; 
 
-    res.render("editAddress", { address, redirect }); // ← pass it
+    res.render("editAddress", { address, redirect }); 
   } catch (error) {
     console.error(error);
     res.redirect("/pageNotFound");
@@ -263,7 +263,7 @@ const changePassword = async (req, res) => {
 
     if (!user) return res.redirect("/login");
 
-    // 🚫 Google users
+    
     if (user.authType === "google") {
       return res.render("user/changePassword", {
         user,
@@ -272,17 +272,16 @@ const changePassword = async (req, res) => {
       });
     }
 
-    // 🚫 No password set
+    
     if (!user.password) {
       return res.render("user/changePassword", {
         user,
         error: null,
         success: null,
-        noPassword: true   // 👈 FLAG
+        noPassword: true  
       });
     }
 
-    // 🚫 Empty fields
     if (!currentPassword || !newPassword || !confirmPassword) {
       return res.render("user/changePassword", {
         user,
@@ -291,7 +290,7 @@ const changePassword = async (req, res) => {
       });
     }
 
-    // 🚫 Length check
+    
     if (newPassword.length < 8) {
       return res.render("user/changePassword", {
         user,
@@ -300,7 +299,7 @@ const changePassword = async (req, res) => {
       });
     }
 
-    // 🚫 Confirm password
+
     if (newPassword !== confirmPassword) {
       return res.render("user/changePassword", {
         user,
@@ -309,7 +308,7 @@ const changePassword = async (req, res) => {
       });
     }
 
-    // 🚫 Wrong current password
+    
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
       return res.render("user/changePassword", {
@@ -319,7 +318,7 @@ const changePassword = async (req, res) => {
       });
     }
 
-    // 🚫 Same password
+  
     const samePassword = await bcrypt.compare(newPassword, user.password);
     if (samePassword) {
       return res.render("user/changePassword", {
@@ -329,11 +328,11 @@ const changePassword = async (req, res) => {
       });
     }
 
-    // ✅ Save new password
+    
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
 
-    // 🔐 Logout after password change
+    
     req.session.destroy(() => {
       res.redirect("/login");
     });

@@ -14,12 +14,12 @@ const pageerror = (req, res) => {
 const loadLogin = async (req, res) => {
   try {
     if (req.session.admin) {
-      // ✅ DB verify — don't trust session blindly
+      
       const admin = await User.findById(req.session.admin.id).lean();
       if (admin && admin.isAdmin && !admin.isBlocked) {
         return res.redirect("/admin");
       }
-      // ✅ Stale session — remove only admin data
+      
       delete req.session.admin;
     }
     return res.render("admin-login", { message: null, layout: false });
@@ -36,7 +36,7 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // ✅ Basic input check
+    
     if (!email || !password) {
       return res.render("admin-login", { message: "Please enter email and password", layout: false });
     }
@@ -55,7 +55,7 @@ const login = async (req, res) => {
       return res.render("admin-login", { message: "Invalid credentials", layout: false });
     }
 
-    // ✅ Store name + email so header.ejs can use admin.name
+    
     req.session.admin = {
       id:    admin._id,
       name:  admin.name,
@@ -91,9 +91,9 @@ const loadDashboard = (req, res) => {
 // ─────────────────────────────────────────
 const logout = (req, res) => {
   try {
-    req.session.destroy((err) => {        // ✅ destroy, not delete
+    req.session.destroy((err) => {        
       if (err) console.error("Logout error:", err);
-      res.clearCookie("admin_sid");       // ✅ correct cookie name
+      res.clearCookie("admin_sid");       
       return res.redirect("/admin/login");
     });
 

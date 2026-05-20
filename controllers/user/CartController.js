@@ -19,7 +19,7 @@ export const addToCart = async (req, res) => {
       return res.status(400).json({ success: false, message: "Product ID required" });
     }
 
-    // ── Block check: reject if product is unlisted/blocked ──
+    
     const product = await Product.findById(productId).lean();
     if (!product || !product.isListed) {
       return res.status(403).json({
@@ -28,9 +28,9 @@ export const addToCart = async (req, res) => {
       });
     }
 
-    // Find variant — use provided variantId or pick cheapest available
+    
  
-    // Find variant — use provided variantId or pick cheapest available
+  
     let variant;
     if (variantId) {
       variant = await Variant.findById(variantId).lean();
@@ -45,7 +45,7 @@ export const addToCart = async (req, res) => {
       return res.status(400).json({ success: false, message: "No available variant found" });
     }
 
-    // v. Stock validation
+    
     const batches = await Batch.find({
       variantId: variant._id,
       status: "active",
@@ -65,13 +65,13 @@ export const addToCart = async (req, res) => {
       cart = new Cart({ userId, items: [] });
     }
  
-    // Check if same product+variant already in cart
+    
     const existingIdx = cart.items.findIndex(
       (item) =>
         item.productId.toString() === productId.toString() &&
         item.variantId?.toString() === variant._id.toString()
     );
-const MAX_QTY = 5; // vi. Maximum quantity limit
+const MAX_QTY = 5; 
 
     if (existingIdx > -1) {
       const newQty = cart.items[existingIdx].quantity + Number(quantity);
@@ -143,12 +143,12 @@ export const getCart = async (req, res) => {
       return res.render("cart", { items: [], total: 0, hasOutOfStock: false });
     }
 
-    // Filter out deleted/unlisted products
+    
     const items = cart.items.filter(
       (item) => item.productId && item.productId.isListed !== false
     );
 
-    // vii. Check stock for each item
+    
     for (const item of items) {
       const batches = await Batch.find({
         variantId: item.variantId._id || item.variantId,
@@ -190,7 +190,7 @@ export const updateCartItem = async (req, res) => {
     if (Number(quantity) <= 0) {
       item.deleteOne();
     } else {
-      // v. Check stock
+      
       const batches = await Batch.find({
         variantId: item.variantId,
         status: "active",
@@ -205,7 +205,7 @@ export const updateCartItem = async (req, res) => {
         });
       }
 
-      // vi. Max quantity limit
+      
       if (Number(quantity) > MAX_QTY) {
         return res.status(400).json({
           success: false,
@@ -218,8 +218,19 @@ export const updateCartItem = async (req, res) => {
 
     await cart.save();
 
-    const total = cart.items.reduce((s, i) => s + i.price * i.quantity, 0);
-    res.json({ success: true, total });
+   const total = cart.items.reduce((s, i) => s + i.price * i.quantity, 0);
+
+const cartCount = cart.items.reduce(
+  (sum, item) => sum + item.quantity,
+  0
+);
+
+res.json({
+  success: true,
+  total,
+  cartCount,
+});
+
   } catch (err) {
     console.error("UPDATE CART ERROR:", err);
     res.status(500).json({ success: false });
@@ -241,9 +252,19 @@ export const removeCartItem = async (req, res) => {
     cart.items = cart.items.filter((i) => i._id.toString() !== itemId.toString());
  
     await cart.save();
- 
-    const total = cart.items.reduce((s, i) => s + i.price * i.quantity, 0);
-    res.json({ success: true, total });
+ const total = cart.items.reduce((s, i) => s + i.price * i.quantity, 0);
+
+const cartCount = cart.items.reduce(
+  (sum, item) => sum + item.quantity,
+  0
+);
+
+res.json({
+  success: true,
+  total,
+  cartCount,
+});
+
   } catch (err) {
     console.error("REMOVE CART ERROR:", err);
     res.status(500).json({ success: false });

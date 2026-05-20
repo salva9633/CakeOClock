@@ -1,7 +1,7 @@
 import Category from "../../models/categoryModel.js";
 import cloudinary from "../../config/cloudinary.js";
 
-// reusable stream upload helper
+
 const streamUpload = (buffer, folder = "categories") => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(

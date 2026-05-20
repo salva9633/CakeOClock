@@ -262,9 +262,9 @@ const loginUser = async (req, res) => {
 
 const logout = async (req, res) => {
   try {
-    req.session.destroy((err) => {        // ✅ destroy fully
+    req.session.destroy((err) => {        
       if (err) console.log("Session destruction error", err.message);
-      res.clearCookie("user_sid");        // ✅ correct cookie name
+      res.clearCookie("user_sid");        
       return res.redirect("/login");
     });
   } catch (error) {

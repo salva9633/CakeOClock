@@ -1,314 +1,313 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manage Addresses</title>
-
-  <!-- Google Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+  <meta charset="UTF-8">
+  <title>Manage Addresses – Cake O'Clock</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/cake.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
   <style>
-    :root {
-      --page-bg: #dba39a;
-      --card-bg: #ffffff;
-      --sidebar-bg: #fff5f2;
-      --accent-brown: #5c2823;
-      --btn-green: #108565;
-      --btn-green-hover: #0d6e53;
-      --tag-bg: #cbf3e3;
-      --tag-text: #0b5e48;
-    }
+    body { background: linear-gradient(135deg, #f5e0dd 0%, #fdf3ef 100%); }
 
-    * {
-      box-sizing: border-box;
-      font-family: 'Outfit', sans-serif;
-    }
-
-    body {
-      margin: 0;
-      background: var(--page-bg);
-    }
-
-    .dashboard-container {
+    .dash-wrap {
       display: flex;
-      width: 98%;
-      height: 85vh;
+      width: 97%;
+      min-height: 85vh;
       margin: 20px auto;
-      background: white;
-      border-radius: 25px;
+      background: #fff;
+      border-radius: var(--r-xl);
+      box-shadow: var(--shadow-md);
       overflow: hidden;
     }
-
-    .sidebar-area {
+    .dash-sidebar {
       width: 260px;
-      background: var(--sidebar-bg);
-      padding: 25px;
+      min-width: 260px;
+      background: linear-gradient(180deg, #fff5f2 0%, #fff0ec 100%);
+      border-right: 1px solid var(--border);
+      padding: 28px 22px;
     }
-
-    .main-content {
+    .dash-main {
       flex: 1;
-      padding: 30px 40px;
+      padding: 36px 44px;
       overflow-y: auto;
     }
 
-    .address-header {
+    .page-topbar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 25px;
-    }
-
-    .btn-add-address {
-      background: var(--btn-green);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    .address-list {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .address-card {
-      background: #f6fcf9;
-      border-radius: 15px;
-      padding: 20px;
-      display: flex;
       justify-content: space-between;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .page-topbar h2 {
+      font-family: var(--font-display);
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: var(--brown);
     }
 
-    .contact-info {
+    .btn-add {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 22px;
+      background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dk) 100%);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-family: var(--font-body);
+      font-size: .85rem;
       font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform .18s, box-shadow .18s;
+      box-shadow: 0 5px 18px rgba(175,84,84,.28);
+    }
+    .btn-add:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(175,84,84,.36); color: #fff; }
+
+    .addr-list { display: flex; flex-direction: column; gap: 16px; }
+
+    .addr-card {
+      background: var(--cream);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 22px 24px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      transition: border-color .2s, box-shadow .2s;
+      animation: fadeUp .4s ease both;
+    }
+    .addr-card:hover { border-color: var(--rose-mid); box-shadow: var(--shadow-sm); }
+
+    .addr-card-left { display: flex; gap: 16px; align-items: flex-start; }
+
+    .addr-icon {
+      width: 46px; height: 46px;
+      background: linear-gradient(135deg, var(--rose-lt), #fde0dc);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .addr-type-badge {
+      display: inline-block;
+      font-size: .62rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, var(--rose), var(--rose-dk));
+      color: #fff;
+      border-radius: 6px;
+      padding: 3px 9px;
       margin-bottom: 6px;
     }
 
-    .address-text {
-      color: #555;
-      margin-bottom: 10px;
-    }
+    .addr-name { font-weight: 700; font-size: .95rem; color: var(--brown); }
+    .addr-phone { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+    .addr-line { font-size: .84rem; color: var(--muted); margin-top: 6px; line-height: 1.5; }
 
-    .tag {
-      background: var(--tag-bg);
-      color: var(--tag-text);
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
+    /* Menu */
+    .menu-wrapper { position: relative; flex-shrink: 0; }
+    .menu-icon {
+      width: 36px; height: 36px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--muted);
+      transition: border-color .2s, color .2s;
     }
+    .menu-icon:hover { border-color: var(--rose-mid); color: var(--rose); }
 
-    .delete {
-      color: red;
+    .menu-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 28px rgba(0,0,0,.12);
+      min-width: 130px;
+      overflow: hidden;
+      z-index: 100;
+      border: 1px solid var(--border);
+    }
+    .menu-dropdown a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 16px;
+      font-size: .84rem;
+      font-weight: 500;
+      color: var(--brown);
       text-decoration: none;
-      font-weight: 600;
+      transition: background .15s;
     }
+    .menu-dropdown a:hover { background: var(--rose-lt); }
+    .menu-dropdown .delete-link { color: #e05555; }
+    .menu-dropdown .delete-link:hover { background: #fde8e8; }
 
-    /* Drop down */
-    .menu-wrapper {
-  position: relative;
-}
+    /* Empty state */
+    .empty-addr {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+    .empty-addr .icon { font-size: 3.5rem; margin-bottom: 16px; display: block; }
+    .empty-addr h3 { font-family: var(--font-display); font-size: 1.4rem; color: var(--rose); margin-bottom: 8px; }
+    .empty-addr p { font-size: .88rem; }
 
-.menu-icon {
-  cursor: pointer;
-  font-size: 18px;
-  color: #555;
-}
+    /* Delete modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(61,31,31,.5);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+    }
+    .modal-box {
+      background: #fff;
+      border-radius: var(--r-lg);
+      padding: 36px 32px;
+      width: 340px;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      animation: scaleIn .3s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    .modal-icon { font-size: 2.5rem; margin-bottom: 14px; }
+    .modal-box h3 { font-family: var(--font-display); font-size: 1.4rem; color: var(--brown); margin-bottom: 8px; }
+    .modal-box p { font-size: .88rem; color: var(--muted); margin-bottom: 24px; }
+    .modal-actions { display: flex; gap: 12px; justify-content: center; }
+    .btn-modal-cancel {
+      padding: 10px 22px; background: #f0ecec; color: var(--muted);
+      border: none; border-radius: 50px; font-weight: 600; font-size: .85rem; cursor: pointer;
+    }
+    .btn-modal-delete {
+      padding: 10px 22px; background: #e05555; color: #fff;
+      border: none; border-radius: 50px; font-weight: 600; font-size: .85rem; cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-modal-delete:hover { background: #c03a3a; }
 
-.menu-dropdown {
-  position: absolute;
-  top: 25px;
-  right: 0;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-  display: none;
-  min-width: 120px;
-  overflow: hidden;
-  z-index: 100;
-}
-
-.menu-dropdown a {
-  display: block;
-  padding: 10px 14px;
-  text-decoration: none;
-  color: #333;
-  font-weight: 500;
-}
-
-.menu-dropdown a:hover {
-  background: #f2f2f2;
-}
-
-.menu-dropdown .delete {
-  color: red;
-}
-
+    @media (max-width: 860px) {
+      .dash-wrap { flex-direction: column; width: 100%; border-radius: 0; margin: 0; }
+      .dash-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
+      .dash-main { padding: 20px 16px; }
+    }
   </style>
 </head>
-
 <body>
 
-  <!-- Header -->
-  <%- include("../../views/partials/user/h2") %>
+<%- include("../../views/partials/user/h2") %>
 
-  <div class="dashboard-container">
+<div class="dash-wrap">
+  <aside class="dash-sidebar">
+    <%- include("../../views/partials/user/sider") %>
+  </aside>
 
-    <!-- Sidebar -->
-    <aside class="sidebar-area">
-      <%- include("../../views/partials/user/sider") %>
-    </aside>
+  <main class="dash-main">
+    <div class="page-topbar">
+      <h2>My Addresses</h2>
+      <a href="/add-address" class="btn-add">
+        <i class="fa-solid fa-plus"></i> Add Address
+      </a>
+    </div>
 
-    <!-- Main -->
-    <main class="main-content">
-
-      <div class="address-header">
-        <h2>Manage Addresses</h2>
-        <a href="/add-address">
-          <button class="btn-add-address">Add Address</button>
-        </a>
-      </div>
-
-      <!-- ADDRESS LIST -->
-      <div class="address-list">
-
-        <% if (!addresses || addresses.length === 0) { %>
-          <p>No address added yet.</p>
-        <% } else { %>
-
-          <% addresses.forEach(address => { %>
-            <div class="address-card">
-
+    <div class="addr-list">
+      <% if (!addresses || addresses.length === 0) { %>
+        <div class="empty-addr">
+          <!-- <span class="icon"></span> -->
+          <h3>No addresses yet</h3>
+          <p>Add your first delivery address to get started</p>
+        </div>
+      <% } else { %>
+        <% addresses.forEach(address => {
+          const icons = { HOME: '🏠', WORK: '💼', FAMILY: '👨‍👩‍👧', FRIEND: '🤝' };
+        %>
+          <div class="addr-card">
+            <div class="addr-card-left">
+              <div class="addr-icon"><%= icons[address.type] || '📍' %></div>
               <div>
-                <div class="contact-info">
-                  <%= address.name %> - <%= address.phone %>
-                </div>
-
-                <div class="address-text">
+                <div class="addr-type-badge"><%= address.type %></div>
+                <div class="addr-name"><%= address.name %></div>
+                <div class="addr-phone"><%= address.phone %></div>
+                <div class="addr-line">
                   <%= address.street %>, <%= address.city %><br>
-                  <%= address.state %> - <%= address.pincode %>
-                </div>
-
-                <span class="tag"><%= address.type %></span>
-              </div>
-
-              <div class="menu-wrapper">
-                <i class="fa-solid fa-ellipsis-vertical menu-icon"
-                  onclick="toggleMenu('<%= address._id %>')"></i>
-
-                <div class="menu-dropdown" id="menu-<%= address._id %>">
-                  <a href="/address/edit/<%= address._id %>">Edit</a>
-                  <a href="javascript:void(0)"
-                    class="delete"
-                    onclick="openDeleteModal('<%= address._id %>')">
-                    Delete
-                  </a>
-
+                  <%= address.state %> – <%= address.pincode %>
                 </div>
               </div>
-
-
             </div>
-          <% }) %>
 
-        <% } %>
+            <div class="menu-wrapper">
+              <div class="menu-icon" onclick="toggleMenu('<%= address._id %>')">
+                <i class="fa-solid fa-ellipsis-vertical"></i>
+              </div>
+              <div class="menu-dropdown" id="menu-<%= address._id %>">
+                <a href="/address/edit/<%= address._id %>">
+                  <i class="fa-solid fa-pen-to-square" style="color:var(--rose)"></i> Edit
+                </a>
+                <a href="javascript:void(0)" class="delete-link" onclick="openDeleteModal('<%= address._id %>')">
+                  <i class="fa-solid fa-trash"></i> Delete
+                </a>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </main>
+</div>
 
-      </div>
-
-    </main>
-  </div>
-
-
-  <!-- DELETE CONFIRMATION MODAL -->
-<div id="deleteModal" style="
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.5);
-  align-items:center;
-  justify-content:center;
-  z-index:200;
-">
-
-  <div style="
-    background:white;
-    padding:25px;
-    border-radius:12px;
-    width:320px;
-    text-align:center;
-  ">
-    <h3 style="margin-bottom:10px;">Delete Address?</h3>
-    <p style="color:#555;">Are you sure you want to delete this address?</p>
-
-    <div style="margin-top:20px; display:flex; justify-content:space-between;">
-      <button onclick="closeDeleteModal()"
-        style="padding:8px 20px; border-radius:6px; border:1px solid #ccc;">
-        Cancel
-      </button>
-
-      <button onclick="confirmDelete()"
-        style="padding:8px 20px; border-radius:6px; background:red; color:white; border:none;">
-        Delete
-      </button>
+<!-- Delete Modal -->
+<div id="deleteModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-icon">🗑️</div>
+    <h3>Delete Address?</h3>
+    <p>This address will be permanently removed from your account.</p>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn-modal-delete" onclick="confirmDelete()">Yes, Delete</button>
     </div>
   </div>
 </div>
 
-<!-- modal script -->
 <script>
   let deleteAddressId = null;
 
   function openDeleteModal(id) {
     deleteAddressId = id;
     document.getElementById("deleteModal").style.display = "flex";
-
-    // close any open dropdown
-    document.querySelectorAll('.menu-dropdown')
-      .forEach(menu => menu.style.display = 'none');
+    document.querySelectorAll('.menu-dropdown').forEach(m => m.style.display = 'none');
   }
-
   function closeDeleteModal() {
     deleteAddressId = null;
     document.getElementById("deleteModal").style.display = "none";
   }
-
   function confirmDelete() {
-    if (deleteAddressId) {
-      window.location.href = `/address/delete/${deleteAddressId}`;
-    }
+    if (deleteAddressId) window.location.href = `/address/delete/${deleteAddressId}`;
   }
-</script>
-<!-- drop down for edit / delete -->
-  <script>
-  function toggleMenu(id) {
-    document.querySelectorAll('.menu-dropdown').forEach(menu => {
-      if (menu.id !== 'menu-' + id) {
-        menu.style.display = 'none';
-      }
-    });
 
+  function toggleMenu(id) {
+    document.querySelectorAll('.menu-dropdown').forEach(m => {
+      if (m.id !== 'menu-' + id) m.style.display = 'none';
+    });
     const menu = document.getElementById('menu-' + id);
     menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
   }
 
-  // Close dropdown when clicking outside
-  document.addEventListener('click', function (e) {
-    if (!e.target.classList.contains('menu-icon')) {
-      document.querySelectorAll('.menu-dropdown')
-        .forEach(menu => menu.style.display = 'none');
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.menu-wrapper')) {
+      document.querySelectorAll('.menu-dropdown').forEach(m => m.style.display = 'none');
     }
   });
 </script>
-
 </body>
 </html>

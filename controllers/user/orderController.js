@@ -12,6 +12,8 @@ export const listOrders = async (req, res) => {
  
     const query = { userId };
     if (search) query.orderId = { $regex: search, $options: "i" };
+
+    
  
     const [orders, total] = await Promise.all([
       Order.find(query).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit),
@@ -58,7 +60,7 @@ export const cancelOrder = async (req, res) => {
       return res.json({ success: false, message: "Order cannot be cancelled at this stage" });
     }
  
-    // Restore stock
+    
     for (const item of order.items) {
       if (item.status === "Cancelled") continue;
       await restoreStock(item.variantId, item.quantity);
@@ -80,7 +82,7 @@ export const cancelOrder = async (req, res) => {
   }
 };
  
-/* ── POST /orders/item/cancel ───────────────────────────────────────── */
+
 export const cancelOrderItem = async (req, res) => {
   try {
     const { orderId, itemId, reason } = req.body;
@@ -101,17 +103,17 @@ export const cancelOrderItem = async (req, res) => {
     item.status       = "Cancelled";
     item.cancelReason = reason || null;
 
-    // ── Recalculate totals from non-cancelled items only ──
+    
     const activeItems = order.items.filter(i => i.status !== "Cancelled");
     const newItemTotal = activeItems.reduce((s, i) => s + i.price * i.quantity, 0);
     const newShipping  = newItemTotal === 0 ? 0 : newItemTotal >= 499 ? 0 : 49;
-    const newTax       = Math.round(newItemTotal * 0); // update TAX_RATE if needed
+    const newTax       = Math.round(newItemTotal * 0); 
     order.itemTotal    = newItemTotal;
     order.shippingCharge = newShipping;
     order.tax          = newTax;
     order.finalTotal   = newItemTotal - order.discount + newTax + newShipping;
 
-    // If all items cancelled, cancel the whole order
+    
     const allCancelled = order.items.every(i => i.status === "Cancelled");
     if (allCancelled) {
       order.status     = "Cancelled";
@@ -126,7 +128,7 @@ export const cancelOrderItem = async (req, res) => {
   }
 };
  
-/* ── POST /orders/:id/return ─────────────────────────────────────────── */
+
 /* ── POST /orders/:id/return ─────────────────────────────────────────── */
 export const returnOrder = async (req, res) => {
   try {
@@ -141,23 +143,30 @@ export const returnOrder = async (req, res) => {
       return res.json({ success: false, message: "Order not found" });
     }
 
-    // ── Only allow return if order is Delivered ──
+    
     if (order.status !== "Delivered") {
       return res.json({ success: false, message: "Only delivered orders can be returned" });
     }
 
-    // ── Mark each delivered item as Returned + restore stock ──
+    
     for (const item of order.items) {
       if (item.status === "Delivered") {
-        item.status       = "Returned";
+item.status = "Return Requested";
         item.returnReason = reason.trim();
         await restoreStock(item.variantId, item.quantity);
       }
     }
 
-    // ── Mark whole order as Returned ──
-    order.status       = "Returned";
+    
+order.status = "Return Requested";
     order.returnReason = reason.trim();
+
+    
+    order.itemTotal      = 0;
+    order.shippingCharge = 0;
+    order.tax            = 0;
+    order.finalTotal     = 0;
+
     await order.save();
 
     res.json({ success: true, message: "Return request submitted successfully" });
@@ -180,7 +189,7 @@ export const downloadInvoice = async (req, res) => {
     res.setHeader("Content-Disposition", `attachment; filename=invoice-${order.orderId}.pdf`);
     doc.pipe(res);
  
-    // Header
+    
     doc.fontSize(20).font("Helvetica-Bold").text("Cake O'Clock", { align: "center" });
     doc.fontSize(10).font("Helvetica").text("Invoice", { align: "center" });
     doc.moveDown();
@@ -189,27 +198,40 @@ export const downloadInvoice = async (req, res) => {
     doc.text(`Payment: ${order.paymentMethod} (${order.paymentStatus})`);
     doc.moveDown();
  
-    // Address
+    
     const a = order.address;
     doc.font("Helvetica-Bold").text("Delivery Address:");
     doc.font("Helvetica").text(`${a.name}, ${a.phone}`);
     doc.text(`${a.street}, ${a.city}, ${a.state} - ${a.pincode}`);
     doc.moveDown();
  
-    // Items table header
-// Items table header — exclude cancelled items
-    const invoiceItems = order.items.filter(i => i.status !== "Cancelled");
-    const invoiceItemTotal = invoiceItems.reduce((s, i) => s + i.price * i.quantity, 0);
-    const invoiceShipping  = order.shippingCharge;
-    const invoiceTax       = order.tax;
-    const invoiceFinal     = invoiceItemTotal - order.discount + invoiceTax + invoiceShipping;
+    
 
-    doc.font("Helvetica-Bold").text("Items:", { underline: true });
+const invoiceItems = order.items.filter(i => !["Cancelled", "Returned"].includes(i.status));  
+ const invoiceItemTotal = invoiceItems.reduce((s, i) => s + i.price * i.quantity, 0);
+    const invoiceShipping  = invoiceItems.length === 0 ? 0 : order.shippingCharge;
+    const invoiceTax       = order.tax;
+    const invoiceFinal     = Math.max(0, invoiceItemTotal - (order.discount || 0) + invoiceTax + invoiceShipping);
+ doc.font("Helvetica-Bold").text("Items:", { underline: true });
     doc.moveDown(0.3);
     invoiceItems.forEach((item, i) => {
       doc.font("Helvetica")
         .text(`${i + 1}. ${item.productName} (${item.weight}g) x${item.quantity}  —  ₹${(item.price * item.quantity).toLocaleString("en-IN")}`);
     });
+
+    
+    const returnedItems = order.items.filter(i => i.status === "Returned");
+    if (returnedItems.length > 0) {
+      doc.moveDown(0.5);
+      doc.font("Helvetica-Bold").fillColor("#6a2fc2").text("Returned Items:", { underline: true });
+      doc.fillColor("black");
+      doc.moveDown(0.3);
+      returnedItems.forEach((item, i) => {
+        doc.font("Helvetica").fillColor("#888888")
+          .text(`${i + 1}. ${item.productName} (${item.weight}g) x${item.quantity}  —  RETURNED${item.returnReason ? " (" + item.returnReason + ")" : ""}`);
+      });
+      doc.fillColor("black");
+    }
 
     doc.moveDown();
     doc.font("Helvetica").text(`Item Total:      ₹${invoiceItemTotal.toLocaleString("en-IN")}`);    if (order.discount)      doc.text(`Discount:        -₹${order.discount.toLocaleString("en-IN")}`);
@@ -226,7 +248,56 @@ if (order.discount)   doc.text(`Discount:        -₹${order.discount.toLocaleSt
     res.redirect("/orders");
   }
 };
- 
+ /* ── POST /orders/item/return ─────────────────────────────────────────── */
+export const returnOrderItem = async (req, res) => {
+  try {
+    const { orderId, itemId, reason } = req.body;
+
+    if (!reason || reason.trim().length < 5) {
+      return res.json({ success: false, message: "Please provide a reason (min 5 characters)" });
+    }
+
+    const order = await Order.findById(orderId);
+    if (!order || String(order.userId) !== String(req.user._id)) {
+      return res.json({ success: false, message: "Order not found" });
+    }
+
+    const item = order.items.id(itemId);
+    if (!item) return res.json({ success: false, message: "Item not found" });
+
+    if (item.status !== "Delivered") {
+      return res.json({ success: false, message: "Only delivered items can be returned" });
+    }
+
+
+item.status = "Return Requested";
+    item.returnReason = reason.trim();
+    await restoreStock(item.variantId, item.quantity);
+
+    
+const allReturned = order.items.every(
+  i => i.status === "Return Requested"
+);
+if (allReturned) {
+  order.status = "Return Requested";
+}
+    
+    const activeItems    = order.items.filter(i => !["Cancelled", "Returned"].includes(i.status));
+    const newItemTotal   = activeItems.reduce((s, i) => s + i.price * i.quantity, 0);
+    const newShipping    = newItemTotal === 0 ? 0 : newItemTotal >= 499 ? 0 : 49;
+    const newTax         = Math.round(newItemTotal * 0);
+    order.itemTotal      = newItemTotal;
+    order.shippingCharge = newShipping;
+    order.tax            = newTax;
+    order.finalTotal     = allReturned ? 0 : newItemTotal - (order.discount || 0) + newTax + newShipping;
+
+    await order.save();
+    res.json({ success: true, message: "Return request submitted successfully" });
+  } catch (err) {
+    console.error("returnOrderItem error:", err);
+    res.json({ success: false, message: "Something went wrong" });
+  }
+};
 /* ── Helper: restore stock to last active batch ─────────────────────── */
 async function restoreStock(variantId, quantity) {
   const batch = await Batch.findOne({
@@ -240,7 +311,7 @@ async function restoreStock(variantId, quantity) {
     await batch.save();
   }
 }
-/* ── GET /orders/:id/status  (used by polling) ─── */
+
 export const getOrderStatus = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)

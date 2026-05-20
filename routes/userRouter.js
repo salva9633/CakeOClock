@@ -12,7 +12,8 @@ import { addReview, getReviews } from "../controllers/user/reviewController.js";
 import { toggleWishlist, getWishlist } from "../controllers/user/wishlistController.js";
 import { addToCart, getCart, updateCartItem, removeCartItem, getVariantsByProduct } from "../controllers/user/cartController.js";
 import { loadCheckout, loadPaymentPage, placeOrder, orderSuccess } from "../controllers/user/checkoutController.js";
-import { listOrders, orderDetail, cancelOrder, cancelOrderItem, returnOrder, downloadInvoice ,getOrderStatus } from "../controllers/user/orderController.js";
+import { listOrders, orderDetail, cancelOrder, cancelOrderItem, returnOrder,  returnOrderItem,   // ← ADD THIS
+ downloadInvoice ,getOrderStatus } from "../controllers/user/orderController.js";
  
 const router = express.Router();
  
@@ -106,13 +107,15 @@ router.post("/checkout/place",       userAuth, placeOrder);
 router.get("/order-success/:id",     userAuth, orderSuccess);
  
 // ── ORDERS ────────────────────────────────────────────
+// ── ORDERS ────────────────────────────────────────────
 router.get("/orders",                userAuth, listOrders);
 router.post("/orders/item/cancel",   userAuth, cancelOrderItem);
-router.get("/orders/:id",            userAuth, orderDetail);
+router.post("/orders/item/return",   userAuth, returnOrderItem);
+router.get("/orders/:id/status",     userAuth, getOrderStatus);
+router.get("/orders/:id/invoice",    userAuth, downloadInvoice);
 router.post("/orders/:id/cancel",    userAuth, cancelOrder);
 router.post("/orders/:id/return",    userAuth, returnOrder);
-router.get("/orders/:id/invoice",    userAuth, downloadInvoice);
-router.get('/orders/:id/status', userAuth, getOrderStatus);
+router.get("/orders/:id",            userAuth, orderDetail);
 router.get('/api/check-session', (req, res) => {
   res.json({ loggedIn: !!req.session?.user });
 });

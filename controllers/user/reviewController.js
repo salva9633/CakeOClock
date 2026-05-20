@@ -1,55 +1,83 @@
 import Review from "../../models/reviewModel.js";
-
-export const addReview = async (req, res) => {
+import Order  from "../../models/orderModel.js";
+ 
+/* ===============================
+   POST /add-review   (userAuth)
+================================ */
+const addReview = async (req, res) => {
   try {
-
-    console.log("BODY:", req.body);
-console.log("USER:", req.session.user);
-
-
-    const { productId, comment } = req.body;
-
-    const userId = req.session.user?.id || req.session.user?._id;
-
+    const userId = req.session?.user?.id || req.session?.user?._id;
     if (!userId) {
-      return res.json({
-        success: false,
-        message: "Please login"
-      });
+      return res.status(401).json({ success: false, message: "Login required." });
     }
-
-    if (!comment || comment.trim() === "") {
-      return res.json({
-        success: false,
-        message: "Comment cannot be empty"
-      });
+ 
+    const { productId, comment, rating } = req.body;
+ 
+    const ratingNum = Number(rating);
+    if (!ratingNum || ratingNum < 1 || ratingNum > 5) {
+      return res.status(400).json({ success: false, message: "Rating must be between 1 and 5." });
     }
-
-    const review = await Review.create({
+ 
+    if (!comment || !comment.trim()) {
+      return res.status(400).json({ success: false, message: "Review comment cannot be empty." });
+    }
+ 
+    const deliveredOrder = await Order.findOne({
       userId,
+      items: {
+        $elemMatch: {
+          productId: productId,
+          status:    "Delivered"
+        }
+      }
+    }).lean();
+ 
+    if (!deliveredOrder) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only review products from your delivered orders."
+      });
+    }
+ 
+    
+    await Review.create({
       productId,
+      userId,
+      rating:  ratingNum,
       comment: comment.trim()
     });
-
-    res.json({ success: true, review });
-
+ 
+    
+    const allReviews   = await Review.find({ productId }).lean();
+    const totalReviews = allReviews.length;
+    const avgRating    = (
+      allReviews.reduce((sum, r) => sum + (r.rating || 0), 0) / totalReviews
+    ).toFixed(1);
+ 
+    return res.json({ success: true, avgRating, totalReviews });
+ 
   } catch (error) {
-    console.error(error);
-    res.json({ success: false, message: "Server error" });
+    console.error("addReview error:", error);
+    return res.status(500).json({ success: false, message: "Server error." });
   }
 };
-
-export const getReviews = async (req, res) => {
+ 
+/* ===============================
+   GET /reviews/:productId
+================================ */
+const getReviews = async (req, res) => {
   try {
-    const { productId } = req.params;
-    const reviews = await Review.find({ productId })
+    const reviews = await Review.find({ productId: req.params.productId })
       .populate("userId", "name")
       .sort({ createdAt: -1 })
       .lean();
-
-    res.json({ success: true, reviews });
+ 
+    return res.json({ success: true, reviews });
   } catch (error) {
-    console.error(error);
-    res.json({ success: false });
+    console.error("getReviews error:", error);
+    return res.status(500).json({ success: false });
   }
 };
+ 
+export { addReview, getReviews };
+ 

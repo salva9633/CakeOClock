@@ -12,9 +12,15 @@ import {
   loadOrders,
   loadOrderDetail,
   updateOrderStatus,
-  updateItemStatus,   
-  pollOrderStatus,    
+  updateItemStatus,
+  pollOrderStatus,
+
+  loadReturnRequests,
+  approveReturnRequest,
+  rejectReturnRequest,
+
 } from '../controllers/admin/orderController.js';
+
 const router = express.Router();
 
 router.use(expressLayouts);
@@ -61,5 +67,13 @@ router.get("/orders/:id",                      adminAuth, loadOrderDetail);
 router.patch("/orders/:id/status",             adminAuth, updateOrderStatus);
 router.patch("/orders/:id/item/:itemId/status",adminAuth, updateItemStatus);
 router.get('/orders/:id/poll-status', adminAuth, pollOrderStatus);
+// RETURN REQUESTS
+router.get(
+  "/return-requests",
+  adminAuth,
+  loadReturnRequests
+);
 
+router.post("/approve-return", adminAuth, approveReturnRequest);
+router.post("/reject-return", adminAuth, rejectReturnRequest);
 export default router;
