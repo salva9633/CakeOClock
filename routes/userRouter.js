@@ -11,10 +11,18 @@ import { loadNearExpiryDeals } from "../controllers/user/expiryDealsController.j
 import { addReview, getReviews } from "../controllers/user/reviewController.js";
 import { toggleWishlist, getWishlist } from "../controllers/user/wishlistController.js";
 import { addToCart, getCart, updateCartItem, removeCartItem, getVariantsByProduct } from "../controllers/user/cartController.js";
-import { loadCheckout, loadPaymentPage, placeOrder, orderSuccess } from "../controllers/user/checkoutController.js";
-import { listOrders, orderDetail, cancelOrder, cancelOrderItem, returnOrder,  returnOrderItem,   // ← ADD THIS
- downloadInvoice ,getOrderStatus } from "../controllers/user/orderController.js";
- 
+import {
+  loadCheckout,
+  loadPaymentPage,
+  placeOrder,
+  orderSuccess,
+  createRazorpayOrder,      
+  verifyRazorpayPayment,     
+  razorpayFailure, 
+  applyCoupon, removeCoupon           
+} from "../controllers/user/checkoutController.js";
+import { listOrders, orderDetail, cancelOrder, cancelOrderItem, returnOrder, returnOrderItem, downloadInvoice, getOrderStatus } from "../controllers/user/orderController.js";
+import { loadWallet, createWalletOrder, verifyWalletPayment } from "../controllers/user/walletController.js";
 const router = express.Router();
  
 // ── AUTH ──────────────────────────────────────────────
@@ -106,7 +114,19 @@ router.get("/payment-page",          userAuth, loadPaymentPage);
 router.post("/checkout/place",       userAuth, placeOrder);
 router.get("/order-success/:id",     userAuth, orderSuccess);
  
-// ── ORDERS ────────────────────────────────────────────
+router.post("/checkout/apply-coupon",  userAuth, applyCoupon);
+router.post("/checkout/remove-coupon", userAuth, removeCoupon);
+// ── RAZORPAY ──────────────────────────────────────────
+router.post("/checkout/create-razorpay-order",   userAuth, createRazorpayOrder);
+router.post("/checkout/verify-razorpay-payment", userAuth, verifyRazorpayPayment);
+router.post("/checkout/razorpay-failure",        userAuth, razorpayFailure);
+
+
+// ── WALLET ────────────────────────────────────────────
+router.get("/wallet",                    userAuth, loadWallet);
+router.post("/wallet/create-order",      userAuth, createWalletOrder);
+router.post("/wallet/verify-payment",    userAuth, verifyWalletPayment);
+
 // ── ORDERS ────────────────────────────────────────────
 router.get("/orders",                userAuth, listOrders);
 router.post("/orders/item/cancel",   userAuth, cancelOrderItem);
@@ -116,8 +136,8 @@ router.get("/orders/:id/invoice",    userAuth, downloadInvoice);
 router.post("/orders/:id/cancel",    userAuth, cancelOrder);
 router.post("/orders/:id/return",    userAuth, returnOrder);
 router.get("/orders/:id",            userAuth, orderDetail);
-router.get('/api/check-session', (req, res) => {
+router.get("/api/check-session", (req, res) => {
   res.json({ loggedIn: !!req.session?.user });
 });
-export default router;
  
+export default router;

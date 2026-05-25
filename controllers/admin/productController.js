@@ -50,9 +50,7 @@ export const getProducts = async (req, res) => {
 ========================= */
 export const addProduct = async (req, res) => {
   try {
-const { productName, description, longDescription, categoryId, brand, discount } = req.body;
-
-
+const { productName, description, longDescription, categoryId, brand, discount, productOffer } = req.body;
     if (!productName || !description || !categoryId) {
       return res.status(400).json({ success: false, message: "Required fields missing" });
     }
@@ -79,13 +77,14 @@ const { productName, description, longDescription, categoryId, brand, discount }
       }
     }
 
-    const product = await Product.create({
+const product = await Product.create({
       productName: cleanName,
       description,
       longDescription,
       categoryId,
       brand,
       discount,
+      productOffer:  Number(productOffer) || 0,
       productImages: imageUrls,
       isListed: true
     });
@@ -103,8 +102,7 @@ const { productName, description, longDescription, categoryId, brand, discount }
 export const editProduct = async (req, res) => {
   try {
     const { productId } = req.params;
-    const { productName, description, longDescription, categoryId, brand } = req.body;
-
+const { productName, description, longDescription, categoryId, brand, productOffer } = req.body;
     const product = await Product.findById(productId);
 
     if (!product) {
@@ -116,6 +114,8 @@ export const editProduct = async (req, res) => {
     product.longDescription = longDescription;
     product.categoryId = categoryId;
     product.brand = brand;
+
+    product.productOffer    = Number(productOffer) || 0;
 
     while (product.productImages.length < 5) {
       product.productImages.push("");

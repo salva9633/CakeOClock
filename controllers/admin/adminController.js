@@ -1,4 +1,5 @@
 import User from "../../models/userModel.js";
+import Order from "../../models/orderModel.js";
 import bcrypt from "bcrypt";
 
 // ─────────────────────────────────────────
@@ -71,17 +72,7 @@ const login = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────
-// DASHBOARD
-// ─────────────────────────────────────────
-const loadDashboard = (req, res) => {
-  try {
-    return res.render("dashboard");
-  } catch (error) {
-    console.error("Dashboard error:", error);
-    return res.redirect("/admin/pageerror");
-  }
-};
+
 
 // ─────────────────────────────────────────
 // LOGOUT
@@ -105,4 +96,4 @@ const logout = (req, res) => {
   }
 };
 
-export { loadLogin, login, loadDashboard, pageerror, logout };
+export { loadLogin, login, pageerror, logout };

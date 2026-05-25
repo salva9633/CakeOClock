@@ -768,18 +768,37 @@
               </span>
             </div>
 
-            <!-- Pricing -->
-            <div class="pricing-row">
-              <% if (product.startingPrice) { %>
-                <span class="price-now">₹<%= product.startingPrice %></span>
-                <% if (product.regularPrice && product.regularPrice > product.startingPrice) { %>
-                  <span class="price-old">₹<%= product.regularPrice %></span>
-                  <span class="disc-pill"><%= product.discount %>% OFF</span>
-                <% } %>
-              <% } else { %>
-                <span style="font-size:.78rem;color:#b09090;">No variants available</span>
-              <% } %>
-            </div>
+          
+<!-- Pricing -->
+
+<div class="pricing-row">
+  <% if (product.startingPrice) { %>
+
+    <span class="price-now">₹<%= Math.round(product.startingPrice) %></span>
+
+    <% if (product.discount > 0) { %>
+      <span class="price-old">₹<%= product.regularPrice %></span>
+      <% if (product.activeOfferLabel === 'category') { %>
+        <span class="disc-pill" title="Category Offer">
+          <%= product.discount %>% OFF 🏷️
+        </span>
+      <% } else if (product.activeOfferLabel === 'product') { %>
+        <span class="disc-pill" title="Product Offer">
+          <%= product.discount %>% OFF 🎁
+        </span>
+      <% } else { %>
+        <span class="disc-pill">
+          <%= product.discount %>% OFF
+        </span>
+      <% } %>
+    <% } else if (product.regularPrice > product.startingPrice) { %>
+      <span class="price-old">₹<%= product.regularPrice %></span>
+    <% } %>
+
+  <% } else { %>
+    <span style="font-size:.78rem;color:#b09090;">No variants available</span>
+  <% } %>
+</div>
 
             <!-- Action button: Add to Cart only -->
             <div class="card-actions">
@@ -867,7 +886,7 @@ function showLoginPrompt(action = 'do that') {
     confirmButtonText: '🔐 Go to Login',
     showCancelButton: true,
     cancelButtonText: 'Cancel',
-    confirmButtonColor: '#8c3535',
+    confirmButtonColor: '#8B4A5A',
     cancelButtonColor: '#d6c0bc',
   }).then(result => {
     if (result.isConfirmed) window.location.href = '/login';
@@ -930,7 +949,7 @@ async function toggleWish(btn) {
         icon: 'warning',
         title: 'Unavailable',
         text: data.message || 'This product is currently unavailable.',
-        confirmButtonColor: '#8c3535',
+        confirmButtonColor: '#8B4A5A',
       });
       return;
     }
@@ -1046,7 +1065,7 @@ async function confirmAddToCart() {
     if (modal) modal.hide();
 
     if (!data.success) {
-      Swal.fire({ icon: 'warning', title: 'Cannot Add to Cart', text: data.message || 'Something went wrong.', confirmButtonColor: '#8c3535' });
+      Swal.fire({ icon: 'warning', title: 'Cannot Add to Cart', text: data.message || 'Something went wrong.', confirmButtonColor: '#8B4A5A' });
       return;
     }
 

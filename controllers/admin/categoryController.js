@@ -130,10 +130,53 @@ const editCategory = async (req, res) => {
   }
 };
 
+const addCategoryOffer = async (req, res) => {
+  try {
+
+    const { categoryId, offerPercentage } = req.body;
+
+    const category = await Category.findById(categoryId);
+
+    category.categoryOffer = offerPercentage;
+
+    await category.save();
+
+    res.json({
+      success: true,
+      message: "Category offer added"
+    });
+
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const removeCategoryOffer = async (req, res) => {
+  try {
+
+    const { categoryId } = req.body;
+
+    const category = await Category.findById(categoryId);
+
+    category.categoryOffer = 0;
+
+    await category.save();
+
+    res.json({
+      success: true
+    });
+
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export {
   categoryInfo,
   toggleCategoryStatus,
   addCategory,
   deleteCategory,
-  editCategory
+  editCategory,
+  addCategoryOffer,
+  removeCategoryOffer
 };

@@ -476,12 +476,31 @@ body{
 
         <!-- Price -->
         <div class="price-block">
-          <span class="price-main">₹<span id="current-price"><%= selectedVariant.salePrice %></span></span>
-          <span class="price-old" id="old-price">₹<%= selectedVariant.regularPrice %></span>
-          <span class="disc-tag" id="discount-percent">
-            <%= Math.round((selectedVariant.regularPrice - selectedVariant.salePrice) / selectedVariant.regularPrice * 100) %>% OFF
-          </span>
-        </div>
+  <span class="price-main">
+    ₹<span id="current-price"><%= offerData.finalPrice %></span>
+  </span>
+  <span class="price-old" id="old-price">
+    ₹<%= selectedVariant.regularPrice %>
+  </span>
+
+  <% if (offerData.bestOffer > 0) { %>
+    <% if (offerData.activeOfferLabel === 'category') { %>
+      <span class="disc-tag" id="discount-percent"
+        title="Category Offer applied — bigger than product offer">
+        <%= offerData.bestOffer %>% OFF 🏷️
+      </span>
+    <% } else { %>
+      <span class="disc-tag" id="discount-percent"
+        title="Product Offer">
+        <%= offerData.bestOffer %>% OFF 🎁
+      </span>
+    <% } %>
+  <% } else { %>
+    <span class="disc-tag" id="discount-percent">
+      <%= Math.round((selectedVariant.regularPrice - selectedVariant.salePrice) / selectedVariant.regularPrice * 100) %>% OFF
+    </span>
+  <% } %>
+</div>
 
         <p class="desc-text"><%= product.longDescription || product.description %></p>
 
@@ -819,7 +838,7 @@ async function toggleWishlist() {
         showToast('Saved to Wishlist ❤️', 'info');
       } else {
         icon.className = 'far fa-heart'; btn.classList.remove('wishlisted');
-        showToast('Removed from Wishlist');
+        showToast('add cake to wishlist');
       }
     } else {
       showToast(data.message || "Please login to save items to your Wishlist"

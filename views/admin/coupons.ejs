@@ -1,0 +1,475 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.2.96/css/materialdesignicons.min.css">
+
+<div class="main-panel">
+<div class="coupon-wrap">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-title">
+      <i class="mdi mdi-ticket-percent"></i>
+      Coupons
+    </div>
+    <p class="breadcrumb">Admin / <span>Coupons</span></p>
+  </div>
+
+  <!-- ADD COUPON CARD -->
+  <div class="c-card mb-24">
+    <div class="c-card-title">
+      <i class="mdi mdi-plus-circle-outline"></i>
+      Add Coupon
+    </div>
+
+    <form action="/admin/coupons/add" method="POST">
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Code</label>
+          <input type="text" name="code" placeholder="e.g. CAKE20" required>
+        </div>
+
+        <div class="field">
+          <label>Discount Type</label>
+          <select name="discountType">
+            <option value="percentage">Percentage</option>
+            <option value="fixed">Fixed</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Discount Value</label>
+          <input type="number" name="discountValue" placeholder="e.g. 20" required>
+        </div>
+
+        <div class="field">
+          <label>Max Discount</label>
+          <input type="number" name="maxDiscount" placeholder="e.g. 200">
+        </div>
+
+        <div class="field">
+          <label>Description</label>
+          <input type="text" name="description" placeholder="Short description">
+        </div>
+
+        <div class="field">
+          <label>Usage Limit</label>
+          <input type="number" name="usageLimit" placeholder="e.g. 100">
+        </div>
+
+        <div class="field">
+          <label>Expiry Date</label>
+          <input type="date" name="expiryDate" required>
+        </div>
+
+        <div class="field">
+          <label>Min Purchase</label>
+          <input type="number" name="minPurchase" placeholder="e.g. 500">
+        </div>
+
+        <div class="field" style="display:flex;align-items:center;gap:10px;padding-top:28px">
+  <input type="checkbox" name="isFirstOrderOnly" value="true" id="firstOrderOnly"
+    style="width:18px;height:18px;accent-color:var(--rose-dk);cursor:pointer">
+  <label for="firstOrderOnly" style="text-transform:none;font-size:13px;color:var(--brown);cursor:pointer">
+    First order only
+  </label>
+</div>
+
+      </div>
+
+      <button type="submit" class="btn-add">Add Coupon</button>
+    </form>
+  </div>
+
+  <!-- COUPON TABLE CARD -->
+  <div class="c-card c-card-flush">
+
+    <div class="table-top">
+      <h4>All Coupons</h4>
+      <span class="count-badge"><%= coupons.length %> coupons</span>
+    </div>
+
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Type</th>
+            <th>Min Purchase</th>
+            <th>Value</th>
+            <th>Limit</th>
+            <th>Created</th>
+            <th>Expiry</th>
+            <th>Status</th>
+            <th>Description</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% coupons.forEach(coupon => { %>
+          <tr>
+            <td class="code-cell"><%= coupon.code %></td>
+            <td><%= coupon.discountType %></td>
+            <td>₹<%= coupon.minPurchase || 0 %></td>
+            <td>
+              <% if(coupon.discountType === 'percentage'){ %>
+                <%= coupon.discountValue %>%
+              <% } else { %>
+                ₹<%= coupon.discountValue %>
+              <% } %>
+            </td>
+            <td><%= coupon.usageLimit || 0 %></td>
+            <td><%= new Date(coupon.createdAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) %></td>
+            <td><%= new Date(coupon.expiryDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) %></td>
+            <td>
+              <% if(coupon.isActive){ %>
+                <span class="badge badge-active">Active</span>
+              <% } else { %>
+                <span class="badge badge-inactive">Inactive</span>
+              <% } %>
+            </td>
+            <td><%= coupon.description || '—' %></td>
+            <td>
+              <div class="action-cell">
+<button
+  onclick="toggleStatus('<%= coupon._id %>')"
+  class="btn-sm btn-toggle"
+  title="<%= coupon.isActive ? 'Deactivate' : 'Activate' %>"
+>
+  <% if(coupon.isActive){ %>
+    <i class="mdi mdi-close-circle-outline"></i>
+  <% } else { %>
+    <i class="mdi mdi-check-circle-outline"></i>
+  <% } %>
+</button>                <a href="/admin/coupons/edit/<%= coupon._id %>" class="btn-sm btn-edit">
+                  <i class="mdi mdi-pencil"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+</div>
+
+
+<style>
+:root {
+  --rose:       #C97B8A;
+  --rose-dk:    #A85F6E;
+  --rose-lt:    #FAE8ED;
+  --blush:      #FDF0F3;
+  --petal:      #FBE4EC;
+  --mint:       #E8F6F0;
+  --peach:      #FEF0E8;
+  --cream:      #FDF8F5;
+  --caramel:    #D4A574;
+  --brown:      #5C3A3A;
+  --brown-lt:   #8A6060;
+  --muted:      #B08A8A;
+  --border:     #F5D8E0;
+  --burgundy:   #8B4A5A;
+  --white:      #FFFFFF;
+}
+
+.coupon-wrap {
+  background: var(--cream);
+  min-height: 100vh;
+  padding: 30px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--brown);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-title i {
+  font-size: 24px;
+  color: var(--rose-dk);
+}
+
+.breadcrumb {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.breadcrumb span {
+  color: var(--brown);
+  font-weight: 600;
+}
+
+.c-card {
+  background: var(--white);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 28px;
+}
+
+.c-card-flush {
+  padding: 0;
+  overflow: hidden;
+}
+
+.mb-24 { margin-bottom: 24px; }
+
+.c-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--brown);
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.c-card-title i {
+  color: var(--rose-dk);
+  font-size: 20px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 7px;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  height: 46px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--cream);
+  padding: 0 14px;
+  font-size: 14px;
+  color: var(--brown);
+  outline: none;
+  transition: border-color .2s, background .2s;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: var(--rose);
+  background: var(--white);
+}
+
+.field input::placeholder { color: var(--muted); }
+
+.btn-add {
+  margin-top: 22px;
+  background: var(--rose-dk);
+  color: var(--white);
+  border: none;
+  border-radius: 10px;
+  padding: 12px 44px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.btn-add:hover { background: var(--burgundy); }
+
+.table-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.table-top h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--brown);
+}
+
+.count-badge {
+  background: var(--rose-lt);
+  color: var(--rose-dk);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 5px 16px;
+  border-radius: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead tr {
+  background: var(--rose-dk);
+}
+
+thead th {
+  padding: 14px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,.9);
+  text-align: left;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background .15s;
+}
+
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--blush); }
+
+tbody td {
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--brown-lt);
+  vertical-align: middle;
+}
+
+.code-cell {
+  font-weight: 700 !important;
+  color: var(--brown) !important;
+  letter-spacing: .04em;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.badge-active   { background: var(--mint);    color: #2a7a58; }
+.badge-inactive { background: var(--rose-lt); color: var(--rose-dk); }
+
+.action-cell {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-sm {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid;
+  transition: all .15s;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.btn-deactivate {
+  background: var(--rose-lt);
+  color: var(--rose-dk);
+  border-color: var(--rose);
+}
+.btn-deactivate:hover { background: var(--rose-dk); color: var(--white); }
+
+.btn-activate {
+  background: var(--mint);
+  color: #2a7a58;
+  border-color: #a3d4c2;
+}
+.btn-activate:hover { background: #2a7a58; color: var(--white); }
+
+.btn-edit {
+  background: var(--peach);
+  color: #b87c3e;
+  border-color: #f0c9a0;
+  width: 32px;
+  padding: 0;
+}
+.btn-edit:hover { background: #b87c3e; color: var(--white); }
+.btn-toggle {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 10px;
+  background: var(--rose-lt);
+  color: var(--rose-dk);
+  border: 1px solid var(--border);
+  font-size: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all .15s;
+}
+.btn-toggle:hover {
+  background: var(--rose-dk);
+  color: var(--white);
+}
+
+.btn-edit {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 10px;
+  background: #FEF3C7;
+  color: #B45309;
+  border: 1px solid #F0C96A;
+  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all .15s;
+}
+.btn-edit:hover {
+  background: #B45309;
+  color: var(--white);
+}
+</style>
+
+
+<script>
+async function toggleStatus(id) {
+  try {
+    const response = await fetch(`/admin/coupons/status/${id}`, { method: 'PATCH' });
+    const data = await response.json();
+    if (data.success) {
+      location.reload();
+    } else {
+      alert('Status update failed');
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+</script>
+

@@ -66,6 +66,26 @@ const userSchema = new mongoose.Schema(
       default: false
     },
 
+    referralCode: {
+  type: String,
+  unique: true,
+  sparse: true
+},
+
+referredBy: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User",
+  default: null
+},
+
+referralDiscount: {
+  type: Number,
+  default: 0
+},
+ walletBalance: {
+      type: Number,
+      default: 0
+    },
 
     addresses: [
       {
@@ -123,11 +143,10 @@ const userSchema = new mongoose.Schema(
         isDefault: {
           type: Boolean,
           default: false
-        }
+        },
+    
       }
     ]
-
-
 
   },
   {

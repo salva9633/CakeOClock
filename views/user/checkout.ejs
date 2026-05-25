@@ -17,463 +17,144 @@
       --muted: #8a7070;
       --border: #ecdada;
       --text: #2d1f1f;
+      --green: #2a8c4a;
+      --green-lt: #e6f4ea;
     }
-
     * { box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
+    h1,h2,h3,h4,h5 { font-family: 'Playfair Display', serif; }
 
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--cream);
-      color: var(--text);
-      min-height: 100vh;
-    }
-
-    h1, h2, h3, h4, h5 { font-family: 'Playfair Display', serif; }
-
-    /* ── Page header strip ── */
-    .page-strip {
-      background: linear-gradient(135deg, #fff5f5 0%, #fdf6f0 100%);
-      border-bottom: 1px solid var(--border);
-      padding: 18px 0 14px;
-    }
+    .page-strip { background: linear-gradient(135deg,#fff5f5 0%,#fdf6f0 100%); border-bottom: 1px solid var(--border); padding: 18px 0 14px; }
     .breadcrumb-item a { color: var(--rose); text-decoration: none; font-size: .85rem; }
     .breadcrumb-item.active { color: var(--muted); font-size: .85rem; }
     .page-title { font-size: 1.65rem; color: var(--text); margin: 0; }
 
-    /* ── Cards ── */
-    .checkout-card {
-      background: #fff;
-      border-radius: 18px;
-      padding: 26px 28px;
-      margin-bottom: 18px;
-      box-shadow: 0 2px 14px rgba(175,84,84,.07);
-      border: 1px solid #f5eded;
-    }
-
-    .card-heading {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-      padding-bottom: 14px;
-      border-bottom: 2px solid var(--rose-lt);
-    }
-    .card-heading h5 {
-      font-size: 1.05rem;
-      color: var(--rose);
-      margin: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .card-heading h5::before {
-      content: '';
-      display: inline-block;
-      width: 4px;
-      height: 18px;
-      background: var(--rose);
-      border-radius: 4px;
-    }
+    .checkout-card { background: #fff; border-radius: 18px; padding: 26px 28px; margin-bottom: 18px; box-shadow: 0 2px 14px rgba(175,84,84,.07); border: 1px solid #f5eded; }
+    .card-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid var(--rose-lt); }
+    .card-heading h5 { font-size: 1.05rem; color: var(--rose); margin: 0; display: flex; align-items: center; gap: 8px; }
+    .card-heading h5::before { content: ''; display: inline-block; width: 4px; height: 18px; background: var(--rose); border-radius: 4px; }
 
     /* ── Coupon Card ── */
-    .coupon-card {
-      background: #fff;
-      border-radius: 18px;
-      padding: 22px 28px;
-      margin-bottom: 18px;
-      box-shadow: 0 2px 14px rgba(175,84,84,.07);
-      border: 1px solid #f5eded;
-    }
-    .coupon-card-title {
-      font-size: 1rem;
-      color: var(--text);
-      font-weight: 700;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
+    .coupon-card { background: #fff; border-radius: 18px; padding: 22px 28px; margin-bottom: 18px; box-shadow: 0 2px 14px rgba(175,84,84,.07); border: 1px solid #f5eded; }
+    .coupon-card-title { font-size: 1rem; color: var(--text); font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 7px; }
 
-    /* Coupon apply row */
-    .coupon-apply-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-    .coupon-input {
-      flex: 1;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: .9rem;
-      font-family: 'DM Sans', sans-serif;
-      color: var(--text);
-      background: #fdfafa;
-      outline: none;
-      transition: border-color .2s;
-    }
+    .coupon-apply-row { display: flex; gap: 10px; margin-bottom: 10px; }
+    .coupon-input { flex: 1; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 14px; font-size: .9rem; font-family: 'DM Sans', sans-serif; color: var(--text); background: #fdfafa; outline: none; transition: border-color .2s; }
     .coupon-input:focus { border-color: var(--rose-mid); background: #fff; }
     .coupon-input::placeholder { color: #c4abab; }
-    .btn-apply {
-      background: var(--rose);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 10px 20px;
-      font-weight: 700;
-      font-size: .88rem;
-      cursor: pointer;
-      transition: background .2s;
-      white-space: nowrap;
-    }
+    .btn-apply { background: var(--rose); color: #fff; border: none; border-radius: 10px; padding: 10px 20px; font-weight: 700; font-size: .88rem; cursor: pointer; transition: background .2s; white-space: nowrap; }
     .btn-apply:hover { background: var(--rose-dk); }
+    .btn-apply:disabled { opacity: .6; cursor: not-allowed; }
 
-    /* Available coupons list */
-    .coupon-list-header {
-      font-size: .8rem;
-      font-weight: 700;
-      color: var(--muted);
-      letter-spacing: .04em;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-
-    .coupon-item {
-      display: flex;
+    /* Applied coupon strip */
+    .applied-strip {
+      display: none;
       align-items: center;
       justify-content: space-between;
-      border: 1.5px dashed var(--border);
-      border-radius: 12px;
-      padding: 13px 16px;
-      margin-bottom: 8px;
-      background: #fffcfc;
-      cursor: pointer;
-      transition: all .2s;
-      gap: 12px;
+      background: var(--green-lt);
+      border: 1.5px solid #b2dfca;
+      border-radius: 10px;
+      padding: 10px 16px;
+      margin-bottom: 10px;
+      gap: 10px;
     }
+    .applied-strip.visible { display: flex; }
+    .applied-strip-left { display: flex; align-items: center; gap: 8px; font-size: .88rem; color: var(--green); font-weight: 600; }
+    .applied-strip-left span { font-size: 1.1rem; }
+    .btn-remove-coupon { background: transparent; border: 1.5px solid #c0392b; color: #c0392b; border-radius: 8px; padding: 4px 12px; font-size: .78rem; font-weight: 700; cursor: pointer; transition: all .18s; white-space: nowrap; }
+    .btn-remove-coupon:hover { background: #fdecea; }
+
+    .coupon-msg { font-size: .8rem; margin-top: 6px; padding: 7px 12px; border-radius: 8px; display: none; }
+    .coupon-msg.success { background: var(--green-lt); color: var(--green); display: block; }
+    .coupon-msg.error   { background: #fdecea; color: #c0392b; display: block; }
+
+    .coupon-list-header { font-size: .8rem; font-weight: 700; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 10px; margin-top: 16px; }
+    .coupon-item { display: flex; align-items: center; justify-content: space-between; border: 1.5px dashed var(--border); border-radius: 12px; padding: 13px 16px; margin-bottom: 8px; background: #fffcfc; cursor: pointer; transition: all .2s; gap: 12px; }
     .coupon-item:hover { border-color: var(--rose-mid); background: var(--rose-lt); }
-    .coupon-item.applied {
-      border-color: var(--rose);
-      background: var(--rose-lt);
-      border-style: solid;
-    }
+    .coupon-item.applied { border-color: var(--green); background: var(--green-lt); border-style: solid; }
 
     .coupon-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
-    .coupon-icon {
-      width: 36px; height: 36px;
-      background: var(--rose-lt);
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem;
-      flex-shrink: 0;
-    }
-    .coupon-item.applied .coupon-icon { background: #fde0e0; }
+    .coupon-icon { width: 36px; height: 36px; background: var(--rose-lt); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+    .coupon-item.applied .coupon-icon { background: var(--green-lt); }
+    .coupon-code { font-weight: 800; font-size: .88rem; color: var(--rose); letter-spacing: .04em; }
+    .coupon-item.applied .coupon-code { color: var(--green); }
+    .coupon-desc { font-size: .77rem; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .coupon-code {
-      font-weight: 800;
-      font-size: .88rem;
-      color: var(--rose);
-      letter-spacing: .04em;
-      font-family: 'DM Sans', monospace;
-    }
-    .coupon-desc {
-      font-size: .77rem;
-      color: var(--muted);
-      margin-top: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .btn-use-coupon {
-      background: transparent;
-      border: 1.5px solid var(--rose);
-      color: var(--rose);
-      border-radius: 8px;
-      padding: 5px 14px;
-      font-size: .78rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all .18s;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
+    .btn-use-coupon { background: transparent; border: 1.5px solid var(--rose); color: var(--rose); border-radius: 8px; padding: 5px 14px; font-size: .78rem; font-weight: 700; cursor: pointer; transition: all .18s; white-space: nowrap; flex-shrink: 0; }
     .btn-use-coupon:hover { background: var(--rose); color: #fff; }
-    .coupon-item.applied .btn-use-coupon {
-      background: var(--rose);
-      color: #fff;
-    }
+    .coupon-item.applied .btn-use-coupon { background: var(--green); color: #fff; border-color: var(--green); cursor: default; }
 
-    .coupon-msg {
-      font-size: .8rem;
-      margin-top: 8px;
-      padding: 7px 12px;
-      border-radius: 8px;
-      display: none;
-    }
-    .coupon-msg.success { background: #e6f4ea; color: #1e7e34; display: block; }
-    .coupon-msg.error { background: #fdecea; color: #c0392b; display: block; }
+    .no-coupons-text { color: var(--muted); font-size: .86rem; }
 
-    .no-coupons-text {
-      color: var(--muted);
-      font-size: .86rem;
-    }
-
-    /* ── Address radio cards ── */
+    /* ── Address ── */
     .addr-list { display: flex; flex-direction: column; gap: 12px; }
-
-    .addr-item {
-      position: relative;
-      border: 2px solid var(--border);
-      border-radius: 14px;
-      padding: 16px 18px 16px 52px;
-      cursor: pointer;
-      transition: all .22s ease;
-      background: #fff;
-    }
+    .addr-item { position: relative; border: 2px solid var(--border); border-radius: 14px; padding: 16px 18px 16px 52px; cursor: pointer; transition: all .22s ease; background: #fff; }
     .addr-item:hover { border-color: var(--rose-mid); background: #fffafa; }
-    .addr-item.active {
-      border-color: var(--rose);
-      background: var(--rose-lt);
-      box-shadow: 0 2px 12px rgba(175,84,84,.12);
-    }
-
-    .addr-radio {
-      position: absolute;
-      left: 18px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 20px; height: 20px;
-      border-radius: 50%;
-      border: 2px solid var(--border);
-      background: #fff;
-      transition: all .2s;
-      display: flex; align-items: center; justify-content: center;
-    }
+    .addr-item.active { border-color: var(--rose); background: var(--rose-lt); box-shadow: 0 2px 12px rgba(175,84,84,.12); }
+    .addr-radio { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); background: #fff; transition: all .2s; display: flex; align-items: center; justify-content: center; }
     .addr-item.active .addr-radio { border-color: var(--rose); background: var(--rose); }
-    .addr-item.active .addr-radio::after {
-      content: '';
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: #fff;
-    }
-
-    .addr-type-badge {
-      display: inline-block;
-      font-size: .65rem;
-      font-weight: 700;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-      background: var(--rose);
-      color: #fff;
-      border-radius: 5px;
-      padding: 2px 8px;
-      margin-bottom: 4px;
-    }
+    .addr-item.active .addr-radio::after { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #fff; }
+    .addr-type-badge { display: inline-block; font-size: .65rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; background: var(--rose); color: #fff; border-radius: 5px; padding: 2px 8px; margin-bottom: 4px; }
     .addr-item.active .addr-type-badge { background: var(--rose-dk); }
-
-    .default-badge {
-      display: inline-block;
-      font-size: .62rem;
-      font-weight: 600;
-      background: #f0f0f0;
-      color: #666;
-      border-radius: 5px;
-      padding: 2px 7px;
-      margin-left: 6px;
-      vertical-align: middle;
-    }
-
+    .default-badge { display: inline-block; font-size: .62rem; font-weight: 600; background: #f0f0f0; color: #666; border-radius: 5px; padding: 2px 7px; margin-left: 6px; vertical-align: middle; }
     .addr-name { font-weight: 600; font-size: .95rem; }
     .addr-phone { font-size: .82rem; color: var(--muted); margin-top: 1px; }
     .addr-line { font-size: .84rem; color: var(--muted); margin-top: 4px; line-height: 1.45; }
-
-    .addr-edit-link {
-      font-size: .78rem;
-      color: var(--rose);
-      text-decoration: none;
-      display: inline-block;
-      margin-top: 6px;
-      font-weight: 500;
-    }
+    .addr-edit-link { font-size: .78rem; color: var(--rose); text-decoration: none; display: inline-block; margin-top: 6px; font-weight: 500; }
     .addr-edit-link:hover { color: var(--rose-dk); text-decoration: underline; }
-
-    /* Add address button — single, full-width */
-    .btn-add-addr {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      border: 2px dashed var(--rose-mid);
-      color: var(--rose);
-      background: transparent;
-      border-radius: 14px;
-      padding: 13px;
-      width: 100%;
-      font-weight: 600;
-      font-size: .9rem;
-      cursor: pointer;
-      transition: all .2s;
-      margin-top: 14px;
-    }
+    .btn-add-addr { display: flex; align-items: center; justify-content: center; gap: 8px; border: 2px dashed var(--rose-mid); color: var(--rose); background: transparent; border-radius: 14px; padding: 13px; width: 100%; font-weight: 600; font-size: .9rem; cursor: pointer; transition: all .2s; margin-top: 14px; }
     .btn-add-addr:hover { background: var(--rose-lt); border-color: var(--rose); }
-    .btn-add-addr .plus-icon {
-      width: 22px; height: 22px;
-      background: var(--rose);
-      color: #fff;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1rem;
-      line-height: 1;
-      flex-shrink: 0;
-    }
+    .plus-icon { width: 22px; height: 22px; background: var(--rose); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; line-height: 1; flex-shrink: 0; }
 
-    /* ── Order summary sidebar ── */
-    .summary-card {
-      background: #fff;
-      border-radius: 18px;
-      padding: 24px;
-      box-shadow: 0 2px 14px rgba(175,84,84,.07);
-      border: 1px solid #f5eded;
-      position: sticky;
-      top: 20px;
-    }
-
-    .summary-title {
-      font-size: 1.15rem;
-      color: var(--text);
-      margin-bottom: 18px;
-      padding-bottom: 14px;
-      border-bottom: 2px solid var(--rose-lt);
-    }
-    .item-count {
-      font-size: .78rem;
-      color: var(--muted);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 400;
-    }
-
-    .order-item {
-      display: flex;
-      gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid #f8f0f0;
-    }
+    /* ── Summary card ── */
+    .summary-card { background: #fff; border-radius: 18px; padding: 24px; box-shadow: 0 2px 14px rgba(175,84,84,.07); border: 1px solid #f5eded; position: sticky; top: 20px; }
+    .summary-title { font-size: 1.15rem; color: var(--text); margin-bottom: 18px; padding-bottom: 14px; border-bottom: 2px solid var(--rose-lt); }
+    .item-count { font-size: .78rem; color: var(--muted); font-family: 'DM Sans', sans-serif; font-weight: 400; }
+    .order-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f8f0f0; }
     .order-item:last-of-type { border-bottom: none; }
-
-    .item-img {
-      width: 56px; height: 56px;
-      object-fit: cover;
-      border-radius: 10px;
-      flex-shrink: 0;
-      border: 1px solid var(--border);
-    }
-
+    .item-img { width: 56px; height: 56px; object-fit: cover; border-radius: 10px; flex-shrink: 0; border: 1px solid var(--border); }
     .item-info { flex: 1; min-width: 0; }
     .item-name { font-weight: 600; font-size: .88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .item-meta { font-size: .76rem; color: var(--muted); margin-top: 2px; }
     .item-price { text-align: right; flex-shrink: 0; }
     .item-price .final { font-weight: 700; font-size: .9rem; color: var(--text); }
     .item-price .was { font-size: .75rem; color: #bbb; text-decoration: line-through; }
-    .item-price .saving { font-size: .72rem; color: #2a8c4a; display: block; }
+    .item-price .saving { font-size: .72rem; color: var(--green); display: block; }
 
     .price-breakdown { margin-top: 16px; }
-    .price-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: .88rem;
-      padding: 5px 0;
-    }
+    .price-row { display: flex; justify-content: space-between; align-items: center; font-size: .88rem; padding: 5px 0; }
     .price-row .label { color: var(--muted); }
     .price-row .val { font-weight: 500; }
-    .price-row.total-row {
-      border-top: 2px solid var(--border);
-      margin-top: 10px;
-      padding-top: 14px;
-    }
+    .price-row.total-row { border-top: 2px solid var(--border); margin-top: 10px; padding-top: 14px; }
     .price-row.total-row .label { font-weight: 700; font-size: .98rem; color: var(--text); }
     .price-row.total-row .val { font-weight: 800; font-size: 1.15rem; color: var(--rose); }
+    .free-badge { background: var(--green-lt); color: var(--green); font-size: .75rem; font-weight: 700; border-radius: 20px; padding: 2px 10px; }
+    .discount-val { color: var(--green); font-weight: 600; }
 
-    .free-badge {
-      background: #e6f4ea;
-      color: #1e7e34;
-      font-size: .75rem;
-      font-weight: 700;
-      border-radius: 20px;
-      padding: 2px 10px;
-    }
+    /* Coupon breakdown row in summary */
+    .coupon-breakdown-row { display: none; }
+    .coupon-breakdown-row.visible { display: flex; }
 
-    .discount-val { color: #2a8c4a; font-weight: 600; }
-
-    .btn-place {
-      background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dk) 100%);
-      color: #fff;
-      font-weight: 700;
-      font-size: 1rem;
-      padding: 15px;
-      border-radius: 14px;
-      border: none;
-      width: 100%;
-      margin-top: 18px;
-      transition: all .22s;
-      letter-spacing: .02em;
-    }
-    .btn-place:hover {
-      background: linear-gradient(135deg, var(--rose-dk) 0%, #6d2a2a 100%);
-      transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(175,84,84,.35);
-    }
+    .btn-place { background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dk) 100%); color: #fff; font-weight: 700; font-size: 1rem; padding: 15px; border-radius: 14px; border: none; width: 100%; margin-top: 18px; transition: all .22s; letter-spacing: .02em; }
+    .btn-place:hover { background: linear-gradient(135deg, var(--rose-dk) 0%, #6d2a2a 100%); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(175,84,84,.35); }
     .btn-place:active { transform: translateY(0); }
     .btn-place:disabled { opacity: .65; transform: none; box-shadow: none; cursor: not-allowed; }
-
-    .secure-note {
-      text-align: center;
-      font-size: .75rem;
-      color: var(--muted);
-      margin-top: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-    }
+    .secure-note { text-align: center; font-size: .75rem; color: var(--muted); margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 5px; }
     .secure-note::before { content: '🔒'; }
 
-    .empty-addr {
-      text-align: center;
-      padding: 24px;
-      color: var(--muted);
-      font-size: .9rem;
-    }
+    .empty-addr { text-align: center; padding: 24px; color: var(--muted); font-size: .9rem; }
 
-    /* Step bar */
-    .steps-bar {
-      display: flex;
-      align-items: center;
-      margin-bottom: 28px;
-    }
-    .step {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: .82rem;
-      font-weight: 600;
-      color: var(--muted);
-    }
+    .steps-bar { display: flex; align-items: center; margin-bottom: 28px; }
+    .step { display: flex; align-items: center; gap: 8px; font-size: .82rem; font-weight: 600; color: var(--muted); }
     .step.done { color: var(--rose); }
-    .step-dot {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      border: 2px solid var(--border);
-      display: flex; align-items: center; justify-content: center;
-      font-size: .75rem;
-      font-weight: 700;
-      background: #fff;
-      flex-shrink: 0;
-    }
+    .step-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; background: #fff; flex-shrink: 0; }
     .step.done .step-dot { border-color: var(--rose); background: var(--rose); color: #fff; }
     .step-line { flex: 1; height: 2px; background: var(--border); margin: 0 8px; }
     .step.done + .step-line { background: var(--rose); }
+
+    /* Spinner inside button */
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; margin-right: 4px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -496,25 +177,13 @@
 <div class="container py-4">
 
   <div class="steps-bar">
-    <div class="step done">
-      <div class="step-dot">✓</div>
-      <span class="d-none d-sm-inline">Cart</span>
-    </div>
+    <div class="step done"><div class="step-dot">✓</div><span class="d-none d-sm-inline">Cart</span></div>
     <div class="step-line"></div>
-    <div class="step done">
-      <div class="step-dot">2</div>
-      <span class="d-none d-sm-inline">Address</span>
-    </div>
+    <div class="step done"><div class="step-dot">2</div><span class="d-none d-sm-inline">Address</span></div>
     <div class="step-line"></div>
-    <div class="step done">
-      <div class="step-dot">3</div>
-      <span class="d-none d-sm-inline">Payment</span>
-    </div>
+    <div class="step done"><div class="step-dot">3</div><span class="d-none d-sm-inline">Payment</span></div>
     <div class="step-line"></div>
-    <div class="step">
-      <div class="step-dot">4</div>
-      <span class="d-none d-sm-inline">Done</span>
-    </div>
+    <div class="step"><div class="step-dot">4</div><span class="d-none d-sm-inline">Done</span></div>
   </div>
 
   <div class="row g-4 align-items-start">
@@ -522,46 +191,59 @@
     <!-- ── LEFT COLUMN ── -->
     <div class="col-lg-7">
 
-      <!-- 🏷️ Available Coupons -->
+      <!-- 🏷️ Coupon Section -->
       <div class="coupon-card">
         <div class="coupon-card-title">🏷️ Available Coupons</div>
 
-        <!-- Manual entry row -->
-        <div class="coupon-apply-row">
-          <input type="text" class="coupon-input" id="couponCodeInput"
-                 placeholder="Enter coupon code" oninput="this.value = this.value.toUpperCase()">
-          <button class="btn-apply" onclick="applyCouponCode()">Apply</button>
+        <!-- Applied coupon strip (hidden until a coupon is applied) -->
+        <div class="applied-strip" id="appliedStrip">
+          <div class="applied-strip-left">
+            <span>✅</span>
+            <span id="appliedStripText">Coupon applied</span>
+          </div>
+          <button class="btn-remove-coupon" onclick="removeCoupon()">✕ Remove</button>
         </div>
+
+        <!-- Manual entry row (hidden when coupon is applied) -->
+        <div id="couponInputRow">
+          <div class="coupon-apply-row">
+            <input type="text" class="coupon-input" id="couponCodeInput"
+                   placeholder="Enter coupon code"
+                   oninput="this.value = this.value.toUpperCase()">
+            <button class="btn-apply" id="btnApply" onclick="applyCouponCode()">Apply</button>
+          </div>
+        </div>
+
         <div class="coupon-msg" id="couponMsg"></div>
 
         <!-- List of available coupons -->
         <% if (typeof coupons !== 'undefined' && coupons && coupons.length > 0) { %>
-          <div class="coupon-list-header mt-3">Available for you</div>
+          <div class="coupon-list-header">Available for you</div>
           <% coupons.forEach(coupon => { %>
             <div class="coupon-item" id="couponItem_<%= coupon.code %>"
-                 onclick="useCoupon('<%= coupon.code %>', this)">
+                 onclick="useCoupon('<%= coupon.code %>')">
               <div class="coupon-left">
                 <div class="coupon-icon">🎟️</div>
                 <div>
                   <div class="coupon-code"><%= coupon.code %></div>
                   <div class="coupon-desc">
                     <% if (coupon.discountType === 'percentage') { %>
-                      <%= coupon.discountValue %>% off
-                      <% if (coupon.maxDiscount) { %> · up to ₹<%= coupon.maxDiscount %><% } %>
+                      <%= coupon.discountValue %>% off<% if (coupon.maxDiscount) { %> · up to ₹<%= coupon.maxDiscount %><% } %>
                     <% } else { %>
                       ₹<%= coupon.discountValue %> off
                     <% } %>
-                    <% if (coupon.minOrderAmount) { %> · Min order ₹<%= coupon.minOrderAmount %><% } %>
+                    <% if (coupon.minPurchase) { %> · Min ₹<%= coupon.minPurchase %><% } %>
                   </div>
                 </div>
               </div>
-              <button class="btn-use-coupon" onclick="event.stopPropagation(); useCoupon('<%= coupon.code %>', document.getElementById('couponItem_<%= coupon.code %>'))">
+              <button class="btn-use-coupon" id="btnUseCoupon_<%= coupon.code %>"
+                      onclick="event.stopPropagation(); useCoupon('<%= coupon.code %>')">
                 Use
               </button>
             </div>
           <% }) %>
         <% } else { %>
-          <p class="no-coupons-text mt-2 mb-0">No coupons available right now.</p>
+          <p class="no-coupons-text mt-3 mb-0">No coupons available right now.</p>
         <% } %>
       </div>
 
@@ -582,9 +264,7 @@
                 <div>
                   <div class="mb-1">
                     <span class="addr-type-badge"><%= addr.type || 'Home' %></span>
-                    <% if (addr.isDefault) { %>
-                      <span class="default-badge">Default</span>
-                    <% } %>
+                    <% if (addr.isDefault) { %><span class="default-badge">Default</span><% } %>
                   </div>
                   <div class="addr-name"><%= addr.name %></div>
                   <div class="addr-phone"><%= addr.phone %></div>
@@ -594,8 +274,7 @@
                     <%= addr.city %>, <%= addr.state %> – <%= addr.pincode %>
                   </div>
                   <a href="/address/edit/<%= addr._id %>?redirect=/checkout"
-                     class="addr-edit-link"
-                     onclick="event.stopPropagation()">✏️ Edit address</a>
+                     class="addr-edit-link" onclick="event.stopPropagation()">✏️ Edit address</a>
                 </div>
               </div>
             <% }) %>
@@ -607,8 +286,8 @@
           </div>
         <% } %>
 
-        <!-- Single add address button -->
-<button class="btn-add-addr" onclick="location.href='/add-address?from=checkout'">          <span class="plus-icon">+</span> Add a new delivery address
+        <button class="btn-add-addr" onclick="location.href='/add-address?from=checkout'">
+          <span class="plus-icon">+</span> Add a new delivery address
         </button>
       </div>
 
@@ -619,9 +298,7 @@
       <div class="summary-card">
         <div class="summary-title">
           Order Summary
-          <span class="item-count d-block">
-            <%= items.length %> item<%= items.length !== 1 ? 's' : '' %> in your bag
-          </span>
+          <span class="item-count d-block"><%= items.length %> item<%= items.length !== 1 ? 's' : '' %> in your bag</span>
         </div>
 
         <% items.forEach(item => {
@@ -636,8 +313,7 @@
             <div class="item-info">
               <div class="item-name"><%= item.productId?.productName %></div>
               <div class="item-meta">
-                <% if (item.variantId?.weight) { %><%= item.variantId.weight %>g · <% } %>
-                Qty: <%= item.quantity %>
+                <% if (item.variantId?.weight) { %><%= item.variantId.weight %>g · <% } %>Qty: <%= item.quantity %>
               </div>
             </div>
             <div class="item-price">
@@ -652,30 +328,40 @@
           </div>
         <% }) %>
 
+        <!-- Price breakdown -->
         <div class="price-breakdown">
           <div class="price-row">
             <span class="label">Item Total</span>
-            <span class="val">₹<%= itemTotal.toLocaleString('en-IN') %></span>
+            <span class="val" id="displayItemTotal">₹<%= itemTotal.toLocaleString('en-IN') %></span>
           </div>
-          <div class="price-row" id="couponDiscountRow" style="display:none">
-            <span class="label">Coupon Discount</span>
-            <span class="val discount-val" id="couponDiscountVal"></span>
-          </div>
+
+          <!-- Offer discount (from product pricing) -->
           <% if (discount > 0) { %>
           <div class="price-row">
-            <span class="label">Discount</span>
+            <span class="label">Offer Discount</span>
             <span class="val discount-val">−₹<%= discount.toLocaleString('en-IN') %></span>
           </div>
           <% } %>
+
+          <!-- Coupon discount row — hidden until coupon applied -->
+          <div class="price-row coupon-breakdown-row" id="couponBreakdownRow">
+            <span class="label">
+              Coupon Discount
+              <span id="couponBreakdownCode" style="font-size:.75rem; color:var(--rose); font-weight:700; margin-left:4px;"></span>
+            </span>
+            <span class="val discount-val" id="couponBreakdownAmt"></span>
+          </div>
+
           <% if (tax > 0) { %>
           <div class="price-row">
             <span class="label">GST (<%= Math.round(TAX_RATE * 100) %>%)</span>
             <span class="val">₹<%= tax.toLocaleString('en-IN') %></span>
           </div>
           <% } %>
+
           <div class="price-row">
             <span class="label">Delivery</span>
-            <span class="val">
+            <span class="val" id="displayShipping">
               <% if (shippingCharge === 0) { %>
                 <span class="free-badge">FREE</span>
               <% } else { %>
@@ -683,17 +369,21 @@
               <% } %>
             </span>
           </div>
+
           <div class="price-row total-row">
             <span class="label">Total Payable</span>
             <span class="val" id="finalTotalDisplay">₹<%= finalTotal.toLocaleString('en-IN') %></span>
           </div>
         </div>
 
-        <input type="hidden" id="selectedAddrId" value="<%= selectedAddress?._id || '' %>">
-        <input type="hidden" id="selectedPayment" value="COD">
-        <input type="hidden" id="appliedCoupon" value="">
+        <!-- Hidden fields -->
+        <input type="hidden" id="selectedAddrId"  value="<%= selectedAddress?._id || '' %>">
+        <input type="hidden" id="appliedCoupon"   value="">
+        <input type="hidden" id="baseItemTotal"   value="<%= itemTotal %>">
+        <input type="hidden" id="baseShipping"    value="<%= shippingCharge %>">
+        <input type="hidden" id="baseTotal"       value="<%= finalTotal %>">
 
-        <button class="btn-place" onclick="placeOrder()">
+        <button class="btn-place" onclick="proceedToPayment()">
           Proceed to Payment →
         </button>
         <div class="secure-note">Safe and secure checkout</div>
@@ -708,123 +398,191 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-  // ── Base total from server (no coupon yet) ──
-  const BASE_TOTAL = <%= finalTotal %>;
 
-  // ── Address selection ──
+  // ── State ───────────────────────────────────────────────────────
+  let couponApplied = false;
+
+  // ── Address selection ───────────────────────────────────────────
   function selectAddr(id, el) {
     document.getElementById('selectedAddrId').value = id;
     document.querySelectorAll('.addr-item').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
   }
 
-  // ── Coupon: click "Use" on a listed coupon ──
-  function useCoupon(code, el) {
+  // ── Click "Use" on a coupon card ────────────────────────────────
+  function useCoupon(code) {
+    if (couponApplied) {
+      // Only one coupon allowed — show message
+      showCouponMsg('Remove the current coupon before applying another.', 'error');
+      return;
+    }
     document.getElementById('couponCodeInput').value = code;
     applyCouponCode();
   }
 
-  // ── Coupon: apply from input or from list ──
-  function applyCouponCode() {
-    const code = document.getElementById('couponCodeInput').value.trim().toUpperCase();
-    const msg  = document.getElementById('couponMsg');
+  // ── Apply coupon via API ────────────────────────────────────────
+  async function applyCouponCode() {
+    if (couponApplied) {
+      showCouponMsg('Remove the current coupon before applying another.', 'error');
+      return;
+    }
+
+    const code    = document.getElementById('couponCodeInput').value.trim().toUpperCase();
+    const btn     = document.getElementById('btnApply');
 
     if (!code) {
       showCouponMsg('Please enter a coupon code.', 'error');
       return;
     }
 
-    // UI-only validation against rendered coupons
-    // Pass available coupons from EJS into JS as JSON
-    const available = <%- JSON.stringify(
-      (typeof coupons !== 'undefined' && coupons) ? coupons.map(c => ({
-        code: c.code,
-        discountType: c.discountType,
-        discountValue: c.discountValue,
-        maxDiscount: c.maxDiscount || null,
-        minOrderAmount: c.minOrderAmount || 0
-      })) : []
-    ) %>;
+    // Loading state
+    btn.disabled    = true;
+    btn.innerHTML   = '<span class="spinner"></span> Applying…';
 
-    const coupon = available.find(c => c.code === code);
+    try {
+      const res  = await fetch('/checkout/apply-coupon', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ code })
+      });
+      const data = await res.json();
 
-    if (!coupon) {
-      showCouponMsg('Invalid or expired coupon code.', 'error');
-      resetCouponUI();
-      return;
-    }
+      if (!data.success) {
+        showCouponMsg(data.message, 'error');
+        return;
+      }
 
-    if (coupon.minOrderAmount && BASE_TOTAL < coupon.minOrderAmount) {
-      showCouponMsg(`Minimum order of ₹${coupon.minOrderAmount} required for this coupon.`, 'error');
-      resetCouponUI();
-      return;
-    }
+      // ── SUCCESS ──────────────────────────────────────────────────
+      couponApplied = true;
+      document.getElementById('appliedCoupon').value = data.couponCode;
 
-    // Calculate discount
-    let discountAmt = 0;
-    if (coupon.discountType === 'percentage') {
-      discountAmt = (BASE_TOTAL * coupon.discountValue) / 100;
-      if (coupon.maxDiscount) discountAmt = Math.min(discountAmt, coupon.maxDiscount);
-    } else {
-      discountAmt = coupon.discountValue;
-    }
-    discountAmt = Math.min(discountAmt, BASE_TOTAL);
-    const newTotal = BASE_TOTAL - discountAmt;
+      // Update summary breakdown
+      document.getElementById('couponBreakdownRow').classList.add('visible');
+      document.getElementById('couponBreakdownCode').textContent = `(${data.couponCode})`;
+      document.getElementById('couponBreakdownAmt').textContent  = `−₹${data.discountAmt.toLocaleString('en-IN')}`;
+      document.getElementById('finalTotalDisplay').textContent   = `₹${data.newTotal.toLocaleString('en-IN')}`;
 
-    // Update UI
-    document.getElementById('appliedCoupon').value = coupon.code;
-    document.getElementById('couponDiscountRow').style.display = 'flex';
-    document.getElementById('couponDiscountVal').textContent = '−₹' + discountAmt.toLocaleString('en-IN');
-    document.getElementById('finalTotalDisplay').textContent = '₹' + newTotal.toLocaleString('en-IN');
+      // Show applied strip, hide input row
+      document.getElementById('appliedStripText').textContent =
+        `${data.couponCode} — You save ₹${data.discountAmt.toLocaleString('en-IN')}`;
+      document.getElementById('appliedStrip').classList.add('visible');
+      document.getElementById('couponInputRow').style.display = 'none';
 
-    showCouponMsg(`🎉 Coupon applied! You save ₹${discountAmt.toLocaleString('en-IN')}`, 'success');
+      // Mark the coupon card as applied
+      document.querySelectorAll('.coupon-item').forEach(i => {
+        i.classList.remove('applied');
+        const b = i.querySelector('.btn-use-coupon');
+        if (b) b.textContent = 'Use';
+      });
+      const card = document.getElementById('couponItem_' + data.couponCode);
+      if (card) {
+        card.classList.add('applied');
+        card.querySelector('.btn-use-coupon').textContent = 'Applied ✓';
+      }
 
-    // Highlight the active coupon card
-    document.querySelectorAll('.coupon-item').forEach(i => i.classList.remove('applied'));
-    const card = document.getElementById('couponItem_' + coupon.code);
-    if (card) {
-      card.classList.add('applied');
-      card.querySelector('.btn-use-coupon').textContent = 'Applied ✓';
+      showCouponMsg(`🎉 ${data.message}`, 'success');
+
+    } catch (err) {
+      showCouponMsg('Something went wrong. Please try again.', 'error');
+    } finally {
+      btn.disabled  = false;
+      btn.innerHTML = 'Apply';
     }
   }
 
-  function resetCouponUI() {
-    document.getElementById('appliedCoupon').value = '';
-    document.getElementById('couponDiscountRow').style.display = 'none';
-    document.getElementById('finalTotalDisplay').textContent = '₹' + BASE_TOTAL.toLocaleString('en-IN');
-    document.querySelectorAll('.coupon-item').forEach(i => {
-      i.classList.remove('applied');
-      const btn = i.querySelector('.btn-use-coupon');
-      if (btn) btn.textContent = 'Use';
-    });
+  // ── Remove coupon via API ───────────────────────────────────────
+  async function removeCoupon() {
+    try {
+      const res  = await fetch('/checkout/remove-coupon', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+
+      if (!data.success) return;
+
+      // Reset state
+      couponApplied = false;
+      document.getElementById('appliedCoupon').value = '';
+
+      // Restore summary
+      document.getElementById('couponBreakdownRow').classList.remove('visible');
+      document.getElementById('couponBreakdownCode').textContent = '';
+      document.getElementById('couponBreakdownAmt').textContent  = '';
+      document.getElementById('finalTotalDisplay').textContent   =
+        `₹${data.newTotal.toLocaleString('en-IN')}`;
+
+      // Show input row, hide applied strip
+      document.getElementById('appliedStrip').classList.remove('visible');
+      document.getElementById('couponInputRow').style.display = '';
+      document.getElementById('couponCodeInput').value = '';
+
+      // Reset coupon cards
+      document.querySelectorAll('.coupon-item').forEach(i => {
+        i.classList.remove('applied');
+        const b = i.querySelector('.btn-use-coupon');
+        if (b) b.textContent = 'Use';
+      });
+
+      hideCouponMsg();
+
+    } catch (err) {
+      console.error('removeCoupon error', err);
+    }
   }
 
   function showCouponMsg(text, type) {
-    const el = document.getElementById('couponMsg');
-    el.className = 'coupon-msg ' + type;
+    const el      = document.getElementById('couponMsg');
+    el.className  = 'coupon-msg ' + type;
     el.textContent = text;
   }
-
-  // ── Place order ──
-  function placeOrder() {
-
-  const addressId = document.getElementById('selectedAddrId').value;
-  const couponCode = document.getElementById('appliedCoupon').value;
-
-  if (!addressId) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Select an Address',
-      text: 'Please select or add a delivery address.',
-      confirmButtonColor: '#AF5454'
-    });
-    return;
+  function hideCouponMsg() {
+    const el     = document.getElementById('couponMsg');
+    el.className = 'coupon-msg';
+    el.textContent = '';
   }
 
-  window.location.href =
-    `/payment-page?addressId=${addressId}&couponCode=${couponCode}`;
-}
+  // ── Proceed to payment ──────────────────────────────────────────
+  function proceedToPayment() {
+    const addressId  = document.getElementById('selectedAddrId').value;
+    const couponCode = document.getElementById('appliedCoupon').value;
 
+    if (!addressId) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Select an Address',
+        text: 'Please select or add a delivery address.',
+        confirmButtonColor: '#AF5454'
+      });
+      return;
+    }
+
+    window.location.href =
+      `/payment-page?addressId=${addressId}&couponCode=${encodeURIComponent(couponCode)}`;
+  }
+
+  // ── Show coupon error from query param (e.g. after failed order) ─
+const urlParams   = new URLSearchParams(window.location.search);
+  const couponError = urlParams.get('couponError');
+  if (couponError) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Coupon Invalid',
+      text: decodeURIComponent(couponError),
+      confirmButtonColor: '#AF5454'
+    });
+  }
+
+  const orderError = urlParams.get('error');
+  if (orderError) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'COD Not Available',
+      text: decodeURIComponent(orderError),
+      confirmButtonColor: '#AF5454',
+      confirmButtonText: 'OK'
+    });
+  }
 </script>
 </body>
 </html>

@@ -1,539 +1,514 @@
-<%- include('../partials/admin/header') %>
-<%- include('../partials/admin/sidebar') %>
+<%- include("../../views/partials/admin/sidebar") %>
 
 <style>
-  :root {
-    --bg-color: #FFF5F2;
-    --btn-color: #AF5454;
-    --btn-hover: #8f3f3f;
-    --text-color: #4A3B32;
-    --hover-color: #F4D0CB;
-    --border-color: rgba(175,84,84,0.15);
-    --card-bg: #ffffff;
-  }
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --rose:#C97B8A;--rose-dk:#A85F6E;--rose-lt:#FAE8ED;
+  --blush:#FDF0F3;--caramel:#D4A574;--brown:#5C3A3A;
+  --muted:#B08A8A;--border:#F5D8E0;--mint:#E8F6F0;--white:#FFFFFF;
+}
 
-  /* ── LAYOUT FIX ── */
-  *, *::before, *::after { box-sizing: border-box; }
-  html, body { margin: 0 !important; padding: 0 !important; overflow-x: hidden; }
-  .main-content {
-    margin-left: 260px !important;
-    margin-top: 64px !important;
-    margin-right: 0 !important;
-    margin-bottom: 0 !important;
-    width: calc(100% - 260px) !important;
-    min-height: calc(100vh - 64px);
-    background: var(--bg-color);
-    font-family: 'Inter', sans-serif;
-    box-sizing: border-box !important;
-    overflow-x: hidden;
-    display: block;
-  }
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(0.96)}to{opacity:1;transform:scale(1)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
 
-  /* ── Page header ── */
-  .page-header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-  }
-  .back-btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 8px 14px; border-radius: 10px; font-size: 13px;
-    border: 1px solid #e8c8c0; background: #fff;
-    color: var(--text-color); text-decoration: none; transition: background .15s;
-    white-space: nowrap;
-  }
-  .back-btn:hover { background: var(--hover-color); }
-  .page-title { font-size: 22px; font-weight: 700; color: var(--text-color); }
-  .order-id-tag {
-    font-size: 13px; font-weight: 700; color: var(--btn-color);
-    background: #fde8e8; padding: 4px 12px; border-radius: 20px;
-    white-space: nowrap;
-  }
+.pg{padding:1.5rem 1rem}
 
-  /* ── Detail grid ── */
-  .detail-grid {
-    display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 20px;
-    align-items: start;
-  }
+.pg-header{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;flex-wrap:wrap;animation:fadeUp .4s ease both}
+.back-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:10px;border:0.5px solid var(--border);background:var(--white);color:var(--brown);font-size:13px;text-decoration:none;transition:all .18s;flex-shrink:0}
+.back-btn:hover{background:var(--rose-lt);border-color:var(--rose);color:var(--rose)}
+.pg-title{font-size:20px;font-weight:500;color:var(--brown)}
+.order-tag{font-size:12px;font-weight:500;color:var(--rose);background:var(--rose-lt);padding:4px 12px;border-radius:20px;border:0.5px solid var(--border)}
+.live-badge{font-size:10px;padding:3px 8px;border-radius:20px;background:var(--rose-lt);color:var(--rose-dk);display:flex;align-items:center;gap:4px;margin-left:auto}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--rose);animation:pulse 1.8s ease infinite}
 
-  /* ── Cards ── */
-  .detail-card {
-    background: var(--card-bg);
-    border-radius: 14px;
-    border: 1px solid var(--border-color);
-    padding: 22px;
-    margin-bottom: 20px;
-    box-shadow: 0 1px 6px rgba(175,84,84,.06);
-    box-sizing: border-box;
-  }
-  .detail-card:last-child { margin-bottom: 0; }
-  .card-title {
-    font-size: 13px; font-weight: 700; color: var(--btn-color);
-    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
-    padding-bottom: 12px; border-bottom: 1px solid var(--border-color);
-  }
+.detail-grid{display:grid;grid-template-columns:1fr 300px;gap:14px;align-items:start}
 
-  /* ── Info rows ── */
-  .info-row {
-    display: flex; justify-content: space-between; align-items: flex-start;
-    font-size: 13px; padding: 8px 0; border-bottom: 1px solid #fff0ee; gap: 12px;
-  }
-  .info-row:last-child { border-bottom: none; }
-  .info-label { color: #a07060; min-width: 110px; flex-shrink: 0; }
-  .info-val { font-weight: 500; color: var(--text-color); text-align: right; word-break: break-word; }
+.card{background:var(--white);border:0.5px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:14px;opacity:0;animation:scaleIn .5s ease forwards}
+.card:nth-child(1){animation-delay:.05s}
+.card:nth-child(2){animation-delay:.12s}
+.card:nth-child(3){animation-delay:.18s}
+.right-col .card:nth-child(1){animation-delay:.08s}
+.right-col .card:nth-child(2){animation-delay:.14s}
+.right-col .card:nth-child(3){animation-delay:.2s}
+.card:last-child{margin-bottom:0}
 
-  /* ── Items table ── */
-  .items-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .items-table th {
-    background: #fdf0f0; padding: 9px 12px;
-    text-align: left; font-size: 11px; font-weight: 600;
-    color: #a07060; border-bottom: 1px solid var(--border-color);
-    text-transform: uppercase; letter-spacing: .4px;
-  }
-  .items-table td {
-    padding: 11px 12px; border-bottom: 1px solid #fff0ee;
-    color: var(--text-color); vertical-align: middle;
-  }
-  .items-table tr:last-child td { border-bottom: none; }
-  .item-img {
-    width: 42px; height: 42px; object-fit: cover;
-    border-radius: 8px; border: 1px solid var(--border-color); flex-shrink: 0;
-  }
-  .item-img-placeholder {
-    width: 42px; height: 42px; border-radius: 8px;
-    background: var(--hover-color); display: flex; align-items: center;
-    justify-content: center; color: var(--btn-color); font-size: 15px; flex-shrink: 0;
-  }
-  .item-name { font-weight: 600; }
-  .item-sub  { font-size: 11px; color: #a07060; margin-top: 2px; }
+.card-head{display:flex;align-items:center;gap:8px;padding-bottom:12px;margin-bottom:14px;border-bottom:0.5px solid var(--rose-lt)}
+.card-head-title{font-size:13px;font-weight:500;color:var(--brown);display:flex;align-items:center;gap:6px}
+.card-head-title i{color:var(--rose);font-size:15px}
+.card-head-sub{font-size:11px;color:var(--muted);margin-left:auto}
 
-  /* ── Badge ── */
-  .badge {
-    display: inline-flex; align-items: center;
-    padding: 4px 11px; border-radius: 20px;
-    font-size: 11px; font-weight: 700; white-space: nowrap;
-  }
-  .b-Pending    { background:#fff3cd; color:#856404; }
-  .b-Processing { background:#fde8d8; color:#9a4b0a; }
-  .b-Shipped    { background:#d0e8ff; color:#1a5fa8; }
-  .b-Delivered  { background:#d4edda; color:#1a6e35; }
-  .b-Cancelled  { background:#f8d7da; color:#8b1a1a; }
-  .b-Returned   { background:#e8d5ff; color:#6a2fc2; }
-  .b-Paid       { background:#d4edda; color:#1a6e35; }
-  .b-Failed     { background:#f8d7da; color:#8b1a1a; }
-  .b-COD        { background:#fff3cd; color:#856404; }
-  .b-Online     { background:#d0e8ff; color:#1a5fa8; }
+.info-row{display:flex;justify-content:space-between;align-items:flex-start;font-size:13px;padding:8px 0;border-bottom:0.5px solid var(--rose-lt);gap:12px}
+.info-row:last-child{border-bottom:none}
+.info-label{color:var(--muted);font-size:12px;min-width:110px;flex-shrink:0}
+.info-val{font-weight:500;color:var(--brown);text-align:right;word-break:break-word;font-size:13px}
 
-  /* ── Totals ── */
-  .totals-block { border-top: 1px solid var(--border-color); margin-top: 12px; padding-top: 12px; }
-  .total-row {
-    display: flex; justify-content: space-between;
-    font-size: 13px; padding: 6px 0; color: var(--text-color);
-  }
-  .total-row.grand {
-    font-weight: 700; font-size: 15px; margin-top: 6px;
-    padding-top: 10px; border-top: 1px solid var(--border-color);
-  }
-  .total-row .label { color: #a07060; }
-  .discount { color: #2e7d32; }
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl thead tr{background:linear-gradient(135deg,var(--rose) 0%,var(--rose-dk) 100%)}
+.tbl thead th{padding:10px 12px;font-size:11px;font-weight:500;color:#fff;text-align:left;letter-spacing:.03em}
+.tbl tbody td{padding:11px 12px;border-bottom:0.5px solid var(--rose-lt);color:var(--brown);vertical-align:middle}
+.tbl tbody tr:last-child td{border-bottom:none}
+.tbl tbody tr{transition:background .15s}
+.tbl tbody tr:hover td{background:var(--blush)}
 
-  /* ── Status update ── */
-  .status-update-wrap { margin-top: 14px; }
-  .status-update-wrap label { font-size: 12px; color: #a07060; display: block; margin-bottom: 6px; }
-  .status-select-lg {
-    width: 100%; padding: 10px 14px;
-    border: 1.5px solid #e8c8c0; border-radius: 10px;
-    background: #fff; font-size: 13px; color: var(--text-color);
-    cursor: pointer; outline: none; margin-bottom: 10px; box-sizing: border-box;
-  }
-  .status-select-lg:focus { border-color: var(--btn-color); }
-  .btn-update {
-    width: 100%; padding: 11px; border-radius: 10px;
-    font-size: 13px; font-weight: 600; cursor: pointer; border: none;
-    background: var(--btn-color); color: #fff; transition: background .15s;
-  }
-  .btn-update:hover { background: var(--btn-hover); }
-  .btn-update:disabled { opacity: .5; cursor: default; }
+.item-img{width:40px;height:40px;object-fit:cover;border-radius:8px;border:0.5px solid var(--border);flex-shrink:0}
+.item-placeholder{width:40px;height:40px;border-radius:8px;background:var(--rose-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.item-placeholder i{font-size:16px;color:var(--rose)}
+.item-name{font-weight:500;font-size:13px}
+.item-sub{font-size:11px;color:var(--muted);margin-top:2px}
 
-  /* ── Timeline ── */
-  .timeline { list-style: none; padding: 0; margin: 0; position: relative; }
-  .timeline::before {
-    content: ''; position: absolute; left: 10px; top: 0; bottom: 0;
-    width: 2px; background: var(--hover-color);
-  }
-  .timeline li { position: relative; padding-left: 32px; margin-bottom: 16px; }
-  .timeline li:last-child { margin-bottom: 0; }
-  .tl-dot {
-    position: absolute; left: 4px; top: 3px;
-    width: 14px; height: 14px; border-radius: 50%;
-    background: var(--btn-color); border: 2px solid #fff;
-    box-shadow: 0 0 0 2px var(--btn-color);
-  }
-  .tl-dot.inactive { background: #e8c8c0; box-shadow: 0 0 0 2px #e8c8c0; }
-  .tl-status { font-size: 13px; font-weight: 600; color: var(--text-color); }
-  .tl-date   { font-size: 11px; color: #a07060; margin-top: 2px; }
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.b-Pending{background:#FEF0E8;color:#C97A30}
+.b-Processing{background:#E8F0FE;color:#3060C9}
+.b-Shipped{background:#E8F6FF;color:#1A7AB8}
+.b-Delivered{background:#E6F4EA;color:#2A7D3A}
+.b-Cancelled{background:#FDECEA;color:#C03030}
+.b-Returned{background:#F0E8FE;color:#7030C9}
+.b-Return-Requested{background:#FFF3CD;color:#856404}
+.b-Return-Rejected{background:#FDECEA;color:#C03030}
+.b-Paid{background:#E6F4EA;color:#2A7D3A}
+.b-Failed{background:#FDECEA;color:#C03030}
+.b-COD{background:#FEF0E8;color:#C97A30}
+.b-Online{background:#E8F0FE;color:#3060C9}
+.b-Razorpay{background:#E8F0FE;color:#3060C9}
+.b-Wallet{background:var(--rose-lt);color:var(--rose-dk)}
 
-  /* ── Toast ── */
-  .toast {
-    position: fixed; bottom: 24px; right: 24px;
-    background: #333; color: #fff; padding: 12px 20px;
-    border-radius: 10px; font-size: 13px; z-index: 9999;
-    opacity: 0; transform: translateY(8px);
-    transition: all .3s; pointer-events: none;
-  }
-  .toast.show { opacity: 1; transform: translateY(0); }
-  .toast.success { background: #2e7d32; }
-  .toast.error   { background: #c0504d; }
+.totals-block{border-top:0.5px solid var(--rose-lt);margin-top:14px;padding-top:14px}
+.total-row{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;color:var(--brown)}
+.total-row .t-label{color:var(--muted);font-size:12px}
+.total-row.grand{font-weight:500;font-size:15px;margin-top:6px;padding-top:10px;border-top:0.5px solid var(--border)}
+.total-row.grand .t-label{color:var(--brown);font-size:15px}
+.discount-val{color:#2A7D3A}
 
-  /* ── Responsive ── */
-  @media (max-width: 1100px) { .detail-grid { grid-template-columns: 1fr; } }
-  @media (max-width: 992px)  { .main-content { margin-left: 0; width: 100%; } }
-  @media (max-width: 600px)  { .main-content { padding: 16px 14px 48px; } }
+.status-sel-lg{width:100%;padding:9px 12px;border:0.5px solid var(--border);border-radius:10px;background:var(--white);font-size:13px;color:var(--brown);outline:none;cursor:pointer;margin-bottom:10px;transition:border-color .18s}
+.status-sel-lg:focus{border-color:var(--rose)}
+.btn-update{width:100%;padding:10px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:linear-gradient(135deg,var(--rose),var(--rose-dk));color:#fff;transition:opacity .18s;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-update:hover{opacity:.9}
+.btn-update:disabled{opacity:.5;cursor:not-allowed}
+
+.timeline{list-style:none;padding:0;position:relative}
+.timeline::before{content:'';position:absolute;left:9px;top:0;bottom:0;width:1.5px;background:var(--rose-lt)}
+.timeline li{position:relative;padding-left:28px;margin-bottom:16px}
+.timeline li:last-child{margin-bottom:0}
+.tl-dot{position:absolute;left:3px;top:3px;width:14px;height:14px;border-radius:50%;background:var(--rose);border:2px solid var(--white);box-shadow:0 0 0 2px var(--rose)}
+.tl-dot.inactive{background:var(--border);box-shadow:0 0 0 2px var(--border)}
+.tl-status{font-size:13px;font-weight:500;color:var(--brown)}
+.tl-status.inactive{color:var(--muted);font-weight:400}
+.tl-date{font-size:11px;color:var(--muted);margin-top:2px}
+
+.btn-approve{background:var(--mint);color:#2A7D3A;border:none;border-radius:7px;padding:5px 11px;font-size:11px;font-weight:500;cursor:pointer;transition:opacity .18s}
+.btn-approve:hover{opacity:.85}
+.btn-reject{background:#FDECEA;color:#C03030;border:none;border-radius:7px;padding:5px 11px;font-size:11px;font-weight:500;cursor:pointer;transition:opacity .18s}
+.btn-reject:hover{opacity:.85}
+
+.toast{position:fixed;right:24px;bottom:24px;padding:10px 18px;border-radius:10px;font-size:13px;color:#fff;opacity:0;transform:translateY(6px);transition:.3s;pointer-events:none;z-index:9999}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{background:#2e7d32}
+.toast.error{background:#c0392b}
+
+@media(max-width:1100px){.detail-grid{grid-template-columns:1fr}}
 </style>
 
+<div class="pg">
 
-
-  <!-- Page header -->
-  <div class="page-header">
+  <div class="pg-header">
     <a href="/admin/orders" class="back-btn">
-      <i class="fas fa-arrow-left"></i> Back
+      <i class="ti ti-arrow-left" aria-hidden="true"></i> Back
     </a>
-    <div class="page-title">Order detail</div>
-    <span class="order-id-tag"><%= order.orderId %></span>
+    <span class="pg-title">Order detail</span>
+    <span class="order-tag"><%= order.orderId %></span>
+    <div class="live-badge">
+      <span class="live-dot"></span> Live
+    </div>
   </div>
 
   <div class="detail-grid">
 
     <!-- ── LEFT COLUMN ── -->
-    <div>
+    <div class="left-col">
 
-      <!-- Ordered items -->
-      <div class="detail-card">
-        <div class="card-title">
-          <i class="fas fa-box"></i> Ordered items
-          <span style="margin-left:auto;font-size:12px;color:#a07060;font-weight:400">
-            <%= order.items.length %> item<%= order.items.length > 1 ? 's' : '' %>
-          </span>
+      <!-- Items table -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-title">
+            <i class="ti ti-box" aria-hidden="true"></i> Ordered items
+          </div>
+          <span class="card-head-sub"><%= order.items.length %> item<%= order.items.length > 1 ? 's' : '' %></span>
         </div>
-        <table class="items-table">
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th style="text-align:center">Qty</th>
-              <th>Price</th>
-              <th>Subtotal</th>
-<th>Status</th>
-<th>Return Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% order.items.forEach(function(item) { %>
-            <tr>
-              <td>
-                <div style="display:flex;align-items:center;gap:10px">
-                  <% if (item.productImage) { %>
-                    <img src="<%= item.productImage %>" alt="" class="item-img">
-                  <% } else { %>
-                    <div class="item-img-placeholder"><i class="fas fa-birthday-cake"></i></div>
-                  <% } %>
-                  <div>
-                    <div class="item-name"><%= item.productName %></div>
-                    <% if (item.weight) { %><div class="item-sub"><%= item.weight %>g</div><% } %>
-                    <% if (item.cancelReason) { %><div class="item-sub" style="color:#c0504d">Reason: <%= item.cancelReason %></div><% } %>
-                    <% if (item.returnReason) { %><div class="item-sub" style="color:#6a2fc2">Reason: <%= item.returnReason %></div><% } %>
+
+        <div style="overflow-x:auto">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th style="text-align:center">Qty</th>
+                <th>Price</th>
+                <th>Subtotal</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% order.items.forEach(function(item) { %>
+              <tr>
+                <td>
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <% if (item.productImage) { %>
+                      <img src="<%= item.productImage %>" alt="" class="item-img">
+                    <% } else { %>
+                      <div class="item-placeholder">
+                        <i class="ti ti-cake" aria-hidden="true"></i>
+                      </div>
+                    <% } %>
+                    <div>
+                      <div class="item-name"><%= item.productName %></div>
+                      <% if (item.weight) { %>
+                        <div class="item-sub"><%= item.weight %>g</div>
+                      <% } %>
+                      <% if (item.cancelReason) { %>
+                        <div class="item-sub" style="color:#C03030">Reason: <%= item.cancelReason %></div>
+                      <% } %>
+                      <% if (item.returnReason) { %>
+                        <div class="item-sub" style="color:#7030C9">Reason: <%= item.returnReason %></div>
+                      <% } %>
+                    </div>
                   </div>
-                </div>
-              </td>
-              <td style="text-align:center"><%= item.quantity %></td>
-              <td>₹<%= item.price.toLocaleString('en-IN') %></td>
-              <td style="font-weight:600">₹<%= (item.price * item.quantity).toLocaleString('en-IN') %></td>
-<td><span class="badge b-<%= item.status %> item-status-badge"><%= item.status %></span></td>
-<td>
-  <% if (item.status === 'Return Requested') { %>
-    <div style="display:flex;gap:6px;flex-wrap:wrap">
-      <button
-        style="background:#d4edda;color:#155724;border:none;border-radius:7px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer"
-        onclick="handleReturn('<%= order._id %>', '<%= item._id %>', 'approve', '<%= item.productName %>')">
-        ✓ Approve
-      </button>
-      <button
-        style="background:#f8d7da;color:#721c24;border:none;border-radius:7px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer"
-        onclick="handleReturn('<%= order._id %>', '<%= item._id %>', 'reject', '<%= item.productName %>')">
-        ✗ Reject
-      </button>
-    </div>
-  <% } %>
-</td>            </tr>
-            <% }) %>
-          </tbody>
-        </table>
+                </td>
+                <td style="text-align:center"><%= item.quantity %></td>
+                <td>₹<%= item.price.toLocaleString('en-IN') %></td>
+                <td style="font-weight:500">₹<%= (item.price * item.quantity).toLocaleString('en-IN') %></td>
+                <td>
+                  <span class="badge b-<%= item.status.replace(' ','-') %> item-status-badge">
+                    <%= item.status %>
+                  </span>
+                </td>
+                <td>
+                  <% if (item.status === 'Return Requested') { %>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap">
+                      <button class="btn-approve"
+                        onclick="handleReturn('<%= order._id %>', '<%= item._id %>', 'approve')">
+                        <i class="ti ti-check" style="font-size:11px" aria-hidden="true"></i> Approve
+                      </button>
+                      <button class="btn-reject"
+                        onclick="handleReturn('<%= order._id %>', '<%= item._id %>', 'reject')">
+                        <i class="ti ti-x" style="font-size:11px" aria-hidden="true"></i> Reject
+                      </button>
+                    </div>
+                  <% } else { %>
+                    <span style="font-size:11px;color:var(--muted)">—</span>
+                  <% } %>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
 
         <!-- Totals -->
         <div class="totals-block">
-          <div class="total-row"><span class="label">Item total</span><span>₹<%= order.itemTotal.toLocaleString('en-IN') %></span></div>
+          <div class="total-row">
+            <span class="t-label">Item total</span>
+            <span>₹<%= order.itemTotal.toLocaleString('en-IN') %></span>
+          </div>
           <% if (order.discount > 0) { %>
-            <div class="total-row"><span class="label">Discount</span><span class="discount">− ₹<%= order.discount.toLocaleString('en-IN') %></span></div>
+          <div class="total-row">
+            <span class="t-label">Discount</span>
+            <span class="discount-val">− ₹<%= order.discount.toLocaleString('en-IN') %></span>
+          </div>
+          <% } %>
+          <% if (order.couponCode) { %>
+          <div class="total-row">
+            <span class="t-label">Coupon</span>
+            <span style="color:var(--rose);font-size:12px"><%= order.couponCode %></span>
+          </div>
           <% } %>
           <% if (order.tax > 0) { %>
-            <div class="total-row"><span class="label">Tax</span><span>₹<%= order.tax.toLocaleString('en-IN') %></span></div>
+          <div class="total-row">
+            <span class="t-label">Tax</span>
+            <span>₹<%= order.tax.toLocaleString('en-IN') %></span>
+          </div>
           <% } %>
-          <% if (order.shippingCharge > 0) { %>
-            <div class="total-row"><span class="label">Shipping</span><span>₹<%= order.shippingCharge.toLocaleString('en-IN') %></span></div>
-          <% } else { %>
-            <div class="total-row"><span class="label">Shipping</span><span class="discount">Free</span></div>
-          <% } %>
+          <div class="total-row">
+            <span class="t-label">Shipping</span>
+            <% if (order.shippingCharge > 0) { %>
+              <span>₹<%= order.shippingCharge.toLocaleString('en-IN') %></span>
+            <% } else { %>
+              <span class="discount-val">Free</span>
+            <% } %>
+          </div>
           <div class="total-row grand">
-            <span>Grand total</span>
-            <span style="color:var(--btn-color)">₹<%= order.finalTotal.toLocaleString('en-IN') %></span>
+            <span class="t-label">Grand total</span>
+            <span style="color:var(--rose)">₹<%= order.finalTotal.toLocaleString('en-IN') %></span>
           </div>
         </div>
       </div>
 
       <!-- Delivery address -->
-      <div class="detail-card">
-        <div class="card-title"><i class="fas fa-map-marker-alt"></i> Delivery address</div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-title">
+            <i class="ti ti-map-pin" aria-hidden="true"></i> Delivery address
+          </div>
+        </div>
         <div class="info-row"><span class="info-label">Name</span><span class="info-val"><%= order.address.name %></span></div>
         <div class="info-row"><span class="info-label">Phone</span><span class="info-val"><%= order.address.phone %></span></div>
         <div class="info-row"><span class="info-label">Street</span><span class="info-val"><%= order.address.street %></span></div>
         <% if (order.address.address) { %>
-          <div class="info-row"><span class="info-label">Address</span><span class="info-val"><%= order.address.address %></span></div>
+        <div class="info-row"><span class="info-label">Address</span><span class="info-val"><%= order.address.address %></span></div>
         <% } %>
         <% if (order.address.landmark) { %>
-          <div class="info-row"><span class="info-label">Landmark</span><span class="info-val"><%= order.address.landmark %></span></div>
+        <div class="info-row"><span class="info-label">Landmark</span><span class="info-val"><%= order.address.landmark %></span></div>
         <% } %>
         <div class="info-row"><span class="info-label">City</span><span class="info-val"><%= order.address.city %></span></div>
         <div class="info-row"><span class="info-label">State</span><span class="info-val"><%= order.address.state %></span></div>
         <div class="info-row"><span class="info-label">Pincode</span><span class="info-val"><%= order.address.pincode %></span></div>
         <% if (order.address.type) { %>
-          <div class="info-row"><span class="info-label">Type</span><span class="info-val"><%= order.address.type %></span></div>
+        <div class="info-row"><span class="info-label">Type</span><span class="info-val"><%= order.address.type %></span></div>
         <% } %>
       </div>
 
-    </div><!-- /left -->
+    </div>
 
     <!-- ── RIGHT COLUMN ── -->
-    <div>
+    <div class="right-col">
 
-      <!-- Order summary -->
-      <div class="detail-card">
-        <div class="card-title"><i class="fas fa-info-circle"></i> Order summary</div>
+      <!-- Order summary + status update -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-title">
+            <i class="ti ti-info-circle" aria-hidden="true"></i> Order summary
+          </div>
+        </div>
+
         <div class="info-row">
           <span class="info-label">Order ID</span>
-          <span class="info-val" style="color:var(--btn-color);font-weight:700"><%= order.orderId %></span>
+          <span class="info-val" style="color:var(--rose)"><%= order.orderId %></span>
         </div>
         <div class="info-row">
           <span class="info-label">Date</span>
           <span class="info-val">
-            <%= new Date(order.createdAt).toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'}) %>
+            <%= new Date(order.createdAt).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}) %>
           </span>
         </div>
         <div class="info-row">
           <span class="info-label">Payment</span>
-          <span class="info-val"><span class="badge b-<%= order.paymentMethod %>"><%= order.paymentMethod %></span></span>
+          <span class="info-val">
+            <span class="badge b-<%= order.paymentMethod %>"><%= order.paymentMethod %></span>
+          </span>
         </div>
         <div class="info-row">
           <span class="info-label">Pay status</span>
-          <span class="info-val"><span class="badge b-<%= order.paymentStatus %>"><%= order.paymentStatus %></span></span>
+          <span class="info-val">
+            <span class="badge b-<%= order.paymentStatus %>"><%= order.paymentStatus %></span>
+          </span>
         </div>
         <div class="info-row">
           <span class="info-label">Order status</span>
-          <span class="info-val"><span class="badge b-<%= order.status %>" id="current-badge"><%= order.status %></span></span>
+          <span class="info-val">
+            <span class="badge b-<%= order.status %>" id="current-badge"><%= order.status %></span>
+          </span>
         </div>
         <% if (order.cancelReason) { %>
-          <div class="info-row">
-            <span class="info-label">Cancel reason</span>
-            <span class="info-val" style="color:#8b1a1a"><%= order.cancelReason %></span>
-          </div>
+        <div class="info-row">
+          <span class="info-label">Cancel reason</span>
+          <span class="info-val" style="color:#C03030;font-size:12px"><%= order.cancelReason %></span>
+        </div>
         <% } %>
         <% if (order.returnReason) { %>
-          <div class="info-row">
-            <span class="info-label">Return reason</span>
-            <span class="info-val" style="color:#6a2fc2"><%= order.returnReason %></span>
-          </div>
+        <div class="info-row">
+          <span class="info-label">Return reason</span>
+          <span class="info-val" style="color:#7030C9;font-size:12px"><%= order.returnReason %></span>
+        </div>
         <% } %>
 
-        <div class="status-update-wrap">
-          <label>Update order status</label>
-       <select class="status-select-lg" id="status-select">
-            <%
-              const STATUS_ORDER = ["Pending","Processing","Shipped","Delivered","Cancelled","Returned"];
-              const currentIdx   = STATUS_ORDER.indexOf(order.status);
-              const LOCKED       = ["Delivered","Cancelled","Returned"];
-            %>
+        <div style="margin-top:16px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px">Update order status</div>
+          <%
+            const STATUS_ORDER = ["Pending","Processing","Shipped","Delivered","Cancelled","Returned"];
+            const currentIdx   = STATUS_ORDER.indexOf(order.status);
+            const LOCKED       = ["Delivered","Cancelled","Returned"];
+          %>
+          <select class="status-sel-lg" id="status-select">
             <% STATUS_ORDER.forEach(function(s, i) { %>
-              <option
-                value="<%= s %>"
+              <option value="<%= s %>"
                 <%= order.status === s ? 'selected' : '' %>
                 <%= (i < currentIdx || LOCKED.includes(order.status)) ? 'disabled' : '' %>
               ><%= s %></option>
             <% }) %>
           </select>
           <button class="btn-update" id="update-btn" onclick="submitStatusUpdate()">
-            <i class="fas fa-check"></i> Update status
+            <i class="ti ti-check" aria-hidden="true"></i> Update status
           </button>
         </div>
       </div>
 
       <!-- Customer -->
-      <div class="detail-card">
-        <div class="card-title"><i class="fas fa-user"></i> Customer</div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-title">
+            <i class="ti ti-user" aria-hidden="true"></i> Customer
+          </div>
+        </div>
         <% if (order.userId) { %>
-          <div class="info-row"><span class="info-label">Name</span><span class="info-val"><%= order.userId.name || order.address.name %></span></div>
-          <div class="info-row"><span class="info-label">Email</span><span class="info-val"><%= order.userId.email || '—' %></span></div>
+        <div class="info-row">
+          <span class="info-label">Name</span>
+          <span class="info-val"><%= order.userId.name || order.address.name %></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Email</span>
+          <span class="info-val" style="font-size:12px"><%= order.userId.email || '—' %></span>
+        </div>
         <% } else { %>
-          <div class="info-row"><span class="info-label">Name</span><span class="info-val"><%= order.address.name %></span></div>
+        <div class="info-row">
+          <span class="info-label">Name</span>
+          <span class="info-val"><%= order.address.name %></span>
+        </div>
         <% } %>
-        <div class="info-row"><span class="info-label">Phone</span><span class="info-val"><%= order.address.phone %></span></div>
+        <div class="info-row">
+          <span class="info-label">Phone</span>
+          <span class="info-val"><%= order.address.phone %></span>
+        </div>
       </div>
 
-      <!-- Status timeline -->
-      <div class="detail-card">
-        <div class="card-title"><i class="fas fa-stream"></i> Status timeline</div>
-<%
-  const allStatuses = ["Pending","Processing","Shipped","Delivered"];
-  const timelineIdx = allStatuses.indexOf(order.status);
-%>
-<ul class="timeline">
-  <% allStatuses.forEach(function(s, i) { %>
-    <li>
-      <div class="tl-dot <%= i <= timelineIdx ? '' : 'inactive' %>"></div>
-      <div class="tl-status" style="color:<%= i <= timelineIdx ? 'var(--btn-color)' : '#c09090' %>"><%= s %></div>
-      <% if (i <= timelineIdx) { %>
-                        <div class="tl-date"><%= new Date(order.updatedAt).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}) %></div>
+      <!-- Timeline -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-title">
+            <i class="ti ti-timeline" aria-hidden="true"></i> Status timeline
+          </div>
+        </div>
+        <%
+          const allStatuses = ["Pending","Processing","Shipped","Delivered"];
+          const timelineIdx = allStatuses.indexOf(order.status);
+        %>
+        <ul class="timeline">
+          <% allStatuses.forEach(function(s, i) { %>
+            <li>
+              <div class="tl-dot <%= i <= timelineIdx ? '' : 'inactive' %>"></div>
+              <div class="tl-status <%= i <= timelineIdx ? '' : 'inactive' %>"><%= s %></div>
+              <% if (i <= timelineIdx) { %>
+                <div class="tl-date">
+                  <%= new Date(order.updatedAt).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}) %>
+                </div>
               <% } else { %>
-                <div class="tl-date" style="color:#d0a090">Pending</div>
+                <div class="tl-date">Upcoming</div>
               <% } %>
             </li>
           <% }) %>
           <% if (order.status === 'Cancelled') { %>
             <li>
-              <div class="tl-dot"></div>
-              <div class="tl-status" style="color:#8b1a1a">Cancelled</div>
+              <div class="tl-dot" style="background:#C03030;box-shadow:0 0 0 2px #C03030"></div>
+              <div class="tl-status" style="color:#C03030">Cancelled</div>
               <div class="tl-date"><%= new Date(order.updatedAt).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}) %></div>
             </li>
           <% } %>
-          <% if (order.status === 'Returned') { %>
+          <% if (order.status === 'Returned' || order.status === 'Return Requested') { %>
             <li>
-              <div class="tl-dot"></div>
-              <div class="tl-status" style="color:#6a2fc2">Returned</div>
+              <div class="tl-dot" style="background:#7030C9;box-shadow:0 0 0 2px #7030C9"></div>
+              <div class="tl-status" style="color:#7030C9"><%= order.status %></div>
               <div class="tl-date"><%= new Date(order.updatedAt).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}) %></div>
             </li>
           <% } %>
         </ul>
       </div>
 
-    </div><!-- /right -->
-  </div><!-- /detail-grid -->
-
+    </div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const ORDER_ID = '<%= order._id %>';
-const STATUS_ORDER = ['Pending','Processing','Shipped','Delivered','Cancelled','Returned'];
-const LOCKED       = ['Delivered','Cancelled','Returned'];
-let lastKnownStatus = '<%= order.status %>';
+const ORDER_ID        = '<%= order._id %>';
+const STATUS_ORDER    = ['Pending','Processing','Shipped','Delivered','Cancelled','Returned'];
+const LOCKED          = ['Delivered','Cancelled','Returned'];
+let   lastKnownStatus = '<%= order.status %>';
 
-/* ════ TOAST ════ */
-function showToast(msg, type = 'success') {
-  const t = document.getElementById('toast');
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
   t.textContent = msg;
-  t.className = `toast ${type} show`;
-  setTimeout(() => { t.className = 'toast'; }, 3000);
+  t.className = 'toast ' + (type || 'success') + ' show';
+  setTimeout(function() { t.className = 'toast'; }, 3000);
 }
 
-/* ════ MANUAL UPDATE ════ */
 async function submitStatusUpdate() {
-  const sel    = document.getElementById('status-select');
-  const btn    = document.getElementById('update-btn');
-  const status = sel.value;
+  var sel    = document.getElementById('status-select');
+  var btn    = document.getElementById('update-btn');
+  var status = sel.value;
   btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating…';
+  btn.innerHTML = '<i class="ti ti-loader" aria-hidden="true"></i> Updating…';
   try {
-    const res  = await fetch(`/admin/orders/${ORDER_ID}/status`, {
-      method:  'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ status })
+    var res  = await fetch('/admin/orders/' + ORDER_ID + '/status', {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: status })
     });
-    const data = await res.json();
+    var data = await res.json();
     if (data.success) {
       lastKnownStatus = status;
-      updateAdminDetailUI(status);
-      showToast(`Status updated to "${status}"`, 'success');
+      updateDetailUI(status);
+      showToast('Status updated to "' + status + '"', 'success');
     } else {
       showToast(data.message || 'Update failed', 'error');
     }
-  } catch {
+  } catch (e) {
     showToast('Network error', 'error');
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-check"></i> Update status';
+    btn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> Update status';
   }
 }
 
-/* ════ APPROVE / REJECT RETURN ════ */
-async function handleReturn(orderId, itemId, action, name) {
-  const url = action === 'approve' ? '/admin/approve-return' : '/admin/reject-return';
+async function handleReturn(orderId, itemId, action) {
+  var url = action === 'approve' ? '/admin/approve-return' : '/admin/reject-return';
   try {
-    const res  = await fetch(url, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ orderId, itemId })
+    var res  = await fetch(url, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId: orderId, itemId: itemId })
     });
-    const data = await res.json();
-    console.log('handleReturn response:', data);
+    var data = await res.json();
     if (data.success) {
       showToast(data.message, 'success');
-      setTimeout(() => location.reload(), 1200);
+      setTimeout(function() { location.reload(); }, 1200);
     } else {
       showToast(data.message || 'Failed', 'error');
     }
-  } catch (err) {
-    console.error('handleReturn error:', err);
+  } catch (e) {
     showToast('Network error', 'error');
   }
 }
 
-/* ════ POLLING – every 8 seconds ════ */
-async function pollAdminStatus() {
+async function pollStatus() {
   try {
-    const res  = await fetch(`/admin/orders/${ORDER_ID}/poll-status`);
-    const data = await res.json();
+    var res  = await fetch('/admin/orders/' + ORDER_ID + '/poll-status');
+    var data = await res.json();
     if (data.success && data.status !== lastKnownStatus) {
       lastKnownStatus = data.status;
-      updateAdminDetailUI(data.status);
-      showToast(`Status changed to "${data.status}"`, 'success');
+      updateDetailUI(data.status);
+      showToast('Status changed to "' + data.status + '"', 'success');
     }
-  } catch (err) { /* silent */ }
+  } catch (e) { /* silent */ }
 }
-setInterval(pollAdminStatus, 8000);
+setInterval(pollStatus, 8000);
 
-/* ════ UPDATE ALL UI ════ */
-function updateAdminDetailUI(newStatus) {
-  const badge = document.getElementById('current-badge');
-  if (badge) {
-    badge.textContent = newStatus;
-    badge.className   = `badge b-${newStatus}`;
-  }
-  document.querySelectorAll('.item-status-badge').forEach(el => {
-    const current = el.textContent.trim();
-    if (!['Cancelled','Returned'].includes(current)) {
+function updateDetailUI(newStatus) {
+  var badge = document.getElementById('current-badge');
+  if (badge) { badge.textContent = newStatus; badge.className = 'badge b-' + newStatus; }
+
+  document.querySelectorAll('.item-status-badge').forEach(function(el) {
+    var cur = el.textContent.trim();
+    if (!['Cancelled','Returned'].includes(cur)) {
       el.textContent = newStatus;
-      el.className   = `badge b-${newStatus} item-status-badge`;
+      el.className   = 'badge b-' + newStatus.replace(' ','-') + ' item-status-badge';
     }
   });
-  const sel = document.getElementById('status-select');
+
+  var sel = document.getElementById('status-select');
   if (sel) {
     sel.value = newStatus;
-    const currentIdx = STATUS_ORDER.indexOf(newStatus);
-    const isLocked   = LOCKED.includes(newStatus);
-    Array.from(sel.options).forEach(opt => {
-      const optIdx = STATUS_ORDER.indexOf(opt.value);
-      opt.disabled = isLocked || optIdx < currentIdx;
+    var curIdx   = STATUS_ORDER.indexOf(newStatus);
+    var isLocked = LOCKED.includes(newStatus);
+    Array.from(sel.options).forEach(function(opt) {
+      opt.disabled = isLocked || STATUS_ORDER.indexOf(opt.value) < curIdx;
     });
     if (isLocked) {
       sel.style.opacity       = '0.6';

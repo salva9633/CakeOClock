@@ -1,285 +1,307 @@
-<!-- CUSTOMER PAGE -->
+<%- include("../../views/partials/admin/sidebar") %>
 
 <style>
-  :root {
-    --bg-color: #FFF5EC;
-    --table-header: #E5B9B7;
-    --text-dark: #5D4037;
-  }
+:root {
+  --rose: #C97B8A; --rose-dk: #A85F6E; --rose-lt: #FAE8ED;
+  --blush: #FDF0F3; --caramel: #D4A574; --brown: #5C3A3A;
+  --muted: #B08A8A; --border: #F5D8E0; --mint: #E8F6F0; --white: #FFFFFF;
+}
 
-  .customer-page {
-    background-color: var(--bg-color);
-    color: var(--text-dark);
-    min-height: 100vh;
-    border-radius: 15px;
-    padding: 30px;
-  }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
 
-  .search-container {
-    position: relative;
-    max-width: 600px;
-    margin: 0 auto 3rem;
-  }
+.cp { padding: 1.5rem 1rem; }
 
-  .search-input {
-    width: 100%;
-    padding: 15px 30px 15px 55px;
-    padding-right: 120px;
-    border-radius: 50px;
-    border: none;
-    background: #fff;
-    box-shadow: 0 4px 15px rgba(176, 105, 104, 0.1);
-    outline: none;
-  }
+/* ── HEADER ── */
+.cp-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px;
+  animation: fadeUp .4s ease both;
+}
+.cp-title { font-size: 20px; font-weight: 500; color: var(--brown); display: flex; align-items: center; gap: 8px; }
+.cp-title i { color: var(--rose); font-size: 20px; }
 
-  .right-icon {
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #B06968;
-    font-size: 1.1rem;
-  }
+/* ── SEARCH ── */
+.search-wrap {
+  position: relative; width: 280px;
+}
+.search-wrap input {
+  width: 100%; padding: 9px 36px 9px 36px;
+  border: 0.5px solid var(--border); border-radius: 8px;
+  font-size: 13px; color: var(--brown); background: var(--white);
+  outline: none; transition: border-color .2s;
+}
+.search-wrap input:focus { border-color: var(--rose); }
+.search-wrap input::placeholder { color: var(--muted); }
+.search-icon, .clear-icon {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  font-size: 14px; color: var(--muted); cursor: pointer;
+}
+.search-icon { left: 11px; pointer-events: none; }
+.clear-icon  { right: 11px; color: var(--rose-dk); }
 
-  .custom-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0 8px;
-  }
+/* ── TABLE CARD ── */
+.table-card {
+  background: var(--white); border: 0.5px solid var(--border);
+  border-radius: 12px; overflow: hidden;
+  opacity: 0; animation: scaleIn .5s ease .2s forwards;
+  margin-bottom: 1.25rem;
+}
+.table-card-header {
+  padding: 1rem 1.25rem; display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 0.5px solid var(--border);
+}
+.table-card-title { font-size: 14px; font-weight: 500; color: var(--brown); display: flex; align-items: center; gap: 6px; }
+.table-card-title i { color: var(--rose); font-size: 16px; }
+.live-badge {
+  font-size: 10px; padding: 3px 8px; border-radius: 20px;
+  background: var(--rose-lt); color: var(--rose-dk);
+  display: flex; align-items: center; gap: 4px;
+}
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--rose); animation: pulse 1.8s ease infinite; }
 
-  .custom-table thead th {
-    background: var(--table-header);
-    padding: 1rem 2rem;
-  }
+table { width: 100%; border-collapse: collapse; }
+thead { background: linear-gradient(135deg, #8B4A5A, var(--rose)); }
+thead th {
+  padding: 13px 16px; color: #fff; font-size: 12px;
+  font-weight: 600; text-align: left; letter-spacing: .03em;
+}
+thead th:last-child { text-align: center; }
+tbody td {
+  padding: 14px 16px; font-size: 13px; color: var(--brown);
+  border-bottom: 0.5px solid var(--rose-lt); vertical-align: middle;
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr { transition: background .15s; }
+tbody tr:hover { background: var(--blush); }
 
-  .custom-table tbody tr {
-    background: #F8E1E1;
-  }
+/* ── AVATAR ── */
+.avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--rose-lt); color: var(--rose-dk);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; flex-shrink: 0;
+}
+.user-cell { display: flex; align-items: center; gap: 10px; }
+.user-name  { font-weight: 500; font-size: 13px; color: var(--brown); }
+.user-email { font-size: 11px; color: var(--muted); margin-top: 1px; }
 
-  .custom-table td {
-    padding: 1rem 2rem;
-  }
+/* ── STATUS BADGE ── */
+.user-status {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+}
+.status-active  { background: #E8F6EE; color: #1F7A47; }
+.status-blocked { background: #FDE8E8; color: #9B2222; }
+.status-dot { width: 5px; height: 5px; border-radius: 50%; }
+.status-active .status-dot  { background: #28a745; }
+.status-blocked .status-dot { background: #dc3545; }
 
-  .avatar-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #D6D6D6;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 10px;
-  }
+/* ── ACTION BUTTONS ── */
+.block-btn {
+  border: 0.5px solid #E57373; color: #9B2222; background: transparent;
+  padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 500;
+  cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: all .2s;
+}
+.block-btn:hover { background: #E57373; color: #fff; }
 
-  .btn-custom {
-    padding: 6px 20px;
-    border-radius: 8px;
-    border: none;
-    font-size: 0.85rem;
-  }
+.unblock-btn {
+  border: 0.5px solid #7BB88A; color: #3A7A4A; background: transparent;
+  padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 500;
+  cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: all .2s;
+}
+.unblock-btn:hover { background: #7BB88A; color: #fff; }
 
-  .btn-block-custom {
-    background: #da6541;
-    color: #fff;
-  }
+/* ── EMPTY STATE ── */
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); font-size: 13px; }
+.empty-state i { font-size: 32px; margin-bottom: 8px; display: block; color: var(--border); }
 
-  .btn-unblock-custom {
-    background: #E8F5E9;
-    color: #2E7D32;
-  }
+/* ── PAGINATION ── */
+.pagination-wrap {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  opacity: 0; animation: fadeUp .4s ease .45s forwards;
+}
+.page-btn {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 500; text-decoration: none;
+  color: var(--muted); border: 0.5px solid var(--border);
+  background: var(--white); transition: all .2s;
+}
+.page-btn:hover { border-color: var(--rose); color: var(--rose-dk); background: var(--rose-lt); }
+.page-btn.active { background: var(--rose); color: #fff; border-color: var(--rose); }
 
-  .pagination-container {
-    display: flex;
-    gap: 8px;
-    margin-top: 20px;
-  }
-
-  .page-num {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-    text-decoration: none;
-    color: #555;
-  }
-
-  .page-num.active {
-    background: #D6D6E0;
-    font-weight: bold;
-  }
+/* ── MODAL ── */
+.modal-content  { border-radius: 12px; border: 0.5px solid var(--border); }
+.modal-header   { border-bottom: 0.5px solid var(--border); }
+.modal-footer   { border-top: 0.5px solid var(--border); gap: 8px; }
+.modal-title    { font-size: 15px; font-weight: 600; color: var(--brown); }
+.modal-body     { font-size: 13px; color: var(--muted); padding: 1.25rem; }
+.btn-confirm-block   { background: #E57373; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-confirm-unblock { background: #7BB88A; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
 </style>
 
-<div class="customer-page">
+<div class="cp">
 
-  <!-- SEARCH -->
-  <form method="GET" action="/admin/users" class="search-container" id="searchForm">
-    <input
-      type="text"
-      name="search"
-      id="searchInput"
-      value="<%= search || '' %>"
-      class="search-input"
-      placeholder="Search customers..."
-      autocomplete="off"
-    >
+  <!-- HEADER -->
+  <div class="cp-header">
+    <div class="cp-title">
+      <i class="ti ti-users" aria-hidden="true"></i> Customers
+    </div>
 
-    <span class="right-icon">
-      <i class="fas fa-search" id="searchIcon"></i>
-      <i class="fas fa-times d-none" id="clearIcon"></i>
-    </span>
-  </form>
-
-  <!-- TABLE -->
-  <div class="table-responsive">
-    <table class="custom-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Phone</th>
-          <th>Join Date</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <% if (users.length === 0) { %>
-          <tr>
-            <td colspan="5" class="text-center">No customers found</td>
-          </tr>
-        <% } else { %>
-          <% users.forEach(user => { %>
-            <tr>
-              <td>
-                <div class="d-flex align-items-center">
-                  <div class="avatar-circle">
-                    <%= user.name.charAt(0).toUpperCase() %>
-                  </div>
-                  <%= user.name %>
-                </div>
-              </td>
-
-              <td><%= user.email %></td>
-              <td><%= user.phone || "N/A" %></td>
-
-              <td>
-                <%= new Date(user.createdAt).toLocaleDateString("en-IN", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric"
-                }) %>
-              </td>
-
-              <td>
-                <% if (user.isBlocked) { %>
-                  <button
-                    class="btn-custom btn-unblock-custom"
-                    onclick="openConfirmModal(
-                      'Unblock User',
-                      'Are you sure you want to unblock <%= user.name %>?',
-                      '/admin/unblock-user/<%= user._id %>',
-                      'btn-success'
-                    )">
-                    Unblock
-                  </button>
-                <% } else { %>
-                  <button
-                    class="btn-custom btn-block-custom"
-                    onclick="openConfirmModal(
-                      'Block User',
-                      'Are you sure you want to block <%= user.name %>?',
-                      '/admin/block-user/<%= user._id %>',
-                      'btn-danger'
-                    )">
-                    Block
-                  </button>
-                <% } %>
-              </td>
-            </tr>
-          <% }) %>
-        <% } %>
-      </tbody>
-    </table>
+    <form method="GET" action="/admin/users" id="searchForm">
+      <div class="search-wrap">
+        <i class="ti ti-search search-icon" aria-hidden="true"></i>
+        <input
+          type="text" name="search" id="searchInput"
+          value="<%= search || '' %>"
+          placeholder="Search customers…"
+          autocomplete="off"
+        >
+        <i class="ti ti-x clear-icon <%= (search && search.trim()) ? '' : 'd-none' %>" id="clearIcon" aria-label="Clear search"></i>
+      </div>
+    </form>
   </div>
 
-  <!-- PAGINATION -->
-  <div class="pagination-container">
-    <% for (let i = 1; i <= totalPages; i++) { %>
-      <a
-        href="/admin/users?page=<%= i %>&search=<%= search || '' %>"
-        class="page-num <%= currentPage === i ? 'active' : '' %>">
-        <%= i %>
-      </a>
+  <!-- TABLE -->
+  <div class="table-card">
+    <div class="table-card-header">
+      <div class="table-card-title">
+        <i class="ti ti-list-details" aria-hidden="true"></i>
+        All customers
+        <span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:4px;">(<%= users.length %> shown)</span>
+      </div>
+      <div class="live-badge">
+        <span class="live-dot"></span> Live
+      </div>
+    </div>
+
+    <% if (users.length === 0) { %>
+      <div class="empty-state">
+        <i class="ti ti-users-off" aria-hidden="true"></i>
+        No customers found<% if (search) { %> for "<%= search %>"<% } %>.
+      </div>
+    <% } else { %>
+    <table>
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th>Phone</th>
+          <th>Joined</th>
+          <th>Status</th>
+          <th style="text-align:center;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach(user => { %>
+        <tr>
+          <td>
+            <div class="user-cell">
+              <div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div>
+              <div>
+                <div class="user-name"><%= user.name %></div>
+                <div class="user-email"><%= user.email %></div>
+              </div>
+            </div>
+          </td>
+          <td style="color:var(--muted);"><%= user.phone || "—" %></td>
+          <td style="color:var(--muted);">
+            <%= new Date(user.createdAt).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" }) %>
+          </td>
+          <td>
+            <span class="user-status <%= user.isBlocked ? 'status-blocked' : 'status-active' %>">
+              <span class="status-dot"></span>
+              <%= user.isBlocked ? 'Blocked' : 'Active' %>
+            </span>
+          </td>
+          <td style="text-align:center;">
+            <% if (user.isBlocked) { %>
+              <button class="unblock-btn" onclick="openConfirmModal('Unblock user','Are you sure you want to unblock <b><%= user.name %></b>?','/admin/unblock-user/<%= user._id %>','unblock')">
+                <i class="ti ti-lock-open" aria-hidden="true"></i> Unblock
+              </button>
+            <% } else { %>
+              <button class="block-btn" onclick="openConfirmModal('Block user','Are you sure you want to block <b><%= user.name %></b>?','/admin/block-user/<%= user._id %>','block')">
+                <i class="ti ti-ban" aria-hidden="true"></i> Block
+              </button>
+            <% } %>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
     <% } %>
   </div>
 
+  <!-- PAGINATION -->
+  <% if (totalPages > 1) { %>
+  <div class="pagination-wrap">
+    <% for (let i = 1; i <= totalPages; i++) { %>
+      <a
+        href="/admin/users?page=<%= i %>&search=<%= search || '' %>"
+        class="page-btn <%= currentPage === i ? 'active' : '' %>"
+      ><%= i %></a>
+    <% } %>
+  </div>
+  <% } %>
+
 </div>
 
+
 <!-- CONFIRM MODAL -->
-<div class="modal fade" id="confirmActionModal" tabindex="-1">
+<div class="modal fade" id="confirmModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="confirmModalTitle"></h5>
+        <h5 class="modal-title" id="modalTitle"></h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-
-      <div class="modal-body" id="confirmModalBody"></div>
-
+      <div class="modal-body" id="modalBody"></div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <a href="#" id="confirmActionBtn" class="btn">Continue</a>
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <a href="#" id="modalActionBtn" class="btn-confirm-block">Continue</a>
       </div>
     </div>
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  function openConfirmModal(title, message, actionUrl, btnClass) {
-    document.getElementById("confirmModalTitle").innerText = title;
-    document.getElementById("confirmModalBody").innerText = message;
-
-    const confirmBtn = document.getElementById("confirmActionBtn");
-    confirmBtn.href = actionUrl;
-    confirmBtn.className = "btn " + btnClass;
-
-    new bootstrap.Modal(
-      document.getElementById("confirmActionModal")
-    ).show();
+  // CONFIRM MODAL
+  function openConfirmModal(title, message, url, type) {
+    document.getElementById("modalTitle").innerText = title;
+    document.getElementById("modalBody").innerHTML  = message;
+    const btn = document.getElementById("modalActionBtn");
+    btn.href      = url;
+    btn.className = type === 'block' ? 'btn-confirm-block' : 'btn-confirm-unblock';
+    new bootstrap.Modal(document.getElementById("confirmModal")).show();
   }
-</script>
 
-<script>
+  // SEARCH
   const searchInput = document.getElementById("searchInput");
-  const searchIcon = document.getElementById("searchIcon");
-  const clearIcon = document.getElementById("clearIcon");
-  const searchForm = document.getElementById("searchForm");
+  const clearIcon   = document.getElementById("clearIcon");
+  const searchForm  = document.getElementById("searchForm");
 
-  toggleIcons();
-
-  searchInput.addEventListener("input", toggleIcons);
-
-  searchIcon.addEventListener("click", () => {
-    if (searchInput.value.trim()) searchForm.submit();
+  searchInput.addEventListener("input", function () {
+    clearIcon.classList.toggle("d-none", !this.value.trim());
   });
 
-  clearIcon.addEventListener("click", () => {
+  searchInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") { e.preventDefault(); searchForm.submit(); }
+  });
+
+  clearIcon.addEventListener("click", function () {
     searchInput.value = "";
-    toggleIcons();
+    clearIcon.classList.add("d-none");
     window.location.href = "/admin/users";
   });
-
-  function toggleIcons() {
-    if (searchInput.value.trim()) {
-      searchIcon.classList.add("d-none");
-      clearIcon.classList.remove("d-none");
-    } else {
-      clearIcon.classList.add("d-none");
-      searchIcon.classList.remove("d-none");
-    }
-  }
 </script>

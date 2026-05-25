@@ -1,0 +1,242 @@
+<div class="main-panel">
+<div class="coupon-wrap">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-title">
+      <i class="mdi mdi-ticket-percent"></i>
+      Edit Coupon
+    </div>
+    <p class="breadcrumb">Admin / <a href="/admin/coupons">Coupons</a> / <span>Edit</span></p>
+  </div>
+
+  <!-- EDIT COUPON CARD -->
+  <div class="c-card">
+    <div class="c-card-title">
+      <i class="mdi mdi-pencil-outline"></i>
+      Update Coupon Details
+    </div>
+
+    <form action="/admin/coupons/edit/<%= coupon._id %>" method="POST">
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Code</label>
+          <input type="text" name="code" value="<%= coupon.code %>" required>
+        </div>
+
+        <div class="field">
+          <label>Discount Type</label>
+          <select name="discountType">
+            <option value="percentage" <%= coupon.discountType === 'percentage' ? 'selected' : '' %>>Percentage</option>
+            <option value="fixed"      <%= coupon.discountType === 'fixed'      ? 'selected' : '' %>>Fixed</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Discount Value</label>
+          <input type="number" name="discountValue" value="<%= coupon.discountValue %>" required>
+        </div>
+
+        <div class="field">
+          <label>Max Discount</label>
+          <input type="number" name="maxDiscount" value="<%= coupon.maxDiscount %>">
+        </div>
+
+        <div class="field">
+          <label>Description</label>
+          <input type="text" name="description" value="<%= coupon.description %>">
+        </div>
+
+        <div class="field">
+          <label>Usage Limit</label>
+          <input type="number" name="usageLimit" value="<%= coupon.usageLimit %>">
+        </div>
+
+        <div class="field">
+          <label>Expiry Date</label>
+          <input type="date" name="expiryDate" value="<%= new Date(coupon.expiryDate).toISOString().split('T')[0] %>" required>
+        </div>
+
+        <div class="field">
+          <label>Min Purchase</label>
+          <input type="number" name="minPurchase" value="<%= coupon.minPurchase %>">
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-save">Save Changes</button>
+        <div class="field" style="display:flex;align-items:center;gap:10px;margin-top:10px">
+  <input type="checkbox" name="isFirstOrderOnly" value="true" id="firstOrderOnly"
+    <%= coupon.isFirstOrderOnly ? 'checked' : '' %>
+    style="width:18px;height:18px;accent-color:var(--rose-dk);cursor:pointer">
+  <label for="firstOrderOnly" style="text-transform:none;font-size:13px;color:var(--brown);cursor:pointer">
+    First order only
+  </label>
+</div>
+        <a href="/admin/coupons" class="btn-cancel">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+</div>
+</div>
+
+
+<style>
+:root {
+  --rose:       #C97B8A;
+  --rose-dk:    #A85F6E;
+  --rose-lt:    #FAE8ED;
+  --blush:      #FDF0F3;
+  --cream:      #FDF8F5;
+  --brown:      #5C3A3A;
+  --brown-lt:   #8A6060;
+  --muted:      #B08A8A;
+  --border:     #F5D8E0;
+  --burgundy:   #8B4A5A;
+  --white:      #FFFFFF;
+}
+
+.coupon-wrap {
+  background: var(--cream);
+  min-height: 100vh;
+  padding: 30px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--brown);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-title i {
+  font-size: 24px;
+  color: var(--rose-dk);
+}
+
+.breadcrumb {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.breadcrumb a {
+  color: var(--rose-dk);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover { text-decoration: underline; }
+
+.breadcrumb span {
+  color: var(--brown);
+  font-weight: 600;
+}
+
+.c-card {
+  background: var(--white);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 32px;
+  max-width: 900px;
+}
+
+.c-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--brown);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.c-card-title i {
+  color: var(--rose-dk);
+  font-size: 20px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 18px;
+}
+
+.field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 7px;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  height: 46px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--cream);
+  padding: 0 14px;
+  font-size: 14px;
+  color: var(--brown);
+  outline: none;
+  transition: border-color .2s, background .2s;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: var(--rose);
+  background: var(--white);
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.btn-save {
+  background: var(--rose-dk);
+  color: var(--white);
+  border: none;
+  border-radius: 10px;
+  padding: 12px 44px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.btn-save:hover { background: var(--burgundy); }
+
+.btn-cancel {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  transition: all .2s;
+}
+
+.btn-cancel:hover {
+  background: var(--rose-lt);
+  color: var(--rose-dk);
+  border-color: var(--rose);
+}
+</style>

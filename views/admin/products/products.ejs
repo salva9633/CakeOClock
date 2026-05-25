@@ -1,1104 +1,1002 @@
-<!-- PRODUCTS PAGE CONTENT ONLY -->
-<style>
-/* PAGE-SPECIFIC STYLES ONLY */
+<%- include("../../views/partials/admin/sidebar") %>
 
-.page-header {
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --rose: #C97B8A; --rose-dk: #A85F6E; --rose-lt: #FAE8ED;
+  --blush: #FDF0F3; --caramel: #D4A574; --brown: #5C3A3A;
+  --muted: #B08A8A; --border: #F5D8E0; --mint: #E8F6F0; --white: #FFFFFF;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ─── Page shell ─── */
+.pg { padding: 1.5rem 1rem; }
+
+/* ─── Header ─── */
+.pg-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+  animation: fadeUp .45s ease both;
 }
-
-.page-title {
-  font-size: 33px;
-  font-weight: 750;
-  color: #AF5454;
-}
-
-.new-btn {
-  background: linear-gradient(135deg, #AF5454, #d97373);
-  color: #fff;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
+.pg-header h1 {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--brown);
   display: flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 2px 8px rgba(175, 84, 84, .3);
 }
+.pg-header h1 i { color: var(--rose); font-size: 20px; }
 
-.table-wrapper {
-  background: #fff;
+/* ─── Search ─── */
+.search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 24px;
+  padding: 0 14px;
+  transition: border-color .2s;
+  height: 36px;
+}
+.search-wrap:focus-within { border-color: var(--rose); }
+.search-wrap i { color: var(--muted); font-size: 15px; flex-shrink: 0; }
+.search-wrap input {
+  border: none;
+  outline: none;
+  font-size: 13px;
+  color: var(--brown);
+  background: transparent;
+  width: 200px;
+}
+.search-wrap input::placeholder { color: var(--muted); }
+.search-clear {
+  font-size: 11px;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color .15s;
+}
+.search-clear:hover { color: var(--rose); }
+
+/* ─── Add button ─── */
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--rose);
+  color: var(--white);
+  border: none;
+  padding: 0 18px;
+  height: 36px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .2s, transform .15s;
+  white-space: nowrap;
+}
+.add-btn:hover { background: var(--rose-dk); transform: translateY(-1px); }
+.add-btn i { font-size: 15px; }
+
+/* ─── Stats row ─── */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+.stat {
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: .9rem 1.1rem;
+  border-top: 3px solid var(--rose);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  animation: fadeUp .5s ease forwards;
+  transition: transform .2s;
+}
+.stat:hover { transform: translateY(-2px); }
+.stat.s2 { border-top-color: var(--caramel); animation-delay: .08s; }
+.stat.s3 { border-top-color: #7BB88A;        animation-delay: .16s; }
+
+.stat-icon {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  background: var(--rose-lt);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.stat-icon i { font-size: 17px; color: var(--rose); }
+.stat.s2 .stat-icon { background: #FEF0E8; }
+.stat.s2 .stat-icon i { color: var(--caramel); }
+.stat.s3 .stat-icon { background: var(--mint); }
+.stat.s3 .stat-icon i { color: #5A9A6A; }
+
+.stat-info {}
+.stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.stat-value { font-size: 22px; font-weight: 500; color: var(--brown); line-height: 1.1; }
+
+/* ─── Table card ─── */
+.table-card {
+  background: var(--white);
+  border: 0.5px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, .1);
+  opacity: 0;
+  animation: scaleIn .5s ease .28s forwards;
+  margin-bottom: 1.5rem;
 }
-
-table {
+.table-card table {
   width: 100%;
   border-collapse: collapse;
 }
-
-thead {
-  background: linear-gradient(135deg, #AF5454, #d97373);
+.table-card thead tr {
+  background: var(--blush);
+  border-bottom: 1px solid var(--border);
+}
+.table-card thead th {
+  padding: 11px 16px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  white-space: nowrap;
+}
+.table-card tbody tr {
+  border-bottom: 0.5px solid var(--rose-lt);
+  transition: background .15s;
+}
+.table-card tbody tr:last-child { border-bottom: none; }
+.table-card tbody tr:hover { background: var(--blush); }
+.table-card tbody td {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--brown);
+  vertical-align: middle;
 }
 
-thead th {
-  padding: 16px;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
+/* ─── Product image cell ─── */
+.prod-img-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-
-tbody td {
-  padding: 16px;
-  font-size: 14px;
-}
-
-.product-image {
-  width: 40px;
-  height: 40px;
-  border-radius: 6px;
+.prod-thumb {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
   object-fit: cover;
-  border: 1px solid #eee;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.prod-name { font-size: 13px; color: var(--brown); font-weight: 500; }
+.prod-desc { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+/* ─── Category / Brand badges ─── */
+.badge-cat {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--rose-lt);
+  color: var(--rose-dk);
+  font-weight: 500;
+}
+.badge-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: #FEF0E8;
+  color: #A07040;
+  font-weight: 500;
 }
 
+/* ─── Toggle ─── */
+.form-switch .form-check-input {
+  cursor: pointer;
+  width: 36px;
+  height: 20px;
+}
+.form-check-input:checked { background-color: var(--rose) !important; border-color: var(--rose) !important; }
+
+/* ─── Action buttons ─── */
+.btn-view {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 0.5px solid var(--border);
+  background: var(--white);
+  color: var(--muted);
+  text-decoration: none;
+  transition: all .2s;
+}
+.btn-view:hover { border-color: var(--rose); color: var(--rose); background: var(--rose-lt); }
+
+.btn-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 0.5px solid var(--border);
+  background: var(--white);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .2s;
+}
+.btn-edit:hover { border-color: var(--caramel); color: var(--caramel); background: #FEF0E8; }
+
+/* ─── Empty state ─── */
+.empty-row td {
+  text-align: center;
+  padding: 3rem 1rem !important;
+  color: var(--muted);
+  font-size: 13px;
+}
+.empty-icon { font-size: 36px; color: var(--border); margin-bottom: 8px; }
+
+/* ─── Pagination ─── */
+.pg-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  animation: fadeUp .5s ease .4s both;
+  opacity: 0;
+}
+.pg-info { font-size: 12px; color: var(--muted); }
+.pager { display: flex; gap: 4px; }
+.page-btn {
+  min-width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 0.5px solid var(--border);
+  background: var(--white);
+  color: var(--brown);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all .2s;
+  padding: 0 6px;
+}
+.page-btn:hover:not(.disabled):not(.active) { border-color: var(--rose); color: var(--rose); }
+.page-btn.active { background: var(--rose); color: var(--white); border-color: var(--rose); }
+.page-btn.disabled { opacity: .4; pointer-events: none; }
+
+/* ─── Modals ─── */
 .custom-modal {
-  background: #FDF2F2;
+  background: var(--blush);
   border-radius: 16px;
+  border: 0.5px solid var(--border);
+}
+.modal-header {
+  background: var(--white);
+  border-bottom: 0.5px solid var(--border);
+  padding: 1rem 1.25rem;
+  border-radius: 16px 16px 0 0;
+}
+.modal-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--brown);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.modal-title i { color: var(--rose); }
+.modal-body { padding: 1.25rem; }
+.modal-footer {
+  background: var(--white);
+  border-top: 0.5px solid var(--border);
+  padding: .9rem 1.25rem;
+  border-radius: 0 0 16px 16px;
 }
 
+.form-label { font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+.form-control, .form-select {
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--brown);
+  background: var(--white);
+  padding: 8px 12px;
+  transition: border-color .2s;
+}
+.form-control:focus, .form-select:focus {
+  outline: none;
+  border-color: var(--rose);
+  box-shadow: 0 0 0 3px rgba(201,123,138,.12);
+}
+textarea.form-control { resize: vertical; min-height: 80px; }
+
+.btn-cancel {
+  font-size: 13px;
+  padding: 7px 18px;
+  border-radius: 20px;
+  border: 0.5px solid var(--border);
+  background: var(--white);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .2s;
+}
+.btn-cancel:hover { border-color: var(--rose); color: var(--rose); }
+.btn-save {
+  font-size: 13px;
+  padding: 7px 20px;
+  border-radius: 20px;
+  border: none;
+  background: var(--rose);
+  color: var(--white);
+  cursor: pointer;
+  font-weight: 500;
+  transition: background .2s, transform .15s;
+}
+.btn-save:hover { background: var(--rose-dk); transform: translateY(-1px); }
+
+/* ─── Image slots ─── */
+.image-grid { display: flex; flex-wrap: wrap; gap: 10px; }
 .image-slot {
-  width: 100px;
-  height: 100px;
-  border: 2px dashed #ccc;
+  width: 90px;
+  height: 90px;
+  border: 1.5px dashed var(--border);
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   position: relative;
-  background: #fff;
-}
-
-.image-slot span {
-  font-size: 28px;
-  color: #aaa;
-}
-
-.image-slot img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-/* ===== Crop Modal Layout ===== */
-
-#cropModal .modal-dialog {
-  max-width: 95vw;
-  margin: 0 auto;
-}
-
-#cropModal .modal-content {
-  height: 95vh;
-  background: #000;
-  color: #fff;
-}
-
-#cropModal .modal-body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
+  background: var(--white);
+  transition: border-color .2s, transform .15s;
   overflow: hidden;
-  padding: 0;
 }
+.image-slot:hover { border-color: var(--rose); transform: scale(1.04); }
+.image-slot .slot-plus { font-size: 24px; color: var(--border); line-height: 1; }
+.image-slot img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
 
-#cropModal .modal-header,
-#cropModal .modal-footer {
-  background: #111;
-  border: none;
-}
-
-#cropModal .btn-close {
-  filter: invert(1);
-}
-
-.cropper-container {
-  max-height: 80vh !important;
-}
+/* ─── Crop modal ─── */
+#cropModal .modal-dialog { max-width: 95vw; margin: 0 auto; }
+#cropModal .modal-content { height: 95vh; background: #111; color: #fff; border-radius: 16px; }
+#cropModal .modal-body { display: flex; align-items: center; justify-content: center; flex: 1; overflow: hidden; padding: 0; }
+#cropModal .modal-header, #cropModal .modal-footer { background: #1a1a1a; border: none; }
+#cropModal .btn-close { filter: invert(1); }
+.cropper-container { max-height: 80vh !important; }
 </style>
 
-<div class="page-header">
-  <h1 class="page-title">Products</h1>
+<div class="pg">
 
-  <form method="GET" action="/admin/products" class="d-flex gap-2">
-    <input
-      type="text"
-      id="adminSearchInput"
-      name="search"
-      value="<%= search %>"
-      placeholder="Search products..."
-      class="form-control"
-      style="width: 250px;"
-    >
-    <!-- <button type="submit" class="btn btn-secondary">Search</button> -->
-    <% if (search) { %>
-      <a href="/admin/products" class="btn btn-outline-secondary">Clear</a>
-    <% } %>
-  </form>
+  <!-- Header -->
+  <div class="pg-header">
+    <h1><i class="ti ti-box" aria-hidden="true"></i> Products</h1>
 
-  <button class="new-btn" data-bs-toggle="modal" data-bs-target="#addProductModal">
-    + Add Product
-  </button>
-</div>
+    <form method="GET" action="/admin/products" class="search-wrap">
+      <i class="ti ti-search" aria-hidden="true"></i>
+      <input
+        type="text"
+        id="adminSearchInput"
+        name="search"
+        value="<%= search %>"
+        placeholder="Search products…"
+        autocomplete="off"
+      >
+      <% if (search) { %>
+        <a href="/admin/products" class="search-clear">Clear</a>
+      <% } %>
+    </form>
 
+    <button class="add-btn" data-bs-toggle="modal" data-bs-target="#addProductModal">
+      <i class="ti ti-plus" aria-hidden="true"></i> Add Product
+    </button>
+  </div>
 
-<div class="table-wrapper">
-  <table>
-    <thead>
-      <tr>
-        <th>Image</th>
-        <th>Product Name</th>
-        <th>Category</th>
-        <th>Brand</th>
-        <th>Visibility</th>
-        <th>View</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat s1">
+      <div class="stat-icon"><i class="ti ti-box" aria-hidden="true"></i></div>
+      <div class="stat-info">
+        <div class="stat-label">Total products</div>
+        <div class="stat-value"><%= typeof totalProducts !== 'undefined' ? totalProducts : products.length %></div>
+      </div>
+    </div>
+    <div class="stat s2">
+      <div class="stat-icon"><i class="ti ti-eye" aria-hidden="true"></i></div>
+      <div class="stat-info">
+        <div class="stat-label">Listed</div>
+        <div class="stat-value"><%= products.filter(p => p.isListed).length %></div>
+      </div>
+    </div>
+    <div class="stat s3">
+      <div class="stat-icon"><i class="ti ti-eye-off" aria-hidden="true"></i></div>
+      <div class="stat-info">
+        <div class="stat-label">Unlisted</div>
+        <div class="stat-value"><%= products.filter(p => !p.isListed).length %></div>
+      </div>
+    </div>
+  </div>
 
-    <tbody>
-      <% products.forEach(product=> { %>
+  <!-- Table -->
+  <div class="table-card">
+    <table>
+      <thead>
         <tr>
-
-          <!-- Image -->
-          <td>
-<img src="<%= product.productImages?.[0] || '/placeholder.png' %>" class="product-image">          </td>
-
-          <!-- Name -->
-          <td>
-            <%= product.productName %>
-          </td>
-
-          <!-- Category -->
-          <td>
-            <%= product.categoryId ? product.categoryId.name : "—" %>
-          </td>
-
-          <!-- Brand -->
-          <td>
-            <%= product.brand || "N/A" %>
-          </td>
-
-          <!-- Visibility Toggle -->
-          <td>
-            <div class="form-check form-switch">
-              <input class="form-check-input listing-toggle" type="checkbox" <%=product.isListed ? "checked" : "" %>
-              data-id="<%= product._id %>"
-                data-name="<%= product.productName %>"
-                  >
-            </div>
-          </td>
-
-          <!-- View -->
-          <td>
-            <a href="/admin/products/<%= product._id %>" class="btn btn-sm btn-outline-secondary">
-              View
-            </a>
-          </td>
-
-          <!-- Actions -->
-          <td>
-            <button type="button" class="btn btn-sm btn-outline-primary edit-btn" data-id="<%= product._id %>"
-              data-name="<%= product.productName %>" data-desc="<%= product.description %>"
-              data-longdesc="<%= product.longDescription || '' %>" data-brand="<%= product.brand || '' %>"
-              data-category="<%= product.categoryId ? product.categoryId._id : '' %>"
-              data-images='<%- JSON.stringify(product.productImages || []) %>'>
-              Edit
-            </button>
-
-          </td>
-
+          <th>Product</th>
+          <th>Category</th>
+          <th>Brand</th>
+          <th>Visibility</th>
+          <th></th>
+          <th></th>
         </tr>
+      </thead>
+      <tbody>
+        <% if (products.length === 0) { %>
+          <tr class="empty-row">
+            <td colspan="6">
+              <div class="empty-icon"><i class="ti ti-box-off" aria-hidden="true"></i></div>
+              <div>No products found</div>
+            </td>
+          </tr>
+        <% } %>
+        <% products.forEach(product => { %>
+          <tr>
+            <td>
+              <div class="prod-img-wrap">
+                <img
+                  src="<%= product.productImages?.[0] || '/placeholder.png' %>"
+                  class="prod-thumb"
+                  alt="<%= product.productName %>"
+                >
+                <div>
+                  <div class="prod-name"><%= product.productName %></div>
+                  <% if (product.description) { %>
+                    <div class="prod-desc"><%= product.description.substring(0, 40) %><%= product.description.length > 40 ? '…' : '' %></div>
+                  <% } %>
+                </div>
+              </div>
+            </td>
+            <td>
+              <% if (product.categoryId) { %>
+                <span class="badge-cat">
+                  <i class="ti ti-tag" aria-hidden="true" style="font-size:10px;"></i>
+                  <%= product.categoryId.name %>
+                </span>
+              <% } else { %>
+                <span style="color:var(--muted); font-size:12px;">—</span>
+              <% } %>
+            </td>
+            <td>
+              <% if (product.brand) { %>
+                <span class="badge-brand">
+                  <i class="ti ti-rosette" aria-hidden="true" style="font-size:10px;"></i>
+                  <%= product.brand %>
+                </span>
+              <% } else { %>
+                <span style="color:var(--muted); font-size:12px;">—</span>
+              <% } %>
+            </td>
+            <td>
+              <div class="form-check form-switch" style="margin:0;">
+                <input
+                  class="form-check-input listing-toggle"
+                  type="checkbox"
+                  <%= product.isListed ? "checked" : "" %>
+                  data-id="<%= product._id %>"
+                  data-name="<%= product.productName %>"
+                >
+              </div>
+            </td>
+            <td>
+              <a href="/admin/products/<%= product._id %>" class="btn-view">
+                <i class="ti ti-eye" aria-hidden="true" style="font-size:12px;"></i> View
+              </a>
+            </td>
+            <td>
+        <button
+                type="button"
+                class="btn-edit edit-btn"
+                data-id="<%= product._id %>"
+                data-name="<%= product.productName %>"
+                data-desc="<%= product.description %>"
+                data-longdesc="<%= product.longDescription || '' %>"
+                data-brand="<%= product.brand || '' %>"
+                data-category="<%= product.categoryId ? product.categoryId._id : '' %>"
+                data-offer="<%= product.productOffer || 0 %>"
+                data-images='<%- JSON.stringify(product.productImages || []) %>'
+              >
+                <i class="ti ti-pencil" aria-hidden="true" style="font-size:12px;"></i> Edit
+              </button>
+            </td>
+          </tr>
         <% }) %>
-    </tbody>
-  </table>
+      </tbody>
+    </table>
+  </div>
 
-</div>  
+  <!-- Pagination -->
+  <div class="pg-footer">
+    <div class="pg-info">
+      Page <%= currentPage %> of <%= totalPages %>
+    </div>
+    <div class="pager">
+      <a
+        class="page-btn <%= currentPage === 1 ? 'disabled' : '' %>"
+        href="?page=<%= currentPage - 1 %>&search=<%= search %>"
+        aria-label="Previous"
+      >
+        <i class="ti ti-chevron-left" aria-hidden="true"></i>
+      </a>
+
+      <% for (let i = 1; i <= totalPages; i++) { %>
+        <a
+          class="page-btn <%= currentPage === i ? 'active' : '' %>"
+          href="?page=<%= i %>&search=<%= search %>"
+        ><%= i %></a>
+      <% } %>
+
+      <a
+        class="page-btn <%= currentPage === totalPages ? 'disabled' : '' %>"
+        href="?page=<%= currentPage + 1 %>&search=<%= search %>"
+        aria-label="Next"
+      >
+        <i class="ti ti-chevron-right" aria-hidden="true"></i>
+      </a>
+    </div>
+  </div>
+
+</div><!-- /pg -->
 
 
-
-<!-- PAGINATION -->
-<div class="d-flex justify-content-center mt-4">
-  <ul class="pagination">
-
-    <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
-      <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">Previous</a>
-    </li>
-
-    <% for (let i = 1; i <= totalPages; i++) { %>
-      <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-        <a class="page-link" href="?page=<%= i %>&search=<%= search %>"><%= i %></a>
-      </li>
-    <% } %>
-
-    <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
-      <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">Next</a>
-    </li>
-
-  </ul>
-</div>
-
-
-
-<!-- ADD PRODUCT MODAL -->
+<!-- ─── ADD PRODUCT MODAL ─── -->
 <div class="modal fade" id="addProductModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
-    <form id="addProductForm" action="/admin/products/add" method="post" enctype="multipart/form-data"
-      class="modal-content custom-modal">
-
+    <form id="addProductForm" action="/admin/products/add" method="post" enctype="multipart/form-data" class="modal-content custom-modal">
       <div class="modal-header">
-        <h5 class="modal-title">Add New Product</h5>
+        <h5 class="modal-title"><i class="ti ti-plus" aria-hidden="true"></i> Add New Product</h5>
       </div>
-
       <div class="modal-body row g-3">
         <div class="col-12">
           <label class="form-label">Product Name</label>
-          <input type="text" name="productName" id="productName" class="form-control">
-<small id="nameError" class="text-danger"></small>
+          <input type="text" name="productName" id="productName" class="form-control" placeholder="Enter product name">
+          <small id="nameError" class="text-danger"></small>
         </div>
-
         <div class="col-12">
           <label class="form-label">Short Description</label>
-          <input type="text" name="description" id="description" class="form-control">
-<small id="descError" class="text-danger"></small>
+          <input type="text" name="description" id="description" class="form-control" placeholder="Brief description">
+          <small id="descError" class="text-danger"></small>
         </div>
-
         <div class="col-12">
           <label class="form-label">Long Description</label>
-          <textarea name="longDescription" id="longDescription" class="form-control"></textarea>
-<small id="longDescError" class="text-danger"></small>
+          <textarea name="longDescription" id="longDescription" class="form-control" placeholder="Detailed description…"></textarea>
+          <small id="longDescError" class="text-danger"></small>
         </div>
-
         <div class="col-md-6">
-<label class="form-label">Category</label>
-
-<select name="categoryId" id="categoryId" class="form-select">
-
-  <% categories.forEach(cat => { %>
-    <option value="<%= cat._id %>">
-      <%= cat.name %>
-    </option>
-  <% }) %>
-</select>
-
-<small id="categoryError" class="text-danger"></small>
+          <label class="form-label">Category</label>
+          <select name="categoryId" id="categoryId" class="form-select">
+            <% categories.forEach(cat => { %>
+              <option value="<%= cat._id %>"><%= cat.name %></option>
+            <% }) %>
+          </select>
+          <small id="categoryError" class="text-danger"></small>
         </div>
-
         <div class="col-md-6">
           <label class="form-label">Brand</label>
-<input type="text" name="brand" id="brand" class="form-control">
-<small id="brandError" class="text-danger"></small>
+          <input type="text" name="brand" id="brand" class="form-control" placeholder="Brand name">
+          <small id="brandError" class="text-danger"></small>
         </div>
-
-       
-
-
+        <div class="col-md-6">
+          <label class="form-label">Product Offer (%)</label>
+          <input type="number" name="productOffer" id="productOffer" 
+            class="form-control" placeholder="e.g. 10" min="0" max="100" value="0">
+        </div>
         <div class="col-12">
-          <label class="form-label">Product Images (Max 5)</label>
-
-          <div class="d-flex gap-3 flex-wrap" id="imageSlots">
-            <% for (let i=0; i < 5; i++) { %>
+          <label class="form-label">Product Images <span style="color:var(--muted);font-weight:400;text-transform:none;">(max 5)</span></label>
+          <div class="image-grid" id="imageSlots">
+            <% for (let i = 0; i < 5; i++) { %>
               <div class="image-slot" data-index="<%= i %>">
-                <span>+</span>
+                <span class="slot-plus">+</span>
                 <img hidden>
               </div>
-              <% } %>
+            <% } %>
           </div>
-
-          <!-- Hidden file input -->
-<input type="file" id="imageInput" accept="image/*" hidden multiple>
+          <input type="file" id="imageInput" accept="image/*" hidden multiple>
         </div>
       </div>
-      
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Cancel
-        </button>
-<button type="submit" class="btn btn-primary">
-            Save Product
-        </button>
+        <button type="button" class="btn-cancel" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn-save">Save Product</button>
       </div>
-
     </form>
   </div>
 </div>
 
-<!--Crop Modal -->
+<!-- ─── CROP MODAL ─── -->
 <div class="modal fade" id="cropModal" tabindex="-1">
   <div class="modal-dialog modal-fullscreen modal-dialog-centered">
     <div class="modal-content">
-
       <div class="modal-header">
-        <h5 class="modal-title">Crop Image</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal">
-        </button>
+        <h5 class="modal-title" style="color:#fff;">Crop Image</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-
       <div class="modal-body d-flex justify-content-center align-items-center p-0">
         <div style="width:100%; height:100%;">
-          <img id="cropImage" style="
-              max-width:100%;
-              max-height:100vh;
-              display:block;
-              margin:auto;
-            " />
+          <img id="cropImage" style="max-width:100%; max-height:100vh; display:block; margin:auto;" />
         </div>
       </div>
-
       <div class="modal-footer justify-content-between">
-        <small class="text-muted">
-          Drag to crop • Scroll to zoom
-        </small>
-        <button id="cropSaveBtn" class="btn btn-primary px-4">
-          Crop & Use Image
-        </button>
+        <small style="color:#999;">Drag to crop • Scroll to zoom</small>
+        <button id="cropSaveBtn" class="btn-save">Crop & Use Image</button>
       </div>
-
     </div>
   </div>
 </div>
 
-
-
-<!-- Edit Modal -->
+<!-- ─── EDIT MODAL ─── -->
 <div class="modal fade" id="editProductModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <form id="editProductForm" method="post" enctype="multipart/form-data" class="modal-content custom-modal">
-
       <div class="modal-header">
-        <h5 class="modal-title">Edit Product</h5>
+        <h5 class="modal-title"><i class="ti ti-pencil" aria-hidden="true"></i> Edit Product</h5>
       </div>
-
       <div class="modal-body row g-3">
-
-      
-
         <div class="col-12">
           <label class="form-label">Product Name</label>
           <input id="editProductName" name="productName" class="form-control" required>
         </div>
-
         <div class="col-12">
           <label class="form-label">Short Description</label>
           <input id="editDescription" name="description" class="form-control" required>
         </div>
-
         <div class="col-12">
           <label class="form-label">Long Description</label>
           <textarea id="editLongDescription" name="longDescription" class="form-control"></textarea>
         </div>
-
         <div class="col-md-6">
           <label class="form-label">Category</label>
           <select id="editCategory" name="categoryId" class="form-select" required>
-            <% categories.forEach(cat=> { %>
-              <option value="<%= cat._id %>">
-                <%= cat.name %>
-              </option>
-              <% }) %>
+            <% categories.forEach(cat => { %>
+              <option value="<%= cat._id %>"><%= cat.name %></option>
+            <% }) %>
           </select>
         </div>
-
         <div class="col-md-6">
           <label class="form-label">Brand</label>
           <input id="editBrand" name="brand" class="form-control">
         </div>
-
+        <div class="col-md-6">
+          <label class="form-label">Product Offer (%)</label>
+          <input type="number" id="editProductOffer" name="productOffer" 
+            class="form-control" placeholder="e.g. 10" min="0" max="100" value="0">
+        </div>
         <div class="col-12">
-          <label class="form-label">Product Images (Max 5)</label>
-
-          <div class="d-flex gap-3 flex-wrap" id="editImageSlots">
-            <% for (let i=0; i < 5; i++) { %>
+          <label class="form-label">Product Images <span style="color:var(--muted);font-weight:400;text-transform:none;">(max 5)</span></label>
+          <div class="image-grid" id="editImageSlots">
+            <% for (let i = 0; i < 5; i++) { %>
               <div class="image-slot edit-slot" data-index="<%= i %>">
-                <span>+</span>
+                <span class="slot-plus">+</span>
                 <img hidden>
               </div>
-              <% } %>
+            <% } %>
           </div>
-
-          <!-- Hidden file input -->
-<input type="file" id="editImageInput" accept="image/*" hidden multiple>
+          <input type="file" id="editImageInput" accept="image/*" hidden multiple>
+        </div>
       </div>
-
       <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button class="btn btn-primary">Update Product</button>
+        <button type="button" class="btn-cancel" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn-save">Update Product</button>
       </div>
-
     </form>
   </div>
 </div>
 
-<!-- Confirmation Modal -->
-
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <h5 class="modal-title">Confirm Action</h5>
-      </div>
-
-      <div class="modal-body">
-        <p id="confirmText"></p>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button id="confirmToggleBtn" class="btn btn-danger">
-          Confirm
-        </button>
-      </div>
-
-    </div>
-  </div>
-</div>
-<!-- Bootstrap JS (first) -->
+<!-- ─── SCRIPTS ─── -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<!-- Cropper.js CSS + JS -->
 <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.js"></script>
+
 <script>
-
-
 document.addEventListener("DOMContentLoaded", function () {
 
-  // ✅ THE REAL FIX — watch body and kill padding-right the moment Bootstrap adds it
-
+  /* ── Toggle listing ── */
   let selectedProductId = null;
-  let selectedCheckbox = null;
-  let confirmed = false;
+  let selectedCheckbox  = null;
 
- 
   document.querySelectorAll(".listing-toggle").forEach(toggle => {
     toggle.addEventListener("change", function () {
-
       selectedProductId = this.dataset.id;
-      selectedCheckbox = this;
-
-      const productName = this.dataset.name;
+      selectedCheckbox  = this;
       const action = this.checked ? "list" : "unlist";
 
-      // ✅ Close ALL open modals first
-      document.querySelectorAll(".modal.show").forEach(openModal => {
-        const instance = bootstrap.Modal.getInstance(openModal);
-        if (instance) instance.hide();
+      document.querySelectorAll(".modal.show").forEach(m => {
+        const inst = bootstrap.Modal.getInstance(m);
+        if (inst) inst.hide();
       });
 
-      // ✅ Use SweetAlert2 instead of Bootstrap modal — no conflict
       Swal.fire({
         title: "Confirm Action",
-        text: `Are you sure you want to ${action} "${productName}"?`,
-        icon: "warning",
+        text: `${action === 'list' ? 'List' : 'Unlist'} "${this.dataset.name}"?`,
+        icon: "question",
         showCancelButton: true,
-        confirmButtonColor: "#AF5454",
-        cancelButtonColor: "#6c757d",
+        confirmButtonColor: "#C97B8A",
+        cancelButtonColor: "#B08A8A",
         confirmButtonText: "Confirm",
         cancelButtonText: "Cancel"
-      }).then(async (result) => {
-
+      }).then(async result => {
         if (result.isConfirmed) {
           try {
-            const res = await fetch(`/admin/products/toggle/${selectedProductId}`, {
-              method: "PATCH",
-              credentials: "same-origin",
+            const res  = await fetch(`/admin/products/toggle/${selectedProductId}`, {
+              method: "PATCH", credentials: "same-origin",
               headers: { "Content-Type": "application/json" }
             });
-
             const data = await res.json();
-
-            if (!data.success) throw new Error("Toggle failed");
-
+            if (!data.success) throw new Error();
             location.reload();
-
-          } catch (err) {
+          } catch {
             Swal.fire("Error", "Toggle failed. Please try again.", "error");
             selectedCheckbox.checked = !selectedCheckbox.checked;
           }
-
         } else {
-          // ✅ User cancelled — revert checkbox
           selectedCheckbox.checked = !selectedCheckbox.checked;
         }
+      });
+    });
+  });
 
+  /* ── Cropper state ── */
+  let cropper        = null;
+  let currentMode    = null;
+  let activeIndex    = null;
+  let cropperReady   = false;
+
+  const croppedImages     = [];
+  const editCroppedImages = [];
+
+  const imageInput     = document.getElementById("imageInput");
+  const editImageInput = document.getElementById("editImageInput");
+  const cropImage      = document.getElementById("cropImage");
+  const cropModalEl    = document.getElementById("cropModal");
+  const editModalEl    = document.getElementById("editProductModal");
+  let   editModalInst  = null;
+  let   cropModalInst  = null;
+
+  /* ── Edit btn ── */
+  document.querySelectorAll(".edit-btn").forEach(btn => {
+    btn.addEventListener("click", function () {
+      editCroppedImages.length = 0;
+      document.getElementById("editProductName").value    = this.dataset.name;
+      document.getElementById("editDescription").value    = this.dataset.desc;
+      document.getElementById("editLongDescription").value = this.dataset.longdesc;
+      document.getElementById("editBrand").value          = this.dataset.brand;
+      document.getElementById("editProductOffer").value   = this.dataset.offer || 0;
+      document.getElementById("editCategory").value       = this.dataset.category;
+      document.getElementById("editProductForm").action   = `/admin/products/edit/${this.dataset.id}`;
+
+      const images = JSON.parse(this.dataset.images || "[]");
+      document.querySelectorAll(".edit-slot").forEach((slot, i) => {
+        const img  = slot.querySelector("img");
+        const plus = slot.querySelector(".slot-plus");
+        img.hidden = true; img.src = ""; plus.style.display = "block";
+        if (images[i]) { img.src = images[i]; img.hidden = false; plus.style.display = "none"; }
       });
 
+      const modal = bootstrap.Modal.getOrCreateInstance(editModalEl);
+      modal.show();
+      editModalInst = modal;
     });
   });
-  
 
-});
-   
-</script>
-<script>
-  // ===================================================
-//  SHARED STATE
-// ===================================================
-let cropper = null;
-let currentMode = null;
-let activeIndex = null;
-let cropperReady = false;
-
-const croppedImages = [];
-const editCroppedImages = [];
-
-const imageInput = document.getElementById("imageInput");
-const editImageInput = document.getElementById("editImageInput");
-const cropImage = document.getElementById("cropImage");
-
-const addForm = document.getElementById("addProductForm");
-const nameInput = document.getElementById("productName");
-const descInput = document.getElementById("description");
-const longDescInput = document.getElementById("longDescription");
-const categoryInput = document.getElementById("categoryId");
-const brandInput = document.getElementById("brand");
-
-const nameError = document.getElementById("nameError");
-const descError = document.getElementById("descError");
-const longDescError = document.getElementById("longDescError");
-const categoryError = document.getElementById("categoryError");
-const brandError = document.getElementById("brandError");
-
-const cropModalEl = document.getElementById("cropModal");
-const editModalEl = document.getElementById("editProductModal");
-
-let editModalInstance = null;
-let cropModalInstance = null;
-
-
-// ===================================================
-// EDIT BUTTON
-// ===================================================
-document.querySelectorAll(".edit-btn").forEach(btn => {
-
-  btn.addEventListener("click", function () {
-
-    editCroppedImages.length = 0;
-
-    document.getElementById("editProductName").value = this.dataset.name;
-    document.getElementById("editDescription").value = this.dataset.desc;
-    document.getElementById("editLongDescription").value = this.dataset.longdesc;
-    document.getElementById("editBrand").value = this.dataset.brand;
-    document.getElementById("editCategory").value = this.dataset.category;
-
-    document.getElementById("editProductForm").action =
-      `/admin/products/edit/${this.dataset.id}`;
-
-    const images = JSON.parse(this.dataset.images || "[]");
-
-    document.querySelectorAll(".edit-slot").forEach((slot, i) => {
-
-      const img = slot.querySelector("img");
-      const plus = slot.querySelector("span");
-
-      img.hidden = true;
-      img.src = "";
-      plus.style.display = "block";
-
-      if (images[i]) {
-        img.src = images[i];
-        img.hidden = false;
-        plus.style.display = "none";
-      }
-
+  /* ── Slot clicks ── */
+  document.querySelectorAll(".image-slot:not(.edit-slot)").forEach(slot => {
+    slot.addEventListener("click", () => {
+      currentMode = "add"; activeIndex = Number(slot.dataset.index);
+      imageInput.value = ""; imageInput.click();
     });
-
-    const modal = bootstrap.Modal.getOrCreateInstance(editModalEl);
-    modal.show();
-    editModalInstance = modal;
-
+  });
+  document.querySelectorAll(".edit-slot").forEach(slot => {
+    slot.addEventListener("click", () => {
+      currentMode = "edit"; activeIndex = Number(slot.dataset.index);
+      editImageInput.value = ""; editImageInput.click();
+    });
   });
 
-});
+  imageInput.addEventListener("change",     e => { if (e.target.files[0]) handleImageSelect(e.target.files[0]); });
+  editImageInput.addEventListener("change",  e => { if (e.target.files[0]) handleImageSelect(e.target.files[0]); });
 
-
-// ===================================================
-// IMAGE SLOT CLICK
-// ===================================================
-document.querySelectorAll(".image-slot:not(.edit-slot)").forEach(slot => {
-
-  slot.addEventListener("click", () => {
-
-    currentMode = "add";
-    activeIndex = Number(slot.dataset.index);
-
-    imageInput.value = "";
-    imageInput.click();
-
-  });
-
-});
-
-
-document.querySelectorAll(".edit-slot").forEach(slot => {
-
-  slot.addEventListener("click", () => {
-
-    currentMode = "edit";
-    activeIndex = Number(slot.dataset.index);
-
-    editImageInput.value = "";
-    editImageInput.click();
-
-  });
-
-});
-
-
-// ===================================================
-// FILE INPUT
-// ===================================================
-imageInput.addEventListener("change", e => {
-
-  if (e.target.files[0]) {
-    handleImageSelect(e.target.files[0]);
+  function handleImageSelect(file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      cropImage.src = reader.result;
+      cropperReady  = false;
+      if (currentMode === "edit" && editModalInst) editModalInst.hide();
+      cropModalInst = new bootstrap.Modal(cropModalEl);
+      cropModalInst.show();
+    };
+    reader.readAsDataURL(file);
   }
 
-});
+  cropModalEl.addEventListener("shown.bs.modal", () => {
+    if (cropperReady) return;
+    if (cropper) { cropper.destroy(); cropper = null; }
+    cropper = new Cropper(cropImage, {
+      aspectRatio: 1, viewMode: 2, autoCropArea: 1,
+      responsive: true, background: false, zoomable: true, movable: true
+    });
+    cropperReady = true;
+  });
 
-editImageInput.addEventListener("change", e => {
-
-  if (e.target.files[0]) {
-    handleImageSelect(e.target.files[0]);
-  }
-
-});
-
-
-// ===================================================
-// IMAGE SELECT
-// ===================================================
-function handleImageSelect(file) {
-
-  const reader = new FileReader();
-
-  reader.onload = () => {
-
-    cropImage.src = reader.result;
+  cropModalEl.addEventListener("hidden.bs.modal", () => {
+    if (cropper) { cropper.destroy(); cropper = null; }
     cropperReady = false;
-
-    // hide edit modal first
-    if (currentMode === "edit" && editModalInstance) {
-      editModalInstance.hide();
+    if (currentMode === "edit" && editModalInst) {
+      setTimeout(() => editModalInst.show(), 200);
     }
-
-    cropModalInstance = new bootstrap.Modal(cropModalEl);
-    cropModalInstance.show();
-
-  };
-
-  reader.readAsDataURL(file);
-
-}
-
-
-// ===================================================
-// CROP MODAL OPEN
-// ===================================================
-cropModalEl.addEventListener("shown.bs.modal", () => {
-
-  if (cropperReady) return;
-
-  if (cropper) {
-    cropper.destroy();
-    cropper = null;
-  }
-
-  cropper = new Cropper(cropImage, {
-
-    aspectRatio: 1,
-    viewMode: 2,
-    autoCropArea: 1,
-    responsive: true,
-    background: false,
-    zoomable: true,
-    movable: true
-
+    document.querySelectorAll(".modal-backdrop").forEach((b, i) => { if (i > 0) b.remove(); });
   });
 
-  cropperReady = true;
+  document.getElementById("cropSaveBtn").addEventListener("click", async () => {
+    if (!cropper) return;
+    const canvas = cropper.getCroppedCanvas({ width: 800, height: 800 });
+    const blob   = await new Promise(res => canvas.toBlob(res, "image/jpeg", 0.9));
 
-});
+    const slotSelector = currentMode === "add"
+      ? `.image-slot[data-index="${activeIndex}"]:not(.edit-slot)`
+      : `.edit-slot[data-index="${activeIndex}"]`;
 
+    const store = currentMode === "add" ? croppedImages : editCroppedImages;
+    store[activeIndex] = blob;
 
-// ===================================================
-// CROP MODAL CLOSE
-// ===================================================
-cropModalEl.addEventListener("hidden.bs.modal", () => {
-
-  if (cropper) {
-    cropper.destroy();
-    cropper = null;
-  }
-
-  cropperReady = false;
-
-  // restore edit modal
-  if (currentMode === "edit" && editModalInstance) {
-
-    setTimeout(() => {
-
-      editModalInstance.show();
-
-    }, 200);
-
-  }
-
-  // cleanup extra backdrops
-  document.querySelectorAll(".modal-backdrop").forEach((backdrop, i) => {
-    if (i > 0) backdrop.remove();
-  });
-
-});
-
-
-// ===================================================
-// CROP SAVE
-// ===================================================
-document.getElementById("cropSaveBtn").addEventListener("click", async () => {
-
-  if (!cropper) return;
-
-  const canvas = cropper.getCroppedCanvas({
-    width: 800,
-    height: 800
-  });
-
-  const blob = await new Promise(res =>
-    canvas.toBlob(res, "image/jpeg", 0.9)
-  );
-
-
-  if (currentMode === "add") {
-
-    croppedImages[activeIndex] = blob;
-
-    const slot = document.querySelector(
-      `.image-slot[data-index="${activeIndex}"]:not(.edit-slot)`
-    );
-
-    const img = slot.querySelector("img");
-
+    const slot = document.querySelector(slotSelector);
+    const img  = slot.querySelector("img");
     img.src = URL.createObjectURL(blob);
     img.hidden = false;
+    slot.querySelector(".slot-plus").style.display = "none";
 
-    slot.querySelector("span").style.display = "none";
-
-  }
-
-
-  if (currentMode === "edit") {
-
-    editCroppedImages[activeIndex] = blob;
-
-    const slot = document.querySelector(
-      `.edit-slot[data-index="${activeIndex}"]`
-    );
-
-    const img = slot.querySelector("img");
-
-    img.src = URL.createObjectURL(blob);
-    img.hidden = false;
-
-    slot.querySelector("span").style.display = "none";
-
-  }
-
-
-  if (cropModalInstance) {
-    cropModalInstance.hide();
-  }
-
-});
-
-
-// ===================================================
-// ADD PRODUCT
-// ===================================================
-addForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-let isValid = true;
-
-// NAME
-const name = nameInput.value.trim();
-if (name === "") {
-  nameError.innerText = "Product name required";
-  nameInput.classList.add("is-invalid");
-  isValid = false;
-} else {
-  nameError.innerText = "";
-  nameInput.classList.remove("is-invalid");
-}
-
-// DESCRIPTION
-const desc = descInput.value.trim();
-if (desc === "") {
-  descError.innerText = "Description required";
-  descInput.classList.add("is-invalid");
-  isValid = false;
-} else {
-  descError.innerText = "";
-  descInput.classList.remove("is-invalid");
-}
-
-// LONG DESCRIPTION REQUIRED
-const longDesc = longDescInput.value.trim();
-
-if (longDesc === "") {
-  longDescError.innerText = "Long description required";
-  longDescInput.classList.add("is-invalid");
-  isValid = false;
-} else if (longDesc.length < 10) {
-  longDescError.innerText = "Minimum 10 characters required";
-  longDescInput.classList.add("is-invalid");
-  isValid = false;
-} else {
-  longDescError.innerText = "";
-  longDescInput.classList.remove("is-invalid");
-}
-// CATEGORY
-const category = categoryInput.value;
-if (!category) {
-  categoryError.innerText = "Select category";
-  categoryInput.classList.add("is-invalid");
-  isValid = false;
-} else {
-  categoryError.innerText = "";
-  categoryInput.classList.remove("is-invalid");
-}
-
-// BRAND
-const brand = brandInput.value.trim();
-
-if (brand && brand.length < 2) {
-  brandError.innerText = "Min 2 characters";
-  brandInput.classList.add("is-invalid");
-  isValid = false;
-} else {
-  brandError.innerText = "";
-  brandInput.classList.remove("is-invalid");
-}
-
-// IMAGE
-const hasImage = croppedImages.some(img => img);
-if (!hasImage) {
-  Swal.fire("Error", "Add at least one image", "error");
-  isValid = false;
-}
-
-// FINAL
-if (!isValid) return;
-
-
-  // ✅ If all valid → continue submit
-  const formData = new FormData();
-
-  formData.append("productName", name);
-  formData.append("description", desc);
-  formData.append("longDescription", addForm.longDescription.value);
-  formData.append("categoryId", category);
-  formData.append("brand", addForm.brand.value);
-
-  croppedImages.forEach((blob, index) => {
-    if (blob) {
-      formData.append("images", blob, `image_${index}.jpg`);
-    }
+    if (cropModalInst) cropModalInst.hide();
   });
 
-  try {
-    const res = await fetch(addForm.action, {
-      method: "POST",
-      body: formData
-    });
+  /* ── Add product form ── */
+  const addForm       = document.getElementById("addProductForm");
+  const nameInput     = document.getElementById("productName");
+  const descInput     = document.getElementById("description");
+  const longDescInput = document.getElementById("longDescription");
+  const categoryInput = document.getElementById("categoryId");
+  const brandInput    = document.getElementById("brand");
 
-    const data = await res.json();
+  addForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    let isValid = true;
 
-   if (data.success) {
-  window.location.href = data.redirectUrl;
-} else {
-  Swal.fire({
-    icon: "error",
-    title: "Error",
-    text: data.message || "Product already exists"
-  });
-}
-  } catch (err) {
-    console.log(err);
-    alert("Something went wrong");
-  }
-});
+    const setErr = (el, errEl, msg) => {
+      if (msg) { errEl.innerText = msg; el.classList.add("is-invalid"); isValid = false; }
+      else      { errEl.innerText = ""; el.classList.remove("is-invalid"); }
+    };
 
-// ===================================================
-// EDIT PRODUCT
-// ===================================================
-const editForm = document.getElementById("editProductForm");
+    const name     = nameInput.value.trim();
+    const desc     = descInput.value.trim();
+    const longDesc = longDescInput.value.trim();
+    const category = categoryInput.value;
+    const brand    = brandInput.value.trim();
 
-editForm.addEventListener("submit", async (e) => {
+    setErr(nameInput,     document.getElementById("nameError"),     name     === "" ? "Product name required" : "");
+    setErr(descInput,     document.getElementById("descError"),     desc     === "" ? "Description required"  : "");
+    setErr(longDescInput, document.getElementById("longDescError"), longDesc === "" ? "Long description required" : longDesc.length < 10 ? "Minimum 10 characters" : "");
+    setErr(categoryInput, document.getElementById("categoryError"), !category ? "Select a category" : "");
+    if (brand && brand.length < 2) { setErr(brandInput, document.getElementById("brandError"), "Min 2 characters"); }
+    else { document.getElementById("brandError").innerText = ""; brandInput.classList.remove("is-invalid"); }
 
-  e.preventDefault();
-
-  let isValid = true;
-
-const name = editForm.productName.value.trim();
-const desc = editForm.description.value.trim();
-const longDesc = editForm.longDescription.value.trim();
-const category = editForm.categoryId.value;
-const brand = editForm.brand.value.trim();
-
-// NAME
-if (name === "") {
-  Swal.fire("Error", "Product name required", "error");
-  isValid = false;
-}
-
-// DESCRIPTION
-if (desc === "") {
-  Swal.fire("Error", "Description required", "error");
-  isValid = false;
-}
-
-// LONG DESCRIPTION
-if (longDesc === "") {
-  Swal.fire("Error", "Long description required", "error");
-  isValid = false;
-} else if (longDesc.length < 10) {
-  Swal.fire("Error", "Minimum 10 characters required", "error");
-  isValid = false;
-}
-
-// CATEGORY
-if (!category) {
-  Swal.fire("Error", "Select category", "error");
-  isValid = false;
-}
-
-// BRAND
-if (brand && brand.length < 2) {
-  Swal.fire("Error", "Brand must be at least 2 characters", "error");
-  isValid = false;
-}
-
-// IMAGE (optional in edit)
-const hasNewImages = editCroppedImages.some(img => img);
-const hasExistingImages = document.querySelectorAll("#editImageSlots img:not([hidden])").length > 0;
-
-if (!hasNewImages && !hasExistingImages) {
-  Swal.fire("Error", "Add at least one image", "error");
-  isValid = false;
-}
-
-// FINAL STOP
-if (!isValid) return;
-
-  const formData = new FormData();
-
-  formData.append("productName", editForm.productName.value);
-  formData.append("description", editForm.description.value);
-  formData.append("longDescription", editForm.longDescription.value);
-  formData.append("categoryId", editForm.categoryId.value);
-  formData.append("brand", editForm.brand.value);
-
-  editCroppedImages.forEach((blob, index) => {
-
-    if (blob) {
-
-      formData.append("images", blob, `image_${index}.jpg`);
-      formData.append("imageIndexes[]", String(index));
-
+    if (!croppedImages.some(img => img)) {
+      Swal.fire("No image", "Add at least one product image", "error");
+      isValid = false;
     }
 
+    if (!isValid) return;
+
+    const fd = new FormData();
+    fd.append("productName",    name);
+    fd.append("description",    desc);
+    fd.append("longDescription", addForm.longDescription.value);
+    fd.append("categoryId",     category);
+    fd.append("brand",          addForm.brand.value);
+    fd.append("productOffer",   addForm.productOffer.value || 0);
+    croppedImages.forEach((blob, i) => { if (blob) fd.append("images", blob, `image_${i}.jpg`); });
+
+    try {
+      const res  = await fetch(addForm.action, { method: "POST", body: fd });
+      const data = await res.json();
+      if (data.success) { window.location.href = data.redirectUrl; }
+      else { Swal.fire({ icon: "error", title: "Error", text: data.message || "Product already exists" }); }
+    } catch { alert("Something went wrong"); }
   });
 
-  try {
+  /* ── Edit product form ── */
+  const editForm = document.getElementById("editProductForm");
+  editForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    let isValid = true;
 
-    const res = await fetch(editForm.action, {
-      method: "POST",
-      body: formData
+    const name     = editForm.productName.value.trim();
+    const desc     = editForm.description.value.trim();
+    const longDesc = editForm.longDescription.value.trim();
+    const category = editForm.categoryId.value;
+    const brand    = editForm.brand.value.trim();
+
+    if (!name)                           { Swal.fire("Error", "Product name required", "error"); isValid = false; }
+    else if (!desc)                      { Swal.fire("Error", "Description required", "error"); isValid = false; }
+    else if (longDesc.length < 10)       { Swal.fire("Error", "Long description min 10 chars", "error"); isValid = false; }
+    else if (!category)                  { Swal.fire("Error", "Select a category", "error"); isValid = false; }
+    else if (brand && brand.length < 2)  { Swal.fire("Error", "Brand must be at least 2 characters", "error"); isValid = false; }
+
+    const hasNew      = editCroppedImages.some(img => img);
+    const hasExisting = document.querySelectorAll("#editImageSlots img:not([hidden])").length > 0;
+    if (!hasNew && !hasExisting) { Swal.fire("Error", "Add at least one image", "error"); isValid = false; }
+
+    if (!isValid) return;
+
+    const fd = new FormData();
+    fd.append("productName",    name);
+    fd.append("description",    desc);
+    fd.append("longDescription", editForm.longDescription.value);
+    fd.append("categoryId",     category);
+    fd.append("brand",          brand);
+    fd.append("productOffer",   editForm.productOffer.value || 0);
+    editCroppedImages.forEach((blob, i) => {
+      if (blob) { fd.append("images", blob, `image_${i}.jpg`); fd.append("imageIndexes[]", String(i)); }
     });
 
-    const data = await res.json();
-
-   if (res.ok && data.success) {
-
-  
-  Swal.fire({
-    icon: "success",
-    title: "Success",
-    text: "Product updated successfully"
-  }).then(() => {
-    window.location.href = "/admin/products";
+    try {
+      const res  = await fetch(editForm.action, { method: "POST", body: fd });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        Swal.fire({ icon: "success", title: "Updated", text: "Product updated successfully" }).then(() => { window.location.href = "/admin/products"; });
+      } else {
+        Swal.fire({ icon: "error", title: "Error", text: data.message || "Update failed" });
+      }
+    } catch (err) { console.error(err); }
   });
 
-} else {
+  /* ── Debounced search ── */
+  const searchForm  = document.querySelector('form[action="/admin/products"]');
+  const searchInput = document.getElementById("adminSearchInput");
+  let   searchTimer = null;
 
-  
-  Swal.fire({
-    icon: "error",
-    title: "Error",
-    text: data.message || "Update failed"
+  searchInput.addEventListener("input", () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => searchForm.submit(), 500);
   });
-
-}
-
-  } catch (err) {
-
-    console.error(err);
-
-  }
+  searchForm.addEventListener("submit", e => { e.preventDefault(); searchForm.submit(); });
 
 });
-
-
-// =======================
-// DEBOUNCED SEARCH
-// =======================
-
-function debounce(func, delay) {
-  let timer;
-  return function () {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      func();
-    }, delay);
-  };
-}
-
-const searchForm = document.querySelector('form[action="/admin/products"]');
-const searchInput = document.getElementById("adminSearchInput");
-
-const debouncedSubmit = debounce(() => {
-  searchForm.submit();
-}, 500);
-
-// typing → debounce trigger
-searchInput.addEventListener("input", () => {
-  debouncedSubmit();
-});
-
-// prevent instant submit spam
-searchForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  debouncedSubmit();
-});
-
-
 </script>

@@ -1,0 +1,626 @@
+<%- include("../../views/partials/admin/sidebar") %>
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --rose: #C97B8A; --rose-dk: #A85F6E; --rose-lt: #FAE8ED;
+  --blush: #FDF0F3; --caramel: #D4A574; --brown: #5C3A3A;
+  --muted: #B08A8A; --border: #F5D8E0; --mint: #E8F6F0; --white: #FFFFFF;
+  --green: #5a769a; --green-lt: #E8F6F0;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+.pg { padding: 1.5rem 1rem; }
+
+/* ─── Header ─── */
+.pg-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+  animation: fadeUp .45s ease both;
+}
+.pg-header h1 {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--brown);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pg-header h1 i { color: var(--rose); font-size: 20px; }
+
+/* ─── Filter bar ─── */
+.filter-card {
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  opacity: 0;
+  animation: fadeUp .45s ease .05s forwards;
+}
+.filter-label { font-size: 12px; color: var(--muted); margin-right: 2px; white-space: nowrap; }
+.filter-select {
+  font-size: 12px;
+  padding: 6px 12px;
+  border: 0.5px solid var(--border);
+  border-radius: 20px;
+  background: var(--white);
+  color: var(--brown);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23B08A8A' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  transition: border-color .2s;
+}
+.filter-select:focus { outline: none; border-color: var(--rose); }
+
+.date-input {
+  font-size: 12px;
+  padding: 6px 12px;
+  border: 0.5px solid var(--border);
+  border-radius: 20px;
+  background: var(--white);
+  color: var(--brown);
+  transition: border-color .2s;
+}
+.date-input:focus { outline: none; border-color: var(--rose); }
+.date-range { display: none; align-items: center; gap: 8px; }
+.date-range.visible { display: flex; }
+.date-sep { font-size: 12px; color: var(--muted); }
+
+.apply-btn {
+  font-size: 12px;
+  padding: 6px 18px;
+  border-radius: 20px;
+  border: none;
+  background: var(--rose);
+  color: var(--white);
+  cursor: pointer;
+  font-weight: 500;
+  transition: background .2s, transform .15s;
+}
+.apply-btn:hover { background: var(--rose-dk); transform: translateY(-1px); }
+
+.download-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 0.5px solid var(--border);
+  background: var(--white);
+  color: var(--muted);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all .2s;
+  margin-left: auto;
+}
+.download-btn:hover { border-color: var(--rose); color: var(--rose); background: var(--rose-lt); }
+.download-btn i { font-size: 14px; }
+
+/* ─── Metric cards ─── */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+.metric {
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  border-top: 3px solid var(--rose);
+  opacity: 0;
+  animation: fadeUp .5s ease forwards;
+  transition: transform .2s ease;
+}
+.metric:hover { transform: translateY(-3px); }
+.metric.m2 { border-top-color: var(--caramel); animation-delay: .08s; }
+.metric.m3 { border-top-color: #7BB88A;        animation-delay: .16s; }
+.metric.m4 { border-top-color: var(--muted);   animation-delay: .24s; }
+
+.metric-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: var(--rose-lt);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 10px;
+  transition: transform .2s ease;
+}
+.metric:hover .metric-icon { transform: scale(1.12); }
+.metric-icon i { font-size: 16px; color: var(--rose); }
+.metric.m2 .metric-icon { background: #FEF0E8; }
+.metric.m2 .metric-icon i { color: var(--caramel); }
+.metric.m3 .metric-icon { background: var(--mint); }
+.metric.m3 .metric-icon i { color: var(--green); }
+.metric.m4 .metric-icon { background: #F5F0F0; }
+.metric.m4 .metric-icon i { color: var(--muted); }
+
+.metric-label { font-size: 11px; color: var(--muted); letter-spacing: .05em; text-transform: uppercase; margin-bottom: 4px; }
+.metric-value { font-size: 24px; font-weight: 500; color: var(--brown); line-height: 1; }
+.metric-sub   { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+/* ─── Charts row ─── */
+.charts-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+.chart-card {
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  opacity: 0;
+  animation: scaleIn .5s ease .32s forwards;
+}
+.card-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.card-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--brown);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.card-title i { color: var(--rose); font-size: 16px; }
+.live-badge {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: var(--rose-lt);
+  color: var(--rose-dk);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--rose);
+  animation: pulse 1.8s ease infinite;
+}
+
+/* ─── Table card ─── */
+.table-card {
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  opacity: 0;
+  animation: scaleIn .5s ease .4s forwards;
+  margin-bottom: 1.5rem;
+}
+.table-card table { width: 100%; border-collapse: collapse; }
+.table-card thead tr {
+  background: var(--blush);
+  border-bottom: 1px solid var(--border);
+}
+.table-card thead th {
+  padding: 11px 16px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  white-space: nowrap;
+}
+.table-card tbody tr {
+  border-bottom: 0.5px solid var(--rose-lt);
+  transition: background .15s;
+}
+.table-card tbody tr:last-child { border-bottom: none; }
+.table-card tbody tr:hover { background: var(--blush); }
+.table-card tbody td {
+  padding: 11px 16px;
+  font-size: 13px;
+  color: var(--brown);
+  vertical-align: middle;
+}
+.order-id { font-family: monospace; font-size: 12px; color: var(--muted); }
+
+/* ─── Status badges ─── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.badge-delivered  { background: var(--mint);  color: var(--green); }
+.badge-cancelled  { background: #FEE8E8;       color: #A33; }
+.badge-returned   { background: #FEF0E8;       color: #A07040; }
+.badge-pending    { background: var(--rose-lt); color: var(--rose-dk); }
+
+/* ─── Payment pill ─── */
+.pay-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--blush);
+  color: var(--brown);
+}
+
+/* ─── Pagination ─── */
+.pg-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  opacity: 0;
+  animation: fadeUp .5s ease .5s forwards;
+}
+.pg-info { font-size: 12px; color: var(--muted); }
+.pager { display: flex; gap: 4px; }
+.page-btn {
+  min-width: 30px; height: 30px;
+  border-radius: 8px;
+  border: 0.5px solid var(--border);
+  background: var(--white);
+  color: var(--brown);
+  font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none;
+  transition: all .2s;
+  padding: 0 6px;
+}
+.page-btn:hover:not(.disabled):not(.active) { border-color: var(--rose); color: var(--rose); }
+.page-btn.active { background: var(--rose); color: var(--white); border-color: var(--rose); }
+.page-btn.disabled { opacity: .4; pointer-events: none; }
+</style>
+
+<div class="pg">
+
+ <!-- Header -->
+<div class="pg-header">
+  <h1><i class="ti ti-chart-bar" aria-hidden="true"></i> Sales Report</h1>
+  <div style="display:flex; gap:8px;">
+    <a href="/admin/sales-report/pdf?filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>"
+       class="download-btn">
+      <i class="ti ti-file-type-pdf" aria-hidden="true"></i> PDF
+    </a>
+    <a href="/admin/sales-report/excel?filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>"
+       class="download-btn">
+      <i class="ti ti-file-spreadsheet" aria-hidden="true"></i> Excel
+    </a>
+  </div>
+</div>
+  <!-- Filter -->
+  <div class="filter-card">
+    <span class="filter-label">Period</span>
+    <form action="/admin/sales-report" method="GET"
+          style="display:flex; align-items:center; flex-wrap:wrap; gap:10px; width:100%;">
+
+      <select name="filter" id="filterSelect" class="filter-select" onchange="toggleDateRange(this.value)">
+        <option value="daily"   <%= filter === 'daily'   ? 'selected' : '' %>>Today</option>
+        <option value="weekly"  <%= filter === 'weekly'  ? 'selected' : '' %>>This Week</option>
+        <option value="monthly" <%= filter === 'monthly' ? 'selected' : '' %>>This Month</option>
+        <option value="yearly"  <%= filter === 'yearly'  ? 'selected' : '' %>>This Year</option>
+        <option value="custom"  <%= filter === 'custom'  ? 'selected' : '' %>>Custom Range</option>
+      </select>
+
+      <div class="date-range <%= filter === 'custom' ? 'visible' : '' %>" id="dateRange">
+        <input type="date" name="startDate" class="date-input"
+               value="<%= startDate || '' %>">
+        <span class="date-sep">→</span>
+        <input type="date" name="endDate" class="date-input"
+               value="<%= endDate || '' %>">
+      </div>
+
+      <button type="submit" class="apply-btn">Apply</button>
+    </form>
+  </div>
+
+  <!-- Metric cards -->
+  <div class="metrics">
+    <div class="metric m1">
+      <div class="metric-icon"><i class="ti ti-shopping-bag" aria-hidden="true"></i></div>
+      <div class="metric-label">Sales Count</div>
+      <div class="metric-value" id="v-sales" data-target="<%= overallSalesCount %>">0</div>
+      <div class="metric-sub">total orders</div>
+    </div>
+    <div class="metric m2">
+      <div class="metric-icon"><i class="ti ti-currency-rupee" aria-hidden="true"></i></div>
+      <div class="metric-label">Order Amount</div>
+      <div class="metric-value" id="v-revenue" data-target="<%= Math.round(overallOrderAmount) %>" data-prefix="₹">₹0</div>
+      <div class="metric-sub">gross revenue</div>
+    </div>
+    <div class="metric m3">
+      <div class="metric-icon"><i class="ti ti-percentage" aria-hidden="true"></i></div>
+      <div class="metric-label">Order Discounts</div>
+      <div class="metric-value" id="v-discount" data-target="<%= Math.round(overallDiscount) %>" data-prefix="₹">₹0</div>
+      <div class="metric-sub">price reductions</div>
+    </div>
+    <div class="metric m4">
+      <div class="metric-icon"><i class="ti ti-ticket" aria-hidden="true"></i></div>
+      <div class="metric-label">Coupon Savings</div>
+      <div class="metric-value" id="v-coupon" data-target="<%= Math.round(couponDeduction) %>" data-prefix="₹">₹0</div>
+      <div class="metric-sub">coupon deductions</div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="card-header-row">
+        <div class="card-title">
+          <i class="ti ti-chart-bar" aria-hidden="true"></i> Revenue Overview
+        </div>
+        <div class="live-badge">
+          <span class="live-dot"></span> Live
+        </div>
+      </div>
+      <div style="position:relative; width:100%; height:220px;">
+        <canvas id="salesChart" role="img" aria-label="Bar chart showing revenue over time"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="card-header-row">
+        <div class="card-title">
+          <i class="ti ti-chart-donut" aria-hidden="true"></i> Order Status
+        </div>
+      </div>
+      <div style="position:relative; width:100%; height:220px;">
+        <canvas id="statusChart" role="img" aria-label="Doughnut chart showing orders by status"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-card">
+    <div style="padding: 1rem 1.25rem; border-bottom: 0.5px solid var(--border); display:flex; align-items:center; gap:6px;">
+      <i class="ti ti-list-details" style="color:var(--rose); font-size:16px;" aria-hidden="true"></i>
+      <span style="font-size:14px; font-weight:500; color:var(--brown);">Order Details</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Date</th>
+          <th>Payment</th>
+          <th>Coupon</th>
+          <th>Discount</th>
+          <th>Amount</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% orders.forEach(order => { %>
+          <tr>
+            <td><span class="order-id"><%= order.orderId %></span></td>
+            <td><%= new Date(order.createdAt).toLocaleDateString('en-IN') %></td>
+            <td>
+              <span class="pay-pill">
+                <i class="ti ti-credit-card" aria-hidden="true" style="font-size:11px;"></i>
+                <%= order.paymentMethod %>
+              </span>
+            </td>
+            <td style="font-size:12px; color:<%= order.couponCode ? 'var(--green)' : 'var(--muted)' %>">
+              <%= order.couponCode || '—' %>
+            </td>
+            <td style="font-size:13px; color:var(--caramel); font-weight:500;">
+              ₹<%= order.discount.toFixed(2) %>
+            </td>
+            <td style="font-size:13px; color:var(--brown); font-weight:500;">
+              ₹<%= order.finalTotal.toFixed(2) %>
+            </td>
+            <td>
+              <% if (order.status === 'Delivered') { %>
+                <span class="badge badge-delivered">
+                  <i class="ti ti-circle-check" aria-hidden="true" style="font-size:11px;"></i> Delivered
+                </span>
+              <% } else if (order.status === 'Cancelled') { %>
+                <span class="badge badge-cancelled">
+                  <i class="ti ti-circle-x" aria-hidden="true" style="font-size:11px;"></i> Cancelled
+                </span>
+              <% } else if (order.status === 'Returned') { %>
+                <span class="badge badge-returned">
+                  <i class="ti ti-arrow-back-up" aria-hidden="true" style="font-size:11px;"></i> Returned
+                </span>
+              <% } else { %>
+                <span class="badge badge-pending">
+                  <i class="ti ti-clock" aria-hidden="true" style="font-size:11px;"></i> <%= order.status %>
+                </span>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+        <% if (!orders || orders.length === 0) { %>
+          <tr>
+            <td colspan="7" style="text-align:center; padding:3rem; color:var(--muted); font-size:13px; font-style:italic;">
+              No orders found for this period
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pg-footer">
+    <div class="pg-info">Page <%= page %> of <%= totalPages %></div>
+    <div class="pager">
+      <% if (page > 1) { %>
+        <a class="page-btn"
+           href="/admin/sales-report?filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= page - 1 %>">
+          <i class="ti ti-chevron-left" aria-hidden="true"></i>
+        </a>
+      <% } else { %>
+        <span class="page-btn disabled"><i class="ti ti-chevron-left" aria-hidden="true"></i></span>
+      <% } %>
+
+      <% for (let i = 1; i <= totalPages; i++) { %>
+        <a class="page-btn <%= page === i ? 'active' : '' %>"
+           href="/admin/sales-report?filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= i %>">
+          <%= i %>
+        </a>
+      <% } %>
+
+      <% if (page < totalPages) { %>
+        <a class="page-btn"
+           href="/admin/sales-report?filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= page + 1 %>">
+          <i class="ti ti-chevron-right" aria-hidden="true"></i>
+        </a>
+      <% } else { %>
+        <span class="page-btn disabled"><i class="ti ti-chevron-right" aria-hidden="true"></i></span>
+      <% } %>
+    </div>
+  </div>
+
+</div><!-- /pg -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+  /* ── Counter animation ── */
+  function animateCount(el, target, prefix, duration) {
+    prefix   = prefix   || '';
+    duration = duration || 800;
+    var start = Date.now();
+    function tick() {
+      var p    = Math.min((Date.now() - start) / duration, 1);
+      var ease = 1 - Math.pow(1 - p, 3);
+      var val  = Math.round(target * ease);
+      el.textContent = prefix + (val >= 1000 ? val.toLocaleString('en-IN') : val);
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  document.querySelectorAll('.metric-value[data-target]').forEach(function(el) {
+    animateCount(el, parseInt(el.dataset.target, 10) || 0, el.dataset.prefix || '', 900);
+  });
+
+  /* ── Date range toggle ── */
+  function toggleDateRange(val) {
+    var el = document.getElementById('dateRange');
+    el.classList.toggle('visible', val === 'custom');
+  }
+
+  /* ── Bar chart ── */
+  new Chart(document.getElementById('salesChart'), {
+    type: 'bar',
+    data: {
+      labels:   <%- JSON.stringify(chartLabels) %>,
+      datasets: [{
+        label: 'Revenue (₹)',
+        data:  <%- JSON.stringify(chartData) %>,
+        backgroundColor: 'rgba(201,123,138,0.2)',
+        borderColor: '#C97B8A',
+        borderWidth: 1.5,
+        borderRadius: 4,
+        borderSkipped: false,
+        hoverBackgroundColor: 'rgba(201,123,138,0.4)'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 900, easing: 'easeInOutQuart' },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) { return '₹' + ctx.parsed.y.toLocaleString('en-IN'); }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 10 }, color: '#B08A8A', maxRotation: 45, autoSkip: true, maxTicksLimit: 12 }
+        },
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(245,216,224,0.4)', lineWidth: 0.5 },
+          ticks: {
+            font: { size: 10 }, color: '#B08A8A',
+            callback: function(v) {
+              if (v >= 100000) return '₹' + (v / 100000).toFixed(1) + 'L';
+              if (v >= 1000)   return '₹' + (v / 1000).toFixed(0)   + 'k';
+              return '₹' + v;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  /* ── Doughnut chart ── */
+  new Chart(document.getElementById('statusChart'), {
+    type: 'doughnut',
+    data: {
+      labels:   <%- JSON.stringify(Object.keys(statusCounts)) %>,
+      datasets: [{
+        data: <%- JSON.stringify(Object.values(statusCounts)) %>,
+ backgroundColor: [
+  'rgba(241,241,241,0.9)', // Pending → Grey
+  'rgba(253,236,239,0.9)', // Processing → Pastel Pink
+  'rgba(234,244,255,0.9)', // Shipped → Pastel Blue
+  'rgba(232,246,240,0.9)', // Delivered → Green
+  'rgba(255,234,234,0.9)'  // Returned → Pastel Red
+],
+
+borderColor: [
+  '#7A7A7A', // Pending
+  '#C97B8A', // Processing
+  '#4A90E2', // Shipped
+  '#5A9A6A', // Delivered
+  '#D95C5C'  // Returned
+],
+        borderWidth: 1.5
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 900 },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { size: 11 }, color: '#5C3A3A', padding: 12, boxWidth: 12 }
+        }
+      },
+      cutout: '68%'
+    }
+  });
+
+</script>

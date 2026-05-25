@@ -148,7 +148,7 @@ export const toggleWishlist = async (req, res) => {
       return res.json({
         success: true,
         wished: false,
-        message: "Removed from wishlist",
+        message: "add cake to wishlist",
         wishlistCount: wishlist.products.length,
       });
     }

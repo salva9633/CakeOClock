@@ -3,7 +3,7 @@ import Variant  from "../../models/variantModel.js";
 import Batch    from "../../models/batchModel.js";
 import Review   from "../../models/reviewModel.js";
 import Order    from "../../models/orderModel.js";
- 
+
 /* ===============================
    LOAD PRODUCT DETAILS PAGE
 ================================ */
@@ -15,7 +15,9 @@ const loadProductDetailsPage = async (req, res) => {
     const userId = req.session?.user?.id || req.session?.user?._id || null;
  
     /* -------- Product -------- */
-    const product = await Product.findOne({ _id: productId, isListed: true }).lean();
+    const product = await Product.findOne({ _id: productId, isListed: true })
+    .populate("categoryId")   
+    .lean();
     if (!product) return res.status(404).render("404");
  
     /* -------- Variants -------- */
@@ -115,19 +117,35 @@ const loadProductDetailsPage = async (req, res) => {
       canReview = !!deliveredOrder;
     }
  
-    /* -------- Render -------- */
-    res.render("productDetails", {
-      product,
-      variants,
-      selectedVariant,
-      relatedProducts,
-      reviews,
-      totalReviews,
-      avgRating,
-      initialStock,
-      canReview,
-      isLoggedIn: !!userId
-    });
+/* -------- Offer Calculation -------- */
+const productOffer  = product.productOffer  || 0;
+const categoryOffer = product.categoryId?.categoryOffer || 0;
+const bestOffer     = Math.max(productOffer, categoryOffer);
+const finalPrice    = selectedVariant.salePrice - (selectedVariant.salePrice * bestOffer / 100);
+
+const offerData = {
+  productOffer,
+  categoryOffer,
+  bestOffer,
+  finalPrice,
+  activeOfferLabel: bestOffer === 0 ? null
+                  : categoryOffer > productOffer ? "category"
+                  : "product"
+};
+/* -------- Render -------- */
+res.render("productDetails", {
+  product,
+  variants,
+  selectedVariant,
+  relatedProducts,
+  reviews,
+  totalReviews,
+  avgRating,
+  initialStock,
+  canReview,
+  isLoggedIn: !!userId,
+  offerData
+});
  
   } catch (error) {
     console.error(error);

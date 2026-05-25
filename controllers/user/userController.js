@@ -5,7 +5,8 @@ import dotenv from "dotenv";
 import { sendVerificationEmail } from "../../utils/email.js";
 import Batch from "../../models/batchModel.js";
 import Category from "../../models/categoryModel.js";
-
+import Coupon from "../../models/couponModel.js";
+import WalletTransaction from "../../models/walletModel.js";
 dotenv.config();
 
 // ─────────────────────────────────────────
@@ -52,7 +53,11 @@ const loadHomePage = async (req, res) => {
 // ─────────────────────────────────────────
 const signuppage = async (req, res) => {
   try {
-    return res.render("signUp");
+const referral = req.query.ref || "";
+
+return res.render("signUp", {
+  referral
+});
   } catch (error) {
     console.log("error in the signUp page", error);
     res.status(500).send("server error");
@@ -72,10 +77,25 @@ function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
+function generateReferralCode(name) {
+
+  return (
+    name.substring(0, 4).toUpperCase() +
+    Math.floor(1000 + Math.random() * 9000)
+  );
+
+}
 const createUser = async (req, res) => {
   try {
-    const { name, gender, phone, email, password, confirmPassword } = req.body;
-
+const {
+  name,
+  gender,
+  phone,
+  email,
+  password,
+  confirmPassword,
+  referral
+} = req.body;
     if (password !== confirmPassword) {
       return res.status(400).json({
         success: false,
@@ -101,11 +121,30 @@ const createUser = async (req, res) => {
         message: "Email sending failed"
       });
     }
+let referredUser = null;
 
+if (referral) {
+
+  referredUser = await User.findOne({
+    referralCode: referral
+  });
+
+}
     req.session.userOtp = otp;
     req.session.otpExpiry = Date.now() + 65 * 1000;
-    req.session.userData = { name, phone, email, password, gender };
+req.session.userData = {
+  name,
+  phone,
+  email,
+  password,
+  gender,
 
+  referralCode:
+    generateReferralCode(name),
+
+  referredBy:
+    referredUser?._id || null
+};
     return res.status(200).json({
       success: true,
       message: "User created"
@@ -139,7 +178,15 @@ const verifyOtp = async (req, res) => {
       return res.status(400).json({ message: "Invalid OTP" });
     }
 
-    const { name, phone, email, password, gender } = req.session.userData;
+const {
+  name,
+  phone,
+  email,
+  password,
+  gender,
+  referralCode,
+  referredBy
+} = req.session.userData;
 
     let user = await User.findOne({ $or: [{ email }, { phone }] });
 
@@ -151,9 +198,45 @@ const verifyOtp = async (req, res) => {
         email,
         gender,
         password: hashedPassword,
-        isVerified: true
+        referralCode,
+        referredBy,
+        isVerified: true,
       });
       await user.save();
+
+   if (referredBy) {
+        const referrer = await User.findById(referredBy);
+
+        if (referrer) {
+          // ── reward referrer with ₹100 wallet credit ──
+          const lastTx = await WalletTransaction.findOne({ userId: referrer._id })
+            .sort({ createdAt: -1 }).select("balanceAfter");
+          const referrerBalance = lastTx ? lastTx.balanceAfter : 0;
+
+          await WalletTransaction.create({
+            userId:       referrer._id,
+            type:         "credit",
+            amount:       100,
+            description:  "Referral bonus — friend signed up",
+            balanceAfter: referrerBalance + 100
+          });
+
+          // ── give new user a personal 10% off coupon ──
+          await Coupon.create({
+            code:          "REF-" + user._id.toString().slice(-6).toUpperCase(),
+            discountType:  "percentage",
+            discountValue: 10,
+            maxDiscount:   100,
+            minPurchase:   0,
+            usageLimit:    1,
+            usedBy:        [],
+            expiryDate:    new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            isActive:      true,
+            isDeleted:     false,
+            assignedTo:    user._id
+          });
+        }
+      }
     } else {
       user.isVerified = true;
       await user.save();

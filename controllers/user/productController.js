@@ -95,22 +95,36 @@ const loadProductsPage = async (req, res) => {
         const variant = variantMap[product._id.toString()];
         if (!variant) return null;
  
-        const { salePrice, regularPrice } = variant;
-        const discount = regularPrice > 0
-          ? Math.round(((regularPrice - salePrice) / regularPrice) * 100)
-          : 0;
- 
+   const { salePrice, regularPrice } = variant;
+
+const productOffer  = product.productOffer || 0;
+const categoryOffer = product.categoryId?.categoryOffer || 0;
+const bestOffer     = Math.max(productOffer, categoryOffer);
+
+// If no manual offer, calculate discount from regularPrice vs salePrice
+const priceDiscount = regularPrice > salePrice
+  ? Math.round((regularPrice - salePrice) / regularPrice * 100)
+  : 0;
+
+const effectiveDiscount = Math.max(bestOffer, priceDiscount);
+const finalPrice = bestOffer > 0
+  ? Math.round(salePrice - (salePrice * bestOffer / 100))
+  : salePrice;
+
         const { avgRating = "0.0", totalReviews = 0 } =
           ratingMap[product._id.toString()] || {};
  
-        return {
-          ...product,
-          startingPrice: salePrice,
-          regularPrice,
-          discount,
-          avgRating,
-          totalReviews
-        };
+return {
+  ...product,
+  startingPrice:    finalPrice,
+  regularPrice,
+  discount:         bestOffer > 0 ? bestOffer : effectiveDiscount,
+  productOffer,
+  categoryOffer,
+  activeOfferLabel: bestOffer === 0 ? null : categoryOffer > productOffer ? "category" : "product",
+  avgRating,
+  totalReviews
+};
       })
       .filter(Boolean);
  

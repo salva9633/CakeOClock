@@ -1,10 +1,452 @@
-<%-include("../../views/partials/admin/sidebar")%>
+<%- include("../../views/partials/admin/sidebar") %>
 
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --rose: #C97B8A; --rose-dk: #A85F6E; --rose-lt: #FAE8ED;
+  --blush: #FDF0F3; --caramel: #D4A574; --brown: #5C3A3A;
+  --muted: #B08A8A; --border: #F5D8E0; --mint: #E8F6F0; --white: #FFFFFF;
+}
 
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 
+.db { padding: 1.5rem 1rem; }
 
+.db-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  animation: fadeUp .45s ease both;
+}
+.db-header h1 {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--brown);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.db-header h1 i { color: var(--rose); font-size: 20px; }
 
+.filter-wrap { display: flex; align-items: center; gap: 6px; }
+.filter-label { font-size: 12px; color: var(--muted); margin-right: 2px; }
+.filter-btn {
+  font-size: 12px;
+  padding: 5px 14px;
+  border: 0.5px solid var(--border);
+  border-radius: 20px;
+  background: var(--white);
+  color: var(--brown);
+  cursor: pointer;
+  transition: all .2s ease;
+  text-decoration: none;
+}
+.filter-btn:hover,
+.filter-btn.active {
+  background: var(--rose);
+  color: var(--white);
+  border-color: var(--rose);
+}
 
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+.metric {
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  border-top: 3px solid var(--rose);
+  opacity: 0;
+  animation: fadeUp .5s ease forwards;
+  transition: transform .2s ease;
+}
+.metric:hover { transform: translateY(-3px); }
+.metric.m2 { border-top-color: var(--caramel); animation-delay: .08s; }
+.metric.m3 { border-top-color: #7BB88A;        animation-delay: .16s; }
+.metric.m4 { border-top-color: var(--muted);   animation-delay: .24s; }
 
+.metric-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: var(--rose-lt);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 10px;
+  transition: transform .2s ease;
+}
+.metric:hover .metric-icon { transform: scale(1.12); }
+.metric-icon i { font-size: 16px; color: var(--rose); }
+.metric.m2 .metric-icon { background: #FEF0E8; }
+.metric.m2 .metric-icon i { color: var(--caramel); }
+.metric.m3 .metric-icon { background: var(--mint); }
+.metric.m3 .metric-icon i { color: #5A9A6A; }
+.metric.m4 .metric-icon { background: #F5F0F0; }
+.metric.m4 .metric-icon i { color: var(--muted); }
 
+.metric-label {
+  font-size: 11px; color: var(--muted);
+  letter-spacing: .05em; text-transform: uppercase; margin-bottom: 4px;
+}
+.metric-value {
+  font-size: 26px; font-weight: 500; color: var(--brown); line-height: 1;
+}
+.metric-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
 
+.chart-card {
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  animation: scaleIn .5s ease .32s forwards;
+}
+.card-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 1rem;
+}
+.card-title {
+  font-size: 14px; font-weight: 500; color: var(--brown);
+  display: flex; align-items: center; gap: 6px;
+}
+.card-title i { color: var(--rose); font-size: 16px; }
+.live-badge {
+  font-size: 10px; padding: 3px 8px; border-radius: 20px;
+  background: var(--rose-lt); color: var(--rose-dk);
+  display: flex; align-items: center; gap: 4px;
+}
+.live-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--rose); animation: pulse 1.8s ease infinite;
+}
+
+.top-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.top-card {
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  opacity: 0;
+  animation: fadeUp .5s ease forwards;
+}
+.top-card:nth-child(1) { animation-delay: .45s; }
+.top-card:nth-child(2) { animation-delay: .55s; }
+.top-card:nth-child(3) { animation-delay: .65s; }
+
+.top-card-title {
+  font-size: 13px; font-weight: 500; color: var(--brown);
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 6px;
+}
+.top-card-title i { color: var(--rose); font-size: 15px; }
+.top-card:nth-child(2) .top-card-title i { color: var(--caramel); }
+.top-card:nth-child(3) .top-card-title i { color: #5A9A6A; }
+
+.top-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 0;
+  border-bottom: 0.5px solid var(--rose-lt);
+  transition: background .15s ease, padding-left .15s ease;
+  border-radius: 4px; cursor: default;
+}
+.top-item:last-child { border-bottom: none; }
+.top-item:hover { background: var(--blush); padding-left: 4px; }
+
+.top-rank { font-size: 11px; font-weight: 500; color: var(--muted); width: 16px; flex-shrink: 0; text-align: center; }
+.top-rank.gold   { color: #C9963A; }
+.top-rank.silver { color: #8A9BA8; }
+.top-rank.bronze { color: #A87060; }
+
+.top-bar-wrap { flex: 1; min-width: 0; }
+.top-name { font-size: 12px; color: var(--brown); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.top-bar { height: 4px; border-radius: 2px; background: var(--rose-lt); overflow: hidden; }
+.top-bar-fill { height: 100%; border-radius: 2px; background: var(--rose); width: 0; transition: width 1s cubic-bezier(.25,.46,.45,.94); }
+
+.top-card:nth-child(2) .top-bar         { background: #FEE8D0; }
+.top-card:nth-child(2) .top-bar-fill    { background: var(--caramel); }
+.top-card:nth-child(3) .top-bar         { background: var(--mint); }
+.top-card:nth-child(3) .top-bar-fill    { background: #7BB88A; }
+
+.top-sold { font-size: 11px; font-weight: 500; color: var(--rose); flex-shrink: 0; }
+.top-card:nth-child(2) .top-sold { color: var(--caramel); }
+.top-card:nth-child(3) .top-sold { color: #5A9A6A; }
+
+.empty-state {
+  font-size: 12px; color: var(--muted); text-align: center;
+  padding: 1rem 0; font-style: italic;
+}
+</style>
+
+<div class="db">
+
+  <div class="db-header">
+    <h1><i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard</h1>
+    <div class="filter-wrap">
+      <span class="filter-label">Period</span>
+      <a href="/admin/dashboard?filter=daily"
+         class="filter-btn <%= filter === 'daily'   ? 'active' : '' %>">Daily</a>
+      <a href="/admin/dashboard?filter=weekly"
+         class="filter-btn <%= filter === 'weekly'  ? 'active' : '' %>">Weekly</a>
+      <a href="/admin/dashboard?filter=monthly"
+         class="filter-btn <%= filter === 'monthly' ? 'active' : '' %>">Monthly</a>
+      <a href="/admin/dashboard?filter=yearly"
+         class="filter-btn <%= filter === 'yearly'  ? 'active' : '' %>">Yearly</a>
+    </div>
+  </div>
+
+  <div class="metrics">
+    <div class="metric m1">
+      <div class="metric-icon"><i class="ti ti-shopping-bag" aria-hidden="true"></i></div>
+      <div class="metric-label">Total orders</div>
+      <div class="metric-value" id="v-orders" data-target="<%= totalOrders %>">0</div>
+      <div class="metric-sub">
+        <%= filter === 'daily' ? 'Today' : filter === 'weekly' ? 'This week' : filter === 'yearly' ? 'This year' : 'This month' %>
+      </div>
+    </div>
+    <div class="metric m2">
+      <div class="metric-icon"><i class="ti ti-currency-rupee" aria-hidden="true"></i></div>
+      <div class="metric-label">Total revenue</div>
+      <div class="metric-value" id="v-revenue" data-target="<%= totalRevenue %>" data-prefix="₹">₹0</div>
+      <div class="metric-sub">
+        <%= filter === 'daily' ? 'Today' : filter === 'weekly' ? 'This week' : filter === 'yearly' ? 'This year' : 'This month' %>
+      </div>
+    </div>
+    <div class="metric m3">
+      <div class="metric-icon"><i class="ti ti-circle-check" aria-hidden="true"></i></div>
+      <div class="metric-label">Delivered</div>
+      <div class="metric-value" id="v-delivered" data-target="<%= deliveredOrders %>">0</div>
+      <div class="metric-sub">
+        <% if (totalOrders > 0) { %>
+          <%= Math.round(deliveredOrders / totalOrders * 100) %>% completion
+        <% } else { %>
+          No orders yet
+        <% } %>
+      </div>
+    </div>
+    <div class="metric m4">
+      <div class="metric-icon"><i class="ti ti-circle-x" aria-hidden="true"></i></div>
+      <div class="metric-label">Cancelled</div>
+      <div class="metric-value" id="v-cancelled" data-target="<%= cancelledOrders %>">0</div>
+      <div class="metric-sub">
+        <% if (totalOrders > 0) { %>
+          <%= Math.round(cancelledOrders / totalOrders * 100) %>% rate
+        <% } else { %>
+          No orders yet
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="card-header">
+      <div class="card-title">
+        <i class="ti ti-chart-bar" aria-hidden="true"></i> Revenue chart
+      </div>
+      <div class="live-badge">
+        <span class="live-dot"></span> Live
+      </div>
+    </div>
+    <div style="position: relative; width: 100%; height: 220px;">
+      <canvas id="revenueChart" role="img" aria-label="Bar chart showing revenue over time">Revenue trend data.</canvas>
+    </div>
+  </div>
+
+  <div class="top-grid">
+
+    <div class="top-card">
+      <div class="top-card-title">
+        <i class="ti ti-cake" aria-hidden="true"></i> Top products
+      </div>
+      <% if (topProducts && topProducts.length > 0) { %>
+        <% const maxP = topProducts[0].totalSold; %>
+        <% topProducts.forEach(function(item, i) { %>
+          <div class="top-item">
+            <span class="top-rank <%= i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '' %>">
+              <%= i + 1 %>
+            </span>
+            <div class="top-bar-wrap">
+              <div class="top-name" title="<%= item.product.productName %>">
+                <%= item.product.productName %>
+              </div>
+              <div class="top-bar">
+                <div class="top-bar-fill"
+                     data-w="<%= Math.round(item.totalSold / maxP * 100) %>">
+                </div>
+              </div>
+            </div>
+            <span class="top-sold"><%= item.totalSold %></span>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <div class="empty-state">No data available</div>
+      <% } %>
+    </div>
+
+    <div class="top-card">
+      <div class="top-card-title">
+        <i class="ti ti-tag" aria-hidden="true"></i> Top categories
+      </div>
+      <% if (topCategories && topCategories.length > 0) { %>
+        <% const maxC = topCategories[0].totalSold; %>
+        <% topCategories.forEach(function(item, i) { %>
+          <div class="top-item">
+            <span class="top-rank <%= i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '' %>">
+              <%= i + 1 %>
+            </span>
+            <div class="top-bar-wrap">
+              <div class="top-name" title="<%= item.category.name %>">
+                <%= item.category.name %>
+              </div>
+              <div class="top-bar">
+                <div class="top-bar-fill"
+                     data-w="<%= Math.round(item.totalSold / maxC * 100) %>">
+                </div>
+              </div>
+            </div>
+            <span class="top-sold"><%= item.totalSold %></span>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <div class="empty-state">No data available</div>
+      <% } %>
+    </div>
+
+    <div class="top-card">
+      <div class="top-card-title">
+        <i class="ti ti-rosette" aria-hidden="true"></i> Top brands
+      </div>
+      <% if (topBrands && topBrands.length > 0) { %>
+        <% const maxB = topBrands[0].totalSold; %>
+        <% topBrands.forEach(function(item, i) { %>
+          <div class="top-item">
+            <span class="top-rank <%= i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '' %>">
+              <%= i + 1 %>
+            </span>
+            <div class="top-bar-wrap">
+              <div class="top-name" title="<%= item._id %>">
+                <%= item._id %>
+              </div>
+              <div class="top-bar">
+                <div class="top-bar-fill"
+                     data-w="<%= Math.round(item.totalSold / maxB * 100) %>">
+                </div>
+              </div>
+            </div>
+            <span class="top-sold"><%= item.totalSold %></span>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <div class="empty-state">No data available</div>
+      <% } %>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const chartLabels = <%- JSON.stringify(chartLabels) %>;
+  const chartData   = <%- JSON.stringify(chartData) %>;
+
+  function animateCount(el, target, prefix, duration) {
+    prefix   = prefix   || '';
+    duration = duration || 800;
+    var start = Date.now();
+    function tick() {
+      var p    = Math.min((Date.now() - start) / duration, 1);
+      var ease = 1 - Math.pow(1 - p, 3);
+      var val  = Math.round(target * ease);
+      el.textContent = prefix + (val >= 1000 ? val.toLocaleString('en-IN') : val);
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  document.querySelectorAll('.metric-value[data-target]').forEach(function(el) {
+    var target = parseInt(el.dataset.target, 10) || 0;
+    var prefix = el.dataset.prefix || '';
+    animateCount(el, target, prefix, 900);
+  });
+
+  setTimeout(function() {
+    document.querySelectorAll('.top-bar-fill').forEach(function(bar, i) {
+      setTimeout(function() {
+        bar.style.width = (bar.dataset.w || 0) + '%';
+      }, i * 70);
+    });
+  }, 500);
+
+  var ctx = document.getElementById('revenueChart');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: chartLabels,
+      datasets: [{
+        label: 'Revenue (₹)',
+        data: chartData,
+        backgroundColor: 'rgba(201,123,138,0.2)',
+        borderColor: '#C97B8A',
+        borderWidth: 1.5,
+        borderRadius: 4,
+        borderSkipped: false,
+        hoverBackgroundColor: 'rgba(201,123,138,0.4)',
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 900, easing: 'easeInOutQuart' },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              return '₹' + ctx.parsed.y.toLocaleString('en-IN');
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 10 }, color: '#B08A8A', maxRotation: 45, autoSkip: true, maxTicksLimit: 12 }
+        },
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(245,216,224,0.4)', lineWidth: 0.5 },
+          ticks: {
+            font: { size: 10 }, color: '#B08A8A',
+            callback: function(v) {
+              if (v >= 100000) return '₹' + (v / 100000).toFixed(1) + 'L';
+              if (v >= 1000)   return '₹' + (v / 1000).toFixed(0) + 'k';
+              return '₹' + v;
+            }
+          }
+        }
+      }
+    }
+  });
+</script>

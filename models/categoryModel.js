@@ -33,7 +33,9 @@ const categorySchema = new mongoose.Schema(
     isDeleted: {
       type: Boolean,
       default: false
-    }
+    },
+    // ADD this field to your existing categorySchema fields:
+categoryOffer: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

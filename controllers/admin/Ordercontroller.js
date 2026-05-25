@@ -1,5 +1,7 @@
 import Order from "../../models/orderModel.js";
- import Wallet from "../../models/walletModel.js";
+import WalletTransaction from "../../models/walletModel.js";
+import User from "../../models/userModel.js";
+
 // ─────────────────────────────────────────
 // GET /admin/orders
 // ─────────────────────────────────────────
@@ -106,16 +108,16 @@ export const updateOrderStatus = async (req, res) => {
       });
     }
  
-    
-    const currentIdx = STATUS_ORDER.indexOf(order.status);
-    const newIdx     = STATUS_ORDER.indexOf(status);
-    if (newIdx < currentIdx) {
-      return res.status(400).json({
-        success: false,
-        message: `Cannot move status backward from "${order.status}" to "${status}"`,
-      });
-    }
- 
+const currentIdx = STATUS_ORDER.indexOf(order.status);
+const newIdx = STATUS_ORDER.indexOf(status);
+
+// only next step allowed
+if (newIdx !== currentIdx + 1) {
+  return res.status(400).json({
+    success: false,
+    message: `Order status must follow step-by-step flow`,
+  });
+}
     
     order.status = status;
  
@@ -243,22 +245,21 @@ export const approveReturnRequest = async (req, res) => {
     item.status = "Returned";
 
     // refund amount
+  // refund amount
     const refundAmount = item.price * item.quantity;
 
-    // find or create wallet
-    let wallet = await Wallet.findOne({ userId: order.userId });
-    if (!wallet) {
-      wallet = new Wallet({ userId: order.userId, balance: 0, transactions: [] });
-    }
-
-    wallet.balance += refundAmount;
-    wallet.transactions.push({
-      amount: refundAmount,
-      type: "Credit",
-      description: `Refund for ${item.productName} (Order: ${order.orderId})`,
+    // credit wallet
+    const user = await User.findById(order.userId);
+    const newBalance = (user.walletBalance || 0) + refundAmount;
+    await User.findByIdAndUpdate(order.userId, { walletBalance: newBalance });
+    await WalletTransaction.create({
+      userId:       order.userId,
+      type:         "credit",
+      amount:       refundAmount,
+      description:  `Refund for ${item.productName} (Order: ${order.orderId})`,
+      orderId:      order._id,
+      balanceAfter: newBalance
     });
-
-    await wallet.save();
 
     // ✅ update order-level status
     const allDone = order.items.every(

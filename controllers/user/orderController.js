@@ -1,6 +1,8 @@
 import Order from "../../models/orderModel.js";
 import Batch from "../../models/batchModel.js";
 import PDFDocument from "pdfkit";
+import User from "../../models/userModel.js";
+import WalletTransaction from "../../models/walletModel.js";
  
 /* ── GET /orders ────────────────────────────────────────────────────── */
 export const listOrders = async (req, res) => {
@@ -66,8 +68,7 @@ export const cancelOrder = async (req, res) => {
       await restoreStock(item.variantId, item.quantity);
       item.status = "Cancelled";
     }
- 
-    order.status         = "Cancelled";
+ order.status         = "Cancelled";
     order.cancelReason   = reason || null;
     order.finalTotal     = 0;
     order.itemTotal      = 0;
@@ -75,7 +76,26 @@ export const cancelOrder = async (req, res) => {
     order.tax            = 0;
     await order.save();
 
+    // refund to wallet if paid online or via wallet
+    if (["Razorpay", "Wallet", "Online"].includes(order.paymentMethod) && order.paymentStatus === "Paid") {
+      const refundAmount = order.finalTotal || order.itemTotal || 0;
+      if (refundAmount > 0) {
+        const user = await User.findById(order.userId);
+        const newBalance = (user.walletBalance || 0) + refundAmount;
+        await User.findByIdAndUpdate(order.userId, { walletBalance: newBalance });
+        await WalletTransaction.create({
+          userId:       order.userId,
+          type:         "credit",
+          amount:       refundAmount,
+          description:  `Refund for cancelled order ${order.orderId}`,
+          orderId:      order._id,
+          balanceAfter: newBalance
+        });
+      }
+    }
+
     res.json({ success: true, message: "Order cancelled successfully" });
+
   } catch (err) {
     console.error("cancelOrder error:", err);
     res.json({ success: false, message: "Something went wrong" });
@@ -113,15 +133,34 @@ export const cancelOrderItem = async (req, res) => {
     order.tax          = newTax;
     order.finalTotal   = newItemTotal - order.discount + newTax + newShipping;
 
-    
-    const allCancelled = order.items.every(i => i.status === "Cancelled");
+ const allCancelled = order.items.every(i => i.status === "Cancelled");
     if (allCancelled) {
       order.status     = "Cancelled";
       order.finalTotal = 0;
     }
 
     await order.save();
+
+    // refund item amount to wallet if paid online or via wallet
+    if (["Razorpay", "Wallet", "Online"].includes(order.paymentMethod) && order.paymentStatus === "Paid") {
+      const refundAmount = item.price * item.quantity;
+      if (refundAmount > 0) {
+        const user = await User.findById(order.userId);
+        const newBalance = (user.walletBalance || 0) + refundAmount;
+        await User.findByIdAndUpdate(order.userId, { walletBalance: newBalance });
+        await WalletTransaction.create({
+          userId:       order.userId,
+          type:         "credit",
+          amount:       refundAmount,
+          description:  `Refund for cancelled item ${item.productName} (Order: ${order.orderId})`,
+          orderId:      order._id,
+          balanceAfter: newBalance
+        });
+      }
+    }
+
     res.json({ success: true, message: "Item cancelled" });
+
   } catch (err) {
     console.error("cancelOrderItem error:", err);
     res.json({ success: false, message: "Something went wrong" });
@@ -318,10 +357,10 @@ export const getOrderStatus = async (req, res) => {
       .select('status updatedAt')
       .lean();
 
-    if (!order || String(order.userId) !== String(req.user._id)) {
+if (!order) {
       return res.status(404).json({ success: false });
     }
-
+    
     return res.json({
       success:   true,
       status:    order.status,

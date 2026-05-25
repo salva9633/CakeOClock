@@ -34,15 +34,23 @@ const orderSchema = new mongoose.Schema({
     pincode:  { type: String, required: true },
     type:     { type: String }
   },
-
+// ADD these fields to your existing orderSchema:
+offerDiscount: { type: Number, default: 0 },
+referralDiscount: { type: Number, default: 0 },
+referralCodeUsed: { type: String, default: null },
   items: [orderItemSchema],
 
-  paymentMethod: { type: String, enum: ["COD", "Online"], default: "COD" },
-  paymentStatus: { type: String, enum: ["Pending", "Paid", "Failed"], default: "Pending" },
+paymentMethod: { type: String, enum: ["COD", "Online", "Razorpay", "Wallet"], default: "COD" },
+paymentStatus: { type: String, enum: ["Pending", "Paid", "Failed", "Refunded"], default: "Pending" },
+razorpayOrderId:   { type: String, default: null },
+razorpayPaymentId: { type: String, default: null },
 
   itemTotal:      { type: Number, required: true },
   discount:       { type: Number, default: 0 },
-  tax:            { type: Number, default: 0 },
+couponCode: {
+  type: String,
+  default: null
+},  tax:            { type: Number, default: 0 },
   shippingCharge: { type: Number, default: 0 },
   finalTotal:     { type: Number, required: true },
   status: {

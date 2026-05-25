@@ -7,7 +7,8 @@ import { adminAuth } from "../middlewares/auth.js";
 import productRoutes from "./admin/productRoutes.js";
 import variantRoutes from "./admin/variantRoutes.js";
 import batchRoutes from "./admin/batchRoutes.js";
-import { loadLogin, login, loadDashboard, pageerror, logout } from "../controllers/admin/adminController.js";
+import { loadLogin, login,  pageerror, logout } from "../controllers/admin/adminController.js";
+import { loadDashboard } from "../controllers/admin/loadDashboard.js";
 import {
   loadOrders,
   loadOrderDetail,
@@ -20,6 +21,25 @@ import {
   rejectReturnRequest,
 
 } from '../controllers/admin/orderController.js';
+import {
+ addCategoryOffer,
+ removeCategoryOffer
+} from "../controllers/admin/categoryController.js";
+
+import {
+  loadCoupons,
+  addCoupon,
+  deleteCoupon,
+  toggleCouponStatus,
+  updateCoupon,
+  loadEditCoupon   
+} from "../controllers/admin/couponController.js";
+
+import {
+  loadSalesReport,
+  exportSalesPdf,
+  exportSalesExcel
+} from "../controllers/admin/salesReportController.js";
 
 const router = express.Router();
 
@@ -76,4 +96,80 @@ router.get(
 
 router.post("/approve-return", adminAuth, approveReturnRequest);
 router.post("/reject-return", adminAuth, rejectReturnRequest);
+router.get("/add-category-offer", adminAuth, (req, res) => res.redirect("/admin/category"));
+router.post(
+  "/add-category-offer",
+  adminAuth,
+  addCategoryOffer
+);
+
+router.post(
+  "/remove-category-offer",
+  adminAuth,
+  removeCategoryOffer
+);
+
+/* COUPONS */
+
+/* COUPONS */
+
+// LOAD PAGE
+router.get(
+  "/coupons",
+  adminAuth,
+  loadCoupons
+);
+
+// ADD COUPON
+router.post(
+  "/coupons/add",
+  adminAuth,
+  addCoupon
+);
+
+
+// SOFT DELETE / STATUS TOGGLE
+router.patch(
+  "/coupons/status/:id",
+  adminAuth,
+  toggleCouponStatus
+);
+
+// DELETE COUPON (OPTIONAL)
+router.get(
+  "/coupons/delete/:id",
+  adminAuth,
+  deleteCoupon
+);
+router.get(
+  "/coupons/edit/:id",
+  adminAuth,
+  loadEditCoupon
+);
+router.post("/coupons/edit/:id", adminAuth, updateCoupon);    // save changes
+/* SALES REPORT */
+
+router.get(
+  "/sales-report",
+  adminAuth,
+  loadSalesReport
+);
+
+router.get(
+  "/sales-report/pdf",
+  adminAuth,
+  exportSalesPdf
+);
+
+router.get(
+  "/sales-report/excel",
+  adminAuth,
+  exportSalesExcel
+);
+
+router.get(
+  "/dashboard",
+  adminAuth,
+  loadDashboard
+);
 export default router;

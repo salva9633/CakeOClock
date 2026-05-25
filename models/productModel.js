@@ -52,7 +52,9 @@ const productSchema = new mongoose.Schema(
     reviewCount: {
       type: Number,
       default: 0
-    }
+    },
+    
+productOffer: { type: Number, default: 0 },  
   },
   { timestamps: true }
 );

@@ -243,60 +243,114 @@
                 <h2 class="main-heading">Get started now</h2>
 
                 <form id="signupForm" method="post" action="/signUp">
-<div class="row g-3">
+<div class="row g-3 mt-2">
+
   <!-- Name -->
   <div class="col-md-6">
     <label class="form-label">Name</label>
-    <input type="text" id="name" name="name" class="form-control"
-           placeholder="Enter your name">
+    <input
+      type="text"
+      id="name"
+      name="name"
+      class="form-control"
+      placeholder="Enter your name"
+    >
     <div id="error1" class="error-message"></div>
   </div>
 
   <!-- Gender -->
   <div class="col-md-6">
     <label class="form-label">Gender</label>
-    <select id="gender" name="gender" class="form-control">
+
+    <select
+      id="gender"
+      name="gender"
+      class="form-control"
+    >
       <option value="">Select gender</option>
       <option value="male">Male</option>
       <option value="female">Female</option>
       <option value="other">Other</option>
     </select>
+
     <div id="error6" class="error-message"></div>
   </div>
 
   <!-- Email -->
   <div class="col-md-6">
     <label class="form-label">Email Address</label>
-    <input type="email" id="email" name="email" class="form-control"
-           placeholder="Enter your email">
+
+    <input
+      type="email"
+      id="email"
+      name="email"
+      class="form-control"
+      placeholder="Enter your email"
+    >
+
     <div id="error2" class="error-message"></div>
   </div>
 
   <!-- Phone -->
   <div class="col-md-6">
     <label class="form-label">Phone Number</label>
-    <input type="text" id="phone" name="phone" class="form-control"
-           placeholder="Enter your phone number">
+
+    <input
+      type="text"
+      id="phone"
+      name="phone"
+      class="form-control"
+      placeholder="Enter your phone number"
+    >
+
     <div id="error3" class="error-message"></div>
+  </div>
+
+  <!-- Referral -->
+  <div class="col-md-6">
+    <label class="form-label">Referral Code</label>
+
+    <input
+      type="text"
+      id="referral"
+      name="referral"
+      class="form-control"
+      placeholder="Enter referral code"
+      value="<%= referral || '' %>"
+    >
   </div>
 
   <!-- Password -->
   <div class="col-md-6">
     <label class="form-label">Password</label>
-    <input type="password" id="password" name="password" class="form-control"
-           placeholder="Enter password">
+
+    <input
+      type="password"
+      id="password"
+      name="password"
+      class="form-control"
+      placeholder="Enter password"
+    >
+
     <div id="error4" class="error-message"></div>
   </div>
 
   <!-- Confirm Password -->
   <div class="col-md-6">
     <label class="form-label">Confirm Password</label>
-    <input type="password" id="confirm-password" name="confirmPassword"
-           class="form-control" placeholder="Confirm password">
+
+    <input
+      type="password"
+      id="confirm-password"
+      name="confirmPassword"
+      class="form-control"
+      placeholder="Confirm password"
+    >
+
     <div id="error5" class="error-message"></div>
   </div>
-</div>
 
+</div>
                     <div class="form-check">
                         <input type="checkbox" name="t" class="form-check-input" id="termsCheck">
                         <label class="form-check-label" for="termsCheck">I agree to the terms & policy</label>

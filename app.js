@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import passport from "./config/passport.js";
-
 import { injectBadgeCounts } from "./middlewares/badgeCounts.js";
 
 import db from "./config/db.js";
