@@ -8,6 +8,30 @@
   <style>
     body { background: linear-gradient(135deg, #f5e0dd 0%, #fdf3ef 100%); }
 
+    /* ── Floating sparkles background ── */
+    .sparkle-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .sparkle {
+      position: absolute;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--rose);
+      opacity: 0;
+      animation: floatUp var(--dur, 6s) var(--delay, 0s) infinite ease-in-out;
+    }
+    @keyframes floatUp {
+      0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+      20%  { opacity: .18; }
+      80%  { opacity: .10; }
+      100% { transform: translateY(-10vh) scale(1.4); opacity: 0; }
+    }
+
+    /* ── Shell ── */
     .address-shell {
       max-width: 860px;
       margin: 36px auto 60px;
@@ -15,22 +39,66 @@
       border-radius: var(--r-xl);
       box-shadow: var(--shadow-lg);
       overflow: hidden;
-      animation: fadeUp .45s ease both;
+      position: relative;
+      z-index: 1;
+      animation: shellDrop .55s cubic-bezier(.22,.9,.36,1) both;
+    }
+    @keyframes shellDrop {
+      from { opacity: 0; transform: translateY(40px) scale(.97); }
+      to   { opacity: 1; transform: translateY(0)   scale(1); }
     }
 
+    /* ── Header ── */
     .address-header {
       background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dk) 100%);
       padding: 32px 44px;
       display: flex;
       align-items: center;
       gap: 16px;
+      position: relative;
+      overflow: hidden;
     }
+    /* shimmer sweep */
+    .address-header::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,.18) 50%, transparent 60%);
+      transform: translateX(-100%);
+      animation: headerShimmer 3.5s 1s infinite;
+    }
+    @keyframes headerShimmer {
+      0%   { transform: translateX(-100%); }
+      100% { transform: translateX(200%); }
+    }
+
+    /* bubbly circles */
+    .header-bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,.08);
+      animation: bubblePulse var(--p, 4s) ease-in-out infinite alternate;
+    }
+    .header-bubble:nth-child(1){ width:160px;height:160px;top:-60px;right:60px;  --p:5s; }
+    .header-bubble:nth-child(2){ width:90px; height:90px; bottom:-30px;right:180px;--p:3.5s; }
+    .header-bubble:nth-child(3){ width:50px; height:50px; top:10px; right:280px; --p:4.5s; }
+    @keyframes bubblePulse {
+      from { transform: scale(1)   translateY(0); }
+      to   { transform: scale(1.1) translateY(-8px); }
+    }
+
     .address-header-icon {
       width: 52px; height: 52px;
       background: rgba(255,255,255,.2);
       border-radius: 14px;
       display: flex; align-items: center; justify-content: center;
       font-size: 1.4rem;
+      position: relative; z-index: 1;
+      animation: iconBounce 2.4s 1s ease-in-out infinite;
+    }
+    @keyframes iconBounce {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-5px); }
     }
     .address-header h1 {
       font-family: var(--font-display);
@@ -38,13 +106,22 @@
       font-weight: 700;
       color: #fff;
       margin: 0;
+      position: relative; z-index: 1;
+      animation: fadeSlideIn .5s .2s both;
     }
     .address-header p {
       font-size: .82rem;
       color: rgba(255,255,255,.8);
       margin: 3px 0 0;
+      position: relative; z-index: 1;
+      animation: fadeSlideIn .5s .35s both;
+    }
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateX(-16px); }
+      to   { opacity: 1; transform: translateX(0); }
     }
 
+    /* ── Body ── */
     .address-body { padding: 44px; }
 
     .form-grid {
@@ -54,14 +131,36 @@
     }
     .full-col { grid-column: 1 / -1; }
 
-    .field-group { display: flex; flex-direction: column; gap: 7px; }
+    /* staggered field reveal */
+    .field-group {
+      display: flex; flex-direction: column; gap: 7px;
+      opacity: 0;
+      animation: fieldReveal .45s ease both;
+    }
+    .field-group:nth-child(1)  { animation-delay: .15s; }
+    .field-group:nth-child(2)  { animation-delay: .22s; }
+    .field-group:nth-child(3)  { animation-delay: .29s; }
+    .field-group:nth-child(4)  { animation-delay: .36s; }
+    .field-group:nth-child(5)  { animation-delay: .43s; }
+    .field-group:nth-child(6)  { animation-delay: .50s; }
+    .field-group:nth-child(7)  { animation-delay: .57s; }
+    .field-group:nth-child(8)  { animation-delay: .64s; }
+    .field-group:nth-child(9)  { animation-delay: .71s; }
+    @keyframes fieldReveal {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
     .field-group label {
       font-size: .72rem;
       font-weight: 700;
       letter-spacing: .10em;
       text-transform: uppercase;
       color: var(--brown-lt);
+      transition: color .2s;
     }
+    .field-group:focus-within label { color: var(--rose); }
+
     .field-input {
       width: 100%;
       background: var(--rose-lt);
@@ -72,23 +171,48 @@
       font-size: .92rem;
       color: var(--brown);
       outline: none;
-      transition: border-color .2s, background .2s, box-shadow .2s;
+      transition: border-color .2s, background .2s, box-shadow .2s, transform .15s;
     }
     .field-input::placeholder { color: var(--muted); opacity: .7; }
     .field-input:focus {
       background: #fff;
       border-color: var(--rose-mid);
       box-shadow: 0 0 0 4px rgba(175,84,84,.09);
+      transform: translateY(-1px);
     }
-    .field-input.error { border-color: #e05555 !important; }
-    .field-input.success { border-color: #4caf50 !important; }
+    .field-input.error {
+      border-color: #e05555 !important;
+      animation: shake .35s ease;
+    }
+    .field-input.success {
+      border-color: #4caf50 !important;
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-5px); }
+      40%      { transform: translateX(5px); }
+      60%      { transform: translateX(-4px); }
+      80%      { transform: translateX(4px); }
+    }
 
     textarea.field-input { resize: none; min-height: 100px; }
 
-    .error-text { font-size: .74rem; color: #e05555; }
+    .error-text {
+      font-size: .74rem;
+      color: #e05555;
+      animation: errorPop .2s ease;
+    }
+    @keyframes errorPop {
+      from { opacity: 0; transform: translateY(-4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
-    /* Address Type */
-    .type-section { margin-top: 8px; }
+    /* ── Address Type ── */
+    .type-section {
+      margin-top: 8px;
+      opacity: 0;
+      animation: fieldReveal .45s .78s ease both;
+    }
     .type-label {
       font-size: .72rem;
       font-weight: 700;
@@ -112,16 +236,24 @@
       font-weight: 600;
       color: var(--muted);
       cursor: pointer;
-      transition: all .2s;
+      transition: all .22s cubic-bezier(.34,1.56,.64,1);
     }
-    .type-option label:hover { border-color: var(--rose-mid); color: var(--rose); }
+    .type-option label:hover {
+      border-color: var(--rose-mid);
+      color: var(--rose);
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 4px 14px rgba(175,84,84,.15);
+    }
     .type-option input:checked + label {
       border-color: var(--rose);
       background: var(--rose-lt);
       color: var(--rose);
+      transform: translateY(-2px) scale(1.06);
+      box-shadow: 0 4px 18px rgba(175,84,84,.2);
     }
     .type-option label span { font-size: 1rem; }
 
+    /* ── Actions ── */
     .form-actions {
       display: flex;
       justify-content: flex-end;
@@ -129,6 +261,8 @@
       margin-top: 32px;
       padding-top: 24px;
       border-top: 1px solid var(--border);
+      opacity: 0;
+      animation: fieldReveal .45s .9s ease both;
     }
 
     .btn-cancel {
@@ -141,9 +275,10 @@
       font-size: .88rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background .2s;
+      transition: background .2s, transform .18s;
     }
-    .btn-cancel:hover { background: #ede8e8; }
+    .btn-cancel:hover { background: #ede8e8; transform: translateY(-2px); }
+    .btn-cancel:active { transform: scale(.96); }
 
     .btn-save {
       padding: 12px 32px;
@@ -157,9 +292,35 @@
       cursor: pointer;
       transition: transform .18s, box-shadow .18s;
       box-shadow: 0 6px 20px rgba(175,84,84,.28);
+      position: relative;
+      overflow: hidden;
     }
-    .btn-save:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(175,84,84,.36); }
+    .btn-save::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,.25) 50%, transparent 60%);
+      transform: translateX(-100%);
+      transition: transform .4s;
+    }
+    .btn-save:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(175,84,84,.36);
+    }
+    .btn-save:hover::after { transform: translateX(160%); }
+    .btn-save:active { transform: scale(.96); }
 
+    /* ── Success ripple on save ── */
+    .btn-save.saving {
+      pointer-events: none;
+      animation: savePulse .6s ease infinite alternate;
+    }
+    @keyframes savePulse {
+      from { box-shadow: 0 6px 20px rgba(175,84,84,.28); }
+      to   { box-shadow: 0 6px 32px rgba(175,84,84,.55); }
+    }
+
+    /* ── Responsive ── */
     @media (max-width: 640px) {
       .address-shell { margin: 0; border-radius: 0; }
       .address-header { padding: 24px 20px; }
@@ -170,12 +331,18 @@
 </head>
 <body>
 
+<!-- Floating sparkle particles -->
+<div class="sparkle-bg" aria-hidden="true" id="sparkleContainer"></div>
+
 <%- include("../partials/user/h2") %>
 
 <div class="address-shell">
 
   <!-- Header -->
   <div class="address-header">
+    <div class="header-bubble"></div>
+    <div class="header-bubble"></div>
+    <div class="header-bubble"></div>
     <div class="address-header-icon">📍</div>
     <div>
       <h1>Add New Address</h1>
@@ -272,6 +439,25 @@
 </div>
 
 <script>
+  /* ── Sparkle particles ── */
+  (function() {
+    const container = document.getElementById('sparkleContainer');
+    for (let i = 0; i < 18; i++) {
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      s.style.cssText = `
+        left: ${Math.random() * 100}%;
+        --dur: ${4 + Math.random() * 6}s;
+        --delay: ${Math.random() * 8}s;
+        width: ${3 + Math.random() * 6}px;
+        height: ${3 + Math.random() * 6}px;
+        opacity: 0;
+      `;
+      container.appendChild(s);
+    }
+  })();
+
+  /* ── Existing validation logic (unchanged) ── */
   const fields = {
     name:    { id: "name",    error: "nameError",    regex: /^[A-Za-z ]{3,}$/, msg: "Min 3 letters" },
     phone:   { id: "phone",   error: "phoneError",   regex: /^[6-9][0-9]{9}$/, msg: "Invalid phone number" },
@@ -300,7 +486,12 @@
   document.querySelector('form').addEventListener('submit', function(e) {
     let isValid = true;
     Object.values(fields).forEach(f => { if (!validate(f)) isValid = false; });
-    if (!isValid) e.preventDefault();
+    if (!isValid) {
+      e.preventDefault();
+    } else {
+      /* brief save animation before submit */
+      document.querySelector('.btn-save').classList.add('saving');
+    }
   });
 </script>
 </body>

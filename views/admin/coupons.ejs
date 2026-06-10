@@ -19,59 +19,68 @@
       Add Coupon
     </div>
 
-    <form action="/admin/coupons/add" method="POST">
-      <div class="form-grid">
+<form id="couponForm" action="/admin/coupons/add" method="POST">
+        <div class="form-grid">
 
-        <div class="field">
-          <label>Code</label>
-          <input type="text" name="code" placeholder="e.g. CAKE20" required>
-        </div>
-
-        <div class="field">
-          <label>Discount Type</label>
-          <select name="discountType">
-            <option value="percentage">Percentage</option>
-            <option value="fixed">Fixed</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label>Discount Value</label>
-          <input type="number" name="discountValue" placeholder="e.g. 20" required>
-        </div>
-
-        <div class="field">
-          <label>Max Discount</label>
-          <input type="number" name="maxDiscount" placeholder="e.g. 200">
-        </div>
-
-        <div class="field">
-          <label>Description</label>
-          <input type="text" name="description" placeholder="Short description">
-        </div>
-
-        <div class="field">
-          <label>Usage Limit</label>
-          <input type="number" name="usageLimit" placeholder="e.g. 100">
-        </div>
-
-        <div class="field">
-          <label>Expiry Date</label>
-          <input type="date" name="expiryDate" required>
-        </div>
-
-        <div class="field">
-          <label>Min Purchase</label>
-          <input type="number" name="minPurchase" placeholder="e.g. 500">
-        </div>
-
-        <div class="field" style="display:flex;align-items:center;gap:10px;padding-top:28px">
-  <input type="checkbox" name="isFirstOrderOnly" value="true" id="firstOrderOnly"
-    style="width:18px;height:18px;accent-color:var(--rose-dk);cursor:pointer">
-  <label for="firstOrderOnly" style="text-transform:none;font-size:13px;color:var(--brown);cursor:pointer">
-    First order only
-  </label>
+<div class="field">
+  <label>Code</label>
+  <input
+    type="text"
+    id="code"
+    name="code"
+    placeholder="e.g. CAKE20"
+    maxlength="20"
+  >
+  <small class="error-message"></small>
 </div>
+
+<div class="field">
+  <label>Discount Type</label>
+  <select name="discountType">
+    <option value="percentage">Percentage</option>
+    <option value="fixed">Fixed</option>
+  </select>
+  <small class="error-message"></small>
+</div>
+
+       <div class="field">
+  <label>Discount Value</label>
+  <input type="number" name="discountValue" placeholder="e.g. 20">
+  <small class="error-message"></small>
+</div>
+
+<div class="field">
+  <label>Max Discount</label>
+  <input type="number" name="maxDiscount" placeholder="e.g. 200">
+  <small class="error-message"></small>
+</div>
+
+<div class="field">
+  <label>Description</label>
+  <input type="text" name="description" placeholder="Short description">
+  <small class="error-message"></small>
+</div>
+
+<div class="field">
+  <label>Usage Limit</label>
+  <input type="number" name="usageLimit" placeholder="e.g. 100">
+  <small class="error-message"></small>
+</div>
+
+
+<div class="field">
+  <label>Expiry Date</label>
+  <input type="date" name="expiryDate">
+  <small class="error-message"></small>
+</div>
+
+
+<div class="field">
+  <label>Min Purchase</label>
+  <input type="number" name="minPurchase" placeholder="e.g. 500">
+  <small class="error-message"></small>
+</div>
+
 
       </div>
 
@@ -454,21 +463,157 @@ tbody td {
   background: #B45309;
   color: var(--white);
 }
+.error-message{
+  display:block;
+  margin-top:5px;
+  color:#dc2626;
+  font-size:12px;
+  font-weight:500;
+}
+
+.input-error{
+  border-color:#dc2626 !important;
+  background:#fff5f5 !important;
+}
 </style>
 
 
 <script>
+const form = document.getElementById("couponForm");
+
+form.addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  let valid = true;
+
+  const code = document.getElementById("code");
+  const discountType = document.querySelector('[name="discountType"]');
+  const discountValue = document.querySelector('[name="discountValue"]');
+  const maxDiscount = document.querySelector('[name="maxDiscount"]');
+  const usageLimit = document.querySelector('[name="usageLimit"]');
+  const expiryDate = document.querySelector('[name="expiryDate"]');
+  const minPurchase = document.querySelector('[name="minPurchase"]');
+  const description = document.querySelector('[name="description"]');
+  document.querySelectorAll(".error-message").forEach(el => {
+    el.textContent = "";
+  });
+
+  document.querySelectorAll("input, select").forEach(el => {
+    el.classList.remove("input-error");
+  });
+
+  function showError(field, message) {
+    field.classList.add("input-error");
+
+    const error = field.parentElement.querySelector(".error-message");
+
+    if (error) {
+      error.textContent = message;
+    }
+
+    valid = false;
+  }
+
+const codeValue = code.value.trim().toUpperCase();
+
+if (!codeValue) {
+  showError(code, "Coupon code is required");
+}
+else if (!/^[A-Z0-9]{5,20}$/.test(codeValue)) {
+  showError(
+    code,
+    "Coupon code must be 5-20 uppercase letters/numbers"
+  );
+}
+
+  if (!discountValue.value || Number(discountValue.value) <= 0) {
+    showError(discountValue, "Discount must be greater than 0");
+  }
+  if (!description.value.trim()) {
+  showError(description, "Description is required");
+}
+else if (description.value.trim().length < 5) {
+  showError(
+    description,
+    "Description must contain at least 5 characters"
+  );
+}
+
+if (!maxDiscount.value) {
+  showError(maxDiscount, "Max discount is required");
+}
+else if (Number(maxDiscount.value) <= 0) {
+  showError(
+    maxDiscount,
+    "Max discount must be greater than 0"
+  );
+}
+
+ if (
+  discountType.value === "fixed" &&
+  Number(discountValue.value) < 10
+) {
+  showError(
+    discountValue,
+    "Fixed discount should be at least ₹10"
+  );
+}
+
+if (!usageLimit.value) {
+  showError(usageLimit, "Usage limit is required");
+}
+else if (Number(usageLimit.value) < 1) {
+  showError(usageLimit, "Usage limit must be at least 1");
+}
+else if (Number(usageLimit.value) > 10000) {
+  showError(usageLimit, "Usage limit is too large");
+}
+
+if (!minPurchase.value) {
+  showError(minPurchase, "Minimum purchase amount is required");
+}
+else if (Number(minPurchase.value) < 100) {
+  showError(minPurchase, "Minimum purchase should be at least ₹100");
+}
+
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  const expiry = new Date(expiryDate.value);
+
+  if (!expiryDate.value) {
+    showError(expiryDate, "Expiry date is required");
+  } else if (expiry <= today) {
+    showError(expiryDate, "Select a future date");
+  }
+
+  if(valid){
+    code.value = codeValue;
+    form.submit();
+  }
+});
+
+document.getElementById("code").addEventListener("input", function () {
+  this.value = this.value
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "");
+});
+
 async function toggleStatus(id) {
   try {
-    const response = await fetch(`/admin/coupons/status/${id}`, { method: 'PATCH' });
+    const response = await fetch(`/admin/coupons/status/${id}`, {
+      method: "PATCH",
+    });
+
     const data = await response.json();
+
     if (data.success) {
       location.reload();
     } else {
-      alert('Status update failed');
+      alert("Status update failed");
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 </script>

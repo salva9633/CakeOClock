@@ -1,9 +1,9 @@
 import Product  from "../../models/productModel.js";
 import Variant  from "../../models/variantModel.js";
 import Category from "../../models/categoryModel.js";
-import Review   from "../../models/reviewModel.js";   // ← ADD THIS LINE
+import Review   from "../../models/reviewModel.js";
+import Offer    from "../../models/offerModel.js";
 import { getOrderStatus } from "./orderController.js";
- 
 const loadProductsPage = async (req, res) => {
   try {
     const { search, category, brand, price, sort, page = 1 } = req.query;
@@ -44,10 +44,10 @@ const loadProductsPage = async (req, res) => {
     // ── 4. PRICE FILTER ON VARIANTS ───────────────────────
     const priceFilter = { isAvailable: true };
  
-    if (price) {
-      const [min, max] = price.split("-").map(Number);
-      priceFilter.salePrice = { $gte: min, $lte: max };
-    }
+   if (price) {
+  const [min, max] = price.split("-").map(Number);
+  priceFilter.regularPrice = { $gte: min, $lte: max };
+}
  
     const productIds = allProducts.map(p => p._id);
  
@@ -55,7 +55,7 @@ const loadProductsPage = async (req, res) => {
       productId: { $in: productIds },
       ...priceFilter
     })
-      .sort({ salePrice: 1 })
+.sort({ regularPrice: 1 })
       .lean();
  
     const variantMap = {};
@@ -90,43 +90,38 @@ const loadProductsPage = async (req, res) => {
     }
  
     // ── 6. BUILD PRODUCTS WITH PRICE + RATING ─────────────
-    let productsWithPrice = allProducts
-      .map(product => {
-        const variant = variantMap[product._id.toString()];
-        if (!variant) return null;
+   let productsWithPrice = (await Promise.all(allProducts
+  .map(async product => {
+    const variant = variantMap[product._id.toString()];
+    if (!variant) return null;
  
-   const { salePrice, regularPrice } = variant;
+  const { regularPrice } = variant;
+const now = new Date();
+const productOfferPct  = product.productOffer || 0;
+const categoryOfferPct = product.categoryId?.categoryOffer || 0;
+const bestDiscount     = Math.max(productOfferPct, categoryOfferPct);
 
-const productOffer  = product.productOffer || 0;
-const categoryOffer = product.categoryId?.categoryOffer || 0;
-const bestOffer     = Math.max(productOffer, categoryOffer);
+const finalPrice = bestDiscount > 0
+  ? Math.round(regularPrice - (regularPrice * bestDiscount / 100))
+  : regularPrice;
 
-// If no manual offer, calculate discount from regularPrice vs salePrice
-const priceDiscount = regularPrice > salePrice
-  ? Math.round((regularPrice - salePrice) / regularPrice * 100)
-  : 0;
-
-const effectiveDiscount = Math.max(bestOffer, priceDiscount);
-const finalPrice = bestOffer > 0
-  ? Math.round(salePrice - (salePrice * bestOffer / 100))
-  : salePrice;
+const effectiveDiscount = bestDiscount;
+const offerLabel = categoryOfferPct > productOfferPct ? "category" : "product";
 
         const { avgRating = "0.0", totalReviews = 0 } =
           ratingMap[product._id.toString()] || {};
  
 return {
   ...product,
-  startingPrice:    finalPrice,
+  startingPrice: finalPrice,
   regularPrice,
-  discount:         bestOffer > 0 ? bestOffer : effectiveDiscount,
-  productOffer,
-  categoryOffer,
-  activeOfferLabel: bestOffer === 0 ? null : categoryOffer > productOffer ? "category" : "product",
+  discount:      effectiveDiscount,
+  offerLabel,
   avgRating,
   totalReviews
 };
-      })
-      .filter(Boolean);
+     })
+)).filter(Boolean);
  
     // ── 7. SORTING ────────────────────────────────────────
     const sorters = {

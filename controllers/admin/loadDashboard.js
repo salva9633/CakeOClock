@@ -8,19 +8,22 @@ export const loadDashboard = async (req, res) => {
 
     let startDate = new Date();
 
-    switch (filter) {
-      case "daily":
-        startDate.setHours(0, 0, 0, 0);
-        break;
-      case "weekly":
-        startDate.setDate(startDate.getDate() - 7);
-        break;
-      case "yearly":
-        startDate = new Date(startDate.getFullYear(), 0, 1);
-        break;
-      default:
-        startDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
-    }
+ switch (filter) {
+  case "daily":
+    startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 0, 0, 0);
+    break;
+  case "weekly": {
+    const day = startDate.getDay();
+    const diff = day === 0 ? 6 : day - 1;
+    startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() - diff, 0, 0, 0);
+    break;
+  }
+  case "yearly":
+    startDate = new Date(startDate.getFullYear() - 4, 0, 1);
+    break;
+  default: // monthly
+    startDate = new Date(startDate.getFullYear(), 0, 1);
+}
 
     // =========================
     // ORDERS
@@ -41,18 +44,98 @@ export const loadDashboard = async (req, res) => {
 
     const deliveredOrders = orders.filter(order => order.status === "Delivered").length;
 
-    const cancelledOrders = orders.filter(order => order.status === "Cancelled").length;
+const cancelledOrders = await Order.countDocuments({
+  createdAt: { $gte: startDate },
+  status: "Cancelled"
+});
+   // =========================
+// CHART DATA (grouped by period)
+// =========================
 
-    // =========================
-    // CHART DATA
-    // =========================
+// =========================
+// CHART DATA (grouped by period)
+// =========================
 
-    const chartLabels = orders.map(order =>
-      new Date(order.createdAt).toLocaleDateString("en-IN")
-    );
+let chartLabels = [];
+let chartData = [];
 
-    const chartData = orders.map(order => order.finalTotal);
+if (filter === "daily") {
 
+  const hourMap = {};
+
+  for (let h = 0; h < 24; h++) {
+    hourMap[`${String(h).padStart(2, "0")}:00`] = 0;
+  }
+
+  orders.forEach(order => {
+    const hour = `${String(new Date(order.createdAt).getHours()).padStart(2, "0")}:00`;
+    hourMap[hour] += order.finalTotal;
+  });
+
+  chartLabels = Object.keys(hourMap);
+  chartData = Object.values(hourMap);
+
+} else if (filter === "weekly") {
+
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const dayMap = {};
+
+  days.forEach(day => {
+    dayMap[day] = 0;
+  });
+
+  orders.forEach(order => {
+    const jsDay = new Date(order.createdAt).getDay();
+    const dayName = days[jsDay === 0 ? 6 : jsDay - 1];
+    dayMap[dayName] += order.finalTotal;
+  });
+
+  chartLabels = Object.keys(dayMap);
+  chartData = Object.values(dayMap);
+
+} else if (filter === "yearly") {
+
+  const currentYear = new Date().getFullYear();
+  const yearMap = {};
+
+  for (let year = currentYear - 4; year <= currentYear; year++) {
+    yearMap[year] = 0;
+  }
+
+  orders.forEach(order => {
+    const year = new Date(order.createdAt).getFullYear();
+
+    if (yearMap[year] !== undefined) {
+      yearMap[year] += order.finalTotal;
+    }
+  });
+
+  chartLabels = Object.keys(yearMap);
+  chartData = Object.values(yearMap);
+
+} else {
+
+  // Monthly chart (Jan-Dec)
+
+  const months = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
+
+  const monthMap = {};
+
+  months.forEach(month => {
+    monthMap[month] = 0;
+  });
+
+  orders.forEach(order => {
+    const month = months[new Date(order.createdAt).getMonth()];
+    monthMap[month] += order.finalTotal;
+  });
+
+  chartLabels = Object.keys(monthMap);
+  chartData = Object.values(monthMap);
+}
     // =========================
     // TOP PRODUCTS
     // =========================

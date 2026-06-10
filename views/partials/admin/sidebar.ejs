@@ -81,6 +81,25 @@
     background: rgba(0,0,0,0.3);
     z-index: 900;
   }
+  .sidebar-logo{
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.sidebar-logo img{
+  width: 140px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+.sidebar-logo h3{
+  margin-top: 10px;
+  color: #8B4A5A;
+  font-size: 22px;
+  font-weight: 700;
+}
 
   @media (max-width: 992px) {
     .sidebar {
@@ -117,6 +136,12 @@
 <div class="overlay" onclick="toggleSidebar()"></div>
 
 <aside class="sidebar">
+
+    <div class="sidebar-logo">
+    <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1780840131/WhatsApp_Image_2026-06-07_at_4.24.57_PM-removebg-preview_cmrltl.png"
+         alt="Cake O Clock Logo">
+  </div>
+
   <nav>
     <a href="/admin/dashboard"            class="menu-item"><i class="fas fa-th-large"></i>Dashboard</a>
     <a href="/admin/orders"     class="menu-item"><i class="fas fa-shopping-bag"></i>Order</a>
@@ -139,6 +164,199 @@
     document.querySelectorAll(".menu-item").forEach(item => {
       const href = item.getAttribute("href");
       if (currentPath === href || (currentPath.startsWith(href) && href !== "/admin")) {
+        item.classList.add("active");
+      }
+    });
+  });
+</script><style>
+  :root {
+    --bg-color: #FFF5F2;
+    --sidebar-width: 260px;
+    --header-height: 64px;
+    --text-color: #4A3B32;
+    --hover-color: #F4D0CB;
+    --active-text: #FFFFFF;
+    --btn-color: #8B4A5A;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; overflow-x: hidden; }
+
+  .sidebar {
+    width: var(--sidebar-width);
+    background: var(--bg-color);
+    padding: 20px 14px;
+    position: fixed;
+    top: var(--header-height); left: 0;
+    height: calc(100vh - var(--header-height));
+    overflow-y: auto;
+    z-index: 1000;
+    border-right: 1px solid rgba(139,74,90,0.08);
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .sidebar-brand { text-align: center; padding: 14px 0 18px; margin-bottom: 6px; }
+  .sidebar-brand img {
+    width: 90px; height: auto; display: block; margin: 0 auto 8px;
+    transition: transform 0.4s ease;
+  }
+  .sidebar-brand img:hover { transform: scale(1.05) rotate(-2deg); }
+  .sidebar-tagline { font-size: 11px; color: #b08a90; letter-spacing: 0.5px; text-transform: uppercase; }
+
+  .nav-section-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px;
+    color: #c4a0a7; padding: 12px 12px 6px; font-weight: 600;
+  }
+
+  .sep { height: 1px; background: rgba(139,74,90,0.08); margin: 10px 12px; }
+
+  .menu-item {
+    display: flex; align-items: center; gap: 11px;
+    padding: 11px 13px; margin-bottom: 3px;
+    border-radius: 12px;
+    color: var(--text-color);
+    text-decoration: none; font-size: 14px; font-weight: 500;
+    transition: background 0.22s, color 0.22s, transform 0.18s, box-shadow 0.22s;
+    position: relative; overflow: hidden;
+  }
+
+  .menu-item::before {
+    content: '';
+    position: absolute; left: 0; top: 0;
+    width: 3px; height: 100%;
+    background: var(--btn-color);
+    border-radius: 0 4px 4px 0;
+    opacity: 0; transform: scaleY(0);
+    transition: opacity 0.2s, transform 0.2s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .menu-item i { font-size: 18px; width: 22px; text-align: center; flex-shrink: 0; transition: transform 0.2s; }
+
+  .menu-item .badge {
+    margin-left: auto; background: var(--hover-color); color: var(--btn-color);
+    font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .menu-item:hover { background: var(--hover-color); transform: translateX(3px); }
+  .menu-item:hover i { transform: scale(1.12); }
+  .menu-item:not(.active):hover::before { opacity: 1; transform: scaleY(1); }
+
+  .menu-item.active {
+    background: var(--btn-color); color: var(--active-text);
+    box-shadow: 0 4px 16px rgba(139,74,90,0.25);
+  }
+  .menu-item.active .badge { background: rgba(255,255,255,0.25); color: #fff; }
+
+  .sidebar-footer {
+    margin-top: 20px; padding: 14px 12px;
+    background: linear-gradient(135deg, #f9e8ec 0%, #fce6de 100%);
+    border-radius: 14px; text-align: center;
+  }
+  .sidebar-footer p { font-size: 12px; color: #9b6a72; line-height: 1.5; }
+  .sidebar-footer strong { color: var(--btn-color); font-size: 13px; }
+
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: rgba(139,74,90,0.15); border-radius: 4px; }
+
+  .main-content {
+    margin-left: var(--sidebar-width);
+    margin-top: var(--header-height);
+    width: calc(100% - var(--sidebar-width));
+    min-height: calc(100vh - var(--header-height));
+    padding: 30px;
+    background: var(--bg-color);
+    box-sizing: border-box;
+  }
+
+  /* Mobile */
+  .mobile-toggle {
+    display: none; position: fixed;
+    top: 18px; right: 18px;
+    z-index: 1100; font-size: 1.4rem; cursor: pointer; color: #fff;
+  }
+  .overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.3); z-index: 900;
+  }
+
+  @media (max-width: 992px) {
+    .sidebar { transform: translateX(-100%); top: 0; height: 100vh; }
+    .sidebar.active { transform: translateX(0); }
+    .mobile-toggle { display: block; }
+    .overlay.active { display: block; }
+    .main-content { margin-left: 0; width: 100%; }
+  }
+
+  @media (max-width: 600px) { .main-content { padding: 16px; } }
+</style>
+
+<div class="mobile-toggle" onclick="toggleSidebar()">
+  <i class="fas fa-bars"></i>
+</div>
+<div class="overlay" onclick="toggleSidebar()"></div>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1780840131/WhatsApp_Image_2026-06-07_at_4.24.57_PM-removebg-preview_cmrltl.png" alt="Cake O Clock Logo">
+    <div class="sidebar-tagline">Catching Sweet Delights</div>
+  </div>
+
+  <div class="nav-section-label">Main</div>
+  <nav>
+    <a href="/admin/dashboard" class="menu-item">
+      <i class="fas fa-th-large"></i> Dashboard
+    </a>
+    <a href="/admin/orders" class="menu-item">
+  <i class="fas fa-shopping-bag"></i>Orders
+  <% if (locals.pendingOrderCount > 0) { %>
+    <span class="badge"><%= pendingOrderCount %></span>
+  <% } %>
+</a>
+    <a href="/admin/products" class="menu-item">
+      <i class="fas fa-box"></i> Products
+    </a>
+  </nav>
+
+  <div class="sep"></div>
+  <div class="nav-section-label">Analytics</div>
+  <nav>
+    <a href="/admin/sales-report" class="menu-item">
+      <i class="fas fa-chart-line"></i> Sales Report
+    </a>
+    <a href="/admin/users" class="menu-item">
+      <i class="fas fa-users"></i> Customers
+    </a>
+  </nav>
+
+  <div class="sep"></div>
+  <div class="nav-section-label">Manage</div>
+  <nav>
+    <a href="/admin/coupons" class="menu-item">
+      <i class="fas fa-tag"></i> Coupons
+    </a>
+    <a href="/admin/category" class="menu-item">
+      <i class="fas fa-layer-group"></i> Category
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <strong>🍰 Cake O Clock</strong>
+    <p>Admin Panel v2.0<br>All systems operational</p>
+  </div>
+</aside>
+
+<script>
+  function toggleSidebar() {
+    document.querySelector('.sidebar')?.classList.toggle('active');
+    document.querySelector('.overlay')?.classList.toggle('active');
+  }
+  document.addEventListener("DOMContentLoaded", () => {
+    const path = window.location.pathname;
+    document.querySelectorAll(".menu-item").forEach(item => {
+      const href = item.getAttribute("href");
+      if (path === href || (path.startsWith(href) && href !== "/admin")) {
         item.classList.add("active");
       }
     });

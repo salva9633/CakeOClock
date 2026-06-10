@@ -63,6 +63,11 @@ const toggleCategoryStatus = async (req, res) => {
 /* ================= ADD CATEGORY ================= */
 const addCategory = async (req, res) => {
   try {
+
+ console.log("BODY:", req.body);
+    console.log("FILE:", req.file);
+
+
     const name = req.body?.name;
     const description = req.body?.description;
     const isActive = req.body?.isActive;
@@ -71,8 +76,9 @@ const addCategory = async (req, res) => {
       return res.json({ success: false, message: "All fields are required" });
     }
 
-    const exists = await Category.findOne({
-      name: { $regex: `^${name}$`, $options: "i" }
+const exists = await Category.findOne({
+      name: { $regex: `^${name}$`, $options: "i" },
+      isDeleted: { $ne: true }
     });
 
     if (exists) {
@@ -110,6 +116,15 @@ const deleteCategory = async (req, res) => {
 const editCategory = async (req, res) => {
   try {
     const { name, description, isActive } = req.body;
+
+      const duplicate = await Category.findOne({
+      name: { $regex: `^${name.trim()}$`, $options: "i" },
+      _id: { $ne: req.params.id }
+    });
+
+    if (duplicate) {
+      return res.json({ success: false, message: "Category name already exists" });
+    }
 
     const updateData = {
       name: name.trim(),

@@ -44,8 +44,9 @@ if (!user || user.isAdmin) {
     next();
 } catch (error) {
     console.log("userAuth error:", error);
-    const isAjax = req.xhr || req.headers['content-type']?.includes('application/json');
-    if (isAjax) {
+const isAjax = req.xhr 
+  || req.headers['content-type']?.includes('application/json')
+  || req.headers['accept']?.includes('application/json');    if (isAjax) {
       return res.status(401).json({ success: false, redirectUrl: "/login" });
     }
     return res.redirect("/login");

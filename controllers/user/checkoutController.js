@@ -27,7 +27,7 @@ export const loadCheckout = async (req, res) => {
       User.findById(userId),
       Cart.findOne({ userId })
         .populate({ path: "items.productId", select: "productName productImages isListed" })
-        .populate({ path: "items.variantId", select: "weight salePrice regularPrice imageUrls isAvailable" })
+        .populate({ path: "items.variantId", select: "weight regularPrice imageUrls isAvailable" })
     ]);
  
     if (!cart || cart.items.length === 0) return res.redirect("/cart");
@@ -48,7 +48,7 @@ export const loadCheckout = async (req, res) => {
     const previousOrders = await Order.findOne({ userId, status: { $ne: "Cancelled" } });
  
     // ── Fetch valid coupons ──────────────────────────────────────────
-   // ✅ REPLACE lines 52-58 with this clean version:
+  
 
 const allCoupons = await Coupon.find({
   isActive:   true,
@@ -89,10 +89,7 @@ const coupons = allCoupons.filter(c => {
 };
  
 // ================================================================
-// NEW: POST /checkout/apply-coupon
-// Called via fetch() from the checkout page JS
-// Returns JSON with discount amount and new total
-// ================================================================
+
 export const applyCoupon = async (req, res) => {
   try {
     const userId     = req.user._id;
@@ -102,7 +99,7 @@ export const applyCoupon = async (req, res) => {
       return res.json({ success: false, message: "Please enter a coupon code." });
     }
  
-    // Load cart total
+    
     const cart = await Cart.findOne({ userId })
       .populate({ path: "items.productId", select: "isListed" })
       .populate({ path: "items.variantId", select: "isAvailable" });
@@ -117,13 +114,16 @@ export const applyCoupon = async (req, res) => {
     const itemTotal      = validItems.reduce((s, i) => s + i.price * i.quantity, 0);
     const shippingCharge = itemTotal >= SHIPPING_FREE_ABOVE ? 0 : SHIPPING_CHARGE;
  
-    // Find coupon in DB
+
+    //coupon from db//
+
     const coupon = await Coupon.findOne({
       code:       code.trim().toUpperCase(),
       isActive:   true,
       isDeleted:  false,
       expiryDate: { $gte: new Date() }
     });
+
  
 if (!coupon) {
       return res.json({ success: false, message: "Invalid or expired coupon code." });
@@ -136,7 +136,7 @@ if (!coupon) {
 
 
  
-    // Minimum purchase check
+    
     if (coupon.minPurchase && itemTotal < coupon.minPurchase) {
       return res.json({
         success: false,
@@ -144,7 +144,7 @@ if (!coupon) {
       });
     }
  
-    // Calculate discount
+    
     let discountAmt = 0;
     if (coupon.discountType === "percentage") {
       discountAmt = (itemTotal * coupon.discountValue) / 100;
@@ -172,9 +172,7 @@ if (!coupon) {
 };
  
 // ================================================================
-// NEW: POST /checkout/remove-coupon
-// Returns the original totals without the coupon
-// ================================================================
+
 export const removeCoupon = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -309,7 +307,7 @@ export const placeOrder = async (req, res) => {
  
     if (orderItems.length === 0) return res.send("No valid items to order");
  
-    // Deduct stock
+    // (FIFO)//
     for (const item of orderItems) {
       let remaining = item.quantity;
       const batches = await Batch.find({ variantId: item.variantId, status: "active", availableStock: { $gt: 0 } }).sort({ manufacturedAt: 1 });

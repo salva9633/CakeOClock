@@ -1,39 +1,117 @@
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light py-3">
+<nav class="navbar navbar-expand-lg navbar-light py-2">
     
     <div class="container-fluid px-5">
 
-        <a class="navbar-brand fs-2 text-dark" href="/">Cake O Clock</a>
-
+<a class="navbar-brand" href="/" style="display:inline-flex; align-items:center;">
+<img 
+    src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1780840131/WhatsApp_Image_2026-06-07_at_4.24.57_PM-removebg-preview_cmrltl.png"
+    alt="Cake O Clock"
+    style="height:60px; width:auto; object-fit:contain; 
+           mix-blend-mode:multiply;
+           filter: contrast(1.1);">
+</a>
         <!-- Search Bar -->
-        <form class="d-flex mx-auto" action="/products" method="GET" style="width: 400px; position: relative;">
-            <input class="form-control rounded-pill px-4 py-2"
-                type="search"
-                name="search"
-                placeholder="search"
-                aria-label="Search"
-                style="color:#AF5454; background-color: rgba(232, 158, 158, 0.3); border: none;">
-            <button class="btn position-absolute end-0 top-0 h-100 pe-4"
-                type="submit"
-                style="border:none; background:transparent;">
-                <i class="fas fa-search fa-lg" style="color:#AF5454;"></i>
-            </button>
-        </form>
+       <form class="d-flex mx-auto" action="/products" method="GET" 
+  style="width: 400px; position: relative;" id="searchForm">
+  
+  <input class="form-control rounded-pill px-4 py-2"
+    type="text"
+    name="search"
+    id="searchInput"
+    placeholder="Search cakes..."
+    autocomplete="off"
+    value="<%= typeof searchQuery !== 'undefined' ? searchQuery : (new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('search') || '') %>"
+    style="color:#8B3A52; background-color: rgba(232,160,160,0.18); 
+           border: 1.5px solid rgba(139,58,82,0.2); outline: none;
+           padding-right: 80px;">
+
+  <!-- Clear button -->
+  <button type="button" id="clearBtn"
+    style="display:none; position:absolute; right:44px; top:50%; 
+           transform:translateY(-50%); background:none; border:none; 
+           color:#8B3A52; font-size:1rem; cursor:pointer; padding:0 6px;">
+    <i class="fas fa-times"></i>
+  </button>
+
+  <!-- Search submit -->
+  <button type="submit"
+    style="position:absolute; right:4px; top:50%; transform:translateY(-50%);
+           background:none; border:none; padding:6px 12px; cursor:pointer;">
+    <i class="fas fa-search" style="color:#8B3A52; font-size:1rem;"></i>
+  </button>
+</form>
+
+<script>
+(function () {
+  const input    = document.getElementById('searchInput');
+  const clearBtn = document.getElementById('clearBtn');
+  const form     = document.getElementById('searchForm');
+
+  // ── 1. Preserve search value from URL on page load ──
+  const params      = new URLSearchParams(window.location.search);
+  const urlSearch   = params.get('search') || '';
+  if (urlSearch) {
+    input.value          = urlSearch;
+    clearBtn.style.display = 'block';
+  }
+
+  // ── 2. Show / hide clear button on typing ──
+  input.addEventListener('input', () => {
+    clearBtn.style.display = input.value.trim() ? 'block' : 'none';
+  });
+
+  // ── 3. Clear button ──
+  clearBtn.addEventListener('click', () => {
+    input.value            = '';
+    clearBtn.style.display = 'none';
+    input.focus();
+    // Also redirect to /products without search param
+    window.location.href = '/products';
+  });
+
+  // ── 4. Debounce — auto-submit after 500ms of no typing ──
+  let debounceTimer;
+  input.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    const val = input.value.trim();
+    if (val.length === 0) return; // don't auto-submit empty
+    debounceTimer = setTimeout(() => {
+      form.submit();
+    }, 500);
+  });
+
+})();
+</script>
 
         <!-- Icons -->
         <div class="d-flex align-items-center gap-4">
 
-            <!-- 🛒 Cart Icon -->
-            <a href="/cart" class="text-reset header-icon" title="My Cart">
-                <img width="25" height="25" src="media/icons8-cart-50.png" alt="cart" />
-            </a>
+           <!-- 🛒 Cart Icon -->
+<a href="/cart" class="text-reset header-icon" title="My Cart" 
+   style="position:relative; display:inline-flex;">
+  <img width="25" height="25" src="media/icons8-cart-50.png" alt="cart" />
+  <span id="cart-count" style="
+    position:absolute; top:-8px; right:-8px;
+    background:#8B3A52; color:#fff;
+    border-radius:50%; width:18px; height:18px;
+    font-size:.62rem; font-weight:700;
+    display:none; align-items:center; justify-content:center;
+    line-height:1;">0</span>
+</a>
 
             <!-- ❤ Wishlist Icon -->
-            <a href="/wishlist" class="text-reset header-icon" title="My Wishlist"
-               style="color:#AF5454 !important; width:30px; height:30px; display:flex; align-items:center; justify-content:center;">
-                <i class="fas fa-heart fa-lg" style="color:#AF5454;"></i>
-            </a>
-
+<a href="/wishlist" class="text-reset header-icon" title="My Wishlist"
+   style="position:relative; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px;">
+  <i class="fas fa-heart fa-lg" style="color:#8B3A52;"></i>
+  <span id="wishlist-count" style="
+    position:absolute; top:-8px; right:-8px;
+    background:#8B3A52; color:#fff;
+    border-radius:50%; width:18px; height:18px;
+    font-size:.62rem; font-weight:700;
+    display:none; align-items:center; justify-content:center;
+    line-height:1;">0</span>
+</a>
             <!-- User Dropdown / Auth Links -->
             <% if (locals.user) { %>
                 <div class="dropdown">
@@ -47,8 +125,6 @@
 
                     <ul class="dropdown-menu dropdown-menu-end custom-dropdown">
                         <li><a class="dropdown-item" href="/profile">Profile</a></li>
-                        <li><a class="dropdown-item" href="/wishlist">Wishlist</a></li>
-                        <li><a class="dropdown-item" href="/cart">My Cart</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="/logout" style="color:#c0392b;">Logout</a></li>
                     </ul>
@@ -67,5 +143,7 @@
         </div>
 
     </div> <!-- container-fluid -->
+
+    
 
 </nav>

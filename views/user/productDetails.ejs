@@ -496,10 +496,10 @@ body{
       </span>
     <% } %>
   <% } else { %>
-    <span class="disc-tag" id="discount-percent">
-      <%= Math.round((selectedVariant.regularPrice - selectedVariant.salePrice) / selectedVariant.regularPrice * 100) %>% OFF
-    </span>
-  <% } %>
+  <span class="disc-tag" id="discount-percent">
+    Best Price
+  </span>
+<% } %>
 </div>
 
         <p class="desc-text"><%= product.longDescription || product.description %></p>

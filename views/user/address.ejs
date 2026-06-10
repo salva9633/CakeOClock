@@ -9,6 +9,7 @@
   <style>
     body { background: linear-gradient(135deg, #f5e0dd 0%, #fdf3ef 100%); }
 
+    /* ── Layout ── */
     .dash-wrap {
       display: flex;
       width: 97%;
@@ -18,10 +19,15 @@
       border-radius: var(--r-xl);
       box-shadow: var(--shadow-md);
       overflow: hidden;
+      animation: wrapIn .5s cubic-bezier(.22,.9,.36,1) both;
     }
+    @keyframes wrapIn {
+      from { opacity: 0; transform: translateY(30px) scale(.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
     .dash-sidebar {
-      width: 260px;
-      min-width: 260px;
+      width: 260px; min-width: 260px;
       background: linear-gradient(180deg, #fff5f2 0%, #fff0ec 100%);
       border-right: 1px solid var(--border);
       padding: 28px 22px;
@@ -32,6 +38,7 @@
       overflow-y: auto;
     }
 
+    /* ── Topbar ── */
     .page-topbar {
       display: flex;
       align-items: center;
@@ -39,12 +46,31 @@
       margin-bottom: 32px;
       flex-wrap: wrap;
       gap: 12px;
+      animation: slideDown .45s .1s ease both;
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
     .page-topbar h2 {
       font-family: var(--font-display);
       font-size: 1.9rem;
       font-weight: 700;
       color: var(--brown);
+      position: relative;
+    }
+    /* underline draw */
+    .page-topbar h2::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      height: 3px; width: 0;
+      background: linear-gradient(90deg, var(--rose), var(--rose-dk));
+      border-radius: 2px;
+      animation: drawLine .55s .55s ease forwards;
+    }
+    @keyframes drawLine {
+      to { width: 100%; }
     }
 
     .btn-add {
@@ -63,11 +89,28 @@
       text-decoration: none;
       transition: transform .18s, box-shadow .18s;
       box-shadow: 0 5px 18px rgba(175,84,84,.28);
+      position: relative;
+      overflow: hidden;
     }
-    .btn-add:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(175,84,84,.36); color: #fff; }
+    .btn-add::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,.22) 50%, transparent 60%);
+      transform: translateX(-100%);
+      transition: transform .4s;
+    }
+    .btn-add:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(175,84,84,.36);
+      color: #fff;
+    }
+    .btn-add:hover::after { transform: translateX(160%); }
+    .btn-add:active { transform: scale(.96); }
 
+    /* ── Address list ── */
     .addr-list { display: flex; flex-direction: column; gap: 16px; }
 
+    /* staggered card reveal */
     .addr-card {
       background: var(--cream);
       border: 1.5px solid var(--border);
@@ -77,10 +120,39 @@
       align-items: flex-start;
       justify-content: space-between;
       gap: 16px;
-      transition: border-color .2s, box-shadow .2s;
-      animation: fadeUp .4s ease both;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      animation: cardReveal .42s ease both;
+      transition: border-color .22s, box-shadow .22s, transform .22s;
     }
-    .addr-card:hover { border-color: var(--rose-mid); box-shadow: var(--shadow-sm); }
+    .addr-card:nth-child(1) { animation-delay: .18s; }
+    .addr-card:nth-child(2) { animation-delay: .28s; }
+    .addr-card:nth-child(3) { animation-delay: .38s; }
+    .addr-card:nth-child(4) { animation-delay: .48s; }
+    .addr-card:nth-child(5) { animation-delay: .58s; }
+    .addr-card:nth-child(n+6) { animation-delay: .65s; }
+    @keyframes cardReveal {
+      from { opacity: 0; transform: translateX(-22px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* left-edge accent bar */
+    .addr-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px; height: 0;
+      background: linear-gradient(180deg, var(--rose), var(--rose-dk));
+      border-radius: 0 4px 4px 0;
+      transition: height .3s ease;
+    }
+    .addr-card:hover {
+      border-color: var(--rose-mid);
+      box-shadow: 0 6px 22px rgba(175,84,84,.12);
+      transform: translateX(4px);
+    }
+    .addr-card:hover::before { height: 100%; }
 
     .addr-card-left { display: flex; gap: 16px; align-items: flex-start; }
 
@@ -91,6 +163,11 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 1.2rem;
       flex-shrink: 0;
+      transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s;
+    }
+    .addr-card:hover .addr-icon {
+      transform: scale(1.12) rotate(-4deg);
+      box-shadow: 0 4px 14px rgba(175,84,84,.2);
     }
 
     .addr-type-badge {
@@ -105,12 +182,11 @@
       padding: 3px 9px;
       margin-bottom: 6px;
     }
-
     .addr-name { font-weight: 700; font-size: .95rem; color: var(--brown); }
     .addr-phone { font-size: .8rem; color: var(--muted); margin-top: 2px; }
     .addr-line { font-size: .84rem; color: var(--muted); margin-top: 6px; line-height: 1.5; }
 
-    /* Menu */
+    /* ── Dropdown menu ── */
     .menu-wrapper { position: relative; flex-shrink: 0; }
     .menu-icon {
       width: 36px; height: 36px;
@@ -120,15 +196,17 @@
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
       color: var(--muted);
-      transition: border-color .2s, color .2s;
+      transition: border-color .2s, color .2s, transform .18s;
     }
-    .menu-icon:hover { border-color: var(--rose-mid); color: var(--rose); }
-
+    .menu-icon:hover {
+      border-color: var(--rose-mid);
+      color: var(--rose);
+      transform: rotate(90deg);
+    }
     .menu-dropdown {
       display: none;
       position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
+      top: calc(100% + 8px); right: 0;
       background: #fff;
       border-radius: 12px;
       box-shadow: 0 8px 28px rgba(0,0,0,.12);
@@ -136,6 +214,11 @@
       overflow: hidden;
       z-index: 100;
       border: 1px solid var(--border);
+      animation: dropIn .22s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes dropIn {
+      from { opacity: 0; transform: translateY(-8px) scale(.95); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
     }
     .menu-dropdown a {
       display: flex;
@@ -146,23 +229,28 @@
       font-weight: 500;
       color: var(--brown);
       text-decoration: none;
-      transition: background .15s;
+      transition: background .15s, padding-left .15s;
     }
-    .menu-dropdown a:hover { background: var(--rose-lt); }
+    .menu-dropdown a:hover { background: var(--rose-lt); padding-left: 20px; }
     .menu-dropdown .delete-link { color: #e05555; }
     .menu-dropdown .delete-link:hover { background: #fde8e8; }
 
-    /* Empty state */
+    /* ── Empty state ── */
     .empty-addr {
       text-align: center;
       padding: 60px 20px;
       color: var(--muted);
+      animation: emptyFloat 3s ease-in-out infinite alternate;
+    }
+    @keyframes emptyFloat {
+      from { transform: translateY(0); }
+      to   { transform: translateY(-8px); }
     }
     .empty-addr .icon { font-size: 3.5rem; margin-bottom: 16px; display: block; }
     .empty-addr h3 { font-family: var(--font-display); font-size: 1.4rem; color: var(--rose); margin-bottom: 8px; }
     .empty-addr p { font-size: .88rem; }
 
-    /* Delete modal */
+    /* ── Delete Modal ── */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -182,20 +270,48 @@
       box-shadow: var(--shadow-lg);
       animation: scaleIn .3s cubic-bezier(.34,1.56,.64,1) both;
     }
-    .modal-icon { font-size: 2.5rem; margin-bottom: 14px; }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(.8); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .modal-icon {
+      font-size: 2.5rem;
+      margin-bottom: 14px;
+      display: block;
+      animation: iconWobble .5s .3s ease both;
+    }
+    @keyframes iconWobble {
+      0%  { transform: rotate(0); }
+      25% { transform: rotate(-12deg); }
+      50% { transform: rotate(10deg); }
+      75% { transform: rotate(-6deg); }
+      100%{ transform: rotate(0); }
+    }
     .modal-box h3 { font-family: var(--font-display); font-size: 1.4rem; color: var(--brown); margin-bottom: 8px; }
-    .modal-box p { font-size: .88rem; color: var(--muted); margin-bottom: 24px; }
+    .modal-box p  { font-size: .88rem; color: var(--muted); margin-bottom: 24px; }
     .modal-actions { display: flex; gap: 12px; justify-content: center; }
     .btn-modal-cancel {
       padding: 10px 22px; background: #f0ecec; color: var(--muted);
       border: none; border-radius: 50px; font-weight: 600; font-size: .85rem; cursor: pointer;
+      transition: background .2s, transform .15s;
     }
+    .btn-modal-cancel:hover { background: #e8e0e0; transform: translateY(-1px); }
     .btn-modal-delete {
       padding: 10px 22px; background: #e05555; color: #fff;
       border: none; border-radius: 50px; font-weight: 600; font-size: .85rem; cursor: pointer;
-      transition: background .2s;
+      transition: background .2s, transform .15s, box-shadow .15s;
+      box-shadow: 0 4px 14px rgba(224,85,85,.3);
     }
-    .btn-modal-delete:hover { background: #c03a3a; }
+    .btn-modal-delete:hover { background: #c03a3a; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(224,85,85,.4); }
+    .btn-modal-delete:active { transform: scale(.96); }
+
+    /* card exit animation on delete */
+    .addr-card.removing {
+      animation: cardRemove .4s ease forwards !important;
+    }
+    @keyframes cardRemove {
+      to { opacity: 0; transform: translateX(40px) scale(.96); max-height: 0; padding: 0; margin: 0; }
+    }
 
     @media (max-width: 860px) {
       .dash-wrap { flex-direction: column; width: 100%; border-radius: 0; margin: 0; }
@@ -224,7 +340,7 @@
     <div class="addr-list">
       <% if (!addresses || addresses.length === 0) { %>
         <div class="empty-addr">
-          <!-- <span class="icon"></span> -->
+          <span class="icon">📭</span>
           <h3>No addresses yet</h3>
           <p>Add your first delivery address to get started</p>
         </div>
@@ -232,7 +348,7 @@
         <% addresses.forEach(address => {
           const icons = { HOME: '🏠', WORK: '💼', FAMILY: '👨‍👩‍👧', FRIEND: '🤝' };
         %>
-          <div class="addr-card">
+          <div class="addr-card" id="card-<%= address._id %>">
             <div class="addr-card-left">
               <div class="addr-icon"><%= icons[address.type] || '📍' %></div>
               <div>
@@ -269,7 +385,7 @@
 <!-- Delete Modal -->
 <div id="deleteModal" class="modal-overlay">
   <div class="modal-box">
-    <div class="modal-icon">🗑️</div>
+    <span class="modal-icon">🗑️</span>
     <h3>Delete Address?</h3>
     <p>This address will be permanently removed from your account.</p>
     <div class="modal-actions">
@@ -292,7 +408,17 @@
     document.getElementById("deleteModal").style.display = "none";
   }
   function confirmDelete() {
-    if (deleteAddressId) window.location.href = `/address/delete/${deleteAddressId}`;
+    if (deleteAddressId) {
+      const card = document.getElementById('card-' + deleteAddressId);
+      if (card) {
+        card.classList.add('removing');
+        card.addEventListener('animationend', () => {
+          window.location.href = `/address/delete/${deleteAddressId}`;
+        }, { once: true });
+      } else {
+        window.location.href = `/address/delete/${deleteAddressId}`;
+      }
+    }
   }
 
   function toggleMenu(id) {
@@ -300,7 +426,14 @@
       if (m.id !== 'menu-' + id) m.style.display = 'none';
     });
     const menu = document.getElementById('menu-' + id);
-    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    const isOpen = menu.style.display === 'block';
+    menu.style.display = isOpen ? 'none' : 'block';
+    if (!isOpen) {
+      // re-trigger animation
+      menu.style.animation = 'none';
+      menu.offsetHeight; // reflow
+      menu.style.animation = '';
+    }
   }
 
   document.addEventListener('click', function(e) {

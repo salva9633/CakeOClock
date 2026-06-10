@@ -40,7 +40,7 @@ import {
   exportSalesPdf,
   exportSalesExcel
 } from "../controllers/admin/salesReportController.js";
-
+import { injectAdminBadgeCounts } from "../middlewares/badgeCounts.js";
 const router = express.Router();
 
 router.use(expressLayouts);
@@ -49,12 +49,18 @@ router.use((req, res, next) => {
   return next();
 });
 
+
+
+
+
 // ── AUTH (no guard needed) ────────────────────────────────
 router.get("/login",  loadLogin);
 router.post("/login", login);
 
 // ── ERROR PAGE (no guard) ─────────────────────────────────
-router.get("/pageerror", pageerror);        // ✅ was "pagenotfound" — fixed name
+router.get("/pageerror", pageerror);     
+
+router.use(adminAuth, injectAdminBadgeCounts);// ✅ was "pagenotfound" — fixed name
 
 // ── PROTECTED ROUTES ─────────────────────────────────────
 router.get("/",       adminAuth, loadDashboard);

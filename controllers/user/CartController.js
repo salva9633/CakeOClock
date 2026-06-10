@@ -3,7 +3,7 @@ import Product from "../../models/productModel.js";
 import Variant from "../../models/variantModel.js";
 import Wishlist from "../../models/wishlistModel.js";
 import Batch from "../../models/batchModel.js";
-
+import { getFinalPrice } from "../../utils/offerCalculator.js";
 
 /* ══════════════════════════════════════
    ADD TO CART
@@ -22,8 +22,7 @@ export const addToCart = async (req, res) => {
     }
 
     
-    const product = await Product.findById(productId).lean();
-    if (!product || !product.isListed) {
+const product = await Product.findById(productId).select("productName isListed categoryId").lean();    if (!product || !product.isListed) {
       return res.status(403).json({
         success: false,
         message: "This product is currently unavailable or has been removed.",
@@ -39,7 +38,7 @@ export const addToCart = async (req, res) => {
     }
     if (!variant) {
       variant = await Variant.findOne({ productId, isAvailable: true })
-        .sort({ salePrice: 1 })
+        .sort({ regularPrice: 1 })
         .lean();
     }
  
@@ -86,12 +85,17 @@ const MAX_QTY = 5;
       }
 
       cart.items[existingIdx].quantity = newQty;
-    } else {
+} else {
+      // ── Offer price calculation ──────────────────────────
+    const priceData    = await getFinalPrice(variant);
+    const effectivePrice = priceData.finalPrice;
+      // ────────────────────────────────────────────────────
+
       cart.items.push({
         productId: productId,
         variantId: variant._id,
         quantity:  Number(quantity),
-        price:     variant.salePrice,
+        price:     effectivePrice,   // ✅ offer price saved
       });
     }
  
@@ -133,7 +137,7 @@ export const getCart = async (req, res) => {
     const cart = await Cart.findOne({ userId })
       .populate({
         path:   "items.productId",
-        select: "productName description productImages isListed",
+        select: "productName description productImages isListed categoryId",
       })
       .populate({
         path:   "items.variantId",
@@ -142,39 +146,70 @@ export const getCart = async (req, res) => {
       .lean();
 
     if (!cart || cart.items.length === 0) {
-      return res.render("cart", { items: [], total: 0, hasOutOfStock: false });
+      return res.render("cart", { items: [], total: 0, savings: 0, hasOutOfStock: false });
     }
 
-    
+    // Filter out removed/unlisted products
     const items = cart.items.filter(
       (item) => item.productId && item.productId.isListed !== false
     );
 
-    
+    const now = new Date();
+
     for (const item of items) {
+      // Stock check via Batch
       const batches = await Batch.find({
-        variantId: item.variantId._id || item.variantId,
-        status: "active",
+        variantId:      item.variantId?._id || item.variantId,
+        status:         "active",
         availableStock: { $gt: 0 }
       }).lean();
-      const totalStock = batches.reduce((s, b) => s + b.availableStock, 0);
+
+      const totalStock   = batches.reduce((s, b) => s + b.availableStock, 0);
       item.totalStock    = totalStock;
       item.outOfStock    = totalStock === 0;
       item.exceedsStock  = item.quantity > totalStock;
+
+      // Variant availability flag
+      item.variantUnavailable = item.variantId?.isAvailable === false;
+
+      // Offer price recalculation
+const priceData      = await getFinalPrice(item.variantId);
+item.effectivePrice  = priceData.finalPrice;
+item.discountPercent = priceData.discountPercent;
+item.regularPrice    = item.variantId?.regularPrice || item.price;
+      // Blocked flag
+      item.isBlocked = item.outOfStock || item.exceedsStock || item.variantUnavailable;
     }
 
-    const hasOutOfStock = items.some(i => i.outOfStock || i.exceedsStock);
-    const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
+    const validItems    = items.filter(i => !i.isBlocked);
+    const hasOutOfStock = items.some(i => i.isBlocked);
+    const total         = validItems.reduce((s, i) => s + i.effectivePrice * i.quantity, 0);
+    const originalTotal = validItems.reduce((s, i) => s + i.regularPrice   * i.quantity, 0);
+    const savings       = originalTotal - total;
 
-    return res.render("cart", { items, total, hasOutOfStock });
+console.log("hasOutOfStock:", hasOutOfStock);
+console.log("blocked items:", items.filter(i => i.isBlocked).map(i => ({
+  name: i.productId?.productName,
+  outOfStock: i.outOfStock,
+  totalStock: i.totalStock,
+  exceedsStock: i.exceedsStock,
+  variantUnavailable: i.variantUnavailable
+})));
+
+    return res.render("cart", {        // ✅ just "cart" not "user/cart"
+      items,
+      total,
+      savings,
+      hasOutOfStock,
+    });
   } catch (err) {
     console.error("GET CART ERROR:", err);
     res.status(500).send("Server Error");
   }
-}; 
-/* ══════════════════════════════════════
-   UPDATE CART ITEM QTY
-══════════════════════════════════════ */
+};
+
+// UPDATE CART ITEM QTY
+// ══════════════════════════════════════ */
 export const updateCartItem = async (req, res) => {
   try {
     const userId = req.session.user?.id;
@@ -290,3 +325,4 @@ export const getVariantsByProduct = async (req, res) => {
     res.status(500).json({ variants: [] });
   }
 };
+

@@ -537,19 +537,21 @@
 
   /* ── Bar chart ── */
   new Chart(document.getElementById('salesChart'), {
-    type: 'bar',
+type: 'line',
     data: {
       labels:   <%- JSON.stringify(chartLabels) %>,
-      datasets: [{
-        label: 'Revenue (₹)',
-        data:  <%- JSON.stringify(chartData) %>,
-        backgroundColor: 'rgba(201,123,138,0.2)',
-        borderColor: '#C97B8A',
-        borderWidth: 1.5,
-        borderRadius: 4,
-        borderSkipped: false,
-        hoverBackgroundColor: 'rgba(201,123,138,0.4)'
-      }]
+    datasets: [{
+  label: 'Revenue (₹)',
+  data:  <%- JSON.stringify(chartData) %>,
+  backgroundColor: 'rgba(201,123,138,0.2)',
+  borderColor: '#C97B8A',
+  fill: true,           // ← add this
+  tension: 0.4,
+  borderWidth: 2,
+  pointRadius: 3,
+  pointHoverRadius: 5,
+  pointBackgroundColor: '#C97B8A',
+}]
     },
     options: {
       responsive: true,

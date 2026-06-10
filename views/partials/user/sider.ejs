@@ -1,150 +1,267 @@
 <style>
-    /* Sidebar Navigation Styles */
-    .brand {
-        font-size: 1.8rem;
-        font-weight: 800;
-        margin-top: 1.5rem;
-        margin-bottom: 2.5rem;
-        margin-left: 1.5rem;
-        color: #AF5454;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        letter-spacing: -0.5px;
-        padding-left: 10px;
-        /* Align brand */
-    }
+  :root {
+    --rose:    #8B4A5A;
+    --rose-dk: #6e3547;
+    --rose-lt: #fdf0f5;
+    --blush:   #f3d7d3;
+    --cream:   #fff8f9;
+    --ink:     #4A3B32;
+    --muted:   #a07085;
+  }
 
-    .menu-item {
-        display: flex;
-        align-items: center;
-        padding: 14px 20px;
-        margin-bottom: 12px;
-        margin-inline: 10px;
-        /* Spacing from edges */
-        border-radius: 15px;
-        /* Softer pills */
-        color: #4A3B32;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        font-weight: 500;
-        cursor: pointer;
-        font-size: 1rem;
-    }
+  /* ── SIDEBAR SHELL ── */
+  .sidebar-nav {
+    background: linear-gradient(180deg, #fff5f7 0%, #ffeef3 100%);
+    border-radius: 20px;
+    padding: 20px 14px 28px;
+    border: 1px solid #f0c4d4;
+    box-shadow: 0 4px 24px rgba(139,74,90,.08);
+    position: sticky;
+    top: 100px;
+  }
 
-    .menu-item i {
-        display: inline-block;
-        width: 24px;
-        margin-right: 15px;
-        font-size: 1.1rem;
-        text-align: center;
-        color: #5c2823;
-    }
+  /* ── BRAND ── */
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 10px 20px;
+    margin-bottom: 8px;
+    border-bottom: 1.5px solid #f0c4d4;
+    animation: sideDown .4s ease both;
+  }
 
-    .menu-item:hover {
-        background-color: #F4D0CB;
-        color: #5c2823;
-    }
+  .sidebar-brand-icon {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dk) 100%);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-size: .95rem;
+    box-shadow: 0 4px 12px rgba(139,74,90,.28);
+    flex-shrink: 0;
+  }
 
-    .menu-item.active {
-        background-color: #AF5454;
-        color: white !important;
-        box-shadow: 0 8px 20px rgba(175, 84, 84, 0.3);
-        font-weight: 600;
-        transform: translateY(-1px);
-    }
+  .sidebar-brand-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--rose);
+    line-height: 1.2;
+  }
 
-    .menu-item.active i {
-        color: white !important;
-    }
+  .sidebar-brand-sub {
+    font-size: .68rem;
+    color: var(--muted);
+    font-family: 'Lato', sans-serif;
+    font-weight: 600;
+    letter-spacing: .04em;
+  }
+
+  /* ── SECTION LABEL ── */
+  .sidebar-section-label {
+    font-family: 'Lato', sans-serif;
+    font-size: .62rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 14px 12px 6px;
+    opacity: 0;
+    animation: sideDown .4s ease .1s both;
+  }
+
+  /* ── MENU ITEM ── */
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    margin-bottom: 4px;
+    border-radius: 14px;
+    color: var(--ink);
+    text-decoration: none;
+    font-family: 'Lato', sans-serif;
+    font-size: .88rem;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    transition: background .2s, color .2s, transform .2s, box-shadow .2s;
+    opacity: 0;
+    animation: sideItem .4s ease both;
+  }
+
+  .menu-item:nth-child(1)  { animation-delay: .12s; }
+  .menu-item:nth-child(2)  { animation-delay: .18s; }
+  .menu-item:nth-child(3)  { animation-delay: .24s; }
+  .menu-item:nth-child(4)  { animation-delay: .30s; }
+  .menu-item:nth-child(5)  { animation-delay: .36s; }
+  .menu-item:nth-child(6)  { animation-delay: .42s; }
+
+  @keyframes sideItem {
+    from { opacity: 0; transform: translateX(-16px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes sideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── ICON WRAP ── */
+  .menu-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .9rem;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: background .2s, color .2s, transform .2s;
+  }
+
+  /* ── HOVER ── */
+  .menu-item:hover {
+    background: rgba(139,74,90,.07);
+    color: var(--rose);
+    transform: translateX(4px);
+  }
+
+  .menu-item:hover .menu-icon {
+    background: var(--rose-lt);
+    color: var(--rose);
+    transform: scale(1.1);
+  }
+
+  /* ── ACTIVE ── */
+  .menu-item.active {
+    background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dk) 100%);
+    color: #fff !important;
+    box-shadow: 0 6px 20px rgba(139,74,90,.28);
+    transform: translateX(4px);
+  }
+
+  .menu-item.active .menu-icon {
+    background: rgba(255,255,255,.2);
+    color: #fff;
+  }
+
+  /* Active indicator dot */
+  .menu-item.active::before {
+    content: '';
+    position: absolute;
+    left: -14px;
+    top: 50%; transform: translateY(-50%);
+    width: 4px; height: 24px;
+    background: var(--rose);
+    border-radius: 0 4px 4px 0;
+  }
+
+  /* ── DIVIDER ── */
+  .sidebar-divider {
+    height: 1px;
+    background: #f0c4d4;
+    margin: 10px 8px;
+    opacity: 0;
+    animation: sideDown .4s ease .38s both;
+  }
+
+  /* ── LOGOUT ── */
+  .menu-item.logout-item:hover {
+    background: rgba(192,57,43,.08);
+    color: #c0392b;
+  }
+
+  .menu-item.logout-item:hover .menu-icon {
+    background: #fff0f0;
+    color: #c0392b;
+  }
 </style>
 
-<nav id="sidebar-nav">
+<nav class="sidebar-nav">
 
-    
-    <!-- Profile Information -->
-    <a href="/profile" class="menu-item">
-        <i class="fa-regular fa-user"></i>
-        Profile Information
-    </a>
-    
-    <!-- Manage Address -->
-    <a href="/profile/address" class="menu-item">
-        <i class="fa-solid fa-location-dot"></i>
-        Manage Address
-    </a>
-    
-    <!-- My Orders -->
-    <a href="/orders" class="menu-item active">
-        <i class="fa-solid fa-bag-shopping"></i>
-        My Orders
-    </a>
-    
-    <!-- Privacy Settings -->
-    <a href="/changePassword" class="menu-item">
-        <i class="fa-solid fa-shield-halved"></i>
-        Privacy Settings
-    </a>
+  <!-- Brand -->
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-icon">
+      <i class="fas fa-cake-candles"></i>
+    </div>
+    <div>
+      <div class="sidebar-brand-text">My Account</div>
+      <div class="sidebar-brand-sub">Cake O'Clock</div>
+    </div>
+  </div>
 
-    <!-- Referral -->
-    <a href="/profile/referral" class="menu-item">
-        <i class="fa-solid fa-users"></i>
-        Referral
-    </a>
+  <!-- Section -->
+  <div class="sidebar-section-label">Account</div>
 
-    <!-- Coupon -->
-    <a href="/profile/coupons" class="menu-item">
-        <i class="fa-solid fa-ticket"></i>
-        Coupon
-    </a>
+  <a href="/profile" class="menu-item">
+    <div class="menu-icon"><i class="fas fa-user"></i></div>
+    Profile Information
+  </a>
 
-    <!-- Wallet -->
-    <a href="/wallet" class="menu-item">
-        <i class="fa-solid fa-wallet"></i>
-        Wallet
-    </a>
+  <a href="/profile/address" class="menu-item">
+    <div class="menu-icon"><i class="fas fa-location-dot"></i></div>
+    Manage Address
+  </a>
 
-    
+  <a href="/orders" class="menu-item">
+    <div class="menu-icon"><i class="fas fa-bag-shopping"></i></div>
+    My Orders
+  </a>
+
+  <a href="/wallet" class="menu-item">
+    <div class="menu-icon"><i class="fas fa-wallet"></i></div>
+    Wallet
+  </a>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-section-label">Settings</div>
+
+  <a href="/changePassword" class="menu-item">
+    <div class="menu-icon"><i class="fas fa-shield-halved"></i></div>
+    Privacy Settings
+  </a>
+
+  <div class="sidebar-divider"></div>
+
+  <a href="/logout" class="menu-item logout-item">
+    <div class="menu-icon"><i class="fas fa-right-from-bracket"></i></div>
+    Logout
+  </a>
 
 </nav>
 
 <script>
-    // Handle Menu Active State
-    document.addEventListener('DOMContentLoaded', function () {
-        const currentPath = window.location.pathname;
-        const menuItems = document.querySelectorAll('.menu-item');
-        let bestMatch = null;
-        let maxMatchLength = 0;
+document.addEventListener('DOMContentLoaded', function () {
+  const currentPath = window.location.pathname;
+  const menuItems   = document.querySelectorAll('.menu-item');
 
-        // 1. Find the best matching link for the current URL
-        menuItems.forEach(item => {
-            const href = item.getAttribute('href');
+  let bestMatch = null;
+  let maxLen    = 0;
 
-            // Simple logic: if the current path starts with this href, it's a candidate.
-            // We want the longest matching href (most specific).
-            if (currentPath === href || (currentPath.startsWith(href) && href !== '/' && href !== '#')) {
-                if (href.length > maxMatchLength) {
-                    maxMatchLength = href.length;
-                    bestMatch = item;
-                }
-            }
-        });
+  menuItems.forEach(item => {
+    const href = item.getAttribute('href');
+    if (!href || href === '#') return;
+    if (currentPath === href ||
+       (currentPath.startsWith(href) && href !== '/')) {
+      if (href.length > maxLen) {
+        maxLen    = href.length;
+        bestMatch = item;
+      }
+    }
+  });
 
-        // Default to first item if no match found (or Home if strict) - mostly for dev/demo
-        // If we found a match, activate it.
-        if (bestMatch) {
-            menuItems.forEach(i => i.classList.remove('active'));
-            bestMatch.classList.add('active');
-        }
+  if (bestMatch) {
+    menuItems.forEach(i => i.classList.remove('active'));
+    bestMatch.classList.add('active');
+  }
 
-        // 2. Add Click Event for Immediate Feedback (Dynamic Switching)
-        menuItems.forEach(item => {
-            item.addEventListener('click', function () {
-                // Remove active class from all
-                menuItems.forEach(i => i.classList.remove('active'));
-                // Add to clicked
-                this.classList.add('active');
-            });
-        });
+  menuItems.forEach(item => {
+    item.addEventListener('click', function () {
+      menuItems.forEach(i => i.classList.remove('active'));
+      this.classList.add('active');
     });
+  });
+});
 </script>

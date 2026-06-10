@@ -1,559 +1,726 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - Cake O Clock</title>
-
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Google Fonts -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500&display=swap"
-        rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <style>
-        body {
-            /* background: linear-gradient(135deg, #fcdcd3 0%, #f9d2c6 100%); */
-            background-color: #dba39a;
-            font-family: 'Poppins', sans-serif;
-            height: 100vh;
-            width: 100vw;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body, html {
+            height: 100%; width: 100%;
+            font-family: 'Outfit', sans-serif;
             overflow: hidden;
-            margin: 0;
-            padding: 0;
+        }
+
+        .background-wrapper {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            overflow: hidden;
+            z-index: -2;
+        }
+
+        .background-image {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .blur-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(255, 200, 200, 0.25);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: -1;
+        }
+
+        .signup-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
         }
 
         .signup-card {
-            background: linear-gradient(135deg, #fcdcd3 0%, #f9d2c6 100%);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            width: 90%;
-            max-width: 1000px;
-            height: 85vh;
-            margin: 0;
+            background: rgba(253, 240, 243, 0.25);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 28px;
+            padding: 28px 36px 24px;
+            width: 100%;
+            max-width: 560px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.3),
+                        inset 0 1px 0 rgba(255,255,255,0.05);
+            animation: cardIn 0.7s cubic-bezier(0.22,1,0.36,1) both;
+            max-height: 96vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(139,58,82,0.2) transparent;
         }
 
-        .image-container {
-            padding: 20px;
-            position: relative;
-            height: 100%;
-            overflow: hidden;
-            background-color: #fcece4;
-            /* Matches login page image container bg */
+        .signup-card::-webkit-scrollbar { width: 4px; }
+        .signup-card::-webkit-scrollbar-track { background: transparent; }
+        .signup-card::-webkit-scrollbar-thumb { background: rgba(139,58,82,0.2); border-radius: 4px; }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(28px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .logo-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 4px;
+            animation: fadeDown 0.6s 0.1s cubic-bezier(0.22,1,0.36,1) both;
+        }
+
+        .logo-icon {
+            width: 90px;
+            height: 90px;
+            background: transparent;
+            border-radius: 0;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .image-container img {
+        .logo-icon img {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 15px;
-            /* Cornering on all sides to match style */
-            position: relative;
-            /* Changed from absolute to flow within padding */
-            display: block;
+            height: auto;
+            object-fit: contain;
         }
 
-        .form-container {
-            padding: 30px 40px;
-            color: #8B4513;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Custom scrollbar for form container */
-        .form-container::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .form-container::-webkit-scrollbar-track {
-            background: rgba(139, 69, 19, 0.05);
-        }
-
-        .form-container::-webkit-scrollbar-thumb {
-            background: rgba(139, 69, 19, 0.2);
-            border-radius: 3px;
-        }
-
-        #signupForm {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            justify-content: space-between;
-        }
-
-        .main-heading {
-            font-family: 'Dancing Script', cursive;
-            font-weight: 700;
-            color: #8B4513;
-            font-size: 3rem;
-            margin-bottom: 0 !important;
+        .brand-sub {
+            font-size: 12px;
+            color: rgba(139,58,82,0.7);
+            letter-spacing: 0.5px;
             text-align: center;
+            margin-bottom: 14px;
+            animation: fadeDown 0.6s 0.18s cubic-bezier(0.22,1,0.36,1) both;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+            animation: fadeDown 0.6s 0.2s cubic-bezier(0.22,1,0.36,1) both;
+        }
+
+        .divider-line { flex: 1; height: 1px; background: rgba(255,255,255,0.1); }
+
+        .divider-text {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 2.5px;
+            color: rgba(139,58,82,0.5);
+        }
+
+        .fields-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 16px;
+            margin-bottom: 12px;
+        }
+
+        .field-full { grid-column: 1 / -1; }
+
+        .form-group {
+            animation: fadeDown 0.6s 0.25s cubic-bezier(0.22,1,0.36,1) both;
         }
 
         .form-label {
-            font-weight: 500;
-            margin-bottom: 0;
-            color: #a0522d;
-            font-size: 0.9rem;
+            display: block;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: rgba(139,58,82,0.8);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            width: 16px; height: 16px;
+            color: rgba(139,58,82,0.4);
+            pointer-events: none;
+            transition: color 0.3s;
+        }
+
+        .input-icon svg {
+            width: 16px; height: 16px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.6;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         .form-control {
-            background-color: rgba(255, 182, 193, 0.3);
-            border: 1px solid rgba(139, 69, 19, 0.2);
-            border-radius: 8px;
-            color: #5a2d0c;
-            padding: 8px 12px;
-            font-size: 0.95rem;
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            background: rgba(255,255,255,0.45);
+            border: 1px solid rgba(139,58,82,0.2);
+            border-radius: 50px;
+            font-size: 13px;
+            font-family: 'Outfit', sans-serif;
+            color: #8B3A52;
+            outline: none;
+            transition: all 0.3s ease;
         }
 
-        .form-control::placeholder {
-            color: #a67c75;
-            font-size: 0.85rem;
-        }
+        .form-control::placeholder { color: rgba(139,58,82,0.4); }
 
         .form-control:focus {
-            background-color: rgba(255, 182, 193, 0.5);
-            border-color: #8B4513;
-            box-shadow: 0 0 0 0.2rem rgba(139, 69, 19, 0.1);
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(212,116,138,0.55);
+            box-shadow: 0 0 0 3px rgba(212,116,138,0.12);
         }
 
-        .signup-btn {
-            background-color: #d89696;
-            color: #8B4513;
-            font-weight: 600;
+        select.form-control {
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .select-arrow {
+            position: absolute;
+            right: 14px;
+            pointer-events: none;
+            color: rgba(139,58,82,0.4);
+        }
+
+        .select-arrow svg {
+            width: 14px; height: 14px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .eye-toggle {
+            position: absolute;
+            right: 12px;
+            background: none;
             border: none;
-            padding: 12px;
-            border-radius: 25px;
-            /* Pill shape like login */
-            width: 100%;
-            transition: all 0.3s ease;
-            font-size: 0.95rem;
-            text-transform: none;
-            /* Login button isn't uppercase */
-            letter-spacing: normal;
-        }
-
-        .signup-btn:hover {
-            background-color: #c97b7b;
-            color: #fff;
-        }
-
-        .social-btn {
-            background-color: #fff;
-            border: 1px solid #ccc;
-            color: #333;
-            font-weight: 600;
-            font-size: 0.85rem;
-            border-radius: 25px;
+            cursor: pointer;
+            color: rgba(139,58,82,0.4);
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 8px;
+            padding: 4px;
+            transition: color 0.2s;
         }
 
-        .social-btn:hover {
-            background-color: #f8f9fa;
-            border-color: #bbb;
+        .eye-toggle svg {
+            width: 16px; height: 16px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.6;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
-        .divider-text {
-            position: relative;
-            border-top: 1px solid rgba(139, 69, 19, 0.2);
-            margin: 10px 0;
-        }
-
-        .divider-text span {
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #fcdcd3;
-            padding: 0 10px;
-            color: #8B4513;
-            font-weight: 700;
-            font-size: 0.8rem;
-        }
-
-        .footer-text {
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-align: center;
-        }
-
-        .signin-link {
-            color: #daa520;
-            text-decoration: none;
-            font-weight: 700;
-        }
-
-        .signin-link:hover {
-            text-decoration: underline;
-            color: #b8860b;
-        }
-
-        .form-check-input:checked {
-            background-color: #8b3a3a;
-            border-color: #8b3a3a;
-        }
+        .input-wrap:focus-within .input-icon { color: rgba(212,116,138,0.7); }
 
         .error-message {
             color: red;
             font-size: 0.75rem;
             display: none;
-            margin-top: 5px;
+            margin-top: 4px;
+            padding-left: 12px;
         }
-        .footer-text {
-  font-weight: 600;
-  font-size: 0.9rem;
-  text-align: center;
-}
 
+        .terms-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            font-size: 12px;
+            color: rgba(139,58,82,0.7);
+        }
+
+        .terms-row input[type="checkbox"] {
+            accent-color: #8b3a3a;
+            width: 14px; height: 14px;
+            cursor: pointer;
+        }
+
+        .btn-signup {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #b86878 0%, #7a2d3d 100%);
+            border: none;
+            border-radius: 50px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 28px rgba(100,30,45,0.5);
+            letter-spacing: 0.3px;
+            animation: fadeDown 0.6s 0.35s cubic-bezier(0.22,1,0.36,1) both;
+        }
+
+        .btn-signup svg {
+            width: 18px; height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .btn-signup:hover {
+            background: linear-gradient(135deg, #ca8090 0%, #9b4a5a 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 14px 36px rgba(139,58,74,0.5);
+        }
+
+        .btn-google {
+            width: 100%;
+            padding: 11px;
+            background: rgba(255,255,255,0.5);
+            border: 1.5px solid rgba(139,58,82,0.3);
+            border-radius: 50px;
+            color: #8B3A52;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-google:hover {
+            background: rgba(139,58,82,0.1);
+            color: #8B3A52;
+            transform: translateY(-1px);
+        }
+
+        .btn-google img { width: 18px; height: 18px; }
+
+        .divider-or {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 10px 0 0;
+        }
+
+        .divider-or .divider-line { flex: 1; height: 1px; background: rgba(139,58,82,0.2); }
+        .divider-or span { font-size: 11px; color: rgba(139,58,82,0.5); letter-spacing: 1px; }
+
+        .signin-link {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 13px;
+            color: rgba(139,58,82,0.6);
+            animation: fadeDown 0.6s 0.4s cubic-bezier(0.22,1,0.36,1) both;
+        }
+
+        .signin-link a { color: #d4748a; text-decoration: none; font-weight: 600; }
+        .signin-link a:hover { color: #e896aa; }
+
+        .secure-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: rgba(139,58,82,0.45);
+        }
+
+        .secure-note svg {
+            width: 14px; height: 14px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 540px) {
+            .signup-card { padding: 28px 20px 24px; }
+            .fields-grid { grid-template-columns: 1fr; }
+            .field-full { grid-column: 1; }
+        }
     </style>
-
 </head>
 
 <body>
 
-    <div class="container h-100 d-flex justify-content-center align-items-center">
-        <div class="signup-card row g-0">
-
-            <!-- Left Side: Image -->
-            <div class="col-md-5 d-none d-md-block image-container">
-                <img src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?q=80&w=1965&auto=format&fit=crop"
-                    alt="Red Velvet Cake">
-            </div>
-
-            <!-- Right Side: Form -->
-            <div class="col-md-7 form-container">
-                <h2 class="main-heading">Get started now</h2>
-
-                <form id="signupForm" method="post" action="/signUp">
-<div class="row g-3 mt-2">
-
-  <!-- Name -->
-  <div class="col-md-6">
-    <label class="form-label">Name</label>
-    <input
-      type="text"
-      id="name"
-      name="name"
-      class="form-control"
-      placeholder="Enter your name"
-    >
-    <div id="error1" class="error-message"></div>
-  </div>
-
-  <!-- Gender -->
-  <div class="col-md-6">
-    <label class="form-label">Gender</label>
-
-    <select
-      id="gender"
-      name="gender"
-      class="form-control"
-    >
-      <option value="">Select gender</option>
-      <option value="male">Male</option>
-      <option value="female">Female</option>
-      <option value="other">Other</option>
-    </select>
-
-    <div id="error6" class="error-message"></div>
-  </div>
-
-  <!-- Email -->
-  <div class="col-md-6">
-    <label class="form-label">Email Address</label>
-
-    <input
-      type="email"
-      id="email"
-      name="email"
-      class="form-control"
-      placeholder="Enter your email"
-    >
-
-    <div id="error2" class="error-message"></div>
-  </div>
-
-  <!-- Phone -->
-  <div class="col-md-6">
-    <label class="form-label">Phone Number</label>
-
-    <input
-      type="text"
-      id="phone"
-      name="phone"
-      class="form-control"
-      placeholder="Enter your phone number"
-    >
-
-    <div id="error3" class="error-message"></div>
-  </div>
-
-  <!-- Referral -->
-  <div class="col-md-6">
-    <label class="form-label">Referral Code</label>
-
-    <input
-      type="text"
-      id="referral"
-      name="referral"
-      class="form-control"
-      placeholder="Enter referral code"
-      value="<%= referral || '' %>"
-    >
-  </div>
-
-  <!-- Password -->
-  <div class="col-md-6">
-    <label class="form-label">Password</label>
-
-    <input
-      type="password"
-      id="password"
-      name="password"
-      class="form-control"
-      placeholder="Enter password"
-    >
-
-    <div id="error4" class="error-message"></div>
-  </div>
-
-  <!-- Confirm Password -->
-  <div class="col-md-6">
-    <label class="form-label">Confirm Password</label>
-
-    <input
-      type="password"
-      id="confirm-password"
-      name="confirmPassword"
-      class="form-control"
-      placeholder="Confirm password"
-    >
-
-    <div id="error5" class="error-message"></div>
-  </div>
-
+<!-- Background -->
+<div class="background-wrapper">
+    <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1776061313/cake_oclock/products/kg0kkgp6kqdu6yk1mvxr.jpg" alt="Background" class="background-image">
 </div>
-                    <div class="form-check">
-                        <input type="checkbox" name="t" class="form-check-input" id="termsCheck">
-                        <label class="form-check-label" for="termsCheck">I agree to the terms & policy</label>
-                    </div>
+<div class="blur-overlay"></div>
 
-                    <button id="signupBtn" type="submit" class="btn btn-primary w-100 signup-btn">Signup</button>
+<div class="signup-container">
+    <div class="signup-card">
 
-                    <div class="text-center divider-text">
-                        <span>OR</span>
-                    </div>
-
-                   <!-- Google Signup -->
-<div class="d-flex justify-content-center mt-2">
-  <a href="/auth/google" class="btn social-btn w-75">
-    <i class="bi bi-google"></i> Sign up with Google
-  </a>
-</div>
-
-<!-- Have an account -->
-<div class="d-flex justify-content-center mt-3">
-  <div class="footer-text">
-    Have an account?
-    <a href="/login" class="signin-link">Sign in</a>
-  </div>
-</div>
-
-                </form>
-
+        <div class="logo-wrap">
+            <div class="logo-icon">
+                <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1780840131/WhatsApp_Image_2026-06-07_at_4.24.57_PM-removebg-preview_cmrltl.png" alt="Logo">
             </div>
         </div>
+
+        <p class="brand-sub">Create your account and start ordering!</p>
+
+        <div class="divider">
+            <div class="divider-line"></div>
+            <span class="divider-text">CREATE YOUR ACCOUNT</span>
+            <div class="divider-line"></div>
+        </div>
+
+        <form id="signupForm" method="post" action="/signUp">
+
+            <div class="fields-grid">
+
+                <!-- Name -->
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <div class="input-wrap">
+                        <span class="input-icon">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                        </span>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="Your name">
+                    </div>
+                    <div id="error1" class="error-message"></div>
+                </div>
+
+                <!-- Gender -->
+                <div class="form-group">
+                    <label class="form-label">Gender</label>
+                    <div class="input-wrap">
+                        <span class="input-icon">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+                        </span>
+                        <select id="gender" name="gender" class="form-control">
+                            <option value="">Select gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <span class="select-arrow">
+                            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                        </span>
+                    </div>
+                    <div id="error6" class="error-message"></div>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <div class="input-wrap">
+                        <span class="input-icon">
+                            <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
+                        </span>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="you@example.com">
+                    </div>
+                    <div id="error2" class="error-message"></div>
+                </div>
+
+                <!-- Phone -->
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <div class="input-wrap">
+                        <span class="input-icon">
+                            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.6 19a19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 3.12 4.18 2 2 0 0 1 5.08 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L9.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        </span>
+                        <input type="text" id="phone" name="phone" class="form-control" placeholder="10-digit number">
+                    </div>
+                    <div id="error3" class="error-message"></div>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div class="input-wrap">
+                        <span class="input-icon">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </span>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Min 8 chars">
+                        <button type="button" class="eye-toggle" id="eyeToggle1">
+                            <svg id="eyeIcon1" viewBox="0 0 24 24">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="error4" class="error-message"></div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <div class="input-wrap">
+                        <span class="input-icon">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </span>
+                        <input type="password" id="confirm-password" name="confirmPassword" class="form-control" placeholder="Re-enter password">
+                        <button type="button" class="eye-toggle" id="eyeToggle2">
+                            <svg id="eyeIcon2" viewBox="0 0 24 24">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="error5" class="error-message"></div>
+                </div>
+
+                <!-- Referral — full width -->
+                <div class="form-group field-full">
+                    <label class="form-label">Referral Code <span style="font-size:9px;opacity:0.6;">(Optional)</span></label>
+                    <div class="input-wrap">
+                        <span class="input-icon">
+                            <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                        </span>
+                        <input type="text" id="referral" name="referral" class="form-control" placeholder="Enter referral code (if any)" value="<%= referral || '' %>">
+                    </div>
+                </div>
+
+            </div><!-- /fields-grid -->
+
+            <!-- Terms -->
+            <div class="terms-row">
+                <input type="checkbox" name="t" id="termsCheck">
+                <label for="termsCheck">I agree to the terms &amp; policy</label>
+            </div>
+
+            <button id="signupBtn" type="submit" class="btn-signup">
+                <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                Create Account
+            </button>
+
+        </form>
+
+        <div class="divider-or">
+            <div class="divider-line"></div>
+            <span>OR</span>
+            <div class="divider-line"></div>
+        </div>
+
+        <a href="/auth/google" class="btn-google">
+            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google">
+            Sign up with Google
+        </a>
+
+        <div class="signin-link">
+            Already have an account? <a href="/login">Sign in</a>
+        </div>
+
+        <div class="secure-note">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Secured with end-to-end encryption
+        </div>
+
     </div>
+</div>
 
-    <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Bootstrap JS (kept for compatibility) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const signupForm = document.getElementById("signupForm");
-            const nameid = document.getElementById("name");
-            const emailid = document.getElementById("email");
-            const genderid = document.getElementById("gender");
-            const phoneid = document.getElementById("phone");
-            const passid = document.getElementById("password");
-            const confoid = document.getElementById("confirm-password");
-            const error1 = document.getElementById("error1");
-            const error2 = document.getElementById("error2");
-            const error3 = document.getElementById("error3");
-            const error4 = document.getElementById("error4");
-            const error5 = document.getElementById("error5");
-            const error6 = document.getElementById("error6");
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const signupForm = document.getElementById("signupForm");
+        const nameid = document.getElementById("name");
+        const emailid = document.getElementById("email");
+        const genderid = document.getElementById("gender");
+        const phoneid = document.getElementById("phone");
+        const passid = document.getElementById("password");
+        const confoid = document.getElementById("confirm-password");
+        const error1 = document.getElementById("error1");
+        const error2 = document.getElementById("error2");
+        const error3 = document.getElementById("error3");
+        const error4 = document.getElementById("error4");
+        const error5 = document.getElementById("error5");
+        const error6 = document.getElementById("error6");
 
-            function nameValidateChecking() {
-                const nameval = nameid.value;
-                const namepattern = /^[A-Za-z\s]+$/;
-
-                if (nameval.trim() === "") {
-                    error1.style.display = "block";
-                    error1.innerHTML = "Please enter a valid name";
-                } else if (!namepattern.test(nameval)) {
-                    error1.style.display = "block";
-                    error1.innerHTML = "Name can only contain alphabets and spaces";
-                } else {
-                    error1.style.display = "none";
-                    error1.innerHTML = "";
-                }
+        function nameValidateChecking() {
+            const nameval = nameid.value;
+            const namepattern = /^[A-Za-z\s]+$/;
+            if (nameval.trim() === "") {
+                error1.style.display = "block";
+                error1.innerHTML = "Please enter a valid name";
+            } else if (!namepattern.test(nameval)) {
+                error1.style.display = "block";
+                error1.innerHTML = "Name can only contain alphabets and spaces";
+            } else {
+                error1.style.display = "none";
+                error1.innerHTML = "";
             }
-               
+        }
 
-             function genderValidateChecking() {
-                   if (genderid.value === "") {
-                          error6.style.display = "block";
-        error6.innerHTML = "Please select your gender";
-    } else {
-        error6.style.display = "none";
-        error6.innerHTML = "";
-    }
-}
+        function genderValidateChecking() {
+            if (genderid.value === "") {
+                error6.style.display = "block";
+                error6.innerHTML = "Please select your gender";
+            } else {
+                error6.style.display = "none";
+                error6.innerHTML = "";
+            }
+        }
 
+        function emailValidateChecking() {
+            const emailval = emailid.value;
+            const emailpattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+            if (!emailpattern.test(emailval)) {
+                error2.style.display = "block";
+                error2.innerHTML = "Invalid Format";
+            } else {
+                error2.style.display = "none";
+                error2.innerHTML = "";
+            }
+        }
 
-            function emailValidateChecking() {
-                const emailval = emailid.value;
-                const emailpattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+        function phoneValidateChecking() {
+            const phoneval = phoneid.value;
+            if (phoneval.trim() === "") {
+                error3.style.display = "block";
+                error3.innerHTML = "Enter valid phone number";
+            } else if (phoneval.length !== 10) {
+                error3.style.display = "block";
+                error3.innerHTML = "Enter 10 digit number";
+            } else {
+                error3.style.display = "none";
+                error3.innerHTML = "";
+            }
+        }
 
-                if (!emailpattern.test(emailval)) {
-                    error2.style.display = "block";
-                    error2.innerHTML = "Invalid Format";
-                } else {
-                    error2.style.display = "none";
-                    error2.innerHTML = "";
-                }
+        function passValidateChecking() {
+            const passval = passid.value;
+            const cpassval = confoid.value;
+            const alpha = /[a-zA-Z]/;
+            const digit = /\d/;
+            if (passval.length < 8) {
+                error4.style.display = "block";
+                error4.innerHTML = "Password must contain at least 8 characters";
+            } else if (!alpha.test(passval) || !digit.test(passval)) {
+                error4.style.display = "block";
+                error4.innerHTML = "Password must contain letters and numbers";
+            } else {
+                error4.style.display = "none";
+                error4.innerHTML = "";
+            }
+            if (passval !== cpassval) {
+                error5.style.display = "block";
+                error5.innerHTML = "Passwords do not match";
+            } else {
+                error5.style.display = "none";
+                error5.innerHTML = "";
+            }
+        }
+
+        signupForm.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            nameValidateChecking();
+            emailValidateChecking();
+            phoneValidateChecking();
+            passValidateChecking();
+            genderValidateChecking();
+
+            if (
+                error1.style.display === "block" ||
+                error2.style.display === "block" ||
+                error3.style.display === "block" ||
+                error4.style.display === "block" ||
+                error5.style.display === "block" ||
+                error6.style.display === "block"
+            ) {
+                return;
             }
 
-            function phoneValidateChecking() {
-                const phoneval = phoneid.value;
+            const formData = new FormData(this);
+            const data = {
+                name: formData.get("name"),
+                email: formData.get("email"),
+                phone: formData.get("phone"),
+                password: formData.get("password"),
+                gender: formData.get("gender"),
+                confirmPassword: formData.get("confirmPassword"),
+                referral: formData.get("referral"),
+                t: formData.get("t") ? true : false
+            };
 
-                if (phoneval.trim() === "") {
-                    error3.style.display = "block";
-                    error3.innerHTML = "Enter valid phone number";
-                } else if (phoneval.length !== 10) {
-                    error3.style.display = "block";
-                    error3.innerHTML = "Enter 10 digit number";
-                } else {
-                    error3.style.display = "none";
-                    error3.innerHTML = "";
-                }
-            }
-
-            function passValidateChecking() {
-                const passval = passid.value;
-                const cpassval = confoid.value;
-
-                const alpha = /[a-zA-Z]/;
-                const digit = /\d/;
-
-                if (passval.length < 8) {
-                    error4.style.display = "block";
-                    error4.innerHTML = "Password must contain at least 8 characters";
-                } else if (!alpha.test(passval) || !digit.test(passval)) {
-                    error4.style.display = "block";
-                    error4.innerHTML = "Password must contain letters and numbers";
-                } else {
-                    error4.style.display = "none";
-                    error4.innerHTML = "";
-                }
-
-                if (passval !== cpassval) {
-                    error5.style.display = "block";
-                    error5.innerHTML = "Passwords do not match";
-                } else {
-                    error5.style.display = "none";
-                    error5.innerHTML = "";
-                }
-            }
-
-            signupForm.addEventListener("submit", async function (e) {
-                e.preventDefault();
-
-                // Run validations
-                nameValidateChecking();
-                emailValidateChecking();
-                phoneValidateChecking();
-                passValidateChecking();
-                genderValidateChecking();
-
-                // Check if any errors are visible
-                if (
-                    error1.style.display === "block" ||
-                    error2.style.display === "block" ||
-                    error3.style.display === "block" ||
-                    error4.style.display === "block" ||
-                    error5.style.display === "block" ||
-                     error6.style.display === "block" 
-                ) {
-                    return; // Stop submission if there are errors
-                }
-
-                // If no errors, proceed with fetch
-                const formData = new FormData(this);
-
-                const data = {
-                    name: formData.get("name"),
-                    email: formData.get("email"),
-                    phone: formData.get("phone"),
-                    password: formData.get("password"),
-                    gender: formData.get("gender"),
-                    confirmPassword: formData.get("confirmPassword"),
-                    referral: formData.get("referral"),
-                    t: formData.get("t") ? true : false
-                };
-
-                try {
-                    const res = await fetch("/signUp", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(data)
+            try {
+                const res = await fetch("/signUp", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (result.success) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Success",
+                        text: result.message
+                    }).then(() => {
+                        window.location.href = "/verify-otp";
                     });
-
-                    const result = await res.json();
-                    if (result.success) {
-                        Swal.fire({
-                            icon: "success",
-                            title: "Success",
-                            text: result.message
-                        }).then(() => {
-                            window.location.href = "/verify-otp";
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Error",
-                            text: result.message
-                        });
-                    }
-                    console.log(result);
-
-                } catch (error) {
-                    console.error("Error:", error);
-                    // Optional: Show error alert
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: result.message
+                    });
                 }
-            });
+                console.log(result);
+            } catch (error) {
+                console.error("Error:", error);
+            }
         });
-    </script>
-</body>
 
+        function makeEyeToggle(btnId, inputId, iconId) {
+            const btn = document.getElementById(btnId);
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            btn.addEventListener('click', () => {
+                const isPass = input.type === 'password';
+                input.type = isPass ? 'text' : 'password';
+                icon.innerHTML = isPass
+                    ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+                    : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+            });
+        }
+
+        makeEyeToggle('eyeToggle1', 'password', 'eyeIcon1');
+        makeEyeToggle('eyeToggle2', 'confirm-password', 'eyeIcon2');
+    });
+</script>
+
+</body>
 </html>

@@ -18,11 +18,6 @@ const variantSchema = new mongoose.Schema(
       required: true
     },
 
-    salePrice: {
-      type: Number,
-      required: true
-    },
-
     isAvailable: {
       type: Boolean,
       default: true

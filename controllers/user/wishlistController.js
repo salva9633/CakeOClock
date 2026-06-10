@@ -34,7 +34,7 @@ const cleanWishlist = async (wishlist) => {
         productId: item.productId,
         isAvailable: true,
       })
-        .sort({ salePrice: 1 })
+.sort({ regularPrice: 1 })
         .lean();
     }
 
@@ -228,19 +228,14 @@ export const getWishlist = async (req, res) => {
 
           variantId: variant?._id || null,
 
-          startingPrice: variant?.salePrice || null,
+          startingPrice: variant?.regularPrice || null,
 
           regularPrice: variant?.regularPrice || null,
 
           isBlocked: !product.isListed,
 
-          discount: variant
-            ? Math.round(
-                ((variant.regularPrice - variant.salePrice) /
-                  variant.regularPrice) *
-                  100
-              )
-            : 0,
+          discount: 0,
+
         };
       })
     );

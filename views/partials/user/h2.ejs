@@ -1,11 +1,12 @@
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/cake.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
   :root {
-    --rose:     #8B4A5A;
-    --rose-dk: #8c3535;
+    --rose:    #8B4A5A;
+    --rose-dk: #6e2f3a;
     --rose-lt: #f8ece8;
     --cream:   #f3d7d3;
     --ink:     #826e73;
@@ -13,7 +14,7 @@
 
   .main-navbar {
     background: var(--cream);
-    height: 72px;
+    height: 76px;
     border-bottom: 1px solid rgba(175,84,84,.15);
     position: sticky;
     top: 0;
@@ -22,17 +23,23 @@
   }
   .main-navbar .container-fluid { height: 100%; }
 
+  /* ── BRAND ── */
   .nav-brand {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.55rem;
-    font-weight: 900;
-    color: var(--rose) !important;
-    letter-spacing: -.5px;
+    display: inline-flex;
+    align-items: center;
     text-decoration: none;
     transition: opacity .2s;
+    flex-shrink: 0;
   }
-  .nav-brand:hover { opacity: .8; }
+  .nav-brand:hover { opacity: .85; }
+  .nav-brand img {
+    height: 58px;
+    width: auto;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
 
+  /* ── NAV LINKS ── */
   .main-navbar .nav-link {
     font-family: 'Lato', sans-serif;
     font-size: .72rem;
@@ -40,11 +47,16 @@
     letter-spacing: .1em;
     text-transform: uppercase;
     color: var(--ink) !important;
-    padding: 6px 10px !important;
+    padding: 6px 12px !important;
     border-radius: 8px;
     transition: background .2s, color .2s;
+    white-space: nowrap;
   }
   .main-navbar .nav-link:hover {
+    color: var(--rose) !important;
+    background: rgba(175,84,84,.09);
+  }
+  .main-navbar .nav-link.active-link {
     color: var(--rose) !important;
     background: rgba(175,84,84,.09);
   }
@@ -63,6 +75,7 @@
     color: var(--rose);
     transition: background .2s, transform .2s;
     text-decoration: none;
+    flex-shrink: 0;
   }
   .nav-icon-btn:hover {
     background: rgba(175,84,84,.12);
@@ -70,7 +83,7 @@
     transform: scale(1.1);
   }
   .nav-icon-btn svg {
-    width: 20px; height: 20px;
+    width: 21px; height: 21px;
     stroke: currentColor;
     fill: none;
     stroke-width: 2;
@@ -86,7 +99,7 @@
     background: var(--rose);
     color: #fff;
     font-family: 'Lato', sans-serif;
-    font-size: .62rem;
+    font-size: .60rem;
     font-weight: 700;
     border-radius: 50px;
     display: flex;
@@ -97,61 +110,77 @@
     pointer-events: none;
     transition: transform .2s;
   }
-  /* Hide badge when count is 0 */
   .nav-badge[data-count="0"],
   .nav-badge:empty { display: none; }
-
   .nav-icon-btn:hover .nav-badge { transform: scale(1.12); }
 
-  /* ── USER DROPDOWN ── */
+  /* ── USER DROPDOWN TOGGLE ── */
   .user-toggle {
     font-family: 'Lato', sans-serif;
-    font-size: .84rem;
+    font-size: .82rem;
     font-weight: 700;
     color: var(--rose) !important;
     text-decoration: none;
     display: flex;
     align-items: center;
     gap: 7px;
-    padding: 6px 12px;
-    border-radius: 20px;
+    padding: 6px 12px 6px 6px;
+    border-radius: 50px;
     border: 1.5px solid rgba(175,84,84,.28);
     transition: background .2s;
+    white-space: nowrap;
   }
   .user-toggle:hover { background: rgba(175,84,84,.08); }
+  .user-toggle::after { display: none !important; }
 
   .u-avatar {
-    width: 28px; height: 28px;
-    background: var(--rose);
+    width: 30px; height: 30px;
+    background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dk) 100%);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     color: #fff;
-    font-size: .75rem;
+    font-family: 'Playfair Display', serif;
+    font-size: .82rem;
     font-weight: 900;
+    flex-shrink: 0;
   }
 
+  .u-caret {
+    font-size: .65rem;
+    opacity: .6;
+    margin-left: 2px;
+  }
+
+  /* ── DROPDOWN MENU ── */
   .u-menu {
     border: none !important;
-    border-radius: 14px !important;
-    box-shadow: 0 12px 40px rgba(175,84,84,.18) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 16px 48px rgba(139,74,90,.18) !important;
     padding: 8px !important;
-    min-width: 165px;
-    margin-top: 6px !important;
+    min-width: 172px;
+    margin-top: 8px !important;
+    background: #fff !important;
   }
   .u-menu .dropdown-item {
-    border-radius: 9px;
-    padding: 9px 14px;
+    border-radius: 10px;
+    padding: 10px 14px;
     font-family: 'Lato', sans-serif;
     font-size: .84rem;
     font-weight: 600;
     color: var(--ink);
-    display: flex; align-items: center; gap: 8px;
+    display: flex; align-items: center; gap: 9px;
     transition: background .15s, color .15s;
   }
   .u-menu .dropdown-item:hover { background: var(--rose-lt); color: var(--rose); }
   .u-menu .dropdown-item svg { flex-shrink: 0; }
-  .u-menu .dropdown-divider { border-color: rgba(175,84,84,.12); margin: 4px 8px; }
+  .u-menu .dropdown-divider {
+    border-color: rgba(175,84,84,.12);
+    margin: 5px 8px;
+  }
+  .u-menu .item-logout { color: #c0392b !important; }
+  .u-menu .item-logout:hover { background: #fff0f0 !important; color: #c0392b !important; }
 
+  /* ── AUTH LINKS (guest) ── */
   .auth-link {
     font-family: 'Lato', sans-serif;
     font-size: .78rem;
@@ -159,48 +188,57 @@
     letter-spacing: .04em;
     color: var(--rose) !important;
     text-decoration: none;
-    padding: 7px 14px;
-    border-radius: 20px;
+    padding: 8px 16px;
+    border-radius: 50px;
     transition: background .2s;
+    white-space: nowrap;
   }
   .auth-link:hover { background: rgba(175,84,84,.1); }
-  .auth-link.signup { background: #8B4A5A; color: #fff !important; }
-  .auth-link.signup:hover { background: var(--rose-dk); }
+  .auth-link.signup {
+    background: var(--rose);
+    color: #fff !important;
+    box-shadow: 0 4px 14px rgba(139,74,90,.28);
+  }
+  .auth-link.signup:hover {
+    background: var(--rose-dk);
+    box-shadow: 0 6px 18px rgba(139,74,90,.36);
+  }
 </style>
 
 <nav class="main-navbar navbar navbar-expand-lg">
-  <div class="container-fluid px-4 px-lg-5 d-flex justify-content-between align-items-center">
+  <div class="container-fluid px-4 px-lg-5 d-flex justify-content-between align-items-center gap-3">
 
-    <!-- Brand -->
-    <a class="nav-brand" href="/">Cake O'Clock</a>
+    <!-- ── LOGO ── -->
+    <a class="nav-brand" href="/">
+      <img
+        src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1780840131/WhatsApp_Image_2026-06-07_at_4.24.57_PM-removebg-preview_cmrltl.png"
+        alt="Cake O'Clock">
+    </a>
 
-    <!-- Nav Links -->
-    <ul class="nav gap-1 d-none d-lg-flex">
-      <li><a class="nav-link" href="/">Home</a></li>
+    <!-- ── NAV LINKS ── -->
+<!-- ── NAV LINKS ── -->
+<ul class="nav gap-1 d-none d-lg-flex position-absolute start-50 translate-middle-x">
+        <li><a class="nav-link" href="/">Home</a></li>
       <li><a class="nav-link" href="/products">Shop</a></li>
       <li><a class="nav-link" href="#">About Us</a></li>
       <li><a class="nav-link" href="#">Contact Us</a></li>
       <li><a class="nav-link" href="#">Support</a></li>
     </ul>
 
-    <!-- Icons + User -->
-    <div class="d-flex align-items-center gap-2">
+    <!-- ── ICONS + USER ── -->
+    <div class="d-flex align-items-center gap-2" style="flex-shrink:0;">
 
       <!-- ❤ WISHLIST -->
       <a href="/wishlist" class="nav-icon-btn" title="My Wishlist" aria-label="Wishlist">
         <svg viewBox="0 0 24 24">
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
         </svg>
-        <%
-          // Safely read wishlistCount — works whether it's set or not
-          const _wc = locals.wishlistCount || 0;
-        %>
-        <span
-          id="wishlist-count"
-          class="nav-badge"
+        <% const _wc = locals.wishlistCount || 0; %>
+        <span id="wishlist-count" class="nav-badge"
           data-count="<%= _wc %>"
-          style="<%= _wc === 0 ? 'display:none' : '' %>"
-        ><%= _wc > 0 ? _wc : '' %></span>
+          style="<%= _wc === 0 ? 'display:none' : '' %>">
+          <%= _wc > 0 ? _wc : '' %>
+        </span>
       </a>
 
       <!-- 🛒 CART -->
@@ -210,46 +248,77 @@
           <circle cx="20" cy="21" r="1"/>
           <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
         </svg>
-        <%
-          const _cc = locals.cartCount || 0;
-        %>
-<span
-  id="cart-count"
-  class="nav-badge"
-  data-count="<%= _cc %>"
-  style="<%= _cc === 0 ? 'display:none' : '' %>"
->
-  <%= _cc > 0 ? _cc : '' %>
-</span>      </a>
+        <% const _cc = locals.cartCount || 0; %>
+        <span id="cart-count" class="nav-badge"
+          data-count="<%= _cc %>"
+          style="<%= _cc === 0 ? 'display:none' : '' %>">
+          <%= _cc > 0 ? _cc : '' %>
+        </span>
+      </a>
 
-      <!-- User / Auth -->
+      <!-- ── USER / AUTH ── -->
       <% if (locals.user) { %>
         <div class="dropdown">
-          <a class="user-toggle dropdown-toggle" href="#"
-             data-bs-toggle="dropdown" aria-expanded="false">
-            <div class="u-avatar"><%= locals.user.name.charAt(0).toUpperCase() %></div>
+          <a class="user-toggle" href="#"
+             data-bs-toggle="dropdown"
+             aria-expanded="false">
+            <div class="u-avatar">
+              <%= locals.user.name.charAt(0).toUpperCase() %>
+            </div>
             <%= locals.user.name.split(' ')[0] %>
+            <i class="fas fa-chevron-down u-caret"></i>
           </a>
           <ul class="dropdown-menu dropdown-menu-end u-menu">
-            <li><a class="dropdown-item" href="/profile">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              My Profile
-            </a></li>
-            <li><a class="dropdown-item" href="/wishlist">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-              Wishlist
-            </a></li>
-            <li><a class="dropdown-item" href="/cart">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-              My Cart
-            </a></li>
+            <li>
+              <a class="dropdown-item" href="/profile">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                My Profile
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="/orders">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+                  <rect x="9" y="3" width="6" height="4" rx="1"/>
+                </svg>
+                My Orders
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="/wishlist">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                Wishlist
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="/cart">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="9" cy="21" r="1"/>
+                  <circle cx="20" cy="21" r="1"/>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                </svg>
+                My Cart
+              </a>
+            </li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="/logout" style="color:#c0392b">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-              Logout
-            </a></li>
+            <li>
+              <a class="dropdown-item item-logout" href="/logout">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                  <polyline points="16 17 21 12 16 7"/>
+                  <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Logout
+              </a>
+            </li>
           </ul>
         </div>
+
       <% } else { %>
         <a href="/login"  class="auth-link">Log In</a>
         <a href="/signUp" class="auth-link signup">Sign Up</a>
@@ -262,12 +331,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-/* ════════════════════════════════════════
-   LIVE BADGE UPDATER
-   Call updateNavBadge('cart-count', 5) or
-        updateNavBadge('wishlist-count', 2)
-   from any page script after API responses.
-════════════════════════════════════════ */
+/* ── LIVE BADGE UPDATER ── */
 function updateNavBadge(id, count) {
   const badge = document.getElementById(id);
   if (!badge) return;
@@ -281,4 +345,15 @@ function updateNavBadge(id, count) {
     badge.style.display = 'none';
   }
 }
+
+/* ── ACTIVE NAV LINK ── */
+(function () {
+  const links = document.querySelectorAll('.main-navbar .nav-link');
+  const path  = window.location.pathname;
+  links.forEach(link => {
+    if (link.getAttribute('href') === path) {
+      link.classList.add('active-link');
+    }
+  });
+})();
 </script>

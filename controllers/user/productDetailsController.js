@@ -3,7 +3,7 @@ import Variant  from "../../models/variantModel.js";
 import Batch    from "../../models/batchModel.js";
 import Review   from "../../models/reviewModel.js";
 import Order    from "../../models/orderModel.js";
-
+import { getFinalPrice } from "../../utils/offerCalculator.js";
 /* ===============================
    LOAD PRODUCT DETAILS PAGE
 ================================ */
@@ -15,14 +15,15 @@ const loadProductDetailsPage = async (req, res) => {
     const userId = req.session?.user?.id || req.session?.user?._id || null;
  
     /* -------- Product -------- */
-    const product = await Product.findOne({ _id: productId, isListed: true })
+  const product = await Product.findOne({ _id: productId, isListed: true })
     .populate("categoryId")   
     .lean();
+    console.log("PRODUCT FOUND:", product ? product.productName : "NULL — not found or not listed");
     if (!product) return res.status(404).render("404");
  
     /* -------- Variants -------- */
     const variants = await Variant.find({ productId, isAvailable: true })
-      .sort({ salePrice: 1 })
+      .sort({ regularPrice: 1 })
       .lean();
     if (variants.length === 0) return res.status(404).render("404");
  
@@ -74,13 +75,13 @@ const loadProductDetailsPage = async (req, res) => {
     const relatedProducts = await Promise.all(
       relatedProductsRaw.map(async (rp) => {
         const rpVariants = await Variant.find({ productId: rp._id, isAvailable: true })
-          .sort({ salePrice: 1 })
+          .sort({ regularPrice: 1 })
           .lean();
         const { avgRating = "0.0", totalReviews = 0 } =
           relatedRatingMap[rp._id.toString()] || {};
         return {
           ...rp,
-          startingPrice: rpVariants.length ? rpVariants[0].salePrice : null,
+         startingPrice: rpVariants.length ? rpVariants[0].regularPrice : null,
           avgRating,
           totalReviews
         };
@@ -118,19 +119,15 @@ const loadProductDetailsPage = async (req, res) => {
     }
  
 /* -------- Offer Calculation -------- */
-const productOffer  = product.productOffer  || 0;
-const categoryOffer = product.categoryId?.categoryOffer || 0;
-const bestOffer     = Math.max(productOffer, categoryOffer);
-const finalPrice    = selectedVariant.salePrice - (selectedVariant.salePrice * bestOffer / 100);
 
+const priceData = await getFinalPrice(selectedVariant);
 const offerData = {
-  productOffer,
-  categoryOffer,
-  bestOffer,
-  finalPrice,
-  activeOfferLabel: bestOffer === 0 ? null
-                  : categoryOffer > productOffer ? "category"
-                  : "product"
+  productOffer:     0,
+  categoryOffer:    0,
+  bestOffer:        priceData.discountPercent,
+  finalPrice:       priceData.finalPrice,
+  originalPrice:    priceData.originalPrice,
+  activeOfferLabel: priceData.offerApplied ? "offer" : null
 };
 /* -------- Render -------- */
 res.render("productDetails", {
@@ -144,12 +141,22 @@ res.render("productDetails", {
   initialStock,
   canReview,
   isLoggedIn: !!userId,
-  offerData
+  offerData,
+  user:          req.session?.user || null,
+  cartCount:     req.session?.cartCount     || 0,
+  wishlistCount: req.session?.wishlistCount || 0,
+  search:        ""
+}, (err, html) => {
+  if (err) {
+    console.error("EJS RENDER ERROR:", err.message);
+    return res.status(500).send("Render Error: " + err.message);
+  }
+  res.send(html);
 });
  
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Server Error");
+} catch (error) {
+    console.error("PRODUCT DETAIL ERROR:", error.message, error.stack);
+    res.status(500).send("Server Error: " + error.message);
   }
 };
  
@@ -174,10 +181,11 @@ const getVariantDetails = async (req, res) => {
  
     const totalStock = batches.reduce((sum, b) => sum + b.availableStock, 0);
  
-    res.json({
-      success:      true,
-      salePrice:    variant.salePrice,
-      regularPrice: variant.regularPrice,
+   const variantPrice = await getFinalPrice(variant);
+res.json({
+  success:      true,
+  salePrice:    variantPrice.finalPrice,   // frontend still gets salePrice key — no EJS change needed
+  regularPrice: variant.regularPrice,
       weight:       variant.weight,
       stock:        totalStock,
       stockStatus:  totalStock > 0 ? "In Stock" : "Out of Stock"

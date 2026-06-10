@@ -1,10 +1,9 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const offerSchema = new mongoose.Schema({
   name: { type: String, required: true },
   offerType: { type: String, enum: ['product', 'category'], required: true },
   discountPercent: { type: Number, required: true, min: 1, max: 100 },
-  // Link to either a product OR category
   productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', default: null },
   categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', default: null },
   startDate: { type: Date, required: true },
@@ -12,4 +11,5 @@ const offerSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Offer', offerSchema);
+const Offer = mongoose.model('Offer', offerSchema);
+export default Offer;

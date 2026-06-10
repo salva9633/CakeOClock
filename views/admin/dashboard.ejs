@@ -401,7 +401,7 @@
 
   var ctx = document.getElementById('revenueChart');
   new Chart(ctx, {
-    type: 'bar',
+    type: 'line',
     data: {
       labels: chartLabels,
       datasets: [{
@@ -409,10 +409,12 @@
         data: chartData,
         backgroundColor: 'rgba(201,123,138,0.2)',
         borderColor: '#C97B8A',
-        borderWidth: 1.5,
-        borderRadius: 4,
-        borderSkipped: false,
-        hoverBackgroundColor: 'rgba(201,123,138,0.4)',
+fill: true,
+tension: 0.4,
+borderWidth: 2,
+pointRadius: 3,
+pointHoverRadius: 5,
+pointBackgroundColor: '#C97B8A',
       }]
     },
     options: {

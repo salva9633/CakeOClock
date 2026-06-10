@@ -246,8 +246,13 @@ export const approveReturnRequest = async (req, res) => {
 
     // refund amount
   // refund amount
-    const refundAmount = item.price * item.quantity;
-
+// Calculate this item's share of the order discount
+const orderItemTotal = order.items.reduce((s, i) => s + i.price * i.quantity, 0);
+const itemSubtotal   = item.price * item.quantity;
+const discountShare  = orderItemTotal > 0
+  ? Math.round((itemSubtotal / orderItemTotal) * (order.discount || 0))
+  : 0;
+const refundAmount   = itemSubtotal - discountShare;
     // credit wallet
     const user = await User.findById(order.userId);
     const newBalance = (user.walletBalance || 0) + refundAmount;

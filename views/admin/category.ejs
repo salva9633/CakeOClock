@@ -221,8 +221,10 @@ small.err-msg { font-size: 11px; color: #dc3545; margin-top: 3px; display: block
   font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity .2s;
 }
 .btn-save:hover { opacity: .88; }
-</style>
 
+/* ── SWAL ABOVE MODAL ── */
+.swal2-container { z-index: 9999 !important; }
+</style>
 <div class="cp">
 
   <!-- HEADER -->
@@ -468,7 +470,6 @@ function openEditModal(id, name, desc, image, status) {
 }
 function closeEditModal() { document.getElementById("editModal").classList.remove("open"); }
 
-// close on overlay click
 ["addModal","editModal"].forEach(id => {
   document.getElementById(id).addEventListener("click", function(e) {
     if (e.target === this) this.classList.remove("open");
@@ -507,15 +508,15 @@ function validateImage(file, boxEl, errEl) {
   if (!file) { setErr(null, errEl, "Image required"); boxEl.classList.add("err"); return false; }
   const valid = ["image/jpeg","image/png","image/jpg"];
   if (!valid.includes(file.type)) { setErr(null, errEl, "Only JPG/PNG allowed"); boxEl.classList.add("err"); return false; }
-  if (file.size > 2*1024*1024)    { setErr(null, errEl, "Max size 2MB");          boxEl.classList.add("err"); return false; }
+  if (file.size > 2*1024*1024)    { setErr(null, errEl, "Max size 2MB"); boxEl.classList.add("err"); return false; }
   boxEl.classList.remove("err"); boxEl.classList.add("ok"); return true;
 }
 
 // ── SUBMIT ADD ──
 function submitCategory() {
-  const name  = document.getElementById("catName");
-  const desc  = document.getElementById("catDesc");
-  const image = document.getElementById("catImage").files[0];
+  const name    = document.getElementById("catName");
+  const desc    = document.getElementById("catDesc");
+  const image   = document.getElementById("catImage").files[0];
   const nameErr = document.getElementById("nameError");
   const descErr = document.getElementById("descError");
   const imgErr  = document.getElementById("imgError");
@@ -524,9 +525,9 @@ function submitCategory() {
   clearErr(name, nameErr); clearErr(desc, descErr); imgErr.innerText = ""; imgBox.classList.remove("err","ok");
 
   let ok = true;
-  if (!name.value.trim())         { setErr(name, nameErr, "Name required"); ok = false; }
+  if (!name.value.trim())                { setErr(name, nameErr, "Name required"); ok = false; }
   else if (name.value.trim().length < 3) { setErr(name, nameErr, "Min 3 characters"); ok = false; }
-  if (!desc.value.trim())         { setErr(desc, descErr, "Description required"); ok = false; }
+  if (!desc.value.trim())                { setErr(desc, descErr, "Description required"); ok = false; }
   if (!validateImage(image, imgBox, imgErr)) ok = false;
   if (!ok) return;
 
@@ -536,10 +537,20 @@ function submitCategory() {
   fd.append("image", image);
   fd.append("isActive", document.getElementById("catStatus").value);
 
-  fetch("/admin/category/add", { method:"POST", body:fd })
-    .then(r => r.json()).then(data => {
-      if (!data.success) { Swal.fire({ icon:"error", title:"Error", text:data.message }); return; }
-      Swal.fire({ icon:"success", title:"Added!", timer:1500, showConfirmButton:false }).then(() => location.reload());
+fetch("/admin/category/add", { method: "POST", body: fd })
+    .then(r => r.json())
+    .then(data => {
+      closeAddModal();   // ← close modal first, then show Swal
+      if (!data.success) {
+        Swal.fire({ icon: "error", title: "Failed!", text: data.message || "Something went wrong", confirmButtonColor: "#A85F6E" });
+        return;
+      }
+      Swal.fire({ icon: "success", title: "Category Added!", text: data.message, timer: 1500, showConfirmButton: false })
+        .then(() => location.reload());
+    })
+
+    .catch(() => {
+      Swal.fire({ icon: "error", title: "Network Error", text: "Could not connect. Please try again.", confirmButtonColor: "#A85F6E" });
     });
 }
 
@@ -568,45 +579,43 @@ function updateCategory() {
   fd.append("isActive", document.getElementById("editStatus").value);
   if (image) fd.append("image", image);
 
-  fetch(`/admin/category/edit/${document.getElementById("editId").value}`, { method:"PATCH", body:fd })
-    .then(r => r.json()).then(data => {
-      if (!data.success) { Swal.fire({ icon:"error", title:"Error", text:data.message }); return; }
-      Swal.fire({ icon:"success", title:"Updated!", timer:1500, showConfirmButton:false }).then(() => location.reload());
+  fetch(`/admin/category/edit/${document.getElementById("editId").value}`, { method: "PATCH", body: fd })
+    .then(r => r.json())
+ .then(data => {
+      closeEditModal();   // ← close modal first, then show Swal
+      if (!data.success) {
+        Swal.fire({ icon: "error", title: "Duplicate Category!", text: data.message, confirmButtonColor: "#A85F6E" });
+        return;
+      }
+      Swal.fire({ icon: "success", title: "Updated!", timer: 1500, showConfirmButton: false })
+        .then(() => location.reload());
+    })
+    .catch(() => {
+      Swal.fire({ icon: "error", title: "Network Error", text: "Could not connect. Please try again.", confirmButtonColor: "#A85F6E" });
     });
 }
 
 // ── TOGGLE STATUS ──
 function toggleStatus(id) {
-  fetch(`/admin/category/status/${id}`, { method:"PATCH" }).then(() => location.reload());
+  fetch(`/admin/category/status/${id}`, { method: "PATCH" }).then(() => location.reload());
 }
+
 // ── CATEGORY OFFER ──
 async function saveCategoryOffer(categoryId, categoryName) {
   const input = document.getElementById('offerInput_' + categoryId);
   const value = input.value.trim();
 
   if (value === '' || isNaN(value)) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Invalid Value',
-      text: 'Please enter a valid offer percentage.',
-      confirmButtonColor: '#A85F6E'
-    });
+    Swal.fire({ icon: 'warning', title: 'Invalid Value', text: 'Please enter a valid offer percentage.', confirmButtonColor: '#A85F6E' });
     return;
   }
 
   const percent = Number(value);
-
   if (percent < 0 || percent > 100) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Invalid Range',
-      text: 'Offer must be between 0 and 100.',
-      confirmButtonColor: '#A85F6E'
-    });
+    Swal.fire({ icon: 'warning', title: 'Invalid Range', text: 'Offer must be between 0 and 100.', confirmButtonColor: '#A85F6E' });
     return;
   }
 
-  // Confirm before saving
   const result = await Swal.fire({
     icon: 'question',
     title: percent === 0 ? 'Remove Offer?' : 'Apply Offer?',
@@ -623,41 +632,23 @@ async function saveCategoryOffer(categoryId, categoryName) {
   if (!result.isConfirmed) return;
 
   try {
-const res  = await fetch('/admin/add-category-offer', {
-  method:  'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ categoryId, offerPercentage: percent })
-});
-
-const data = await res.json();
-
-if (data.success) {
-
-  Swal.fire({
-    icon: 'success',
-    title: 'Success',
-    text: data.message,
-    confirmButtonColor: '#A85F6E',
-    timer: 2000,
-    showConfirmButton: false
-  }).then(() => {
-    location.reload();
-  });
-
-} else {
-
-  Swal.fire({
-    icon: 'error',
-    title: 'Failed',
-    text: data.message || 'Something went wrong',
-    confirmButtonColor: '#A85F6E'
-  });
-
-}
+    const res  = await fetch('/admin/add-category-offer', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ categoryId, offerPercentage: percent })
+    });
+    const data = await res.json();
+    if (data.success) {
+      Swal.fire({ icon: 'success', title: 'Success', text: data.message, confirmButtonColor: '#A85F6E', timer: 2000, showConfirmButton: false })
+        .then(() => location.reload());
+    } else {
+      Swal.fire({ icon: 'error', title: 'Failed', text: data.message || 'Something went wrong', confirmButtonColor: '#A85F6E' });
+    }
   } catch (err) {
     Swal.fire({ icon: 'error', title: 'Error', text: 'Network error. Please try again.', confirmButtonColor: '#A85F6E' });
   }
 }
+
 // ── SEARCH ──
 const searchInput = document.getElementById("searchInput");
 const clearIcon   = document.getElementById("clearIcon");
@@ -673,11 +664,13 @@ clearIcon.addEventListener("click", function () {
   window.location.href = "/admin/category";
 });
 
-// debounced search
 let searchTimer;
 searchInput.addEventListener("input", function () {
   clearTimeout(searchTimer);
   searchTimer = setTimeout(() => {
+    const addOpen  = document.getElementById("addModal").classList.contains("open");
+    const editOpen = document.getElementById("editModal").classList.contains("open");
+    if (addOpen || editOpen) return;
     if (this.value.trim()) searchForm.submit();
     else window.location.href = "/admin/category";
   }, 500);

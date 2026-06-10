@@ -7,30 +7,31 @@ import Product from "../../models/productModel.js";
 ========================= */
 export const addVariant = async (req, res) => {
   try {
-    const { productId, weight, costPrice, regularPrice, salePrice } = req.body;
+const { productId, weight, costPrice, regularPrice } = req.body;
 
-    if (!productId || !weight || !costPrice || !regularPrice || !salePrice) {
-      return res.status(400).send("All fields are required");
+ if (!productId || !weight || !costPrice || !regularPric) {
+      return res.status(400).json({ success: false, message: "All fields are required" });
     }
 
     const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).send("Product not found");
-    }
+    return res.status(404).json({ success: false, message: "Product not found" });
+
+  }
 
     const allowedWeights = [60, 80, 500, 750, 1000, 2000, 3000];
     const parsedWeight = Number(weight);
 
     if (!allowedWeights.includes(parsedWeight)) {
-      return res.status(400).send("Invalid weight selected");
-    }
-
-    if (Number(salePrice) > Number(regularPrice)) {
-      return res.status(400).send("Sale price cannot be higher than regular price");
+    return res.status(400).json({ success: false, message: "Invalid weight selected" });
     }
 
     if (Number(salePrice) < Number(costPrice)) {
-      return res.status(400).send("Sale price cannot be lower than cost price");
+  return res.status(400).json({ success: false, message: "Sale price cannot be lower than cost price" });
+}
+
+    if (Number(salePrice) < Number(costPrice)) {
+    return res.status(400).json({ success: false, message: "Sale price cannot be lower than cost price" });
     }
 
     const variant = await Variant.create({
@@ -38,18 +39,17 @@ export const addVariant = async (req, res) => {
       weight: parsedWeight,
       costPrice: Number(costPrice),
       regularPrice: Number(regularPrice),
-      salePrice: Number(salePrice)
     });
 
-    res.redirect(`/admin/variants/${variant._id}`);
+res.status(200).json({ success: true, variantId: variant._id });
   } catch (error) {
     console.error("ADD VARIANT ERROR:", error);
 
-    if (error.code === 11000) {
-      return res.status(400).send("Variant with this weight already exists");
+if (error.code === 11000) {
+      return res.status(400).json({ success: false, message: "A variant with this weight already exists for this product." });
     }
 
-    res.status(500).send("Add variant failed");
+    res.status(500).json({ success: false, message: "Add variant failed" });
   }
 };
 
@@ -85,11 +85,11 @@ export const getVariantDetail = async (req, res) => {
 export const updateVariant = async (req, res) => {
   try {
     const { variantId } = req.params;
-    const { weight, costPrice, regularPrice, salePrice } = req.body;
+  const { weight, costPrice, regularPrice } = req.body;
 
-    const variant = await Variant.findByIdAndUpdate(
-      variantId,
-      { weight, costPrice, regularPrice, salePrice },
+const variant = await Variant.findByIdAndUpdate(
+  variantId,
+  { weight, costPrice, regularPrice },
       { new: true }
     );
 

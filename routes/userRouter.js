@@ -100,13 +100,28 @@ router.post("/address/edit/:id",  userAuth, profileController.updateAddress);
 // ── WISHLIST ──────────────────────────────────────────
 router.get("/wishlist",         userAuth, getWishlist);
 router.post("/wishlist/toggle", userAuth, toggleWishlist);
- 
+router.get("/wishlist/count", userAuth, async (req, res) => {
+  try {
+    const Wishlist = (await import("../models/wishlistModel.js")).default;
+    const wish = await Wishlist.findOne({ userId: req.session.user.id }).lean();
+    const count = wish?.products?.length || 0;
+    res.json({ count });
+  } catch { res.json({ count: 0 }); }
+});
 // ── CART ──────────────────────────────────────────────
 router.get("/cart",          userAuth, getCart);
 router.post("/cart/add",     userAuth, addToCart);
 router.post("/cart/update",  userAuth, updateCartItem);
 router.post("/cart/remove",  userAuth, removeCartItem);
 router.get("/variant/by-product/:productId", getVariantsByProduct);
+router.get("/cart/count", userAuth, async (req, res) => {
+  try {
+    const Cart = (await import("../models/cartModel.js")).default;
+    const cart = await Cart.findOne({ userId: req.session.user.id }).lean();
+    const count = cart?.items?.length || 0;
+    res.json({ count });
+  } catch { res.json({ count: 0 }); }
+});
  
 // ── CHECKOUT ──────────────────────────────────────────
 router.get("/checkout",              userAuth, loadCheckout);

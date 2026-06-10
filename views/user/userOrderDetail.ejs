@@ -79,7 +79,10 @@
     <span id="order-status-badge" class="status-badge status-<%= order.status %>">
       <%= order.status %>
     </span>
-    <a href="/orders/<%= order._id %>/invoice" class="btn-rose ms-auto">📄 Download Invoice</a>
+<!-- AFTER -->
+<button class="btn-rose ms-auto" onclick="downloadInvoice('<%= order._id %>','<%= order.status %>')">
+  📄 Download Invoice
+</button>
   </div>
 
   <div class="row g-4">
@@ -237,10 +240,11 @@
             </div>
           <% } %>
 
-          <a href="/orders/<%= order._id %>/invoice"
-            class="btn w-100" style="background:#f0f0f0;border-radius:9px">
-            📄 Download Invoice
-          </a>
+         
+<button onclick="downloadInvoice('<%= order._id %>','<%= order.status %>')"
+  class="btn w-100" style="background:#f0f0f0;border-radius:9px">
+  📄 Download Invoice
+</button>
         </div>
       </div>
 
@@ -331,19 +335,29 @@ async function cancelItem(orderId, itemId, name) {
     title: 'Cancel Item?',
     html:  `Cancel <strong>"${name}"</strong>?`,
     icon:  'warning',
-    input: 'text',
-    inputPlaceholder:   'Reason (optional)',
+    input: 'select',
+    inputOptions: {
+      'Changed my mind':        'Changed my mind',
+      'Ordered by mistake':     'Ordered by mistake',
+      'Found a better price':   'Found a better price',
+      'Delivery time too long': 'Delivery time too long',
+      'Other':                  'Other'
+    },
+    inputPlaceholder:   'Select a reason',
     showCancelButton:   true,
     confirmButtonColor: '#AF5454',
     cancelButtonColor:  '#9a7070',
     confirmButtonText:  'Yes, Cancel',
-    cancelButtonText:   'Keep'
+    cancelButtonText:   'Keep',
+    preConfirm: (val) => {
+      if (!val) { Swal.showValidationMessage('Please select a reason'); return false; }
+    }
   });
   if (!isConfirmed) return;
   const res  = await fetch('/orders/item/cancel', {
     method:  'POST',
     headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify({ orderId, itemId, reason: reason || '' })
+    body:    JSON.stringify({ orderId, itemId, reason })
   });
   const data = await res.json();
   if (data.success) {
@@ -353,25 +367,28 @@ async function cancelItem(orderId, itemId, name) {
     Swal.fire({ icon:'error', title:'Failed', text:data.message, confirmButtonColor:'#AF5454' });
   }
 }
-
 /* ════ RETURN ITEM ════ */
 async function returnItem(orderId, itemId, name) {
   const { value: reason, isConfirmed } = await Swal.fire({
     title: 'Return Item?',
     html:  `Return <strong>"${name}"</strong>?`,
     icon:  'question',
-    input: 'textarea',
-    inputPlaceholder:   'Enter reason (required)',
+    input: 'select',
+    inputOptions: {
+      'Damaged or defective':   'Damaged or defective',
+      'Wrong item delivered':   'Wrong item delivered',
+      'Not as described':       'Not as described',
+      'Quality not satisfactory': 'Quality not satisfactory',
+      'Other':                  'Other'
+    },
+    inputPlaceholder:   'Select a reason',
     showCancelButton:   true,
     confirmButtonColor: '#AF5454',
     cancelButtonColor:  '#9a7070',
     confirmButtonText:  'Submit Return',
     cancelButtonText:   'Keep',
     preConfirm: (val) => {
-      if (!val || val.trim().length < 5) {
-        Swal.showValidationMessage('Please enter a reason (min 5 characters)');
-        return false;
-      }
+      if (!val) { Swal.showValidationMessage('Please select a reason'); return false; }
     }
   });
   if (!isConfirmed) return;
@@ -388,26 +405,35 @@ async function returnItem(orderId, itemId, name) {
     Swal.fire({ icon:'error', title:'Failed', text:data.message, confirmButtonColor:'#AF5454' });
   }
 }
-
 /* ════ CANCEL FULL ORDER ════ */
 async function cancelFullOrder(id, orderId) {
   const { value: reason, isConfirmed } = await Swal.fire({
     title: 'Cancel Full Order?',
     html:  `Cancel all items in <strong>${orderId}</strong>?`,
     icon:  'warning',
-    input: 'text',
-    inputPlaceholder:   'Reason (optional)',
+    input: 'select',
+    inputOptions: {
+      'Changed my mind':        'Changed my mind',
+      'Ordered by mistake':     'Ordered by mistake',
+      'Found a better price':   'Found a better price',
+      'Delivery time too long': 'Delivery time too long',
+      'Other':                  'Other'
+    },
+    inputPlaceholder:   'Select a reason',
     showCancelButton:   true,
     confirmButtonColor: '#AF5454',
     cancelButtonColor:  '#9a7070',
     confirmButtonText:  'Yes, Cancel Order',
-    cancelButtonText:   'Keep Order'
+    cancelButtonText:   'Keep Order',
+    preConfirm: (val) => {
+      if (!val) { Swal.showValidationMessage('Please select a reason'); return false; }
+    }
   });
   if (!isConfirmed) return;
   const res  = await fetch(`/orders/${id}/cancel`, {
     method:  'POST',
     headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify({ reason: reason || '' })
+    body:    JSON.stringify({ reason })
   });
   const data = await res.json();
   if (data.success) {
@@ -417,24 +443,27 @@ async function cancelFullOrder(id, orderId) {
     Swal.fire({ icon:'error', title:'Failed', text:data.message, confirmButtonColor:'#AF5454' });
   }
 }
-
 /* ════ RETURN FULL ORDER ════ */
 async function returnFullOrder(id) {
   const { value: reason, isConfirmed } = await Swal.fire({
     title: 'Return Order',
-    text:  'Please provide a reason for your return.',
+    text:  'Please select a reason for your return.',
     icon:  'question',
-    input: 'textarea',
-    inputPlaceholder:   'Enter reason (required)',
+    input: 'select',
+    inputOptions: {
+      'Damaged or defective':     'Damaged or defective',
+      'Wrong item delivered':     'Wrong item delivered',
+      'Not as described':         'Not as described',
+      'Quality not satisfactory': 'Quality not satisfactory',
+      'Other':                    'Other'
+    },
+    inputPlaceholder:   'Select a reason',
     showCancelButton:   true,
     confirmButtonColor: '#AF5454',
     cancelButtonColor:  '#9a7070',
     confirmButtonText:  'Submit Return',
     preConfirm: (val) => {
-      if (!val || val.trim().length < 5) {
-        Swal.showValidationMessage('Please enter a reason (min 5 characters)');
-        return false;
-      }
+      if (!val) { Swal.showValidationMessage('Please select a reason'); return false; }
     }
   });
   if (!isConfirmed) return;

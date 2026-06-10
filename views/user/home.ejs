@@ -1,5 +1,6 @@
 <%- include("../../views/partials/user/header") %>
-
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Dancing+Script:wght@700&display=swap');
 
@@ -724,8 +725,9 @@ img { display: block; }
   gap: 14px;
 }
 .feature-icon-wrap {
-  width: 64px; height: 64px;
-  border-radius: 20px;
+width: 80px;
+  height: 80px;
+    border-radius: 20px;
   background: var(--rose-lt);
   display: flex;
   align-items: center;
@@ -733,6 +735,10 @@ img { display: block; }
   font-size: 1.6rem;
   box-shadow: 0 4px 16px rgba(201,123,138,.15);
   transition: transform .2s, box-shadow .2s;
+}
+.feature-icon-wrap i{
+  font-size:32px;
+  color:#C97B8A;
 }
 .feature-item:hover .feature-icon-wrap {
   transform: translateY(-4px);
@@ -823,7 +829,6 @@ img { display: block; }
         Order Now
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </a>
-      <a href="#about" class="btn-hero-ghost">Our Story</a>
     </div>
     <div class="hero-trust">
       <div class="trust-item">
@@ -845,20 +850,15 @@ img { display: block; }
 
   <div class="hero-right">
     <div class="hero-img-cell tall">
-      <img src="/media/1.jpg" alt="Wedding Cake" loading="eager">
+      <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1780683061/photo-1695050193946-3a3bde70c2c1_dpx2bq.avif" alt="Cake Detail" loading="eager">
     </div>
     <div class="hero-img-cell">
-      <img src="/media/2.png" alt="Cake Detail" loading="eager">
+      <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1780682113/premium_photo-1680172800367-9d9437174856_ng5e7d.avif" alt="Cake Detail" loading="eager">
     </div>
     <div class="hero-img-cell">
-      <img src="/media/3.jpg" alt="Floral Cake" loading="eager">
+      <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1780682138/premium_photo-1673809128714-36d37d85a3af_bzaho4.avif" alt="Floral Cake" loading="eager">
     </div>
-    <div class="hero-badge">
-      <div class="badge-icon">🎂</div>
-      <div>
-        <div class="badge-text-top">Same Day</div>
-        <div class="badge-text-bottom">Delivery Available</div>
-      </div>
+    
     </div>
   </div>
 
@@ -884,22 +884,30 @@ img { display: block; }
 <div class="features-strip reveal">
   <div class="features-inner">
     <div class="feature-item">
-      <div class="feature-icon-wrap">🎂</div>
-      <div class="feature-label">Custom Designs</div>
+<div class="feature-icon-wrap">
+  <i class="fa-solid fa-cake-candles"></i>
+</div>   
+   <div class="feature-label">Custom Designs</div>
       <div class="feature-desc">Made exactly to your vision and style</div>
     </div>
     <div class="feature-item">
-      <div class="feature-icon-wrap">🚚</div>
+<div class="feature-icon-wrap">
+  <i class="fa-solid fa-truck-fast"></i>
+</div>
       <div class="feature-label">Free Delivery</div>
       <div class="feature-desc">On all orders above ₹500</div>
     </div>
     <div class="feature-item">
-      <div class="feature-icon-wrap">🌸</div>
+<div class="feature-icon-wrap">
+  <i class="fa-solid fa-cookie-bite"></i>
+</div>
       <div class="feature-label">Fresh Daily</div>
       <div class="feature-desc">Baked fresh every morning</div>
     </div>
     <div class="feature-item">
-      <div class="feature-icon-wrap">⭐</div>
+<div class="feature-icon-wrap">
+  <i class="fa-solid fa-crown"></i>
+</div>
       <div class="feature-label">4.9★ Rated</div>
       <div class="feature-desc">Loved by 5000+ customers</div>
     </div>
@@ -928,7 +936,7 @@ img { display: block; }
     </div>
     <div class="about-img-stack">
       <div class="about-img-main">
-        <img src="/media/5png.png" alt="Team Baking" loading="lazy">
+        <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1780683245/5png_e4engj.png" alt="Team Baking" loading="lazy">
       </div>
       <div class="about-img-float">
         <img src="/media/4.png" alt="Cake Detail" loading="lazy">

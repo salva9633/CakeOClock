@@ -56,7 +56,7 @@ const couponSchema = new mongoose.Schema({
     default: false
   },
 
-  // First order only coupon
+  
   isFirstOrderOnly: {
     type: Boolean,
     default: false
@@ -70,7 +70,7 @@ const couponSchema = new mongoose.Schema({
     }
   ],
 
-  // Assigned coupon to specific user
+  
   assignedTo: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

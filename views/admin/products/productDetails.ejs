@@ -345,8 +345,8 @@ small.text-danger { font-size: 11px; margin-top: 4px; display: block; }
 <!-- ── ADD VARIANT MODAL ── -->
 <div class="modal fade" id="addVariantModal" tabindex="-1">
   <div class="modal-dialog">
-    <form id="addVariantForm" action="/admin/variants/add" method="post" class="modal-content">
-      <input type="hidden" name="productId" value="<%= product._id %>">
+<form id="addVariantForm" class="modal-content">
+        <input type="hidden" name="productId" value="<%= product._id %>">
       <div class="modal-header">
         <h5 class="modal-title"><i class="ti ti-plus" style="color:var(--rose);margin-right:6px"></i>Add variant</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -477,11 +477,13 @@ document.querySelectorAll(".edit-variant-btn").forEach(btn => {
 });
 
 // ADD FORM
-document.getElementById("addVariantForm").addEventListener("submit", function (e) {
-  const w = document.getElementById("weight");
-  const c = document.getElementById("costPrice");
-  const r = document.getElementById("regularPrice");
-  const s = document.getElementById("salePrice");
+document.getElementById("addVariantForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const w  = document.getElementById("weight");
+  const c  = document.getElementById("costPrice");
+  const r  = document.getElementById("regularPrice");
+  const s  = document.getElementById("salePrice");
   const wE = document.getElementById("weightError");
   const cE = document.getElementById("costError");
   const rE = document.getElementById("regularError");
@@ -491,8 +493,35 @@ document.getElementById("addVariantForm").addEventListener("submit", function (e
   let valid = true;
   if (!w.value) { showError(w, wE, "Weight required"); valid = false; }
   if (!validatePrices(c, r, s, cE, rE, sE)) valid = false;
+  if (!valid) { Swal.fire({ icon:"error", title:"Validation Error", text:"Please fix the errors above.", confirmButtonColor:"#AF5454" }); return; }
 
-  if (!valid) { e.preventDefault(); Swal.fire("Error", "Please fix the errors above.", "error"); }
+  const productId = document.querySelector('[name="productId"]').value;
+
+  try {
+    const res  = await fetch('/admin/variants/add', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        productId,
+        weight:       w.value,
+        costPrice:    c.value,
+        regularPrice: r.value,
+        salePrice:    s.value
+      })
+    });
+    const data = await res.json();
+
+    if (!data.success) {
+      Swal.fire({ icon: 'error', title: 'Failed!', text: data.message || 'Something went wrong.', confirmButtonColor: '#AF5454' });
+      return;
+    }
+
+    Swal.fire({ icon: 'success', title: 'Variant Added!', timer: 1500, showConfirmButton: false })
+      .then(() => window.location.href = `/admin/variants/${data.variantId}`);
+
+  } catch (err) {
+    Swal.fire({ icon: 'error', title: 'Network Error', text: 'Could not connect. Please try again.', confirmButtonColor: '#AF5454' });
+  }
 });
 
 // EDIT FORM
