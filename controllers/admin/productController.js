@@ -108,7 +108,16 @@ const { productName, description, longDescription, categoryId, brand, productOff
     if (!product) {
       return res.status(404).json({ success: false });
     }
+const cleanName = productName.trim();
 
+    const duplicate = await Product.findOne({
+      productName: { $regex: `^${cleanName}$`, $options: "i" },
+      _id: { $ne: productId }
+    });
+
+    if (duplicate) {
+      return res.status(400).json({ success: false, message: "A product with this name already exists" });
+    }
     product.productName = productName.trim();
     product.description = description;
     product.longDescription = longDescription;

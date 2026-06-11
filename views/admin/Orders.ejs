@@ -99,6 +99,14 @@
 @media(max-width:600px){
   .summary-grid{grid-template-columns:repeat(2,1fr)}
 }
+.page-btn {
+  min-width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 0.5px solid var(--border);
+  background: var(--white);
+  color: var(--brown);
+  font-size: 15px;}
 </style>
 
 <div class="pg">
@@ -224,17 +232,21 @@
                 <% } %>
               </td>
               <td style="font-weight:500">₹<%= order.finalTotal.toLocaleString('en-IN') %></td>
-              <td>
+           <td>
                 <% if (hasReturnRequest) { %>
                   <span class="status-badge badge-return-req" style="margin-bottom:6px;display:inline-flex">
                     <i class="ti ti-arrow-back-up" style="font-size:11px" aria-hidden="true"></i>&nbsp;Return req.
                   </span><br>
                 <% } %>
-                <select class="status-sel" data-id="<%= order._id %>" onchange="updateStatus(this)">
-                  <% ["Pending","Processing","Shipped","Delivered","Cancelled","Returned"].forEach(function(s) { %>
-                    <option value="<%= s %>" <%= order.status === s ? 'selected' : '' %>><%= s %></option>
-                  <% }) %>
-                </select>
+                <%
+                  const sClass = {
+                    Pending:'badge-pending', Processing:'badge-processing',
+                    Shipped:'badge-shipped', Delivered:'badge-delivered',
+                    Cancelled:'badge-cancelled', Returned:'badge-returned',
+                    'Return Requested':'badge-return-req'
+                  }[order.status] || 'badge-pending';
+                %>
+                <span class="status-badge <%= sClass %>"><%= order.status %></span>
               </td>
               <td>
                 <a href="/admin/orders/<%= order._id %>" class="btn-view">
@@ -289,7 +301,7 @@
 </div>
 
 <div class="toast" id="toast"></div>
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <script>
   // Count-up animation for summary cards
   function animCount(el, target, dur) {
@@ -331,28 +343,4 @@
     setTimeout(function() { t.className = 'toast'; }, 3000);
   }
 
-  // Update order status via PATCH
-  async function updateStatus(sel) {
-    var orderId = sel.dataset.id;
-    var status  = sel.value;
-    var prev    = sel.dataset.prev;
-    try {
-      var res = await fetch('/admin/orders/' + orderId + '/status', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: status })
-      });
-      var data = await res.json();
-      if (data.success) {
-        showToast('Status updated to "' + status + '"', 'success');
-        sel.dataset.prev = status;
-      } else {
-        showToast(data.message || 'Update failed', 'error');
-        sel.value = prev;
-      }
-    } catch (e) {
-      showToast('Network error', 'error');
-      sel.value = prev;
-    }
-  }
 </script>

@@ -5,95 +5,261 @@
   <title>Near Expiry Cake Deals</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Bootstrap -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-    rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
+    :root {
+      --rose:      #b5284f;
+      --rose-dark: #8b1a38;
+      --green:     #1a7a4a;
+      --text:      #2b1a20;
+      --muted:     #8a7880;
+      --tag-bg:    #fdf0f4;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
-      background: linear-gradient(to right, #fde2d9, #f9c5b5);
-      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #fde8f0 0%, #fce4d4 100%);
+      font-family: 'Nunito', sans-serif;
+      color: var(--text);
     }
 
-    .page-title {
-      margin-top: 100px;
-      margin-bottom: 30px;
-      font-weight: bold;
+    .page-header {
       text-align: center;
+      padding: 100px 16px 10px;
+    }
+    .page-header .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--rose);
+      margin-bottom: 6px;
+    }
+    .page-header h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      color: var(--rose-dark);
+      margin: 0 0 8px;
+    }
+    .page-header p {
+      color: var(--muted);
+      font-size: 0.93rem;
+      margin: 0 auto 40px;
+      max-width: 480px;
     }
 
-    /* PRODUCT CARD (same as products page) */
-    .product-card {
-      border-radius: 14px;
+    .deals-grid { padding: 0 16px 60px; }
+
+    /* ── CARD ── */
+    .deal-card {
+      background: #fff;
+      border-radius: 20px;
       border: none;
-      transition: 0.3s ease;
+      overflow: hidden;
       height: 100%;
       position: relative;
+      box-shadow: 0 2px 12px rgba(181,40,79,.08);
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      transform: translateY(28px);
+      animation: cardIn 0.55s cubic-bezier(.22,.68,0,1.2) forwards;
+      transition: transform 0.28s cubic-bezier(.22,.68,0,1.2), box-shadow 0.28s ease;
+    }
+    .col-deal:nth-child(1) .deal-card { animation-delay: 0.05s; }
+    .col-deal:nth-child(2) .deal-card { animation-delay: 0.12s; }
+    .col-deal:nth-child(3) .deal-card { animation-delay: 0.19s; }
+    .col-deal:nth-child(4) .deal-card { animation-delay: 0.26s; }
+    .col-deal:nth-child(5) .deal-card { animation-delay: 0.33s; }
+    .col-deal:nth-child(6) .deal-card { animation-delay: 0.40s; }
+    .col-deal:nth-child(7) .deal-card { animation-delay: 0.47s; }
+    .col-deal:nth-child(8) .deal-card { animation-delay: 0.54s; }
+    @keyframes cardIn { to { opacity: 1; transform: translateY(0); } }
+    .deal-card:hover {
+      transform: translateY(-5px) scale(1.01);
+      box-shadow: 0 16px 40px rgba(181,40,79,.18);
     }
 
-    .product-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-    }
-
-    .product-img {
-      height: 200px;
-      object-fit: cover;
-      border-radius: 14px 14px 0 0;
-    }
-
-    .desc {
-      font-size: 0.85rem;
-      color: #6c757d;
-      height: 42px;
+    /* ── IMAGE LINK ── */
+    .card-img-link {
+      display: block;
+      position: relative;
       overflow: hidden;
+      height: 200px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .card-img-link img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.45s ease;
+    }
+    .deal-card:hover .card-img-link img { transform: scale(1.06); }
+    .card-img-link::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.18) 50%, transparent 70%);
+      transform: translateX(-100%);
+    }
+    .deal-card:hover .card-img-link::after {
+      transform: translateX(100%);
+      transition: transform 0.55s ease;
     }
 
-    .price {
-      font-weight: bold;
-      color: #c0392b;
+    /* ── DISCOUNT BADGE ── */
+    .badge-discount {
+      position: absolute;
+      top: 12px; left: 12px;
+      background: var(--rose-dark);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 5px 11px;
+      border-radius: 20px;
+      z-index: 2;
+    }
+
+    /* ── WISHLIST BTN ── */
+    .btn-wish {
+      position: absolute;
+      top: 12px; right: 12px;
+      width: 34px; height: 34px;
+      background: rgba(255,255,255,0.92);
+      border: none;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
       font-size: 1.1rem;
+      color: #ccc;
+      cursor: pointer;
+      z-index: 3;
+      transition: color 0.2s, transform 0.2s;
+      line-height: 1;
+    }
+    .btn-wish:hover { color: var(--rose); transform: scale(1.2); }
+    .btn-wish.wishlisted { color: var(--rose); }
+
+    /* ── CARD BODY ── */
+    .deal-card .card-body {
+      padding: 13px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
     }
 
-    /* EXPIRY BADGE */
-    .expiry-badge {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      background: #dc3545;
-      color: white;
-      font-size: 0.75rem;
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-weight: 600;
+    .product-name {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text);
+      margin: 0 0 5px;
+      line-height: 1.3;
     }
 
-    /* DISCOUNT BADGE */
-    .discount-badge {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: #198754;
-      color: white;
-      font-size: 0.75rem;
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-weight: 600;
+    /* brand + category row */
+    .meta-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 7px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .meta-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: var(--tag-bg);
+      color: var(--rose-dark);
+      padding: 3px 8px;
+      border-radius: 10px;
     }
 
-    .old-price {
+    /* stars */
+    .stars {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      margin-bottom: 9px;
+    }
+    .star { font-size: 0.78rem; color: #e0c8d0; }
+    .star.filled { color: #e8a020; }
+    .rating-count { font-size: 0.72rem; color: var(--muted); margin-left: 4px; }
+
+    /* price + cart */
+    .price-cart-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 8px;
+    }
+    .price-block { display: flex; flex-direction: column; }
+    .price-now {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1;
+    }
+    .price-old {
+      font-size: 0.78rem;
+      color: var(--muted);
       text-decoration: line-through;
-      color: #6c757d;
-      font-size: 0.85rem;
-      margin-left: 6px;
     }
 
-    .expiry-text {
+    .btn-cart {
+      background: var(--rose-dark);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 9px 15px;
       font-size: 0.8rem;
-      color: #b02a37;
-      font-weight: 600;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    }
+    .btn-cart:hover {
+      background: var(--rose);
+      transform: scale(1.04);
+      box-shadow: 0 6px 18px rgba(181,40,79,.35);
+    }
+    .btn-cart:active { transform: scale(0.97); }
+    .btn-cart:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+    /* toast */
+    .toast-msg {
+      position: fixed;
+      bottom: 28px; right: 24px;
+      background: #2b1a20;
+      color: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      padding: 12px 20px;
+      border-radius: 14px;
+      box-shadow: 0 8px 28px rgba(0,0,0,.2);
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.25s, transform 0.25s;
+      pointer-events: none;
+    }
+    .toast-msg.show { opacity: 1; transform: translateY(0); }
+
+    .empty-state { text-align: center; padding: 80px 20px; color: var(--muted); }
+    .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .deal-card { animation: none; opacity: 1; transform: none; }
+      .deal-card:hover { transform: none; }
     }
   </style>
 </head>
@@ -102,101 +268,216 @@
 
 <%- include("../partials/user/h2") %>
 
-<div class="container">
+<div class="container-xl">
 
-
-  <% if (deals.length === 0) { %>
-    <p class="text-center text-muted">
-      No near-expiry cake offers available right now.
-    </p>
-  <% } %>
-
-  <div class="row g-4">
-
-    <% deals.forEach(deal => { %>
-
-      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-        <div class="card product-card">
-
-          <!-- BADGES -->
-          <span class="expiry-badge">
-            Expires Soon
-          </span>
-
-          <span class="discount-badge">
-            <%= deal.discountPercent %>% OFF
-          </span>
-
-          <!-- IMAGE -->
-          <% if (deal.product.productImages && deal.product.productImages.length > 0) { %>
-            <img
-              src="<%= deal.product.productImages[0] %>"
-              class="product-img"
-              alt="<%= deal.product.productName %>">
-          <% } else { %>
-            <img
-              src="https://via.placeholder.com/300x200?text=No+Image"
-              class="product-img">
-          <% } %>
-
-          <div class="card-body d-flex flex-column">
-
-            <h6 class="fw-semibold">
-              <%= deal.product.productName %>
-            </h6>
-
-            <p class="desc">
-              <%= deal.product.description %>
-            </p>
-
-            <!-- VARIANT / EXPIRY INFO -->
-            <p class="expiry-text mb-1">
-              Weight: <%= deal.variant.weight %>g<br>
-              Expires on:
-              <%= new Date(deal.expiryAt).toDateString() %>
-            </p>
-
-            <div class="mt-auto">
-
-              <!-- PRICE -->
-              <p class="mb-1">
-                <span class="price">
-                  ₹ <%= deal.offerPrice %>
-                </span>
-               <span class="old-price">
-  ₹ <%= deal.variant.regularPrice %>
-</span>
-              </p>
-
-              <small class="text-muted">
-                Limited stock: <%= deal.stock %>
-              </small>
-
-              <div class="d-flex gap-2 mt-2">
-                <a
-                  href="/product/<%= deal.product._id %>"
-                  class="btn btn-outline-dark btn-sm w-100">
-                  View
-                </a>
-                <a
-                  href="/product/<%= deal.product._id %>"
-                  class="btn btn-dark btn-sm w-100">
-                  Buy
-                </a>
-              </div>
-
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    <% }) %>
-
+  <div class="page-header">
+    <p class="eyebrow">🎂 Limited Time</p>
+    <h1>Near Expiry Deals</h1>
+    <p>Fresh cakes at unbeatable prices — grab them before they're gone!</p>
   </div>
 
+  <% if (deals.length === 0) { %>
+    <div class="empty-state">
+      <div class="icon">🎂</div>
+      <p>No near-expiry deals available right now.<br>Check back soon!</p>
+    </div>
+  <% } %>
+
+  <div class="deals-grid">
+    <div class="row g-4">
+
+      <% deals.forEach((deal, i) => { %>
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-deal">
+        <div class="deal-card">
+
+          <!-- IMAGE → detail page -->
+          <a href="/product/<%= deal.product._id %>" class="card-img-link" aria-label="View <%= deal.product.productName %>">
+            <% if (deal.product.productImages && deal.product.productImages.length > 0) { %>
+              <img src="<%= deal.product.productImages[0] %>" alt="<%= deal.product.productName %>">
+            <% } else { %>
+              <img src="https://via.placeholder.com/300x200?text=No+Image" alt="No Image">
+            <% } %>
+
+            <span class="badge-discount"><%= deal.discountPercent %>% OFF</span>
+          </a>
+
+          <!-- WISHLIST — outside <a> so click doesn't follow link -->
+          <button
+            class="btn-wish wish-btn"
+            data-product-id="<%= deal.product._id %>"
+            aria-label="Add to wishlist"
+          >♡</button>
+
+          <!-- CARD BODY -->
+          <div class="card-body">
+
+            <h6 class="product-name"><%= deal.product.productName %></h6>
+
+            <!-- BRAND + CATEGORY tags -->
+            <div class="meta-row">
+              <% if (deal.product.brand) { %>
+                <span class="meta-tag">🏪 <%= deal.product.brand %></span>
+              <% } %>
+              <% if (deal.product.categoryId && deal.product.categoryId.name) { %>
+                <span class="meta-tag">🏷 <%= deal.product.categoryId.name %></span>
+              <% } %>
+            </div>
+
+            <!-- STARS -->
+            <div class="stars">
+              <% for (let s = 1; s <= 5; s++) { %>
+                <span class="star <%= s <= Math.round(deal.avgRating || 0) ? 'filled' : '' %>">★</span>
+              <% } %>
+              <span class="rating-count">
+                <%= deal.avgRating ? Number(deal.avgRating).toFixed(1) : '0.0' %>
+                (<%= deal.totalReviews || 0 %> reviews)
+              </span>
+            </div>
+
+            <!-- PRICE + CART -->
+            <div class="price-cart-row">
+              <div class="price-block">
+                <span class="price-now">₹<%= deal.offerPrice %></span>
+                <span class="price-old">₹<%= deal.variant.regularPrice %></span>
+              </div>
+
+              <button
+                class="btn-cart add-to-cart-btn"
+                data-product-id="<%= deal.product._id %>"
+                data-variant-id="<%= deal.variant._id %>"
+                aria-label="Add to cart"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                </svg>
+                Add to Cart
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <% }) %>
+
+    </div>
+  </div>
 </div>
 
+<!-- Toast notification -->
+<div class="toast-msg" id="toast"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // ── TOAST HELPER ──────────────────────────────────────
+  function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.background = isError ? '#8b1a38' : '#2b1a20';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  // ── ADD TO CART ───────────────────────────────────────
+  // Route: POST /cart/add   (userAuth required — user must be logged in)
+  document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+    btn.addEventListener('click', async function () {
+      const productId = this.dataset.productId;
+      const variantId = this.dataset.variantId;
+      const original  = this.innerHTML;
+
+      this.disabled = true;
+      this.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/></svg> Added!`;
+
+      try {
+        const res = await fetch('/cart/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId, variantId, quantity: 1 })
+        });
+
+        if (res.status === 401) {
+          window.location.href = '/login';
+          return;
+        }
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          throw new Error(data.message || 'Could not add to cart');
+        }
+
+        showToast('🛒 Added to cart!');
+
+        // update cart count badge in navbar if present
+        const badge = document.querySelector('#cart-count, .cart-count');
+        if (badge) {
+          badge.textContent = (parseInt(badge.textContent) || 0) + 1;
+        }
+
+        setTimeout(() => {
+          this.disabled = false;
+          this.innerHTML = original;
+        }, 1800);
+
+      } catch (err) {
+        this.disabled = false;
+        this.innerHTML = original;
+        showToast(err.message || 'Something went wrong', true);
+      }
+    });
+  });
+
+  // ── WISHLIST ──────────────────────────────────────────
+  // Route: POST /wishlist/toggle   body: { productId }
+  document.querySelectorAll('.wish-btn').forEach(btn => {
+    btn.addEventListener('click', async function (e) {
+      e.stopPropagation(); // prevent any parent link firing
+      const productId = this.dataset.productId;
+
+      try {
+        const res = await fetch('/wishlist/toggle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId })
+        });
+
+        if (res.status === 401) {
+          window.location.href = '/login';
+          return;
+        }
+
+        const data = await res.json();
+
+        // toggleWishlist should return { wishlisted: true/false } or { added: true/false }
+        const isWishlisted = data.wishlisted ?? data.added ?? false;
+
+        this.classList.toggle('wishlisted', isWishlisted);
+        this.textContent = isWishlisted ? '♥' : '♡';
+
+showToast(
+  isWishlisted
+    ? '❤️ Added to wishlist'
+    : '💔 Removed from wishlist'
+);  
+
+// update wishlist count badge in navbar if present
+        const badge = document.querySelector('#wishlist-count, .wishlist-count');
+        if (badge) {
+          fetch('/wishlist/count')
+            .then(r => r.json())
+            .then(d => { if (d.count !== undefined) badge.textContent = d.count; });
+        }
+
+      } catch (err) {
+        showToast('Something went wrong', true);
+      }
+    });
+  });
+</script>
 </body>
 </html>

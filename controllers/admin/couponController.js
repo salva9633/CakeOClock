@@ -2,8 +2,15 @@ import Coupon from "../../models/couponModel.js";
 
 const loadCoupons = async (req, res) => {
   try {
-    const coupons = await Coupon.find().sort({ createdAt: -1 });
-    res.render("coupons", { coupons });
+    const page = parseInt(req.query.page) || 1;
+    const limit = 3;
+    const skip = (page - 1) * limit;
+
+    const totalCoupons = await Coupon.countDocuments();
+    const coupons = await Coupon.find().sort({ createdAt: -1 }).skip(skip).limit(limit);
+    const totalPages = Math.ceil(totalCoupons / limit);
+
+    res.render("coupons", { coupons, currentPage: page, totalPages, totalCoupons });
   } catch (error) {
     console.log(error);
     res.redirect("/admin/error");

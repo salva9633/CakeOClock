@@ -138,6 +138,14 @@ tbody tr:hover { background: var(--blush); }
   color: var(--muted); border: 0.5px solid var(--border);
   background: var(--white); transition: all .2s;
 }
+.page-btn {
+  min-width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 0.5px solid var(--border);
+  background: var(--white);
+  color: var(--brown);
+  font-size: 15px;}
 .page-btn:hover { border-color: var(--rose); color: var(--rose-dk); background: var(--rose-lt); }
 .page-btn.active { background: var(--rose); color: #fff; border-color: var(--rose); }
 
@@ -273,7 +281,7 @@ tbody tr:hover { background: var(--blush); }
     </div>
   </div>
 </div>
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   // CONFIRM MODAL
@@ -287,19 +295,33 @@ tbody tr:hover { background: var(--blush); }
   }
 
   // SEARCH
+// SEARCH
   const searchInput = document.getElementById("searchInput");
   const clearIcon   = document.getElementById("clearIcon");
   const searchForm  = document.getElementById("searchForm");
+  let   debounceTimer;
 
+  // show/hide clear icon on input + debounce submit
   searchInput.addEventListener("input", function () {
     clearIcon.classList.toggle("d-none", !this.value.trim());
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(function () {
+      searchForm.submit();
+    }, 500);
   });
 
+  // enter key submit
   searchInput.addEventListener("keydown", function (e) {
-    if (e.key === "Enter") { e.preventDefault(); searchForm.submit(); }
+    if (e.key === "Enter") {
+      e.preventDefault();
+      clearTimeout(debounceTimer);
+      searchForm.submit();
+    }
   });
 
+  // clear button
   clearIcon.addEventListener("click", function () {
+    clearTimeout(debounceTimer);
     searchInput.value = "";
     clearIcon.classList.add("d-none");
     window.location.href = "/admin/users";

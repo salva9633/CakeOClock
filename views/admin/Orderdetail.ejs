@@ -453,8 +453,7 @@
         <div class="info-row">
           <span class="info-label">Order status</span>
           <span class="info-val">
-            <span class="badge b-<%= order.status %>" id="current-badge"><%= order.status %></span>
-          </span>
+<span class="badge b-<%= order.status.replace(/ /g,'-') %>" id="current-badge"><%= order.status %></span>          </span>
         </div>
         <% if (order.cancelReason) { %>
         <div class="info-row">
@@ -472,17 +471,25 @@
         <div style="margin-top:16px">
           <div style="font-size:11px;color:var(--muted);margin-bottom:6px">Update order status</div>
           <%
-            const STATUS_ORDER = ["Pending","Processing","Shipped","Delivered","Cancelled","Returned"];
+           const STATUS_ORDER = ["Pending","Processing","Shipped","Delivered","Cancelled","Returned"];
             const currentIdx   = STATUS_ORDER.indexOf(order.status);
-            const LOCKED       = ["Delivered","Cancelled","Returned"];
+            const LOCKED       = ['Cancelled','Returned'];
+            const nextStatus   = !LOCKED.includes(order.status) && currentIdx < STATUS_ORDER.length - 1
+                                   ? STATUS_ORDER[currentIdx + 1] : order.status;
           %>
           <select class="status-sel-lg" id="status-select">
-           <% STATUS_ORDER.forEach(function(s, i) { %>
-  <% if (s !== 'Returned') { %>
+        <% STATUS_ORDER.forEach(function(s, i) { %>
+  <% if (s !== 'Returned' && s !== 'Cancelled') { %>
     <option value="<%= s %>"
-      <%= order.status === s ? 'selected' : '' %>
+      <%= nextStatus === s ? 'selected' : '' %>
       <%= (i < currentIdx || LOCKED.includes(order.status)) ? 'disabled' : '' %>
     ><%= s %></option>
+  <% } %>
+  <% if (s === 'Cancelled') { %>
+    <option value="Cancelled"
+      <%= nextStatus === 'Cancelled' ? 'selected' : '' %>
+      <%= (['Delivered','Cancelled','Returned'].includes(order.status)) ? 'disabled' : '' %>
+    >Cancelled</option>
   <% } %>
 <% }) %>
           </select>
@@ -567,11 +574,16 @@
 </div>
 
 <div class="toast" id="toast"></div>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+  .swal-slim        { border-radius: 16px !important; padding: 1.4rem !important; width: 300px !important; }
+  .swal-slim-title  { font-size: 15px !important; font-weight: 600 !important; color: #5C3A3A !important; padding: 0 !important; }
+  .swal-slim-text   { font-size: 12px !important; color: #B08A8A !important; margin-top: 4px !important; }
+</style>
 <script>
 const ORDER_ID        = '<%= order._id %>';
 const STATUS_ORDER    = ['Pending','Processing','Shipped','Delivered','Cancelled','Returned'];
-const LOCKED          = ['Delivered','Cancelled','Returned'];
+const LOCKED = ['Cancelled','Returned'];
 let   lastKnownStatus = '<%= order.status %>';
 
 function showToast(msg, type) {
@@ -609,7 +621,28 @@ async function submitStatusUpdate() {
 }
 
 async function handleReturn(orderId, itemId, action) {
-  var url = action === 'approve' ? '/admin/approve-return' : '/admin/reject-return';
+  // ── Confirmation SweetAlert ──
+  const isApprove = action === 'approve';
+const confirm = await Swal.fire({
+    title: isApprove ? '✅ Approve Return?' : '✕ Reject Return?',
+    text: isApprove ? 'Refund goes to wallet.' : 'Request will be declined.',
+    icon: isApprove ? 'success' : 'error',
+    background: isApprove ? '#f0faf2' : '#fff5f5',
+    showCancelButton: true,
+    confirmButtonColor: isApprove ? '#2A7D3A' : '#C03030',
+    cancelButtonColor: '#B08A8A',
+    confirmButtonText: isApprove ? 'Approve' : 'Reject',
+    cancelButtonText: 'Back',
+    customClass: {
+      popup: 'swal-slim',
+      title: 'swal-slim-title',
+      htmlContainer: 'swal-slim-text'
+    }
+  });
+  if (!confirm.isConfirmed) return;
+  // ────────────────────────────
+
+  var url = isApprove ? '/admin/approve-return' : '/admin/reject-return';
   try {
     var res  = await fetch(url, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },

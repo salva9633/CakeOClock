@@ -89,11 +89,11 @@
   </div>
 
   <!-- COUPON TABLE CARD -->
-  <div class="c-card c-card-flush">
+<div class="c-card c-card-flush">
 
     <div class="table-top">
       <h4>All Coupons</h4>
-      <span class="count-badge"><%= coupons.length %> coupons</span>
+      <span class="count-badge"><%= totalCoupons %> coupons</span>
     </div>
 
     <div class="table-responsive">
@@ -138,17 +138,18 @@
             <td><%= coupon.description || '—' %></td>
             <td>
               <div class="action-cell">
-<button
-  onclick="toggleStatus('<%= coupon._id %>')"
-  class="btn-sm btn-toggle"
-  title="<%= coupon.isActive ? 'Deactivate' : 'Activate' %>"
->
-  <% if(coupon.isActive){ %>
-    <i class="mdi mdi-close-circle-outline"></i>
-  <% } else { %>
-    <i class="mdi mdi-check-circle-outline"></i>
-  <% } %>
-</button>                <a href="/admin/coupons/edit/<%= coupon._id %>" class="btn-sm btn-edit">
+                <button
+                  onclick="toggleStatus('<%= coupon._id %>')"
+                  class="btn-sm btn-toggle"
+                  title="<%= coupon.isActive ? 'Deactivate' : 'Activate' %>"
+                >
+                  <% if(coupon.isActive){ %>
+                    <i class="mdi mdi-close-circle-outline"></i>
+                  <% } else { %>
+                    <i class="mdi mdi-check-circle-outline"></i>
+                  <% } %>
+                </button>
+                <a href="/admin/coupons/edit/<%= coupon._id %>" class="btn-sm btn-edit">
                   <i class="mdi mdi-pencil"></i>
                 </a>
               </div>
@@ -159,11 +160,32 @@
       </table>
     </div>
 
-  </div>
+    <% if (totalPages > 1) { %>
+    <div class="pagination-row">
+      <span class="page-info">
+        Page <strong><%= currentPage %></strong> of <strong><%= totalPages %></strong>
+        &nbsp;·&nbsp; <strong><%= totalCoupons %></strong> total
+      </span>
+      <div class="page-btns">
+        <a href="?page=<%= currentPage - 1 %>"
+           class="page-btn <%= currentPage === 1 ? 'disabled' : '' %>">
+          <i class="mdi mdi-chevron-left"></i>
+        </a>
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <a href="?page=<%= i %>"
+             class="page-btn <%= i === currentPage ? 'active' : '' %>">
+            <%= i %>
+          </a>
+        <% } %>
+        <a href="?page=<%= currentPage + 1 %>"
+           class="page-btn <%= currentPage === totalPages ? 'disabled' : '' %>">
+          <i class="mdi mdi-chevron-right"></i>
+        </a>
+      </div>
+    </div>
+    <% } %>
 
-</div>
-</div>
-
+  </div><!-- end .c-card-flush -->
 
 <style>
 :root {
@@ -475,9 +497,37 @@ tbody td {
   border-color:#dc2626 !important;
   background:#fff5f5 !important;
 }
+
+
+.pagination-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+}
+.page-info { font-size: 13px; color: var(--muted); }
+.page-info strong { color: var(--brown); font-weight: 600; }
+.page-btns { display: flex; gap: 6px; align-items: center; }
+.page-btn {
+  min-width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 0.5px solid var(--border);
+  background: var(--white);
+  color: var(--brown);
+  font-size: 15px; font-weight: 500;
+  display: inline-flex; align-items: center; justify-content: center;
+  text-decoration: none; transition: all .15s;
+}
+
+
+.page-btn:hover { background: var(--rose-lt); border-color: var(--rose); color: var(--rose-dk); }
+.page-btn.active { background: var(--rose-dk); color: var(--white); border-color: var(--rose-dk); }
+.page-btn.disabled { opacity: 0.4; pointer-events: none; }
 </style>
 
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <script>
 const form = document.getElementById("couponForm");
 

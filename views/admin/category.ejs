@@ -47,6 +47,15 @@
   position: absolute; top: 50%; transform: translateY(-50%);
   font-size: 14px; color: var(--muted); cursor: pointer;
 }
+.clear-icon {
+  right: 11px;
+  color: var(--rose-dk);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  z-index: 10;
+  padding: 2px 4px;
+}
 .search-icon { left: 11px; pointer-events: none; }
 .clear-icon  { right: 11px; color: var(--rose-dk); }
 
@@ -166,7 +175,7 @@ tbody tr:hover { background: var(--blush); }
 .page-btn:hover:not(.disabled) { border-color: var(--rose); color: var(--rose-dk); background: var(--rose-lt); }
 .page-btn.active    { background: var(--rose); color: #fff; border-color: var(--rose); }
 .page-btn.disabled  { opacity: .4; pointer-events: none; }
-
+.d-none { display: none !important; }
 /* ── MODALS ── */
 .modal-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,.4);
@@ -243,8 +252,7 @@ small.err-msg { font-size: 11px; color: #dc3545; margin-top: 3px; display: block
             placeholder="Search categories…"
             autocomplete="off"
           >
-          <i class="ti ti-x clear-icon <%= (search && search.trim()) ? '' : 'd-none' %>" id="clearIcon"></i>
-        </div>
+<span class="clear-icon <%= (search && search.trim()) ? '' : 'd-none' %>" id="clearIcon">✕</span>        </div>
       </form>
       <button class="add-btn" onclick="openAddModal()">
         <i class="ti ti-plus" aria-hidden="true"></i> New category
@@ -654,18 +662,17 @@ const searchInput = document.getElementById("searchInput");
 const clearIcon   = document.getElementById("clearIcon");
 const searchForm  = document.getElementById("searchForm");
 
-searchInput.addEventListener("input", function () {
-  clearIcon.classList.toggle("d-none", !this.value.trim());
-});
 searchInput.addEventListener("keydown", function (e) {
   if (e.key === "Enter") { e.preventDefault(); searchForm.submit(); }
 });
+
 clearIcon.addEventListener("click", function () {
   window.location.href = "/admin/category";
 });
 
 let searchTimer;
 searchInput.addEventListener("input", function () {
+  clearIcon.classList.toggle("d-none", !this.value.trim());
   clearTimeout(searchTimer);
   searchTimer = setTimeout(() => {
     const addOpen  = document.getElementById("addModal").classList.contains("open");

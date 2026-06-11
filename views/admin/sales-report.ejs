@@ -290,12 +290,13 @@
 .pg-info { font-size: 12px; color: var(--muted); }
 .pager { display: flex; gap: 4px; }
 .page-btn {
-  min-width: 30px; height: 30px;
+  min-width: 34px;
+  height: 34px;
   border-radius: 8px;
   border: 0.5px solid var(--border);
   background: var(--white);
   color: var(--brown);
-  font-size: 12px;
+  font-size: 15px;
   display: flex; align-items: center; justify-content: center;
   text-decoration: none;
   transition: all .2s;
@@ -362,12 +363,7 @@
       <div class="metric-value" id="v-revenue" data-target="<%= Math.round(overallOrderAmount) %>" data-prefix="₹">₹0</div>
       <div class="metric-sub">gross revenue</div>
     </div>
-    <div class="metric m3">
-      <div class="metric-icon"><i class="ti ti-percentage" aria-hidden="true"></i></div>
-      <div class="metric-label">Order Discounts</div>
-      <div class="metric-value" id="v-discount" data-target="<%= Math.round(overallDiscount) %>" data-prefix="₹">₹0</div>
-      <div class="metric-sub">price reductions</div>
-    </div>
+   
     <div class="metric m4">
       <div class="metric-icon"><i class="ti ti-ticket" aria-hidden="true"></i></div>
       <div class="metric-label">Coupon Savings</div>
@@ -506,7 +502,7 @@
   </div>
 
 </div><!-- /pg -->
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 

@@ -100,13 +100,21 @@ export const updateOrderStatus = async (req, res) => {
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
  
     
-    const LOCKED = ['Delivered', 'Cancelled', 'Returned'];
-    if (LOCKED.includes(order.status)) {
-      return res.status(400).json({
-        success: false,
-        message: `Cannot change status from "${order.status}"`,
-      });
-    }
+const LOCKED = ['Cancelled', 'Returned'];
+if (LOCKED.includes(order.status)) {
+  return res.status(400).json({
+    success: false,
+    message: `Cannot change status from "${order.status}"`,
+  });
+}
+
+// Cannot cancel after delivery
+if (status === 'Cancelled' && order.status === 'Delivered') {
+  return res.status(400).json({
+    success: false,
+    message: `Cannot cancel a delivered order`,
+  });
+}
  
 const currentIdx = STATUS_ORDER.indexOf(order.status);
 const newIdx = STATUS_ORDER.indexOf(status);
@@ -244,15 +252,29 @@ export const approveReturnRequest = async (req, res) => {
     // ✅ update item status to Returned
     item.status = "Returned";
 
-    // refund amount
-  // refund amount
-// Calculate this item's share of the order discount
-const orderItemTotal = order.items.reduce((s, i) => s + i.price * i.quantity, 0);
-const itemSubtotal   = item.price * item.quantity;
-const discountShare  = orderItemTotal > 0
-  ? Math.round((itemSubtotal / orderItemTotal) * (order.discount || 0))
-  : 0;
-const refundAmount   = itemSubtotal - discountShare;
+    // Calculate this item's share of the order discount
+    const orderItemTotal = order.items.reduce((s, i) => s + i.price * i.quantity, 0);
+    const itemSubtotal   = item.price * item.quantity;
+    const discountShare  = orderItemTotal > 0
+      ? Math.round((itemSubtotal / orderItemTotal) * (order.discount || 0))
+      : 0;
+    const refundAmount   = itemSubtotal - discountShare;
+
+    // ── Recalculate order totals after return ──
+    const activeItems = order.items.filter(
+      i => i.status !== 'Cancelled' && i.status !== 'Returned'
+    );
+    const newItemTotal = activeItems.reduce(
+      (sum, i) => sum + i.price * i.quantity, 0
+    );
+    const newDiscount = orderItemTotal > 0
+      ? Math.round((newItemTotal / orderItemTotal) * (order.discount || 0))
+      : 0;
+    order.itemTotal  = newItemTotal;
+    order.discount   = newDiscount;
+    order.finalTotal = newItemTotal - newDiscount + (order.tax || 0) + (order.shippingCharge || 0);
+    // ──────────────────────────────────────────
+
     // credit wallet
     const user = await User.findById(order.userId);
     const newBalance = (user.walletBalance || 0) + refundAmount;
@@ -279,7 +301,6 @@ const refundAmount   = itemSubtotal - discountShare;
     } else if (!anyStillRequested) {
       order.status = "Delivered";
     }
-    // if anyStillRequested remains, keep order.status as "Return Requested"
 
     await order.save();
 
@@ -292,8 +313,7 @@ const refundAmount   = itemSubtotal - discountShare;
     console.log(error);
     return res.json({ success: false, message: "Server error" });
   }
-};
-// REJECT RETURN
+};// REJECT RETURN
 export const rejectReturnRequest = async (req, res) => {
   try {
     const { orderId, itemId } = req.body;

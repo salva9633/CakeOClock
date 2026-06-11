@@ -9,8 +9,8 @@ export const addVariant = async (req, res) => {
   try {
 const { productId, weight, costPrice, regularPrice } = req.body;
 
- if (!productId || !weight || !costPrice || !regularPric) {
-      return res.status(400).json({ success: false, message: "All fields are required" });
+if (!productId || !weight || !costPrice || !regularPrice) {
+        return res.status(400).json({ success: false, message: "All fields are required" });
     }
 
     const product = await Product.findById(productId);
@@ -26,14 +26,9 @@ const { productId, weight, costPrice, regularPrice } = req.body;
     return res.status(400).json({ success: false, message: "Invalid weight selected" });
     }
 
-    if (Number(salePrice) < Number(costPrice)) {
-  return res.status(400).json({ success: false, message: "Sale price cannot be lower than cost price" });
-}
-
-    if (Number(salePrice) < Number(costPrice)) {
-    return res.status(400).json({ success: false, message: "Sale price cannot be lower than cost price" });
+if (Number(regularPrice) < Number(costPrice)) {
+      return res.status(400).json({ success: false, message: "Regular price cannot be lower than cost price" });
     }
-
     const variant = await Variant.create({
       productId,
       weight: parsedWeight,
@@ -79,23 +74,35 @@ export const getVariantDetail = async (req, res) => {
   }
 };
 
-/* =========================
+/* =====================
    UPDATE VARIANT
 ========================= */
 export const updateVariant = async (req, res) => {
   try {
     const { variantId } = req.params;
-  const { weight, costPrice, regularPrice } = req.body;
+    const { weight, costPrice, regularPrice } = req.body;
 
-const variant = await Variant.findByIdAndUpdate(
-  variantId,
-  { weight, costPrice, regularPrice },
+    // check duplicate weight in same product
+    const existing = await Variant.findById(variantId);
+    const duplicate = await Variant.findOne({
+      productId: existing.productId,
+      weight:    Number(weight),
+      _id:       { $ne: variantId }
+    });
+
+    if (duplicate) {
+      return res.status(400).json({ success: false, message: "A variant with this weight already exists" });
+    }
+
+    await Variant.findByIdAndUpdate(
+      variantId,
+      { weight, costPrice, regularPrice },
       { new: true }
     );
 
-    res.redirect(`/admin/products/${variant.productId}`);
+    return res.json({ success: true });
   } catch (error) {
     console.error("UPDATE VARIANT ERROR:", error);
-    res.status(500).send("Update failed");
+    return res.status(500).json({ success: false, message: "Update failed" });
   }
 };

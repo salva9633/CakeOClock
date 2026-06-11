@@ -294,8 +294,7 @@ small.text-danger { font-size: 11px; margin-top: 4px; display: block; }
           </td>
           <td>
             <div class="price-box">
-              <div class="price-sale">₹<%= variant.salePrice %></div>
-              <div class="price-reg">Regular ₹<%= variant.regularPrice %></div>
+<div class="price-sale">₹<%= variant.regularPrice %></div>
               <div class="price-cost">Cost ₹<%= variant.costPrice %></div>
             </div>
           </td>
@@ -376,11 +375,7 @@ small.text-danger { font-size: 11px; margin-top: 4px; display: block; }
           <input type="number" name="regularPrice" id="regularPrice" class="form-control" min="1" placeholder="MRP">
           <small id="regularError" class="text-danger d-none"></small>
         </div>
-        <div>
-          <label class="form-label">Sale price</label>
-          <input type="number" name="salePrice" id="salePrice" class="form-control" min="1" placeholder="Selling price">
-          <small id="saleError" class="text-danger d-none"></small>
-        </div>
+        
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
@@ -423,11 +418,7 @@ small.text-danger { font-size: 11px; margin-top: 4px; display: block; }
           <input type="number" name="regularPrice" id="editRegularPrice" class="form-control" min="1">
           <small id="editRegularError" class="text-danger d-none"></small>
         </div>
-        <div>
-          <label class="form-label">Sale price</label>
-          <input type="number" name="salePrice" id="editSalePrice" class="form-control" min="1">
-          <small id="editSaleError" class="text-danger d-none"></small>
-        </div>
+        
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
@@ -454,7 +445,7 @@ function validatePrices(cost, regular, sale, costErr, regularErr, saleErr) {
   let valid = true;
   if (!cost.value || cost.value <= 0)      { showError(cost, costErr, "Enter valid cost"); valid = false; }
   if (!regular.value || regular.value <= 0){ showError(regular, regularErr, "Enter valid regular price"); valid = false; }
-  if (!sale.value || sale.value <= 0)      { showError(sale, saleErr, "Enter valid sale price"); valid = false; }
+
   if (valid) {
     if (+regular.value <= +cost.value) { showError(regular, regularErr, "Regular must be > cost"); valid = false; }
     if (+sale.value <= +cost.value)    { showError(sale, saleErr, "Sale must be > cost"); valid = false; }
@@ -470,7 +461,6 @@ document.querySelectorAll(".edit-variant-btn").forEach(btn => {
     document.getElementById("editWeight").value      = this.dataset.weight;
     document.getElementById("editCostPrice").value   = this.dataset.cost;
     document.getElementById("editRegularPrice").value= this.dataset.regular;
-    document.getElementById("editSalePrice").value   = this.dataset.sale;
     document.getElementById("editVariantForm").action = `/admin/variants/edit/${this.dataset.id}`;
     editModal.show();
   });
@@ -480,19 +470,20 @@ document.querySelectorAll(".edit-variant-btn").forEach(btn => {
 document.getElementById("addVariantForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
-  const w  = document.getElementById("weight");
+const w  = document.getElementById("weight");
   const c  = document.getElementById("costPrice");
   const r  = document.getElementById("regularPrice");
-  const s  = document.getElementById("salePrice");
   const wE = document.getElementById("weightError");
   const cE = document.getElementById("costError");
   const rE = document.getElementById("regularError");
-  const sE = document.getElementById("saleError");
-  [w,c,r,s].forEach((el,i) => clearError(el, [wE,cE,rE,sE][i]));
+
+  [w,c,r].forEach((el,i) => clearError(el, [wE,cE,rE][i]));
 
   let valid = true;
   if (!w.value) { showError(w, wE, "Weight required"); valid = false; }
-  if (!validatePrices(c, r, s, cE, rE, sE)) valid = false;
+  if (!c.value || c.value <= 0) { showError(c, cE, "Enter valid cost"); valid = false; }
+  if (!r.value || r.value <= 0) { showError(r, rE, "Enter valid regular price"); valid = false; }
+  if (valid && +r.value <= +c.value) { showError(r, rE, "Regular must be > cost"); valid = false; }
   if (!valid) { Swal.fire({ icon:"error", title:"Validation Error", text:"Please fix the errors above.", confirmButtonColor:"#AF5454" }); return; }
 
   const productId = document.querySelector('[name="productId"]').value;
@@ -506,7 +497,6 @@ document.getElementById("addVariantForm").addEventListener("submit", async funct
         weight:       w.value,
         costPrice:    c.value,
         regularPrice: r.value,
-        salePrice:    s.value
       })
     });
     const data = await res.json();
@@ -525,25 +515,49 @@ document.getElementById("addVariantForm").addEventListener("submit", async funct
 });
 
 // EDIT FORM
-document.getElementById("editVariantForm").addEventListener("submit", function (e) {
-  const w = document.getElementById("editWeight");
-  const c = document.getElementById("editCostPrice");
-  const r = document.getElementById("editRegularPrice");
-  const s = document.getElementById("editSalePrice");
+// EDIT FORM
+document.getElementById("editVariantForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const w  = document.getElementById("editWeight");
+  const c  = document.getElementById("editCostPrice");
+  const r  = document.getElementById("editRegularPrice");
   const wE = document.getElementById("editWeightError");
   const cE = document.getElementById("editCostError");
   const rE = document.getElementById("editRegularError");
-  const sE = document.getElementById("editSaleError");
-  [w,c,r,s].forEach((el,i) => clearError(el, [wE,cE,rE,sE][i]));
+
+  [w,c,r].forEach((el,i) => clearError(el, [wE,cE,rE][i]));
 
   let valid = true;
   if (!w.value) { showError(w, wE, "Weight required"); valid = false; }
-  if (!validatePrices(c, r, s, cE, rE, sE)) valid = false;
+  if (!c.value || c.value <= 0) { showError(c, cE, "Enter valid cost"); valid = false; }
+  if (!r.value || r.value <= 0) { showError(r, rE, "Enter valid regular price"); valid = false; }
+  if (valid && +r.value <= +c.value) { showError(r, rE, "Regular must be > cost"); valid = false; }
+  if (!valid) { Swal.fire({ icon:"error", title:"Validation Error", text:"Please fix the errors above.", confirmButtonColor:"#AF5454" }); return; }
 
-  if (!valid) { e.preventDefault(); Swal.fire("Error", "Please fix the errors above.", "error"); return; }
+  const variantId = this.action.split('/').pop();
 
-  e.preventDefault();
-  Swal.fire({ title: "Variant updated!", text: "Changes saved successfully.", icon: "success", confirmButtonColor: "#AF5454" })
-    .then(() => this.submit());
-});
-</script>
+  try {
+    const res  = await fetch(`/admin/variants/edit/${variantId}`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        weight:       w.value,
+        costPrice:    c.value,
+        regularPrice: r.value,
+      })
+    });
+    const data = await res.json();
+
+    if (!data.success) {
+      Swal.fire({ icon:'error', title:'Failed!', text: data.message || 'Something went wrong.', confirmButtonColor:'#AF5454' });
+      return;
+    }
+
+    Swal.fire({ icon:'success', title:'Updated!', timer:1500, showConfirmButton:false })
+      .then(() => location.reload());
+
+  } catch (err) {
+    Swal.fire({ icon:'error', title:'Network Error', text:'Could not connect.', confirmButtonColor:'#AF5454' });
+  }
+});</script>
