@@ -1,4 +1,4 @@
-import ContactMessage from "../../models/contactMessageModel.js";
+import ContactMessage from "../../models/Contactmessagemodel.js";
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({

@@ -521,7 +521,7 @@ const postContactUs = async (req, res) => {
       return res.redirect("/contact-us?error=Please fill in all fields");
     }
 
-    const ContactMessage = (await import("../../models/contactMessageModel.js")).default;
+    const ContactMessage = (await import("../../models/Contactmessagemodel.js")).default;
     const newMsg = new ContactMessage({
       name,
       email,
