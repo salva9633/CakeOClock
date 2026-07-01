@@ -11,7 +11,7 @@ import upload from "../middlewares/multer.js";
 import { loadNearExpiryDeals } from "../controllers/user/expiryDealsController.js";
 import { addReview, getReviews } from "../controllers/user/reviewController.js";
 import { toggleWishlist, getWishlist } from "../controllers/user/wishlistController.js";
-import { addToCart, getCart, updateCartItem, removeCartItem, getVariantsByProduct, validateCart } from "../controllers/user/cartController.js";
+import { addToCart, getCart, updateCartItem, removeCartItem, getVariantsByProduct, validateCart } from "../controllers/user/CartController.js";
 import {
   loadCheckout,
   loadPaymentPage,
