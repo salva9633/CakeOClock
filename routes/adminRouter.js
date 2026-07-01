@@ -55,7 +55,7 @@ import {
   replyContactMessage,
   resolveTicket,
   deleteContactMessage
-} from "../controllers/admin/contactMessageController.js";
+} from "../controllers/admin/Contactmessagecontroller.js";
 
 
 // ── AUTH (no guard needed) ────────────────────────────────

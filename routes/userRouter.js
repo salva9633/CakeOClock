@@ -27,7 +27,7 @@ import {
 } from "../controllers/user/checkoutController.js";
 import { listOrders, orderDetail, cancelOrder, cancelOrderItem, returnOrder, returnOrderItem, downloadInvoice, getOrderStatus } from "../controllers/user/orderController.js";
 import { loadWallet, createWalletOrder, verifyWalletPayment, paymentFailed } from "../controllers/user/walletController.js";
-import { loadContactMessages, viewContactMessage, replyContactMessage, deleteContactMessage } from "../controllers/admin/contactMessageController.js";
+import { loadContactMessages, viewContactMessage, replyContactMessage, deleteContactMessage } from "../controllers/admin/Contactmessagecontroller.js";
 import { myMessages, viewMyMessage, replyToTicket } from "../controllers/user/contactMessageController.js";
 const router = express.Router();
  
