@@ -136,3 +136,8 @@ export const verifyWalletPayment = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+/* ── GET /wallet/payment-failed ──────────────────────── */
+export const paymentFailed = async (req, res) => {
+  const reason = req.query.reason || "Your payment could not be completed.";
+  res.render("paymentFailed", { reason });
+};

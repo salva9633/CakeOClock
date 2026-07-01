@@ -320,7 +320,7 @@
 
         .btn-google:hover {
             background: rgba(139,58,82,0.1);
-            color: #8B3A52;
+            color: #eecbd5;
             transform: translateY(-1px);
         }
 
@@ -340,11 +340,11 @@
             text-align: center;
             margin-top: 10px;
             font-size: 13px;
-            color: rgba(139,58,82,0.6);
+            color: rgba(139,58,82,0.8);
             animation: fadeDown 0.6s 0.4s cubic-bezier(0.22,1,0.36,1) both;
         }
 
-        .signin-link a { color: #d4748a; text-decoration: none; font-weight: 600; }
+        .signin-link a { color: #853a3a; text-decoration: none; font-weight: 600; }
         .signin-link a:hover { color: #e896aa; }
 
         .secure-note {
@@ -354,7 +354,7 @@
             gap: 7px;
             margin-top: 10px;
             font-size: 12px;
-            color: rgba(139,58,82,0.45);
+            color: rgba(139,58,82,0.7);
         }
 
         .secure-note svg {
@@ -542,7 +542,7 @@ type="email"
         </div>
 
         <a href="/auth/google" class="btn-google">
-            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google">
+            <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1781813006/icons8-google_1_joh0sl.svg" alt="Google">
             Sign up with Google
         </a>
 
@@ -654,9 +654,11 @@ type="email"
         }
 
         signupForm.addEventListener("submit", async function (e) {
-            e.preventDefault();
+         e.preventDefault();
 
-            nameValidateChecking();
+const signupBtn = document.getElementById("signupBtn");
+
+nameValidateChecking();
             emailValidateChecking();
             phoneValidateChecking();
             passValidateChecking();
@@ -685,7 +687,10 @@ type="email"
                 t: formData.get("t") ? true : false
             };
 
-            try {
+          try {
+                signupBtn.disabled = true;
+                signupBtn.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Please wait…`;
+
                 const res = await fetch("/signUp", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -700,7 +705,9 @@ type="email"
                     }).then(() => {
                         window.location.href = "/verify-otp";
                     });
-                } else {
+          } else {
+                    signupBtn.disabled = false;
+                    signupBtn.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg> Create Account`;
                     Swal.fire({
                         icon: "error",
                         title: "Error",
@@ -710,6 +717,8 @@ type="email"
                 console.log(result);
             } catch (error) {
                 console.error("Error:", error);
+                signupBtn.disabled = false;
+                signupBtn.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg> Create Account`;
             }
         });
 

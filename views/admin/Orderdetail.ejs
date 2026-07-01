@@ -470,30 +470,28 @@
 
         <div style="margin-top:16px">
           <div style="font-size:11px;color:var(--muted);margin-bottom:6px">Update order status</div>
-          <%
-           const STATUS_ORDER = ["Pending","Processing","Shipped","Delivered","Cancelled","Returned"];
+<%
+            const STATUS_ORDER = ["Pending","Processing","Shipped","Delivered","Cancelled","Returned"];
             const currentIdx   = STATUS_ORDER.indexOf(order.status);
             const LOCKED       = ['Cancelled','Returned'];
-            const nextStatus   = !LOCKED.includes(order.status) && currentIdx < STATUS_ORDER.length - 1
-                                   ? STATUS_ORDER[currentIdx + 1] : order.status;
           %>
           <select class="status-sel-lg" id="status-select">
-        <% STATUS_ORDER.forEach(function(s, i) { %>
-  <% if (s !== 'Returned' && s !== 'Cancelled') { %>
-    <option value="<%= s %>"
-      <%= nextStatus === s ? 'selected' : '' %>
-      <%= (i < currentIdx || LOCKED.includes(order.status)) ? 'disabled' : '' %>
-    ><%= s %></option>
-  <% } %>
-  <% if (s === 'Cancelled') { %>
-    <option value="Cancelled"
-      <%= nextStatus === 'Cancelled' ? 'selected' : '' %>
-      <%= (['Delivered','Cancelled','Returned'].includes(order.status)) ? 'disabled' : '' %>
-    >Cancelled</option>
-  <% } %>
-<% }) %>
+            <% STATUS_ORDER.forEach(function(s, i) { %>
+              <% if (s !== 'Returned' && s !== 'Cancelled') { %>
+                <option value="<%= s %>"
+                  <%= order.status === s ? 'selected' : '' %>
+                  <%= (i < currentIdx || LOCKED.includes(order.status)) ? 'disabled' : '' %>
+                ><%= s %></option>
+              <% } %>
+              <% if (s === 'Cancelled') { %>
+                <option value="Cancelled"
+                  <%= order.status === 'Cancelled' ? 'selected' : '' %>
+                  <%= (['Delivered','Cancelled','Returned'].includes(order.status)) ? 'disabled' : '' %>
+                >Cancelled</option>
+              <% } %>
+            <% }) %>
           </select>
-          <button class="btn-update" id="update-btn" onclick="submitStatusUpdate()">
+                    <button class="btn-update" id="update-btn" onclick="submitStatusUpdate()">
             <i class="ti ti-check" aria-hidden="true"></i> Update status
           </button>
         </div>

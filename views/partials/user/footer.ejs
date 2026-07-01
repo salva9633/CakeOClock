@@ -1,67 +1,361 @@
- <!-- Footer -->
-    <footer class="py-5" style="background-color: transparent; border-top: 1px solid #E8A0A0;">
-        <div class="container">
-            <div class="row mb-5">
-                <div class="col-12 text-left mb-4">
-                    <h2 class="h3" style="color: #D95353; font-family: var(--font-heading);">Cake O Clock</h2>
-                </div>
-                <!-- About Column -->
-                <div class="col-md-4 mb-4 mb-md-0">
-                    <p class="small text-muted" style="text-align: justify;">
-                        Welcome to Cake O'Clock, your ultimate destination for fresh cakes, delightful cupcakes, and
-                        memorable events. We take pride in baking happiness with the freshest ingredients, rich flavors,
-                        and a touch of creativity. From our cozy kitchen to your extraordinary celebrations, we pour our
-                        heart into every baking creation, just to make your celebrations sweeter and brighter than ever!
-                    </p>
-                </div>
-                <!-- Links Column 1 -->
-                <div class="col-md-4 offset-md-1 mb-4 mb-md-0">
-                    <ul class="list-unstyled small text-muted">
-                        <li><i class="fas fa-phone me-2 text-warning"></i> Call Us: Quote Us</li>
-                        <li>• About Us</li>
-                        <li>• Our Bakery Locations</li>
-                        <li>• Privacy Policy</li>
-                        <li>• Terms & Conditions</li>
-                        <li>• Affiliates & Partnerships</li>
-                        <li>• Blog & Recipe Swaps</li>
-                        <li>• Contact</li>
-                        <li>• FAQs & Policy</li>
-                    </ul>
-                </div>
-                <!-- Links Column 2 -->
-                <div class="col-md-3">
-                    <ul class="list-unstyled small text-muted">
-                        <li><i class="fas fa-map-marker-alt me-2 text-danger"></i> CONTACT US</li>
-                        <li class="mb-2"><strong>CakeOClock HQ</strong><br>Sweet Street, Trade Centre<br>Kottayam,
-                            Kerala, India</li>
-                        <li class="mb-2"><i class="fas fa-envelope me-2"></i> support@cakeoclock.com</li>
-                        <li class="mb-2"><i class="fas fa-phone me-2"></i> +91 123 456 7890</li>
-                        <li><i class="fas fa-fax me-2"></i> Fax: +91 98765 43210</li>
-                    </ul>
-                </div>
-            </div>
+<style>
+/* ── Keyframes ── */
+@keyframes ftFadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes ftPulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50%       { opacity: 0.7; transform: scale(1.08); }
+}
+@keyframes ftFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+@keyframes ftShimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes ftSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
 
-            <hr style="color: #E8A0A0;">
+/* ── Column entrance ── */
+.ft-col {
+  opacity: 0;
+  animation: ftFadeUp .7s cubic-bezier(.22,1,.36,1) both;
+}
+.ft-col:nth-child(1) { animation-delay: .1s; }
+.ft-col:nth-child(2) { animation-delay: .22s; }
+.ft-col:nth-child(3) { animation-delay: .34s; }
+.ft-col:nth-child(4) { animation-delay: .46s; }
 
-            <div class="row align-items-center">
-                <div class="col-md-4">
-                    <div class="d-flex gap-2">
-                        <i class="fab fa-cc-visa fa-2x text-primary"></i>
-                        <i class="fab fa-cc-mastercard fa-2x text-warning"></i>
-                        <i class="fab fa-cc-paypal fa-2x text-info"></i>
-                    </div>
-                </div>
-                <div class="col-md-4 text-center">
-                    <p class="small mb-0 text-muted fw-bold">© 2024 CakeOClock - All Rights Reserved</p>
-                </div>
-                <div class="col-md-4 text-end">
-                    <div class="d-flex justify-content-end gap-3">
-                        <a href="#" class="text-dark"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-dark"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="text-dark"><i class="fab fa-youtube"></i></a>
-                        <a href="#" class="text-dark"><i class="fab fa-instagram"></i></a>
-                    </div>
-                </div>
-            </div>
+/* ── Brand title shimmer ── */
+.ft-brand-title {
+  background: linear-gradient(90deg, #fff 30%, #ffe0e8 50%, #fff 70%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: ftShimmer 4s linear infinite;
+  display: inline-block;
+}
+.ft-brand-em {
+  background: linear-gradient(90deg, #ffd6e0 20%, #fff 50%, #ffd6e0 80%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: ftShimmer 3s linear infinite reverse;
+  font-style: italic;
+}
+
+/* ── Decorative blobs ── */
+.ft-blob {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(60px);
+  animation: ftPulse 6s ease-in-out infinite;
+}
+
+/* ── Social buttons ── */
+.ft-soc-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.22);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; text-decoration: none; font-size: .9rem;
+  transition: background .25s, transform .25s, box-shadow .25s;
+}
+.ft-soc-btn:hover {
+  background: rgba(255,255,255,0.28) !important;
+  transform: translateY(-4px) scale(1.1) !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  color: #fff;
+}
+
+/* ── Nav links ── */
+.ft-nav-link {
+  font-size: .84rem;
+  color: rgba(255,255,255,0.65);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color .2s, gap .2s, letter-spacing .2s;
+}
+.ft-nav-link:hover {
+  color: #fff !important;
+  gap: 10px !important;
+  letter-spacing: .01em;
+}
+.ft-nav-link .ft-chevron {
+  font-size: .5rem;
+  color: rgba(255,220,228,0.55);
+  transition: color .2s, transform .2s;
+}
+.ft-nav-link:hover .ft-chevron {
+  color: rgba(255,220,228,0.9);
+  transform: translateX(2px);
+}
+
+/* ── Contact icon box ── */
+.ft-contact-icon {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background .25s, transform .25s;
+}
+.ft-contact-icon:hover {
+  background: rgba(255,255,255,0.22);
+  transform: scale(1.08);
+}
+
+/* ── Hours card ── */
+.ft-hours-card {
+  margin-top: 20px; padding: 14px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+  transition: background .3s, border-color .3s;
+}
+.ft-hours-card:hover {
+  background: rgba(255,255,255,0.13);
+  border-color: rgba(255,255,255,0.25);
+}
+
+/* ── Payment badges ── */
+.ft-pay-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 7px; padding: 4px 11px;
+  font-size: .68rem; font-weight: 700;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: .07em;
+  transition: background .2s, color .2s, transform .2s;
+}
+.ft-pay-badge i {
+  transition: color .2s;
+}
+.ft-pay-badge:hover {
+  background: rgba(255,255,255,0.22);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* ── Divider glow ── */
+.ft-divider {
+  max-width: 1100px; margin: 48px auto 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25) 30%, rgba(255,255,255,0.35) 50%, rgba(255,255,255,0.25) 70%, transparent);
+}
+
+/* ── Floating cake icon ── */
+.ft-cake-float {
+  position: absolute;
+  font-size: 5rem;
+  opacity: 0.06;
+  pointer-events: none;
+  animation: ftFloat 5s ease-in-out infinite;
+}
+
+/* ── Section heading ── */
+.ft-section-head {
+  font-size: .7rem; font-weight: 700; letter-spacing: .15em;
+  text-transform: uppercase; color: rgba(255,220,228,0.9);
+  margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+}
+.ft-section-head::after {
+  content: '';
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.2), transparent);
+}
+
+/* ── Scroll-reveal via Intersection Observer ── */
+.ft-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+.ft-reveal.ft-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
+
+<footer style="
+  position: relative;
+  background: url('https://res.cloudinary.com/dtfzp8rwt/image/upload/v1782739413/photo-1570475735025-6cd1cd5c779d_j1ehkg.avif') center/cover no-repeat;
+  padding: 70px 40px 0;
+  font-family: 'DM Sans', sans-serif;
+  color: rgba(255,255,255,0.85);
+  overflow: hidden;
+">
+
+  <!-- Background overlay -->
+  <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,123,138,0.92) 0%,rgba(168,80,100,0.90) 50%,rgba(201,123,138,0.92) 100%);pointer-events:none;z-index:0;"></div>
+
+  <!-- Decorative blobs -->
+  <div class="ft-blob" style="width:320px;height:320px;background:rgba(255,180,200,0.18);top:-80px;left:-60px;animation-delay:0s;"></div>
+  <div class="ft-blob" style="width:240px;height:240px;background:rgba(255,150,180,0.14);bottom:40px;right:80px;animation-delay:2s;"></div>
+  <div class="ft-blob" style="width:180px;height:180px;background:rgba(255,200,215,0.12);top:40%;left:45%;animation-delay:4s;"></div>
+
+  <!-- Floating cake icons -->
+  <div class="ft-cake-float" style="top:30px;right:160px;animation-delay:.5s;">🎂</div>
+  <div class="ft-cake-float" style="bottom:80px;left:120px;font-size:3.5rem;animation-delay:2.5s;animation-duration:7s;">🧁</div>
+
+  <!-- Main grid -->
+  <div style="position:relative;z-index:1;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:44px;">
+
+    <!-- ── Brand Column ── -->
+    <div class="ft-col">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;margin-bottom:14px;line-height:1.2;">
+        <span class="ft-brand-title">Cake O'</span>
+        <span class="ft-brand-em"> Clock</span>
+      </h2>
+      <p style="font-size:.83rem;line-height:1.9;color:rgba(255,255,255,0.6);margin-bottom:26px;">
+        From our cozy kitchen to your extraordinary celebrations — we pour our heart into every creation, making your moments sweeter and brighter.
+      </p>
+
+      <!-- Social -->
+      <div style="display:flex;gap:10px;margin-bottom:28px;">
+        <a href="#" class="ft-soc-btn" title="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="#" class="ft-soc-btn" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="ft-soc-btn" title="YouTube"><i class="fab fa-youtube"></i></a>
+        <a href="#" class="ft-soc-btn" title="Twitter"><i class="fab fa-twitter"></i></a>
+      </div>
+
+      <!-- Mini trust badge -->
+      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);border-radius:30px;padding:7px 14px;">
+        <i class="fas fa-shield-alt" style="color:rgba(255,220,228,0.9);font-size:.75rem;"></i>
+        <span style="font-size:.74rem;color:rgba(255,255,255,0.75);font-weight:500;">100% Secure & Trusted</span>
+      </div>
+    </div>
+
+    <!-- ── Quick Links ── -->
+    <div class="ft-col">
+      <div class="ft-section-head">Quick Links</div>
+      <ul style="list-style:none;padding:0;margin:0;">
+        <% [
+          {href:'/',label:'Home',icon:'fa-home'},
+          {href:'/products',label:'Shop',icon:'fa-store'},
+          {href:'/about',label:'About Us',icon:'fa-heart'},
+          {href:'/near-expiry',label:'Flash Deals',icon:'fa-bolt'},
+          {href:'/orders',label:'My Orders',icon:'fa-box'},
+          {href:'/wallet',label:'My Wallet',icon:'fa-wallet'},
+          {href:'/wishlist',label:'Wishlist',icon:'fa-bookmark'}
+        ].forEach(link => { %>
+        <li style="margin-bottom:12px;">
+          <a href="<%= link.href %>" class="ft-nav-link">
+            <i class="fas ft-chevron fa-chevron-right"></i><%= link.label %>
+          </a>
+        </li>
+        <% }) %>
+      </ul>
+    </div>
+
+    <!-- ── Support ── -->
+    <div class="ft-col">
+      <div class="ft-section-head">Support</div>
+      <ul style="list-style:none;padding:0;margin:0;">
+        <% [
+          {href:'/customer-support',label:'Customer Support'},
+          {href:'/contact-us',label:'Contact Us'},
+          {href:'/customer-support',label:'FAQs'},
+          {href:'/customer-support',label:'Returns Policy'},
+          {href:'#',label:'Privacy Policy'},
+          {href:'#',label:'Terms & Conditions'},
+          {href:'#',label:'Affiliates'}
+        ].forEach(link => { %>
+        <li style="margin-bottom:12px;">
+          <a href="<%= link.href %>" class="ft-nav-link">
+            <i class="fas ft-chevron fa-chevron-right"></i><%= link.label %>
+          </a>
+        </li>
+        <% }) %>
+      </ul>
+    </div>
+
+    <!-- ── Contact ── -->
+    <div class="ft-col">
+      <div class="ft-section-head">Contact Us</div>
+
+      <div style="display:flex;align-items:flex-start;gap:11px;margin-bottom:16px;">
+        <div class="ft-contact-icon" style="margin-top:2px;">
+          <i class="fas fa-map-marker-alt" style="color:rgba(255,220,228,0.9);font-size:12px;"></i>
         </div>
-    </footer>
+        <div>
+          <strong style="color:#fff;font-size:.8rem;display:block;margin-bottom:3px;">Our Bakery</strong>
+          <span style="font-size:.8rem;color:rgba(255,255,255,0.55);line-height:1.7;">Sweet Street, Trade Centre<br>Kottayam, Kerala, India</span>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:flex-start;gap:11px;margin-bottom:16px;">
+        <div class="ft-contact-icon">
+          <i class="fas fa-phone" style="color:rgba(255,220,228,0.9);font-size:12px;"></i>
+        </div>
+        <div>
+          <strong style="color:#fff;font-size:.8rem;display:block;margin-bottom:3px;">Phone</strong>
+          <span style="font-size:.8rem;color:rgba(255,255,255,0.55);">+91 123 456 7890</span>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:flex-start;gap:11px;">
+        <div class="ft-contact-icon">
+          <i class="fas fa-envelope" style="color:rgba(255,220,228,0.9);font-size:12px;"></i>
+        </div>
+        <div>
+          <strong style="color:#fff;font-size:.8rem;display:block;margin-bottom:3px;">Email</strong>
+          <span style="font-size:.8rem;color:rgba(255,255,255,0.55);">cakeoclock@gmail.com</span>
+        </div>
+      </div>
+
+      </div>
+
+  </div>
+
+  <!-- Divider -->
+  <div class="ft-divider" style="position:relative;z-index:1;"></div>
+
+  <!-- Bottom Bar -->
+  <div style="position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:22px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+    <p style="font-size:.78rem;color:rgba(255,255,255,0.4);">© 2026 Cake O'Clock — All Rights Reserved. Made with ❤️ in Kerala.</p>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <% [
+        {label:'VISA', icon:'fab fa-cc-visa'},
+        {label:'Mastercard', icon:'fab fa-cc-mastercard'},
+        {label:'Razorpay', icon:'fas fa-bolt'},
+        {label:'UPI', icon:'fas fa-indian-rupee-sign'}
+      ].forEach(p => { %>
+      <span class="ft-pay-badge"><i class="<%= p.icon %>" style="color:#fff;font-size:.85rem;"></i><%= p.label %></span>
+      <% }) %>
+
+    </div>
+  </div>
+
+</footer>
+
+<script>
+// Scroll-reveal for footer elements
+(function() {
+  const reveals = document.querySelectorAll('.ft-reveal');
+  if (!reveals.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('ft-visible'), i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+})();
+</script>

@@ -1,0 +1,522 @@
+<%- include('../partials/admin/header') %>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* { box-sizing: border-box; }
+
+:root {
+  --bg:       #F8F9FC;
+  --white:    #FFFFFF;
+  --primary:  #C86A7A;
+  --primary-dk:#A8546A;
+  --primary-lt:#FDF2F4;
+  --success:  #10B981;
+  --warning:  #F59E0B;
+  --info:     #3B82F6;
+  --text:     #1F2937;
+  --text-2:   #374151;
+  --text-muted:#6B7280;
+  --text-faint:#9CA3AF;
+  --border:   #E5E7EB;
+  --border-lt:#F3F4F6;
+}
+
+@keyframes fadeUp  { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+@keyframes cardIn  { from{opacity:0;transform:translateY(20px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+@keyframes rowIn   { from{opacity:0;transform:translateX(-6px)} to{opacity:1;transform:translateX(0)} }
+
+/* PAGE SHELL */
+.cm-page {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  padding: 2rem 2rem 3rem;
+  color: var(--text);
+}
+
+/* ── HEADER ── */
+.cm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  animation: fadeUp .4s ease both;
+}
+.cm-header-left { display: flex; align-items: center; gap: 14px; }
+.cm-hdr-icon {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #C86A7A, #e891a0);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.cm-hdr-icon i { font-size: 24px; color: #fff; }
+.cm-hdr-title { font-size: 26px; font-weight: 700; color: #111827; letter-spacing: -.4px; line-height: 1.1; }
+.cm-hdr-sub   { font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 400; }
+.cm-header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+.cm-search {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 10px; padding: 0 14px; height: 40px; min-width: 240px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.cm-search:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(200,106,122,.1); }
+.cm-search i   { font-size: 15px; color: var(--text-faint); flex-shrink: 0; }
+.cm-search input {
+  border: none; outline: none; font-size: 13px; color: var(--text);
+  background: transparent; font-family: 'Inter', sans-serif; width: 100%;
+}
+.cm-search input::placeholder { color: var(--text-faint); }
+
+.cm-sort {
+  height: 40px; border: 1px solid var(--border); border-radius: 10px;
+  padding: 0 12px; font-size: 13px; color: var(--text-2);
+  background: var(--white); font-family: 'Inter', sans-serif;
+  cursor: pointer; outline: none; transition: border-color .2s;
+}
+.cm-sort:focus { border-color: var(--primary); }
+
+/* ── STATS ── */
+.cm-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 1.75rem;
+}
+.cm-stat {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 16px; padding: 1.25rem 1.25rem 1.1rem;
+  display: flex; flex-direction: column; gap: 14px;
+  opacity: 0; animation: cardIn .5s ease forwards;
+  transition: transform .25s, box-shadow .25s;
+  position: relative; overflow: hidden;
+}
+.cm-stat::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+}
+.cm-stat.c-pink::before  { background: var(--primary); }
+.cm-stat.c-amber::before { background: var(--warning); }
+.cm-stat.c-blue::before  { background: var(--info); }
+.cm-stat.c-green::before { background: var(--success); }
+.cm-stat:nth-child(1) { animation-delay: .06s; }
+.cm-stat:nth-child(2) { animation-delay: .12s; }
+.cm-stat:nth-child(3) { animation-delay: .18s; }
+.cm-stat:nth-child(4) { animation-delay: .24s; }
+.cm-stat:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.08); }
+
+.cm-stat-head { display: flex; justify-content: space-between; align-items: center; }
+.cm-stat-ico {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.c-pink  .cm-stat-ico { background: #FDF2F4; }
+.c-pink  .cm-stat-ico i { color: var(--primary); }
+.c-amber .cm-stat-ico { background: #FFFBEB; }
+.c-amber .cm-stat-ico i { color: var(--warning); }
+.c-blue  .cm-stat-ico { background: #EFF6FF; }
+.c-blue  .cm-stat-ico i { color: var(--info); }
+.c-green .cm-stat-ico { background: #ECFDF5; }
+.c-green .cm-stat-ico i { color: var(--success); }
+.cm-stat-ico i { font-size: 19px; }
+
+.cm-trend {
+  font-size: 11px; font-weight: 600;
+  padding: 3px 8px; border-radius: 20px;
+  display: inline-flex; align-items: center; gap: 3px;
+}
+.trend-up  { background: #ECFDF5; color: #059669; }
+.trend-neu { background: #F3F4F6; color: var(--text-muted); }
+
+.cm-stat-num  { font-size: 36px; font-weight: 700; letter-spacing: -1px; line-height: 1; color: #111827; }
+.cm-stat-lbl  { font-size: 14px; font-weight: 500; color: var(--text-2); margin-top: 2px; }
+.cm-stat-hint { font-size: 12px; color: var(--text-faint); margin-top: 2px; }
+
+/* ── FILTER PILLS ── */
+.cm-filters {
+  display: flex; gap: 8px; margin-bottom: 1.5rem;
+  animation: fadeUp .5s ease .3s both; opacity: 0;
+  flex-wrap: wrap;
+}
+.cm-pill {
+  padding: 7px 16px; border-radius: 99px;
+  font-size: 13px; font-weight: 500;
+  cursor: pointer; border: 1.5px solid var(--border);
+  background: var(--white); color: var(--text-muted);
+  transition: all .2s; white-space: nowrap;
+  font-family: 'Inter', sans-serif;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+}
+.cm-pill:hover:not(.active) { border-color: var(--primary); color: var(--primary); background: var(--primary-lt); }
+.cm-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.cm-pill-count {
+  font-size: 10px; font-weight: 700; min-width: 18px; height: 18px;
+  border-radius: 99px; display: inline-flex; align-items: center;
+  justify-content: center; padding: 0 4px;
+}
+.cm-pill.active .cm-pill-count  { background: rgba(255,255,255,.25); color: #fff; }
+.cm-pill:not(.active) .cm-pill-count { background: var(--border-lt); color: var(--text-muted); }
+
+/* ── TABLE ── */
+.cm-table-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden;
+  opacity: 0; animation: cardIn .5s ease .36s forwards;
+  margin-bottom: 1.5rem;
+}
+.cm-table-scroll { overflow-x: auto; }
+.cm-table {
+  width: 100%; border-collapse: collapse; min-width: 680px;
+}
+.cm-table thead tr {
+  background: #F9FAFB; border-bottom: 1px solid var(--border);
+}
+.cm-table thead th {
+  padding: 12px 18px; font-size: 12px; font-weight: 600;
+  color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: .06em; white-space: nowrap; text-align: left;
+}
+.cm-table tbody tr {
+  border-bottom: 1px solid var(--border-lt);
+  transition: background .15s; cursor: pointer;
+}
+.cm-table tbody tr:last-child { border-bottom: none; }
+.cm-table tbody tr:hover { background: #FAFAFA; }
+.cm-table tbody td {
+  padding: 14px 18px; font-size: 14px;
+  color: var(--text); vertical-align: middle;
+}
+
+/* Sender cell */
+.cm-sender { display: flex; align-items: center; gap: 12px; }
+.cm-av {
+  width: 38px; height: 38px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; flex-shrink: 0; letter-spacing: .5px;
+}
+.av-0 { background: #FDE8EC; color: #9D2235; }
+.av-1 { background: #FEF3C7; color: #92400E; }
+.av-2 { background: #D1FAE5; color: #065F46; }
+.av-3 { background: #EDE9FE; color: #4C1D95; }
+.av-4 { background: #DBEAFE; color: #1E3A5F; }
+.cm-sname  { font-size: 14px; font-weight: 600; color: #111827; }
+.cm-semail { font-size: 12px; color: var(--text-faint); margin-top: 1px; }
+
+/* Subject */
+.cm-subj      { font-size: 14px; font-weight: 500; color: #111827; }
+.cm-subj.dim  { color: var(--text-muted); font-weight: 400; }
+.cm-preview   {
+  font-size: 12px; color: var(--text-faint); margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 260px;
+}
+
+/* Badge */
+.cm-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600;
+  padding: 4px 10px; border-radius: 99px;
+  white-space: nowrap; border: 1px solid transparent;
+}
+.cm-badge i { font-size: 10px; }
+.b-unread  { background: #FFFBEB; color: #B45309; border-color: #FDE68A; }
+.b-read    { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
+.b-replied { background: #ECFDF5; color: #047857; border-color: #A7F3D0; }
+
+/* Date */
+.cm-date-main { font-size: 13px; color: var(--text-2); font-weight: 500; }
+.cm-date-rel  { font-size: 11px; color: var(--text-faint); margin-top: 2px; }
+
+/* View btn */
+.cm-btn-view {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600;
+  padding: 6px 14px; border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--white); color: var(--text-muted);
+  cursor: pointer; text-decoration: none;
+  transition: all .2s; font-family: 'Inter', sans-serif;
+}
+.cm-btn-view:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+.cm-btn-view i { font-size: 13px; }
+
+/* Empty */
+.cm-empty { text-align: center; padding: 4rem 1rem; }
+.cm-empty-ico { font-size: 52px; color: var(--border); margin-bottom: 16px; }
+.cm-empty h3  { font-size: 16px; font-weight: 600; color: var(--text-2); margin-bottom: 6px; }
+.cm-empty p   { font-size: 13px; color: var(--text-faint); }
+
+/* Footer / Pagination */
+.cm-tbl-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 18px; border-top: 1px solid var(--border-lt);
+  flex-wrap: wrap; gap: 10px;
+}
+.cm-pg-info { font-size: 13px; color: var(--text-muted); }
+.cm-pager   { display: flex; gap: 4px; }
+.cm-pb {
+  min-width: 34px; height: 34px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--white);
+  color: var(--text-2); font-size: 13px; font-weight: 500;
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none; cursor: pointer;
+  transition: all .2s; padding: 0 8px;
+  font-family: 'Inter', sans-serif;
+}
+.cm-pb:hover:not(.dis):not(.on) { border-color: var(--primary); color: var(--primary); }
+.cm-pb.on  { background: var(--primary); color: #fff; border-color: var(--primary); }
+.cm-pb.dis { opacity: .35; pointer-events: none; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .cm-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .cm-page { padding: 1rem; }
+  .cm-stats { grid-template-columns: minmax(0, 1fr); }
+  .cm-header { flex-direction: column; }
+  .cm-search { min-width: 100%; }
+}
+</style>
+
+<div class="page-wrapper">
+  <%- include('../partials/admin/sidebar') %>
+
+
+    <!-- ── HEADER ── -->
+    <div class="cm-header">
+      <div class="cm-header-left">
+        <div class="cm-hdr-icon">
+          <i class="ti ti-message-2" aria-hidden="true"></i>
+        </div>
+        <div>
+          <div class="cm-hdr-title">Contact Messages</div>
+          <div class="cm-hdr-sub">Manage customer inquiries, review conversations, and respond efficiently.</div>
+        </div>
+      </div>
+      <div class="cm-header-right">
+        <form method="GET" action="/admin/contact-messages" class="cm-search">
+          <i class="ti ti-search" aria-hidden="true"></i>
+          <input type="text" name="search" value="<%= search || '' %>"
+                 placeholder="Search sender, email or subject…" autocomplete="off">
+        </form>
+        <select class="cm-sort" onchange="window.location='?sort='+this.value+'&status=<%= activeFilter %>'">
+          <option value="newest" <%= (sort==='newest'||!sort)?'selected':'' %>>Newest first</option>
+          <option value="oldest" <%= sort==='oldest'?'selected':'' %>>Oldest first</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ── STATS ── -->
+    <%
+      const totalPct   = 100;
+      const unreadPct  = totalCount > 0 ? Math.round(unreadCount  / totalCount * 100) : 0;
+      const readPct    = totalCount > 0 ? Math.round(readCount    / totalCount * 100) : 0;
+      const repliedPct = totalCount > 0 ? Math.round(repliedCount / totalCount * 100) : 0;
+    %>
+    <div class="cm-stats">
+      <div class="cm-stat c-pink">
+        <div class="cm-stat-head">
+          <div class="cm-stat-ico"><i class="ti ti-inbox" aria-hidden="true"></i></div>
+          <span class="cm-trend trend-up">
+            <i class="ti ti-arrow-up" style="font-size:10px"></i>+2 today
+          </span>
+        </div>
+        <div>
+          <div class="cm-stat-num"><%= totalCount %></div>
+          <div class="cm-stat-lbl">Total messages</div>
+          <div class="cm-stat-hint">All time received</div>
+        </div>
+      </div>
+      <div class="cm-stat c-amber">
+        <div class="cm-stat-head">
+          <div class="cm-stat-ico"><i class="ti ti-bell" aria-hidden="true"></i></div>
+          <span class="cm-trend trend-neu">Pending</span>
+        </div>
+        <div>
+          <div class="cm-stat-num"><%= unreadCount %></div>
+          <div class="cm-stat-lbl">Unread</div>
+          <div class="cm-stat-hint">Needs attention</div>
+        </div>
+      </div>
+      <div class="cm-stat c-blue">
+        <div class="cm-stat-head">
+          <div class="cm-stat-ico"><i class="ti ti-eye" aria-hidden="true"></i></div>
+          <span class="cm-trend trend-neu">Opened</span>
+        </div>
+        <div>
+          <div class="cm-stat-num"><%= readCount %></div>
+          <div class="cm-stat-lbl">Read</div>
+          <div class="cm-stat-hint">Pending reply</div>
+        </div>
+      </div>
+      <div class="cm-stat c-green">
+        <div class="cm-stat-head">
+          <div class="cm-stat-ico"><i class="ti ti-send" aria-hidden="true"></i></div>
+          <span class="cm-trend trend-up">
+            <i class="ti ti-arrow-up" style="font-size:10px"></i><%= repliedPct %>%
+          </span>
+        </div>
+        <div>
+          <div class="cm-stat-num"><%= repliedCount %></div>
+          <div class="cm-stat-lbl">Replied</div>
+          <div class="cm-stat-hint">Response rate</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── FILTER PILLS ── -->
+    <div class="cm-filters">
+      <%
+        const filters = [
+          { key: 'all',     label: 'All',     count: totalCount   },
+          { key: 'unread',  label: 'Unread',  count: unreadCount  },
+          { key: 'read',    label: 'Read',    count: readCount    },
+          { key: 'replied', label: 'Replied', count: repliedCount },
+        ];
+      %>
+      <% filters.forEach(f => { %>
+        <a href="/admin/contact-messages<%= f.key !== 'all' ? '?status='+f.key : '' %>"
+           class="cm-pill <%= activeFilter === f.key ? 'active' : '' %>">
+          <%= f.label %>
+          <span class="cm-pill-count"><%= f.count %></span>
+        </a>
+      <% }) %>
+    </div>
+
+    <!-- ── TABLE ── -->
+    <div class="cm-table-card">
+      <% if (messages.length === 0) { %>
+        <div class="cm-empty">
+          <div class="cm-empty-ico"><i class="ti ti-mail-off" aria-hidden="true"></i></div>
+          <h3>No Messages Found</h3>
+          <p>Customer messages will appear here once they reach out.</p>
+        </div>
+      <% } else { %>
+      <%
+        const avClasses = ['av-0','av-1','av-2','av-3','av-4'];
+        const badgeMap  = {
+          unread:  { cls: 'b-unread',  icon: 'ti-clock', label: 'Unread'  },
+          read:    { cls: 'b-read',    icon: 'ti-eye',   label: 'Read'    },
+          replied: { cls: 'b-replied', icon: 'ti-check', label: 'Replied' },
+        };
+        function timeAgo(date) {
+          const diff = Math.floor((Date.now() - new Date(date)) / 1000);
+          if (diff < 3600)   return Math.floor(diff/60) + ' min ago';
+          if (diff < 86400)  return Math.floor(diff/3600) + ' hours ago';
+          if (diff < 172800) return 'Yesterday';
+          return Math.floor(diff/86400) + ' days ago';
+        }
+      %>
+      <div class="cm-table-scroll">
+        <table class="cm-table">
+          <thead>
+            <tr>
+              <th style="width:22%">Sender</th>
+              <th style="width:30%">Subject</th>
+              <th style="width:13%">Status</th>
+              <th style="width:18%">Received</th>
+              <th style="width:17%;text-align:center">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% messages.forEach((msg, i) => {
+              const initials = msg.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+              const avCls    = avClasses[i % avClasses.length];
+              const isUnread = msg.status === 'unread';
+              const b        = badgeMap[msg.status];
+              const dateStr  = new Date(msg.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+              const relTime  = timeAgo(msg.createdAt);
+            %>
+            <tr onclick="window.location='/admin/contact-messages/<%= msg._id %>'">
+              <td>
+                <div class="cm-sender">
+                  <div class="cm-av <%= avCls %>"><%= initials %></div>
+                  <div>
+                    <div class="cm-sname"><%= msg.name %></div>
+                    <div class="cm-semail"><%= msg.email %></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="cm-subj <%= isUnread ? '' : 'dim' %>">
+                  <%= msg.subject.length > 50 ? msg.subject.substring(0,50)+'…' : msg.subject %>
+                </div>
+                <% if (msg.message) { %>
+                  <div class="cm-preview">
+                    <%= msg.message.substring(0, 60) %>…
+                  </div>
+                <% } %>
+              </td>
+              <td>
+                <span class="cm-badge <%= b.cls %>">
+                  <i class="ti <%= b.icon %>" aria-hidden="true"></i>
+                  <%= b.label %>
+                </span>
+              </td>
+              <td>
+                <div class="cm-date-main"><%= dateStr %></div>
+                <div class="cm-date-rel"><%= relTime %></div>
+              </td>
+              <td style="text-align:center;" onclick="event.stopPropagation()">
+                <a href="/admin/contact-messages/<%= msg._id %>" class="cm-btn-view">
+                  <i class="ti ti-eye" aria-hidden="true"></i> View
+                </a>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PAGINATION -->
+      <div class="cm-tbl-footer">
+        <div class="cm-pg-info">
+          Showing <%= (currentPage - 1) * perPage + 1 %>–<%= Math.min(currentPage * perPage, totalCount) %>
+          of <%= totalCount %> messages
+        </div>
+        <div class="cm-pager">
+          <a class="cm-pb <%= currentPage === 1 ? 'dis' : '' %>"
+             href="?page=<%= currentPage-1 %>&status=<%= activeFilter %>" aria-label="Previous">
+            <i class="ti ti-chevron-left" aria-hidden="true"></i>
+          </a>
+          <% for (let p = 1; p <= totalPages; p++) { %>
+            <% if (totalPages > 7 && p > 3 && p < totalPages - 1 && Math.abs(p - currentPage) > 1) { %>
+              <% if (p === 4 || p === totalPages - 2) { %>
+                <span class="cm-pb dis">…</span>
+              <% } %>
+            <% } else { %>
+              <a class="cm-pb <%= currentPage === p ? 'on' : '' %>"
+                 href="?page=<%= p %>&status=<%= activeFilter %>"><%= p %></a>
+            <% } %>
+          <% } %>
+          <a class="cm-pb <%= currentPage === totalPages ? 'dis' : '' %>"
+             href="?page=<%= currentPage+1 %>&status=<%= activeFilter %>" aria-label="Next">
+            <i class="ti ti-chevron-right" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+      <% } %>
+    </div>
+
+  
+</div>
+
+<script>
+(function(){
+  const searchForm  = document.querySelector('form.cm-search');
+  const searchInput = searchForm ? searchForm.querySelector('input') : null;
+  let   timer       = null;
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => searchForm.submit(), 450);
+    });
+    searchForm.addEventListener('submit', e => { e.preventDefault(); searchForm.submit(); });
+  }
+})();
+</script>

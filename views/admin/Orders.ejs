@@ -18,7 +18,7 @@
 .pg-header h1{font-size:20px;font-weight:500;color:var(--brown);display:flex;align-items:center;gap:8px}
 .pg-header h1 i{color:var(--rose)}
 
-.summary-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;margin-bottom:1.5rem}
+.summary-grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px;margin-bottom:1.5rem}-grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px;margin-bottom:1.5rem}-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;margin-bottom:1.5rem}
 .s-card{background:var(--white);border:0.5px solid var(--border);border-radius:12px;padding:.85rem 1rem;border-top:3px solid var(--rose);opacity:0;animation:fadeUp .5s ease forwards;transition:transform .2s}
 .s-card:hover{transform:translateY(-2px)}
 .s-card:nth-child(2){border-top-color:#F0A050;animation-delay:.05s}
@@ -145,15 +145,18 @@
       <div class="s-label">Cancelled</div>
       <div class="s-val" data-target="<%= counts.Cancelled %>">0</div>
     </div>
-    <div class="s-card">
+   <div class="s-card">
       <div class="s-label">Returned</div>
       <div class="s-val" data-target="<%= counts.Returned %>">0</div>
+    </div>
+    <div class="s-card" style="border-top-color:#856404;">
+      <div class="s-label">Return Req.</div>
+      <div class="s-val" data-target="<%= counts['Return Requested'] %>">0</div>
     </div>
   </div>
 
   <div class="tabs">
-    <% const tabStatuses = ["All","Pending","Processing","Shipped","Delivered","Returned","Cancelled"]; %>
-    <% tabStatuses.forEach(function(s){ %>
+<% const tabStatuses = ["All","Pending","Processing","Shipped","Delivered","Return Requested","Returned","Cancelled"]; %>    <% tabStatuses.forEach(function(s){ %>
       <a href="/admin/orders?search=<%= encodeURIComponent(search) %>&status=<%= s==='All'?'':s %>&sort=<%= sort %>&page=1"
          class="tab <%= (s==='All'&&!status)||s===status?'active':'' %>">
         <%= s %>

@@ -1,0 +1,417 @@
+<%- include('../partials/user/header') %>
+<%- include('../partials/user/navbar') %>
+
+<!-- ============================================================
+     CAKE O'CLOCK — ABOUT US
+     Tokens:
+     --blush:#FDF1F4  --cream:#FFF9F7  --rosegold:#C97B84
+     --choco:#3B1F29  --beige:#F6E8E3  --gold:#D9A857
+     Display: 'Playfair Display'   Body: 'Poppins'
+     Signature element: the "piped border" — a scalloped buttercream
+     edge (SVG) separates every major section, echoing the way a
+     cake decorator finishes a layer.
+============================================================= -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --blush:#FDF1F4;
+    --cream:#FFF9F7;
+    --rosegold:#C97B84;
+    --choco:#3B1F29;
+    --beige:#F6E8E3;
+    --gold:#D9A857;
+  }
+
+  .coc-about{ background:var(--cream); color:var(--choco); overflow:hidden; }
+  .coc-about *{ box-sizing:border-box; }
+  .coc-about h1,.coc-about h2,.coc-about h3,.coc-about .font-display{
+    font-family:'Playfair Display',serif; font-weight:600; letter-spacing:-0.01em;
+  }
+  .coc-about, .coc-about p, .coc-about span, .coc-about a, .coc-about button{
+    font-family:'Poppins',sans-serif;
+  }
+  .coc-wrap{ max-width:1180px; margin:0 auto; padding:0 28px; }
+
+  /* ---------- scroll reveal ---------- */
+  .coc-reveal{ opacity:0; transform:translateY(28px); transition:opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
+  .coc-reveal.is-in{ opacity:1; transform:translateY(0); }
+
+  /* ---------- piped scallop divider (signature) ---------- */
+  .coc-scallop{ display:block; width:100%; height:34px; margin-top:-1px; }
+
+  /* ============ HERO ============ */
+  .coc-hero{
+    position:relative; padding:120px 0 90px; background:
+      radial-gradient(60% 50% at 85% 10%, rgba(201,123,132,.18), transparent 60%),
+      radial-gradient(50% 45% at 5% 90%, rgba(217,168,87,.16), transparent 60%),
+      var(--blush);
+  }
+  .coc-hero-grid{ display:grid; grid-template-columns:1.05fr .95fr; gap:60px; align-items:center; }
+  .coc-eyebrow{
+    display:inline-flex; align-items:center; gap:8px; font-size:.74rem; letter-spacing:.22em;
+    font-weight:600; color:var(--rosegold); text-transform:uppercase; margin-bottom:18px;
+  }
+  .coc-eyebrow svg{ width:14px; height:14px; }
+  .coc-hero h1{ font-size:clamp(2.4rem,4.6vw,3.6rem); line-height:1.08; color:var(--choco); margin:0 0 22px; }
+  .coc-hero h1 em{ font-style:italic; color:var(--rosegold); }
+  .coc-hero p.sub{ font-size:1.05rem; line-height:1.8; color:#7a5a62; max-width:480px; margin-bottom:34px; }
+
+  .coc-btn{
+    position:relative; display:inline-flex; align-items:center; gap:10px;
+    background:var(--choco); color:#fff; padding:16px 36px; border-radius:50px;
+    text-decoration:none; font-weight:500; font-size:.95rem; letter-spacing:.02em;
+    overflow:hidden; isolation:isolate; transition:transform .35s ease, box-shadow .35s ease;
+    box-shadow:0 12px 30px rgba(59,31,41,.22);
+  }
+  .coc-btn::before{
+    content:""; position:absolute; inset:0; z-index:-1; transform:scaleX(0); transform-origin:left;
+    background:var(--rosegold); transition:transform .45s cubic-bezier(.2,.7,.2,1);
+  }
+  .coc-btn:hover::before{ transform:scaleX(1); }
+  .coc-btn:hover{ transform:translateY(-3px); box-shadow:0 18px 36px rgba(201,123,132,.35); }
+
+  .coc-hero-art{ position:relative; }
+  .coc-hero-frame{
+    position:relative; border-radius:30px; overflow:hidden; transform:rotate(2.5deg);
+    box-shadow:0 30px 80px rgba(59,31,41,.22); border:6px solid #fff;
+  }
+  .coc-hero-frame img{ width:100%; display:block; aspect-ratio:4/4.6; object-fit:cover; }
+  .coc-glow{ position:absolute; width:340px; height:340px; border-radius:50%; filter:blur(60px); background:rgba(201,123,132,.35); top:-40px; right:10%; z-index:-1; }
+  .coc-badge{
+    position:absolute; left:-26px; bottom:36px; background:rgba(255,255,255,.75); backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.6); border-radius:18px; padding:14px 20px; box-shadow:0 14px 34px rgba(59,31,41,.15);
+    font-size:.8rem; font-weight:600; color:var(--choco); display:flex; align-items:center; gap:8px;
+    animation:coc-float 5s ease-in-out infinite;
+  }
+  .coc-float-icon{
+    position:absolute; font-size:1.8rem; filter:drop-shadow(0 6px 10px rgba(0,0,0,.12));
+    animation:coc-float 6s ease-in-out infinite;
+  }
+  .coc-float-icon.f1{ top:6%; left:-8%; animation-delay:.2s; }
+  .coc-float-icon.f2{ bottom:8%; right:-6%; font-size:2.1rem; animation-delay:1.4s; }
+  .coc-float-icon.f3{ top:46%; right:-10%; font-size:1.5rem; animation-delay:.8s; }
+  @keyframes coc-float{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-14px);} }
+
+  @media (prefers-reduced-motion: reduce){
+    .coc-badge, .coc-float-icon{ animation:none; }
+    .coc-reveal{ transition:none; opacity:1; transform:none; }
+  }
+
+  /* ============ STORY ============ */
+  .coc-story{ padding:110px 0; background:var(--cream); }
+  .coc-story-grid{ display:grid; grid-template-columns:.85fr 1.15fr; gap:70px; align-items:center; }
+  .coc-story-img{ border-radius:26px; overflow:hidden; box-shadow:0 24px 60px rgba(59,31,41,.14); }
+  .coc-story-img img{ width:100%; display:block; aspect-ratio:3/3.4; object-fit:cover; }
+  .coc-story h2{ font-size:clamp(1.9rem,3vw,2.6rem); margin:0 0 18px; color:var(--choco); }
+  .coc-story p.lead{ color:#7a5a62; line-height:1.85; margin-bottom:40px; max-width:520px; }
+
+  .coc-timeline{ position:relative; padding-left:30px; }
+  .coc-timeline::before{ content:""; position:absolute; left:6px; top:6px; bottom:6px; width:2px; background:var(--rosegold); }
+  .coc-tl-item{ position:relative; padding-bottom:34px; }
+  .coc-tl-item:last-child{ padding-bottom:0; }
+  .coc-tl-item::before{
+    content:""; position:absolute; left:-30px; top:4px; width:13px; height:13px; border-radius:50%;
+    background:var(--rosegold); border:3px solid var(--cream); box-shadow:0 0 0 2px var(--rosegold);
+  }
+  .coc-tl-year{ font-family:'Playfair Display',serif; font-weight:700; color:var(--rosegold); font-size:1.05rem; margin-bottom:4px; }
+  .coc-tl-text{ color:#5c4047; font-size:.96rem; }
+
+  /* ============ WHY CHOOSE US ============ */
+  .coc-why{ padding:100px 0; background:var(--beige); position:relative; }
+  .coc-section-head{ text-align:center; max-width:560px; margin:0 auto 56px; }
+  .coc-section-head .coc-eyebrow{ justify-content:center; }
+  .coc-section-head h2{ font-size:clamp(1.9rem,3vw,2.5rem); }
+
+  .coc-cards4{ display:grid; grid-template-columns:repeat(4,1fr); gap:24px; }
+  .coc-card{
+    background:rgba(255,255,255,.55); backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,.7);
+    border-radius:25px; padding:34px 26px; text-align:center; box-shadow:0 14px 34px rgba(59,31,41,.08);
+    transition:transform .4s cubic-bezier(.2,.7,.2,1), box-shadow .4s ease, background .4s ease;
+  }
+  .coc-card:hover{ transform:translateY(-10px); box-shadow:0 26px 50px rgba(59,31,41,.16); background:rgba(255,255,255,.85); }
+  .coc-card .ic{
+    width:62px; height:62px; margin:0 auto 18px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:1.6rem; background:var(--rosegold); color:#fff;
+  }
+  .coc-card h3{ font-size:1rem; margin:0 0 8px; color:var(--choco); }
+  .coc-card p{ font-size:.86rem; color:#806369; line-height:1.7; margin:0; }
+
+  /* ============ STATS ============ */
+  .coc-stats{ padding:90px 0; background:var(--choco); color:#fff; position:relative; }
+  .coc-stats::before{
+    content:""; position:absolute; inset:0; background:radial-gradient(50% 80% at 50% 0%, rgba(201,123,132,.18), transparent 70%);
+  }
+  .coc-stats-grid{ position:relative; display:grid; grid-template-columns:repeat(4,1fr); gap:20px; text-align:center; }
+  .coc-stat-num{ font-family:'Playfair Display',serif; font-weight:700; font-size:clamp(2.1rem,3.6vw,2.8rem); color:var(--gold); }
+  .coc-stat-label{ font-size:.84rem; letter-spacing:.04em; color:rgba(255,255,255,.7); margin-top:6px; }
+
+  /* ============ BAKERS ============ */
+  .coc-bakers{ padding:100px 0; background:var(--cream); }
+  .coc-baker-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:32px; }
+  .coc-baker{ text-align:center; }
+  .coc-baker .photo{
+    width:140px; height:140px; border-radius:50%; margin:0 auto 18px; overflow:hidden;
+    border:5px solid #fff; box-shadow:0 16px 34px rgba(59,31,41,.16);
+  }
+  .coc-baker .photo img{ width:100%; height:100%; object-fit:cover; }
+  .coc-baker h3{ font-size:1.1rem; margin:0 0 2px; color:var(--choco); }
+  .coc-baker .role{ font-size:.8rem; color:var(--rosegold); font-weight:600; letter-spacing:.05em; text-transform:uppercase; margin-bottom:12px; }
+  .coc-baker .quote{ font-style:italic; color:#806369; font-size:.92rem; max-width:240px; margin:0 auto; line-height:1.7; }
+
+  /* ============ TESTIMONIALS ============ */
+  .coc-testi{ padding:100px 0; background:var(--beige); }
+  .coc-testi-track{ display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+  .coc-testi-card{
+    background:#fff; border-radius:22px; padding:30px; box-shadow:0 14px 34px rgba(59,31,41,.08);
+  }
+  .coc-stars{ color:var(--gold); font-size:.9rem; margin-bottom:14px; letter-spacing:2px; }
+  .coc-testi-card p{ color:#5c4047; font-size:.92rem; line-height:1.8; margin-bottom:20px; }
+  .coc-testi-person{ display:flex; align-items:center; gap:12px; }
+  .coc-testi-person img{ width:42px; height:42px; border-radius:50%; object-fit:cover; }
+  .coc-testi-person .name{ font-weight:600; font-size:.88rem; color:var(--choco); }
+  .coc-testi-person .loc{ font-size:.76rem; color:#a4878d; }
+
+  /* ============ GALLERY ============ */
+  .coc-gallery{ padding:100px 0; background:var(--cream); }
+  .coc-masonry{ column-count:3; column-gap:18px; }
+  .coc-masonry .g-item{ break-inside:avoid; margin-bottom:18px; border-radius:18px; overflow:hidden; box-shadow:0 10px 26px rgba(59,31,41,.1); }
+  .coc-masonry .g-item img{ width:100%; display:block; transition:transform .6s ease; }
+  .coc-masonry .g-item:hover img{ transform:scale(1.08); }
+
+  /* ============ FINAL CTA ============ */
+  .coc-final{ position:relative; background:var(--choco); padding:110px 0; text-align:center; overflow:hidden; }
+  .coc-final::before{ content:""; position:absolute; inset:0; background:radial-gradient(55% 70% at 50% 100%, rgba(217,168,87,.18), transparent 70%); }
+  .coc-final h2{ position:relative; color:#fff; font-size:clamp(2rem,4vw,3rem); margin:0 0 18px; }
+  .coc-final p{ position:relative; color:rgba(255,255,255,.65); margin-bottom:36px; }
+  .coc-final .coc-btn{ position:relative; background:var(--rosegold); }
+  .coc-final .coc-btn::before{ background:#fff; }
+  .coc-final .coc-btn:hover{ color:var(--choco); }
+  .coc-final-icon{ position:absolute; font-size:2.2rem; opacity:.5; animation:coc-float 7s ease-in-out infinite; }
+  .coc-final-icon.fi1{ top:14%; left:8%; }
+  .coc-final-icon.fi2{ bottom:16%; right:10%; animation-delay:1.6s; }
+
+  @media (max-width: 900px){
+    .coc-hero-grid, .coc-story-grid{ grid-template-columns:1fr; }
+    .coc-hero-art{ order:-1; max-width:380px; margin:0 auto; }
+    .coc-cards4{ grid-template-columns:repeat(2,1fr); }
+    .coc-stats-grid{ grid-template-columns:repeat(2,1fr); row-gap:30px; }
+    .coc-baker-grid, .coc-testi-track{ grid-template-columns:1fr; }
+    .coc-masonry{ column-count:2; }
+    .coc-badge{ left:6px; }
+  }
+</style>
+
+<div class="coc-about">
+
+  <!-- ============ HERO ============ -->
+  <section class="coc-hero">
+    <div class="coc-wrap coc-hero-grid">
+      <div class="coc-reveal">
+        <span class="coc-eyebrow">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.6 7.9H22l-6.3 4.9 2.4 8L12 16l-6.1 4.8 2.4-8L2 7.9h7.4z"/></svg>
+          Handcrafted with love · Est. 2020
+        </span>
+        <h1>Every Celebration<br>Begins With <em>Cake</em></h1>
+        <p class="sub">Crafting unforgettable moments with handcrafted cakes, baked fresh every day — from our kitchen in Kottayam to your table.</p>
+        <a href="/products" class="coc-btn">Explore Our Cakes →</a>
+      </div>
+
+      <div class="coc-hero-art coc-reveal">
+        <div class="coc-glow"></div>   
+        <div class="coc-hero-frame">
+          <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1782742063/WhatsApp_Image_2026-02-20_at_12.52.55_AM_n8b4wb.jpg" alt="Freshly baked cake at Cake O'Clock" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </section>
+  <svg class="coc-scallop" viewBox="0 0 1200 34" preserveAspectRatio="none"><path d="M0,0 H1200 V14 C1150,30 1110,2 1060,16 C1010,30 970,2 920,16 C870,30 830,2 780,16 C730,30 690,2 640,16 C590,30 550,2 500,16 C450,30 410,2 360,16 C310,30 270,2 220,16 C170,30 130,2 80,16 C40,28 10,10 0,14 Z" fill="#FFF9F7"/></svg>
+
+  <!-- ============ STORY ============ -->
+  <section class="coc-story">
+    <div class="coc-wrap coc-story-grid">
+      <div class="coc-story-img coc-reveal">
+        <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1782811902/log_gejmaw.jpg" alt="Cake O'Clock home kitchen beginnings" loading="lazy">
+      </div>
+      <div class="coc-reveal">
+        <span class="coc-eyebrow">Our Story</span>
+        <h2>From a Home Kitchen<br>to Your Favourite Bakery</h2>
+        <p class="lead">Cake O'Clock was born out of a simple dream: to make every moment sweeter. What started as a home kitchen passion project has grown into a bakery trusted by thousands of families — without losing the care of those first batches.</p>
+
+        <div class="coc-timeline">
+          <div class="coc-tl-item">
+            <div class="coc-tl-year">2020</div>
+            <div class="coc-tl-text">Started from a home kitchen, one custom order at a time.</div>
+          </div>
+          <div class="coc-tl-item">
+            <div class="coc-tl-year">2022</div>
+            <div class="coc-tl-text">Served 10,000+ customers across Kottayam and beyond.</div>
+          </div>
+          <div class="coc-tl-item">
+            <div class="coc-tl-year">2024</div>
+            <div class="coc-tl-text">Expanded into custom wedding cakes and large celebration tiers.</div>
+          </div>
+          <div class="coc-tl-item">
+            <div class="coc-tl-year">Today</div>
+            <div class="coc-tl-text">Delivering handcrafted happiness, fresh, every single day.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WHY CHOOSE US ============ -->
+  <section class="coc-why">
+    <div class="coc-wrap">
+      <div class="coc-section-head coc-reveal">
+        <span class="coc-eyebrow">Why Cake O'Clock</span>
+        <h2>The Little Things We Never Skip</h2>
+      </div>
+      <div class="coc-cards4">
+        <div class="coc-card coc-reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M3 13l9-9 9 9"/><path d="M4 13v6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6"/><path d="M9 20v-7a3 3 0 0 1 6 0v7"/></svg></div><h3>Freshly Baked Daily</h3><p>Every cake is baked the same morning it's ordered — never frozen, never rushed.</p></div>
+        <div class="coc-card coc-reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 21s-7.5-4.6-10-9.1C.4 8.6 1.7 5 5.2 4.1c2-.5 4 .3 5.1 2 .3.4.5.8.7 1.3.2-.5.4-.9.7-1.3 1.1-1.7 3.1-2.5 5.1-2 3.5.9 4.8 4.5 3.2 7.8C19.5 16.4 12 21 12 21z"/></svg></div><h3>Crafted with Love</h3><p>Each order gets a personal quality check before it ever leaves our kitchen.</p></div>
+        <div class="coc-card coc-reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M1 8h13v9H1z"/><path d="M14 11h4l4 4v2h-8z"/><circle cx="6" cy="19" r="2"/><circle cx="17.5" cy="19" r="2"/></svg></div><h3>Same Day Delivery</h3><p>Order by noon and we'll have your cake at your door by evening.</p></div>
+        <div class="coc-card coc-reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.9L12 17.8 5.8 21l1.2-6.9-5-4.9 6.9-1z"/></svg></div><h3>Premium Ingredients</h3><p>Real butter, real cream, locally sourced — nothing artificial, ever.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STATS ============ -->
+  <section class="coc-stats">
+    <div class="coc-wrap coc-stats-grid">
+      <div class="coc-reveal"><div class="coc-stat-num" data-count="10000" data-suffix="+">0</div><div class="coc-stat-label">Happy Customers</div></div>
+      <div class="coc-reveal"><div class="coc-stat-num" data-count="500" data-suffix="+">0</div><div class="coc-stat-label">Cake Designs</div></div>
+      <div class="coc-reveal"><div class="coc-stat-num" data-count="100" data-suffix="%">0</div><div class="coc-stat-label">Fresh Ingredients</div></div>
+      <div class="coc-reveal"><div class="coc-stat-num" data-count="5" data-suffix=" Yrs">0</div><div class="coc-stat-label">Sweet Memories</div></div>
+    </div>
+  </section>
+
+  <!-- ============ MEET OUR BAKERS ============ -->
+  <!-- <section class="coc-bakers">
+    <div class="coc-wrap">
+      <div class="coc-section-head coc-reveal">
+        <span class="coc-eyebrow">The Team</span>
+        <h2>Meet Our Bakers</h2>
+      </div>
+      <div class="coc-baker-grid">
+        <div class="coc-baker coc-reveal">
+          <div class="photo"><img src="/images/about/baker-1.jpg" alt="Head Baker" loading="lazy"></div>
+          <h3>Anjali Menon</h3>
+          <div class="role">Head Baker & Founder</div>
+          <p class="quote">"Every cake should taste like it was made for someone you love."</p>
+        </div>
+        <div class="coc-baker coc-reveal">
+          <div class="photo"><img src="/images/about/baker-2.jpg" alt="Pastry Chef" loading="lazy"></div>
+          <h3>Rohan Pillai</h3>
+          <div class="role">Pastry Chef</div>
+          <p class="quote">"The details — that's where the magic of a cake really lives."</p>
+        </div>
+        <div class="coc-baker coc-reveal">
+          <div class="photo"><img src="/images/about/baker-3.jpg" alt="Cake Decorator" loading="lazy"></div>
+          <h3>Meera Thomas</h3>
+          <div class="role">Lead Decorator</div>
+          <p class="quote">"I treat every tier like it's for my own family's celebration."</p>
+        </div>
+      </div>
+    </div>
+  </section> -->
+
+  <!-- ============ TESTIMONIALS ============ -->
+  <section class="coc-testi">
+    <div class="coc-wrap">
+      <div class="coc-section-head coc-reveal">
+        <span class="coc-eyebrow">Kind Words</span>
+        <h2>What Our Customers Say</h2>
+      </div>
+      <div class="coc-testi-track">
+        <div class="coc-testi-card coc-reveal">
+          <div class="coc-stars">★★★★★</div>
+          <p>The wedding cake was beyond what we imagined — every guest asked where it was from.</p>
+          <div class="coc-testi-person"><img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1782812308/premium_photo-1723489474086-72c7ace39d04_jwym2y.avif" alt=""><div><div class="name">Priya S.</div><div class="loc">Kottayam</div></div></div>
+        </div>
+        <div class="coc-testi-card coc-reveal">
+          <div class="coc-stars">★★★★★</div>
+          <p>Same-day delivery saved our birthday party. The cake arrived warm with the smell of fresh baking.</p>
+          <div class="coc-testi-person"><img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1782812291/premium_photo-1689977927774-401b12d137d6_jxzvyq.avif" alt=""><div><div class="name">Arjun K.</div><div class="loc">Kochi</div></div></div>
+        </div>
+        <div class="coc-testi-card coc-reveal">
+          <div class="coc-stars">★★★★★</div>
+          <p>You can genuinely taste the difference real butter and care make. Our new go-to bakery.</p>
+          <div class="coc-testi-person"><img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1782812299/premium_photo-1690407617542-2f210cf20d7e_ydwi48.avif" alt=""><div><div class="name">Divya R.</div><div class="loc">Pathanamthitta</div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ GALLERY ============ -->
+  <section class="coc-gallery">
+    <div class="coc-wrap">
+      <div class="coc-section-head coc-reveal">
+        <span class="coc-eyebrow">From Our Kitchen</span>
+        <h2>A Glimpse Inside Cake O'Clock</h2>
+      </div>
+      <div class="coc-masonry">
+        <div class="g-item coc-reveal"><img src="/images/about/gallery-1.jpg" alt="" loading="lazy"></div>
+        <div class="g-item coc-reveal"><img src="/images/about/gallery-2.jpg" alt="" loading="lazy"></div>
+        <div class="g-item coc-reveal"><img src="/images/about/gallery-3.jpg" alt="" loading="lazy"></div>
+        <div class="g-item coc-reveal"><img src="/images/about/gallery-4.jpg" alt="" loading="lazy"></div>
+        <div class="g-item coc-reveal"><img src="/images/about/gallery-5.jpg" alt="" loading="lazy"></div>
+        <div class="g-item coc-reveal"><img src="/images/about/gallery-6.jpg" alt="" loading="lazy"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FINAL CTA ============ -->
+  <section class="coc-final">
+   
+    <div class="coc-wrap coc-reveal">
+      <h2>Let's Make Your Celebration Sweeter</h2>
+      <p>Custom cakes, designed around your story, baked fresh and delivered with care.</p>
+      <a href="/products" class="coc-btn">Order Your Dream Cake →</a>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // Scroll reveal
+  (function(){
+    var els = document.querySelectorAll('.coc-reveal');
+    if(!('IntersectionObserver' in window)){ els.forEach(function(e){ e.classList.add('is-in'); }); return; }
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){ entry.target.classList.add('is-in'); io.unobserve(entry.target); }
+      });
+    }, { threshold: 0.15 });
+    els.forEach(function(e){ io.observe(e); });
+  })();
+
+  // Animated counters
+  (function(){
+    var nums = document.querySelectorAll('.coc-stat-num');
+    if(!('IntersectionObserver' in window)){ return; }
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(!entry.isIntersecting) return;
+        var el = entry.target;
+        var target = parseInt(el.getAttribute('data-count'), 10);
+        var suffix = el.getAttribute('data-suffix') || '';
+        var start = 0, duration = 1400, startTime = null;
+        function step(ts){
+          if(!startTime) startTime = ts;
+          var progress = Math.min((ts - startTime) / duration, 1);
+          var eased = 1 - Math.pow(1 - progress, 3);
+          el.textContent = Math.floor(eased * target).toLocaleString() + suffix;
+          if(progress < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+        io.unobserve(el);
+      });
+    }, { threshold: 0.4 });
+    nums.forEach(function(n){ io.observe(n); });
+  })();
+</script>
+
+<%- include('../partials/user/footer') %>

@@ -138,8 +138,8 @@
             <td><%= coupon.description || '—' %></td>
             <td>
               <div class="action-cell">
-                <button
-                  onclick="toggleStatus('<%= coupon._id %>')"
+              <button
+                  onclick="toggleStatus('<%= coupon._id %>', <%= coupon.isActive %>)"
                   class="btn-sm btn-toggle"
                   title="<%= coupon.isActive ? 'Deactivate' : 'Activate' %>"
                 >
@@ -528,6 +528,8 @@ tbody td {
 </style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 const form = document.getElementById("couponForm");
 
@@ -639,7 +641,20 @@ else if (Number(minPurchase.value) < 100) {
 
   if(valid){
     code.value = codeValue;
-    form.submit();
+
+    Swal.fire({
+      title: "Add this coupon?",
+      text: `Code: ${codeValue}`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#A85F6E",
+      cancelButtonColor: "#aaa",
+      confirmButtonText: "Yes, add it",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        form.submit();
+      }
+    });
   }
 });
 
@@ -649,7 +664,21 @@ document.getElementById("code").addEventListener("input", function () {
     .replace(/[^A-Z0-9]/g, "");
 });
 
-async function toggleStatus(id) {
+async function toggleStatus(id, isActive) {
+  const action = isActive ? "deactivate" : "activate";
+
+  const result = await Swal.fire({
+    title: `${action === "deactivate" ? "Deactivate" : "Activate"} Coupon?`,
+    text: `Are you sure you want to ${action} this coupon?`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#A85F6E",
+    cancelButtonColor: "#aaa",
+    confirmButtonText: `Yes, ${action} it`,
+  });
+
+  if (!result.isConfirmed) return;
+
   try {
     const response = await fetch(`/admin/coupons/status/${id}`, {
       method: "PATCH",
@@ -658,12 +687,20 @@ async function toggleStatus(id) {
     const data = await response.json();
 
     if (data.success) {
-      location.reload();
+      Swal.fire({
+        icon: "success",
+        title: "Updated!",
+        text: `Coupon ${action}d successfully.`,
+        confirmButtonColor: "#A85F6E",
+        timer: 1500,
+        showConfirmButton: false,
+      }).then(() => location.reload());
     } else {
-      alert("Status update failed");
+      Swal.fire("Error", "Status update failed", "error");
     }
   } catch (error) {
     console.error(error);
+    Swal.fire("Error", "Something went wrong", "error");
   }
 }
 </script>

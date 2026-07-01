@@ -271,8 +271,15 @@
     .img-badge-tl.bestseller { background: #fff1c2; color: #7a5000; }
     .img-badge-tl.sale       { background: #fde8c8; color: #7a3800; }
     .img-badge-tl.new-b      { background: #d1f5e0; color: #1a6638; }
-    .img-badge-tl.oos        { background: rgba(255,255,255,.88); color: var(--rose-dk); }
-
+.img-badge-tl.oos { 
+  background: #e02d2d;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: .72rem;
+  padding: 6px 16px;
+  letter-spacing: .08em;
+}
     /* TOP RIGHT: Offer % pill — sits left of wishlist button */
     .offer-pill {
       position: absolute;
@@ -627,8 +634,6 @@
         </div>
         <% } %>
 
-        <input type="hidden" name="sort" id="hiddenSort">
-        <input type="hidden" name="search" id="hiddenSearch" value="<%= search || '' %>">
         <button type="button" class="apply-btn" onclick="applyAll()">Apply Filters</button>
         <button type="button" class="clear-filter-btn" onclick="clearFilters()">Clear Filters</button>
       </form>
@@ -693,8 +698,8 @@
             <% } else if (!isOos && badge === 'new') { %>
               <span class="img-badge-tl new-b">NEW</span>
             <% } else if (isOos) { %>
-              <span class="img-badge-tl oos">OUT OF STOCK</span>
-            <% } %>
+  <span class="img-badge-tl oos">OUT OF STOCK</span>
+<% } %>
 
             <!-- TOP RIGHT: Offer % pill (only on image, only when discount exists) -->
           <% if (!isOos && product.discount > 0) { %>
@@ -836,20 +841,29 @@
 
 <script>
 /* ── FILTER / SORT ── */
+/* ── FILTER / SORT ── */
 function applyAll() {
-  document.getElementById('hiddenSort').value   = document.getElementById('sortOptions').value;
-  document.getElementById('hiddenSearch').value = document.getElementById('sortOptions').value
-    ? document.getElementById('hiddenSearch').value
-    : document.getElementById('hiddenSearch').value;
-  document.getElementById('filterForm').submit();
+  const params = new URLSearchParams();
+
+  const search   = document.getElementById('searchInput')?.value.trim()             || '';
+  const sort     = document.getElementById('sortOptions')?.value                    || '';
+  const category = document.querySelector('input[name="category"]:checked')?.value || '';
+  const price    = document.querySelector('input[name="price"]:checked')?.value     || '';
+  const brand    = document.querySelector('input[name="brand"]:checked')?.value     || '';
+
+  if (search)   params.set('search',   search);
+  if (sort)     params.set('sort',     sort);
+  if (category) params.set('category', category);
+  if (price)    params.set('price',    price);
+  if (brand)    params.set('brand',    brand);
+  params.set('page', '1');
+
+  window.location.href = '/products?' + params.toString();
 }
 
 function clearFilters() {
   window.location.href = '/products';
 }
-
-const _p = new URLSearchParams(location.search);
-if (_p.get('sort')) document.getElementById('sortOptions').value = _p.get('sort');
 
 /* ── SESSION CHECK ── */
 async function isLoggedIn() {
@@ -953,6 +967,15 @@ async function toggleWish(btn) {
 let selectedVariantId = null;
 let currentProductId  = null;
 
+function formatWeight(weightInGrams) {
+  const w = Number(weightInGrams);
+  if (w >= 1000) {
+    const kg = w / 1000;
+    return (kg % 1 === 0 ? kg : kg.toFixed(1)) + 'kg';
+  }
+  return w + 'g';
+}
+
 async function openVariantModal(productId, productName) {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) { showLoginPrompt('add items to your Cart'); return; }
@@ -979,39 +1002,66 @@ async function openVariantModal(productId, productName) {
   const container = document.getElementById('vm-variants');
   container.innerHTML = '';
 
+  const firstAvailableIdx = data.variants.findIndex(v => Number(v.stock) > 0);
+
   data.variants.forEach((v, i) => {
-    const uid = 'v-' + v._id;
+    const uid          = 'v-' + v._id;
+    const outOfStock    = Number(v.stock) === 0;
+    const isPreSelected = i === (firstAvailableIdx === -1 ? 0 : firstAvailableIdx) && !outOfStock;
+
     const row = document.createElement('label');
     row.htmlFor = uid;
     row.style.cssText = `
-      border: 1.5px solid #f0d4db; border-radius: 10px; padding: 11px 15px;
+      border: 1.5px solid ${outOfStock ? '#f0e8e8' : '#f0d4db'}; border-radius: 10px; padding: 11px 15px;
       display: flex; justify-content: space-between; align-items: center;
-      cursor: pointer; margin-bottom: 8px; transition: border-color .2s, background .2s;
+      cursor: ${outOfStock ? 'not-allowed' : 'pointer'}; margin-bottom: 8px;
+      background: ${outOfStock ? '#fafafa' : '#fff'};
+      opacity: ${outOfStock ? '0.55' : '1'};
+      transition: border-color .2s, background .2s;
     `;
+
     row.innerHTML = `
       <div style="display:flex;align-items:center;gap:10px">
-        <span style="width:20px;height:20px;border:2px solid #4caf50;border-radius:4px;
-          display:inline-flex;align-items:center;justify-content:center;color:#4caf50;font-size:11px;font-weight:700">✔</span>
-        <span style="font-weight:700;color:#2b1515">${v.weight || v.size || 'Variant'}</span>
+        <span style="width:20px;height:20px;border:2px solid ${outOfStock ? '#ccc' : '#4caf50'};border-radius:4px;
+          display:inline-flex;align-items:center;justify-content:center;color:${outOfStock ? '#ccc' : '#4caf50'};font-size:11px;font-weight:700">${outOfStock ? '✕' : '✔'}</span>
+        <div>
+<span style="font-weight:700;color:${outOfStock ? '#aaa' : '#2b1515'}">${v.weight ? formatWeight(v.weight) : 'Variant'}</span>          ${outOfStock
+            ? `<span style="display:block;font-size:.72rem;color:#e07070;font-weight:600;margin-top:2px;">Out of Stock</span>`
+            : `<span style="display:block;font-size:.72rem;color:#5aaa60;font-weight:500;margin-top:2px;">${v.stock} in stock</span>`}
+        </div>
       </div>
       <div style="display:flex;align-items:center;gap:12px">
-        <span style="font-family:'Playfair Display',serif;font-weight:700;color:#C2607A;font-size:1rem">₹${v.salePrice}</span>
-        <input type="radio" name="vm-variant" id="${uid}" value="${v._id}"
-          data-price="${v.salePrice}" ${i === 0 ? 'checked' : ''}
-          style="accent-color:#C2607A;width:18px;height:18px;cursor:pointer">
+        <div style="text-align:right;line-height:1.5;">
+  ${v.regularPrice && Number(v.regularPrice) > Number(v.price) ? `
+    <span style="font-size:.75rem;color:#aaa;text-decoration:line-through;display:block;">
+      ₹${Number(v.regularPrice).toFixed(0)}
+    </span>` : ''}
+  <span style="font-family:'Playfair Display',serif;font-weight:700;
+               color:${outOfStock ? '#bbb' : '#C2607A'};font-size:1rem;">
+    ₹${Number(v.price).toFixed(0)}
+  </span>
+  ${v.discountPct > 0 ? `
+    <span style="font-size:.68rem;font-weight:700;color:#5aaa60;display:block;">
+      ${Math.round(v.discountPct)}% off
+    </span>` : ''}
+</div>
+<input type="radio" name="vm-variant" id="${uid}" value="${v._id}"
+  data-price="${v.price}" ${outOfStock ? 'disabled' : ''} ${isPreSelected ? 'checked' : ''}
+  style="accent-color:#C2607A;width:18px;height:18px;cursor:${outOfStock ? 'not-allowed' : 'pointer'}">
       </div>`;
 
-    row.addEventListener('mouseover', () => { row.style.borderColor = '#C2607A'; row.style.background = '#fdf0f3'; });
-    row.addEventListener('mouseout',  () => { row.style.borderColor = '#f0d4db'; row.style.background = ''; });
-    row.querySelector('input').addEventListener('change', () => { selectVariant(v._id, v.salePrice); });
+    if (!outOfStock) {
+      row.addEventListener('mouseover', () => { row.style.borderColor = '#C2607A'; row.style.background = '#fdf0f3'; });
+      row.addEventListener('mouseout',  () => { row.style.borderColor = '#f0d4db'; row.style.background = '#fff'; });
+row.querySelector('input').addEventListener('change', () => { selectVariant(v._id, v.price); });
+    }
 
     container.appendChild(row);
-    if (i === 0) { selectedVariantId = v._id; updatePrice(v.salePrice); }
+if (isPreSelected) { selectedVariantId = v._id; updatePrice(v.price); }
   });
 
   new bootstrap.Modal(document.getElementById('variantModal')).show();
 }
-
 function selectVariant(variantId, price) {
   selectedVariantId = variantId;
   updatePrice(price);

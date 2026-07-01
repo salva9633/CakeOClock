@@ -1,4 +1,5 @@
 import Product from "../../models/productModel.js";
+import mongoose from "mongoose";
 import Variant  from "../../models/variantModel.js";
 import Batch    from "../../models/batchModel.js";
 import Review   from "../../models/reviewModel.js";
@@ -13,21 +14,42 @@ const loadProductDetailsPage = async (req, res) => {
     const selectedVariantId = req.query.variant;
  
     const userId = req.session?.user?.id || req.session?.user?._id || null;
+
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(404).render("404");
+    }
  
-    /* -------- Product -------- */
-  const product = await Product.findOne({ _id: productId, isListed: true })
-    .populate("categoryId")   
-    .lean();
-    console.log("PRODUCT FOUND:", product ? product.productName : "NULL — not found or not listed");
-    if (!product) return res.status(404).render("404");
- 
-    /* -------- Variants -------- */
+
+const product = await Product.findOne({ _id: productId })
+  .populate("categoryId")   
+  .lean();
+
+console.log("PRODUCT FOUND:", product ? product.productName : "NULL — not found");
+if (!product) return res.status(404).render("404");
+
+
+
+if (!product.isListed) {
+  return res.status(200).render("productDetails", {
+    product,
+    blocked: true,
+    variants: [], selectedVariant: null, relatedProducts: [],
+    reviews: [], totalReviews: 0, avgRating: "0.0",
+    initialStock: 0, canReview: false,
+    isLoggedIn: !!userId, offerData: null,
+    user: req.session?.user || null,
+    cartCount: req.session?.cartCount || 0,
+    wishlistCount: req.session?.wishlistCount || 0,
+    search: ""
+  });
+}
+    
     const variants = await Variant.find({ productId, isAvailable: true })
       .sort({ regularPrice: 1 })
       .lean();
     if (variants.length === 0) return res.status(404).render("404");
  
-    /* -------- Selected Variant -------- */
+  
     let selectedVariant;
     if (selectedVariantId) {
       selectedVariant = variants.find(v => v._id.toString() === selectedVariantId);
@@ -41,14 +63,16 @@ const loadProductDetailsPage = async (req, res) => {
       expiryAt:       { $gt: new Date() },
       availableStock: { $gt: 0 }
     }).lean();
+
     const initialStock = batches.reduce((sum, b) => sum + b.availableStock, 0);
  
     /* -------- Related Products (with ratings) -------- */
-    const relatedProductsRaw = await Product.find({
+   const relatedProductsRaw = await Product.find({
       categoryId: product.categoryId,
       _id:        { $ne: product._id },
       isListed:   true
     })
+      .populate("categoryId")
       .limit(4)
       .lean();
  
@@ -72,16 +96,36 @@ const loadProductDetailsPage = async (req, res) => {
       };
     }
  
-    const relatedProducts = await Promise.all(
+  const relatedProducts = await Promise.all(
       relatedProductsRaw.map(async (rp) => {
         const rpVariants = await Variant.find({ productId: rp._id, isAvailable: true })
           .sort({ regularPrice: 1 })
           .lean();
         const { avgRating = "0.0", totalReviews = 0 } =
           relatedRatingMap[rp._id.toString()] || {};
+
+        let startingPrice   = null;
+        let regularPrice    = null;
+        let discountPercent = 0;
+        let offerApplied    = false;
+
+        if (rpVariants.length) {
+          const cheapest = rpVariants[0];
+          const priceData = await getFinalPrice(cheapest);
+          startingPrice   = priceData.finalPrice;
+          regularPrice    = cheapest.regularPrice;
+          discountPercent = priceData.discountPercent;
+          offerApplied    = priceData.offerApplied;
+        }
+
         return {
           ...rp,
-         startingPrice: rpVariants.length ? rpVariants[0].regularPrice : null,
+          startingPrice,
+          regularPrice,
+          discountPercent,
+          offerApplied,
+          brand:    rp.brand || "",
+          category: rp.categoryId?.categoryName || rp.categoryId?.name || "",
           avgRating,
           totalReviews
         };
@@ -156,7 +200,7 @@ res.render("productDetails", {
  
 } catch (error) {
     console.error("PRODUCT DETAIL ERROR:", error.message, error.stack);
-    res.status(500).send("Server Error: " + error.message);
+    return res.status(404).render("404");
   }
 };
  
@@ -184,7 +228,7 @@ const getVariantDetails = async (req, res) => {
    const variantPrice = await getFinalPrice(variant);
 res.json({
   success:      true,
-  salePrice:    variantPrice.finalPrice,   // frontend still gets salePrice key — no EJS change needed
+  salePrice:    variantPrice.finalPrice,   
   regularPrice: variant.regularPrice,
       weight:       variant.weight,
       stock:        totalStock,

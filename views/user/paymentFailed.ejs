@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Failed – Cake O'Clock</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --rose:#AF5454; --rose-dk:#8c3a3a; --rose-lt:#f9eded; --cream:#fdf6f0; --muted:#8a7070; --border:#ecdada; --text:#2d1f1f; }
+    * { box-sizing: border-box; }
+    body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--text); min-height:100vh; }
+    h2 { font-family:'Playfair Display',serif; }
+    .failed-wrap { min-height:70vh; display:flex; align-items:center; justify-content:center; padding:40px 16px; }
+    .failed-card { background:#fff; border-radius:18px; padding:44px 36px; max-width:460px; width:100%; text-align:center; box-shadow:0 4px 24px rgba(175,84,84,.1); border:1px solid #f5eded; }
+    .failed-icon { width:78px; height:78px; border-radius:50%; background:#fdeaea; display:flex; align-items:center; justify-content:center; margin:0 auto 22px; }
+    .failed-icon svg { width:36px; height:36px; }
+    .failed-title { font-size:1.6rem; margin-bottom:10px; }
+    .failed-sub { color:var(--muted); font-size:.95rem; margin-bottom:28px; }
+    .failed-actions { display:flex; flex-direction:column; gap:12px; }
+    .btn-failed { padding:12px 18px; border-radius:12px; font-weight:600; font-size:.92rem; border:none; text-decoration:none; display:inline-block; }
+    .btn-try-again { background:var(--rose); color:#fff; }
+    .btn-try-again:hover { background:var(--rose-dk); color:#fff; }
+    .btn-view-orders { background:var(--rose-lt); color:var(--rose-dk); }
+    .btn-home { background:transparent; color:var(--muted); border:1px solid var(--border); }
+  </style>
+</head>
+<body>
+
+<%- include("../partials/user/h2") %>
+
+<div class="failed-wrap">
+  <div class="failed-card">
+    <div class="failed-icon">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="11" fill="#e74c3c"/>
+        <path d="M8 8L16 16M16 8L8 16" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h2 class="failed-title">Payment Failed</h2>
+    <p class="failed-sub"><%= reason %></p>
+    <div class="failed-actions">
+      <a href="/payment-page?addressId=<%= addressId %>&couponCode=<%= couponCode %>" class="btn-failed btn-try-again">Try Again</a>
+      <a href="/orders" class="btn-failed btn-view-orders">View Orders</a>
+      <a href="/" class="btn-failed btn-home">Home</a>
+    </div>
+  </div>
+</div>
+
+<%- include("../partials/user/footer") %>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

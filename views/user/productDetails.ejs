@@ -402,6 +402,143 @@ body{
   transition: background 0.2s;
 }
 .btn-cart:hover { background: #5e2a3d; }
+
+/* ── Shop-style Related Product Cards (matches /products page card design) ── */
+.p-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 3px 16px rgba(194,96,122,.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(240,212,219,.6);
+  transition: box-shadow .35s, transform .35s;
+  text-decoration: none;
+  color: inherit;
+}
+.p-card:hover { box-shadow: 0 14px 40px rgba(194,96,122,.2); transform: translateY(-6px); }
+
+.card-img-zone { position: relative; overflow: hidden; height: 195px; background: #fce8ed; }
+.card-img-zone img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.p-card:hover .card-img-zone img { transform: scale(1.08); }
+.card-img-zone.oos-img img { filter: grayscale(.4) brightness(.95); }
+
+.img-badge-tl {
+  position: absolute; top: 10px; left: 10px;
+  font-size: .6rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
+  padding: 4px 11px; border-radius: 20px; z-index: 4; pointer-events: none;
+}
+.img-badge-tl.oos { background: #e02d2d; color: #fff; border-radius: 6px; font-size: .72rem; padding: 6px 16px; letter-spacing: .08em; }
+
+.offer-pill {
+  position: absolute; top: 10px; left: 10px;
+  background: #8b3a52; color: #fff;
+  font-size: .6rem; font-weight: 800; letter-spacing: .06em;
+  padding: 4px 9px; border-radius: 20px; z-index: 4; pointer-events: none;
+}
+
+.img-cat-strip {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 32px 11px 10px;
+  background: linear-gradient(to top, rgba(43,10,20,.58) 0%, transparent 100%);
+  pointer-events: none; z-index: 3;
+}
+.img-cat-label {
+  display: inline-block; background: rgba(255,255,255,.90); color: #8B3A52;
+  font-size: .59rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 20px; backdrop-filter: blur(3px);
+}
+
+.shop-wish-btn {
+  position: absolute; top: 9px; right: 9px; width: 32px; height: 32px;
+  background: rgba(255,255,255,.92); border: none; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: 0 2px 9px rgba(0,0,0,.12); z-index: 4;
+  transition: background .2s, transform .2s; color: #C2607A; font-size: .8rem;
+}
+.shop-wish-btn:hover { background: #C2607A; color: #fff; transform: scale(1.12); }
+
+.card-body-inner { padding: 13px 14px 14px; display: flex; flex-direction: column; flex: 1; }
+.card-name {
+  font-family: 'Playfair Display', serif; font-size: .98rem; font-weight: 600;
+  color: #2d1a20; line-height: 1.3; margin-bottom: 3px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  transition: color .2s;
+}
+.p-card:hover .card-name { color: #C2607A; }
+
+.card-meta-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; flex-wrap: wrap; }
+.meta-cat { font-size: .68rem; font-weight: 600; color: #9a6b75; letter-spacing: .03em; }
+
+.card-stars { display: flex; align-items: center; gap: 1px; margin-bottom: 8px; }
+.card-stars i { font-size: .68rem; color: #f59e0b; }
+.card-stars i.empty { color: #e8d0d5; }
+.card-stars .rev-info { font-size: .7rem; color: #b09090; margin-left: 5px; }
+
+.pricing-row { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; flex-wrap: wrap; }
+.price-now { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 900; color: #C2607A; }
+.card-price-old { font-size: .75rem; color: #c0a0a8; text-decoration: line-through; }
+
+.card-actions { display: flex; gap: 7px; margin-top: auto; padding-top: 9px; }
+.shop-atc-btn {
+  flex: 1; padding: 9px 10px; border: none; border-radius: 10px;
+  font-family: 'DM Sans', sans-serif; font-size: .79rem; font-weight: 700; letter-spacing: .04em;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;
+  transition: background .2s, transform .15s, box-shadow .2s;
+  background: #8B3A52; color: #fff;
+}
+.shop-atc-btn:hover { background: #C2607A; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(194,96,122,.35); }
+.shop-atc-btn.disabled-oos { background: #ede0e4; color: #b09090; cursor: not-allowed; }
+/* ── Related card entrance + hover polish ── */
+@keyframes relCardIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.p-card {
+  animation: relCardIn .5s ease both;
+}
+.p-card:nth-child(1) { animation-delay: .05s; }
+.p-card:nth-child(2) { animation-delay: .12s; }
+.p-card:nth-child(3) { animation-delay: .19s; }
+.p-card:nth-child(4) { animation-delay: .26s; }
+
+.card-img-zone::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 60%, rgba(0,0,0,.08) 100%);
+  opacity: 0; transition: opacity .35s ease;
+  pointer-events: none; z-index: 2;
+}
+.p-card:hover .card-img-zone::after { opacity: 1; }
+
+/* ── Image hover "View Product" overlay ── */
+.img-hover-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(43,10,20,0) 35%, rgba(43,10,20,.55) 100%);
+  display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: 16px;
+  opacity: 0; transform: translateY(8px);
+  transition: opacity .3s ease, transform .3s ease;
+  z-index: 3; pointer-events: none;
+}
+.p-card:hover .img-hover-overlay {
+  opacity: 1; transform: translateY(0);
+}
+.view-product-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: #fff; color: #8B3A52;
+  font-family: 'DM Sans', sans-serif; font-size: .76rem; font-weight: 700; letter-spacing: .04em;
+  padding: 9px 18px; border-radius: 30px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.25);
+  transition: background .25s, color .25s, transform .25s;
+}
+.p-card:hover .view-product-pill {
+  animation: pillPop .35s ease;
+}
+@keyframes pillPop {
+  0%   { transform: scale(.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
   </style>
 </head>
 <body>
@@ -422,8 +559,31 @@ body{
   </div>
 
   <!-- PRODUCT WRAPPER -->
-  <div class="pw">
-    <div class="row align-items-start gx-5">
+<!-- BLOCKED PRODUCT CHECK -->
+  <% if (locals.blocked) { %>
+  <div style="
+    min-height:60vh; display:flex; align-items:center; justify-content:center;
+    flex-direction:column; text-align:center; padding:60px 24px;
+  ">
+    <div style="font-size:3.5rem; margin-bottom:16px;">🚫</div>
+    <h2 style="font-family:'Playfair Display',serif; color:#8b3a52;
+               font-size:1.9rem; margin-bottom:10px;">Product Unavailable</h2>
+    <p style="color:#7a5c5c; font-size:1rem; max-width:400px; line-height:1.6;">
+      This product is currently unavailable and cannot be purchased at this time.
+      Please check back later or explore similar products.
+    </p>
+    <a href="/products" style="
+      margin-top:28px; padding:12px 36px; border-radius:12px;
+      background:linear-gradient(135deg,#8b3a52,#d97f9a);
+      color:#fff; font-weight:700; font-size:.92rem;
+      text-decoration:none; box-shadow:0 4px 14px rgba(175,84,84,.3);">
+      ← Back to Shop
+    </a>
+  </div>
+  <% } else { %>
+
+  <!-- PRODUCT WRAPPER -->
+  <div class="pw">    <div class="row align-items-start gx-5">
 
       <!-- Gallery -->
       <div class="col-lg-7 mb-5 mb-lg-0">
@@ -444,7 +604,18 @@ body{
 
       <!-- Details -->
       <div class="col-lg-5">
-        <h1 class="product-title"><%= product.productName %></h1>
+<h1 class="product-title"><%= product.productName %></h1>
+
+<div class="mb-3">
+  <p style="margin-bottom:4px;color:#7a5c5c;font-size:.9rem;">
+    <strong>Category:</strong>
+<%= product.categoryId?.categoryName || product.categoryId?.name || "N/A" %>  </p>
+
+  <p style="margin-bottom:0;color:#7a5c5c;font-size:.9rem;">
+    <strong>Brand:</strong>
+    <%= product.brand || "N/A" %>
+  </p>
+</div>
 
         <!-- Meta row: stars + stock -->
         <div class="meta-row">
@@ -641,65 +812,85 @@ body{
   <h3 class="sec-title d-block text-center">You May Also Like</h3>
   <div class="row g-4 mt-2">
     <% relatedProducts.forEach(p => { %>
+     <%
+        const rIsOos = (p.startingPrice === null);
+        const rDisc  = p.discountPercent || 0;
+      %>
       <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-        <a href="/product/<%= p._id %>" style="text-decoration:none">
-          <div class="rel-card">
+        <a href="/product/<%= p._id %>" class="p-card">
 
-            <!-- Image + Category Badge + Wishlist -->
-            <div class="rel-img-wrap">
-              <% if (p.productImages && p.productImages.length > 0) { %>
-                <img src="<%= p.productImages[0] %>" alt="<%= p.productName %>">
-              <% } else { %>
-                <img src="https://via.placeholder.com/400x300?text=🎂" alt="No image">
-              <% } %>
-              <% if (p.category) { %>
-                <span class="rel-badge"><%= p.category.toUpperCase() %></span>
-              <% } %>
-              <button class="rel-wish" onclick="event.preventDefault()">
-                <i class="far fa-heart"></i>
-              </button>
-            </div>
+          <div class="card-img-zone <%= rIsOos ? 'oos-img' : '' %>">
+            <% if (rIsOos) { %>
+              <span class="img-badge-tl oos">OUT OF STOCK</span>
+            <% } else if (rDisc > 0) { %>
+              <span class="offer-pill"><%= rDisc %>% OFF</span>
+            <% } %>
 
-            <!-- Card Body -->
-            <div class="rel-body">
-              <p class="rel-cat"><%= (p.category || '').toUpperCase() %></p>
-              <h6 class="rel-title"><%= p.productName %></h6>
+          <% if (p.productImages && p.productImages.length > 0) { %>
+              <img src="<%= p.productImages[0] %>" alt="<%= p.productName %>" loading="lazy">
+            <% } else { %>
+              <img src="https://placehold.co/400x280/fde2d9/C2607A?text=" alt="No image">
+            <% } %>
 
-              <!-- Stars -->
-              <div class="rel-stars">
-                <%
-                  const rAvg = parseFloat(p.avgRating) || 0;
-                  for (let i = 1; i <= 5; i++) {
-                    const d = rAvg - (i - 1);
-                    if      (d >= 0.75) { %><i class="fas fa-star"></i><%
-                    } else if (d >= 0.25) { %><i class="fas fa-star-half-alt"></i><%
-                    } else               { %><i class="far fa-star empty"></i><% }
-                  }
-                %>
-                <span class="rev-ct"><%= rAvg.toFixed(1) %> (<%= p.totalReviews || 0 %> reviews)</span>
+            <!-- <div class="img-hover-overlay">
+              <span class="view-product-pill">
+                <i class="fas fa-eye"></i> View Product
+              </span>
+            </div> -->
+            <% if (p.category) { %>
+              <div class="img-cat-strip">
+                <span class="img-cat-label"><%= p.category %></span>
               </div>
+            <% } %>
+          </div>
 
-              <!-- Price Row -->
-              <% if (p.startingPrice !== null) { %>
-                <div class="pr-row">
-                  <span class="pr-v">₹<%= p.startingPrice %></span>
-                  <% if (p.regularPrice && p.regularPrice > p.startingPrice) { %>
-                    <span class="pr-o">₹<%= p.regularPrice %></span>
-                    <%
-                      const disc = Math.round((1 - p.startingPrice / p.regularPrice) * 100);
-                    %>
-                    <span class="pr-disc"><%= disc %>% OFF</span>
-                  <% } %>
-                </div>
+          <div class="card-body-inner">
+            <div class="card-name"><%= p.productName %></div>
+
+           <% if (p.category || p.brand) { %>
+              <div class="card-meta-row">
+                <% if (p.category) { %>
+                  <span class="meta-cat"><i class="fas fa-tag" style="font-size:.55rem;margin-right:3px;"></i><%= p.category %></span>
+                <% } %>
+                <% if (p.brand) { %>
+                  <span class="meta-cat">· <%= p.brand %></span>
+                <% } %>
+              </div>
+            <% } %>
+
+            <div class="card-stars">
+              <%
+                const rAvg = parseFloat(p.avgRating) || 0;
+                for (let i = 1; i <= 5; i++) {
+                  const d = rAvg - (i - 1);
+              %>
+                <% if (d >= 0.75) { %>
+                  <i class="fas fa-star"></i>
+                <% } else if (d >= 0.25) { %>
+                  <i class="fas fa-star-half-alt"></i>
+                <% } else { %>
+                  <i class="far fa-star empty"></i>
+                <% } %>
               <% } %>
-
-              <!-- Add to Cart -->
-              <button class="btn-cart">
-                <i class="fas fa-shopping-bag"></i> Add to Cart
-              </button>
+              <span class="rev-info"><%= rAvg.toFixed(1) %> (<%= p.totalReviews || 0 %> reviews)</span>
             </div>
 
+       
+
+            <div class="pricing-row">
+              <% if (!rIsOos) { %>
+                <span class="price-now">₹<%= Math.round(p.startingPrice) %></span>
+              <% if (rDisc > 0) { %>
+                  <span class="card-price-old">₹<%= p.regularPrice %></span>
+                <% } %>
+              <% } else { %>
+                <span style="font-size:.76rem;color:#b09090;">Currently unavailable</span>
+              <% } %>
+            </div>
+
+          
           </div>
+
         </a>
       </div>
     <% }) %>
@@ -787,7 +978,7 @@ async function addToCart() {
     });
     const data = await res.json();
 
-    if (data.success) {
+   if (data.success) {
       showToast('Added to cart! 🛒', 'success');
       btn.style.background = '#8B3A62';
       btn.innerHTML = '<i class="fas fa-check"></i> Added!';
@@ -796,6 +987,8 @@ async function addToCart() {
         btn.style.background = '';
         btn.innerHTML = '<i class="fas fa-shopping-bag"></i> Add to Cart';
       }, 1800);
+      // update cart badge
+      fetch('/cart/count').then(r => r.json()).then(d => updateNavBadge('cart-count', d.count));
     } else if (data.redirectUrl) {
       Swal.fire({
         icon:'warning', iconColor:'#e8a87c', title:'Login Required',
@@ -838,8 +1031,10 @@ async function toggleWishlist() {
         showToast('Saved to Wishlist ❤️', 'info');
       } else {
         icon.className = 'far fa-heart'; btn.classList.remove('wishlisted');
-        showToast('add cake to wishlist');
+        showToast('Removed from Wishlist');
       }
+      // update wishlist badge
+      fetch('/wishlist/count').then(r => r.json()).then(d => updateNavBadge('wishlist-count', d.count));
     } else {
       showToast(data.message || "Please login to save items to your Wishlist"
 );
@@ -958,6 +1153,22 @@ async function submitReview() {
   }
 }
 </script>
+</script>
 
+<script>
+function updateNavBadge(id, count) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = count;
+  el.style.display = count > 0 ? 'inline-block' : 'none';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  fetch('/cart/count').then(r => r.json()).then(d => updateNavBadge('cart-count', d.count)).catch(()=>{});
+  fetch('/wishlist/count').then(r => r.json()).then(d => updateNavBadge('wishlist-count', d.count)).catch(()=>{});
+});
+</script>
+
+<% } %>
 </body>
 </html>

@@ -26,14 +26,14 @@ if (!user || user.isAdmin) {
       });
       return;
     }
-  if (user.isBlocked) {
+if (user.isBlocked) {
       req.session.destroy((err) => {
         if (err) console.log("Session destroy error:", err);
         const isAjax = req.xhr || req.headers['content-type']?.includes('application/json');
         if (isAjax) {
-          return res.status(401).json({ success: false, redirectUrl: "/login" });
+          return res.status(401).json({ success: false, redirectUrl: "/login?blocked=true" });
         }
-        return res.redirect("/login");
+        return res.redirect("/login?blocked=true");
       });
       return;
     }

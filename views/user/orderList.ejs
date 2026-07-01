@@ -170,6 +170,27 @@
       transition: background .2s, border-color .2s;
     }
     .btn-return:hover { background: var(--blush); border-color: var(--burgundy); }
+    .btn-retry {
+  background: linear-gradient(135deg, #e05c6e, #b71c1c);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 8px 20px;
+  font-size: .83rem;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(183,28,28,.25);
+  transition: transform .18s, box-shadow .18s;
+}
+.btn-retry:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 20px rgba(183,28,28,.35);
+}
+.foot-failed {
+  background: linear-gradient(90deg, #fce4ec 0%, #fff8fb 100%);
+  border-top-color: #f8bbd0;
+}
 
     /* ── Empty state ── */
     .empty-state { text-align: center; padding: 70px 20px; }
@@ -223,6 +244,23 @@
       font-family: 'Nunito', sans-serif;
       white-space: nowrap;
     }
+    /* ── Status badge ── */
+    .status-badge {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 50px;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      vertical-align: middle;
+    }
+    .status-pending          { background: #fff8e1; color: #b8860b; }
+    .status-processing       { background: #e3f2fd; color: #1565c0; }
+    .status-shipped          { background: #e8f5e9; color: #2e7d32; }
+    .status-delivered        { background: #e8f5e9; color: #1b5e20; }
+    .status-cancelled        { background: #fce4ec; color: #b71c1c; }
+    .status-return-requested { background: #f3e5f5; color: #6a1b9a; }
+    .status-returned         { background: #ede7f6; color: #4527a0; }
 
     @media (max-width: 860px) {
       .dash-wrap { flex-direction: column; width: 100%; border-radius: 0; margin: 0; }
@@ -290,15 +328,26 @@
               <% }) %>
             </div>
 
-            <div class="card-foot">
-              <div class="order-total"><span>Total</span>₹<%= order.finalTotal.toLocaleString('en-IN') %></div>
-              <div class="card-actions">
-                <% if (order.status === 'Delivered') { %>
-                  <button class="btn-return" onclick="returnOrder('<%= order._id %>')">Return</button>
-                <% } %>
-                <a href="/orders/<%= order._id %>" class="btn-details">Details</a>
-              </div>
-            </div>
+          <div class="card-foot <%= order.paymentStatus === 'Failed' ? 'foot-failed' : '' %>">
+  <div class="order-total">
+    <span>Total</span>₹<%= order.finalTotal.toLocaleString('en-IN') %>
+    &nbsp;
+    <span class="status-badge status-<%= order.status.toLowerCase().replace(/ /g,'-') %>">
+      <%= order.status %>
+    </span>
+    <% if (order.paymentStatus === 'Failed') { %>
+      <span class="status-badge" style="background:#fce4ec;color:#b71c1c;margin-left:6px;">⚠ Payment Failed</span>
+    <% } %>
+  </div>
+  <div class="card-actions">
+    <% if (order.paymentStatus === 'Failed' && order.status === 'Pending') { %>
+      <button class="btn-retry" onclick="retryPayment('<%= order._id %>', <%= order.finalTotal %>)">
+        Retry Payment
+      </button>
+    <% } %>
+    <a href="/orders/<%= order._id %>" class="btn-details">Details</a>
+  </div>
+</div>
 
           </div>
         <% }) %>
@@ -338,9 +387,10 @@
 
 <%- include("../../views/partials/user/footer") %>
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-async function returnOrder(id) {async function returnOrder(id) {
+async function returnOrder(id) {
   const { value: reason, isConfirmed } = await Swal.fire({
     title: 'Return Order',
     text:  'Please select a reason for your return.',
@@ -375,7 +425,70 @@ async function returnOrder(id) {async function returnOrder(id) {
   } else {
     Swal.fire({ icon:'error', title:'Failed', text:data.message, confirmButtonColor:'#8B4A5A' });
   }
-}}
+}
+
+async function retryPayment(orderId, amount) {
+  const confirmed = await Swal.fire({
+    title: 'Retry Payment',
+    text:  `Retry payment of ₹${amount.toLocaleString('en-IN')}?`,
+    icon:  'question',
+    showCancelButton:   true,
+    confirmButtonColor: '#8B4A5A',
+    cancelButtonColor:  '#b08090',
+    confirmButtonText:  'Yes, Pay Now'
+  });
+  if (!confirmed.isConfirmed) return;
+
+  try {
+    const res  = await fetch('/checkout/retry-razorpay-order', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ orderId })
+    });
+    const data = await res.json();
+    if (!data.success) {
+      Swal.fire({ icon: 'error', title: 'Error', text: data.message, confirmButtonColor: '#8B4A5A' });
+      return;
+    }
+
+    const options = {
+      key:      data.razorpayKeyId,
+      amount:   data.razorpayOrder.amount,
+      currency: 'INR',
+      name:     "Cake O'Clock",
+      order_id: data.razorpayOrder.id,
+      handler: async function (response) {
+const verifyRes = await fetch('/checkout/verify-retry-payment', {
+  method:  'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body:    JSON.stringify({
+    razorpay_order_id:   response.razorpay_order_id,
+    razorpay_payment_id: response.razorpay_payment_id,
+    razorpay_signature:  response.razorpay_signature,
+    orderId
+  })
+});
+        const verifyData = await verifyRes.json();
+        if (verifyData.success) {
+          window.location.href = `/order-success/${orderId}`;
+        } else {
+          Swal.fire({ icon: 'error', title: 'Verification Failed', text: verifyData.message, confirmButtonColor: '#8B4A5A' });
+        }
+      },
+      modal: {
+        ondismiss: function () {
+          Swal.fire({ icon: 'info', title: 'Payment Cancelled', confirmButtonColor: '#8B4A5A' });
+        }
+      },
+      theme: { color: '#8B4A5A' }
+    };
+
+    const rzp = new Razorpay(options);
+    rzp.open();
+  } catch (err) {
+    Swal.fire({ icon: 'error', title: 'Something went wrong', confirmButtonColor: '#8B4A5A' });
+  }
+}
 </script>
 </body>
 </html>

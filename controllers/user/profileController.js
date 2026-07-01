@@ -1,4 +1,6 @@
-import User from "../../models/userModel.js";
+import User     from "../../models/userModel.js";
+import Order    from "../../models/orderModel.js";
+import Wishlist from "../../models/wishlistModel.js";
 import cloudinary from "../../config/cloudinary.js";
 import bcrypt from "bcrypt";
 import { sendVerificationEmail } from "../../utils/email.js";
@@ -8,8 +10,17 @@ const userProfile = async (req, res) => {
   try {
     if (!req.session.user) return res.redirect("/login");
 
-    const user = await User.findById(req.session.user.id);
+    const userId = req.session.user.id;
+    const user   = await User.findById(userId);
     if (!user) return res.redirect("/login");
+
+    const [totalOrders, wishlistDoc] = await Promise.all([
+      Order.countDocuments({ userId }),
+      Wishlist.findOne({ userId }).lean()
+    ]);
+
+    user.totalOrders   = totalOrders;
+    user.wishlistCount = wishlistDoc?.products?.length || 0;
 
     res.render("profile", { user });
   } catch (error) {
@@ -17,7 +28,6 @@ const userProfile = async (req, res) => {
     res.redirect("/pageNotFound");
   }
 };
-
 /* ================= EDIT PROFILE PAGE ================= */
 const editProfileLoad = async (req, res) => {
   try {
@@ -50,21 +60,26 @@ const editProfilePost = async (req, res) => {
       return res.redirect("/profile");
     }
 
-    
-    if (email && email !== user.email) {
+ // FIXED ✅ — save new email in session, redirect to OLD email OTP first
+if (email && email !== user.email) {
+  const existing = await User.findOne({ email, _id: { $ne: user._id } });
+  if (existing) {
+    return res.render("editProfile", { user, emailError: "Email already in use" });
+  }
 
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      console.log(otp)
+  // Step 1: Send OTP to OLD email
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  console.log("Old email OTP:", otp);
 
-      req.session.emailChangeOtp = otp;
-      req.session.emailChangeExpiry = Date.now() + 5 * 60 * 1000;
-      req.session.newEmail = email;
+  req.session.emailChangeOtp    = otp;
+  req.session.emailChangeExpiry = Date.now() + 5 * 60 * 1000;
+  req.session.newEmail          = email;          // store new email for later
+  req.session.oldEmailVerified  = false;          // not yet verified
 
-      await sendVerificationEmail(email, otp);
+  await sendVerificationEmail(user.email, otp);   // ← send to OLD email
 
-      
-      return res.redirect("/verifyEmailOtp");
-    }
+  return res.redirect("/verifyEmailOtp?step=old");
+}
 
     
     if (req.file) {
@@ -83,38 +98,94 @@ const editProfilePost = async (req, res) => {
     res.redirect("/pageNotFound");
   }
 };
-
 const verifyEmailOtpPage = (req, res) => {
-  if (!req.session.newEmail) return res.redirect("/editProfile");
-  res.render("verifyEmailOtp");
-};
+  const step = req.query.step || "old";
 
-const verifyEmailOtp = async (req, res) => {
-  const { otp1, otp2, otp3, otp4, otp5, otp6 } = req.body;
-  const otp = otp1 + otp2 + otp3 + otp4 + otp5 + otp6;
-
-  if (
-    !req.session.emailChangeOtp ||
-    Date.now() > req.session.emailChangeExpiry
-  ) {
+  // ✅ Allow step=new through even if newEmail is in session being processed
+  if (!req.session.newEmail && !req.session.emailChangeOtp) {
     return res.redirect("/editProfile");
   }
 
-  if (otp !== req.session.emailChangeOtp) {
-    return res.render("verifyEmailOtp", { error: "Invalid OTP" });
-  }
+  res.render("verifyEmailOtp", { step, error: undefined });
+};
 
-  
+// FIXED ✅ — two-step: verify old email OTP, then send & verify new email OTP
+const verifyEmailOtp = async (req, res) => {
+  try {
+    const { otp1, otp2, otp3, otp4, otp5, otp6 } = req.body;
+    const otp  = otp1 + otp2 + otp3 + otp4 + otp5 + otp6;
+    const step = req.query.step || "old";
+
+    if (!req.session.emailChangeOtp || Date.now() > req.session.emailChangeExpiry) {
+      return res.redirect("/editProfile");
+    }
+
+    if (otp !== req.session.emailChangeOtp) {
+      return res.render("verifyEmailOtp", {
+        error: "Invalid OTP. Please try again.",
+        step
+      });
+    }
+
+    if (step === "old") {
+      // ✅ Old email verified — now send OTP to NEW email
+      req.session.oldEmailVerified = true;
+      delete req.session.emailChangeOtp;
+      delete req.session.emailChangeExpiry;
+
+      const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+      console.log("New email OTP:", newOtp);
+
+      req.session.emailChangeOtp    = newOtp;
+      req.session.emailChangeExpiry = Date.now() + 5 * 60 * 1000;
+
+      await sendVerificationEmail(req.session.newEmail, newOtp); // ← send to NEW email
+
+return res.redirect(303, "/verifyEmailOtp?step=new");
+} else {
+  // ✅ New email verified — update DB
+  if (!req.session.oldEmailVerified) return res.redirect("/editProfile");
+
   await User.findByIdAndUpdate(req.session.user.id, {
-    email: req.session.newEmail
+    $set: { email: req.session.newEmail }
   });
 
-  
+  req.session.user.email = req.session.newEmail;
+
+  // Cleanup
   delete req.session.emailChangeOtp;
   delete req.session.emailChangeExpiry;
   delete req.session.newEmail;
+  delete req.session.oldEmailVerified;
 
-  res.redirect("/profile");
+return res.send(`
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
+  <body>
+    <script>
+      window.onload = function () {
+        Swal.fire({
+          icon: 'success',
+          title: 'Email Updated!',
+          text: 'Your email has been changed successfully.',
+          confirmButtonColor: '#8B4A5A',
+          confirmButtonText: 'Go to Profile'
+        }).then(() => {
+          window.location.href = '/profile';
+        });
+      };
+    </script>
+  </body>
+  </html>
+`);
+}
+  } catch (error) {
+    console.error("verifyEmailOtp error:", error);
+    res.redirect("/pageNotFound");
+  }
 };
 
 

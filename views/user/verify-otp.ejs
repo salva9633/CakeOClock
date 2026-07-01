@@ -96,6 +96,8 @@
 
 <body>
 
+
+
 <div class="card">
     <h2>Confirm With OTP</h2>
     <p class="text-center">Check your email for the 6-digit OTP</p>
@@ -195,19 +197,29 @@ function startTimer() {
   }, 1000);
 }
 
+// FIXED ✅
 function showResend() {
-  resendSection.innerHTML = `<a id="resendOtp">Resend OTP</a>`;
+  resendSection.innerHTML = `<a id="resendOtp" style="cursor:pointer;">Resend OTP</a>`;
 
-  document.getElementById("resendOtp").addEventListener("click", async () => {
+  document.getElementById("resendOtp").addEventListener("click", async function () {
+    // ✅ Disable immediately on first click — prevents all double clicks
+    this.style.pointerEvents = "none";
+    this.style.opacity = "0.5";
+    this.textContent = "Sending...";
+
     const res = await fetch("/resend-otp", { method: "POST" });
     const data = await res.json();
 
     if (res.ok) {
       Swal.fire("Success", data.message, "success");
       timeLeft = 65;
-      startTimer();
+      startTimer(); // hides the link and shows countdown again
     } else {
       Swal.fire("Error", data.message, "error");
+      // ✅ Re-enable if server rejected (e.g. session expired)
+      this.style.pointerEvents = "auto";
+      this.style.opacity = "1";
+      this.textContent = "Resend OTP";
     }
   });
 }

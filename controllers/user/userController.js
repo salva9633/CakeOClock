@@ -207,19 +207,25 @@ const {
    if (referredBy) {
         const referrer = await User.findById(referredBy);
 
-        if (referrer) {
-          // ── reward referrer with ₹100 wallet credit ──
-          const lastTx = await WalletTransaction.findOne({ userId: referrer._id })
-            .sort({ createdAt: -1 }).select("balanceAfter");
-          const referrerBalance = lastTx ? lastTx.balanceAfter : 0;
+   // FIXED ✅
+if (referrer) {
+  // ── reward referrer with ₹100 wallet credit ──
+  const newReferrerBalance = (referrer.walletBalance || 0) + 100;
 
-          await WalletTransaction.create({
-            userId:       referrer._id,
-            type:         "credit",
-            amount:       100,
-            description:  "Referral bonus — friend signed up",
-            balanceAfter: referrerBalance + 100
-          });
+  // ✅ THIS WAS MISSING — update walletBalance on the User document
+  await User.findByIdAndUpdate(
+    referrer._id,
+    { $set: { walletBalance: newReferrerBalance } },
+    { new: true }
+  );
+
+  await WalletTransaction.create({
+    userId:       referrer._id,
+    type:         "credit",
+    amount:       100,
+    description:  "Referral bonus — friend signed up",
+    balanceAfter: newReferrerBalance
+  });
 
           // ── give new user a personal 10% off coupon ──
           await Coupon.create({
@@ -260,17 +266,29 @@ const {
   }
 };
 
+// FIXED ✅
 const resendOtp = async (req, res) => {
   try {
     if (!req.session.userData) {
       return res.status(400).json({ message: "Session expired. Signup again." });
     }
 
+    // ✅ Block if resend was clicked within last 30 seconds
+    if (req.session.resendCooldown && Date.now() < req.session.resendCooldown) {
+      const secondsLeft = Math.ceil((req.session.resendCooldown - Date.now()) / 1000);
+      return res.status(429).json({ 
+        message: `Please wait ${secondsLeft} seconds before resending.` 
+      });
+    }
+
+    // ✅ Set 30-second cooldown
+    req.session.resendCooldown = Date.now() + 30 * 1000;
+
     const email = req.session.userData.email;
     const otp = generateOtp();
     req.session.userOtp = otp;
     req.session.otpExpiry = Date.now() + 65 * 1000;
-
+    console.log(otp);
     const emailSent = await sendVerificationEmail(email, otp);
     if (!emailSent) {
       return res.status(500).json({ message: "Failed to resend OTP" });
@@ -289,7 +307,10 @@ const resendOtp = async (req, res) => {
 // ─────────────────────────────────────────
 const loadlogin = async (req, res) => {
   try {
-    return res.render("login");
+    const error = req.query.blocked === "true"
+      ? "Your account has been blocked. Please contact support."
+      : undefined;
+    return res.render("login", { error });
   } catch (error) {
     console.log("error in the loginpage", error);
     res.status(500).send("server side error");
@@ -457,6 +478,108 @@ const updatePassword = async (req, res) => {
   }
 };
 
+
+// ─────────────────────────────────────────
+// STATIC PAGES
+// ─────────────────────────────────────────
+const getAbout = async (req, res) => {
+  try {
+    let userData = null;
+    if (req.session.user) {
+      userData = await User.findById(req.session.user.id).lean();
+    }
+res.render("about", { user: userData, title: "About Us" });
+  } catch (error) {
+    console.error("About page error:", error);
+    res.redirect("/pageNotFound");
+  }
+};
+
+const getContactUs = async (req, res) => {
+  try {
+    let userData = null;
+    if (req.session.user) {
+      userData = await User.findById(req.session.user.id).lean();
+    }
+  res.render("contactUs", {
+      user: userData,
+      title: "Contact Us",
+      success: req.query.success || null,
+      error:   req.query.error   || null
+    });
+  } catch (error) {
+    console.error("Contact page error:", error);
+    res.redirect("/pageNotFound");
+  }
+};
+
+const postContactUs = async (req, res) => {
+  try {
+    const { name, email, subject, message } = req.body;
+
+    if (!name || !email || !subject || !message) {
+      return res.redirect("/contact-us?error=Please fill in all fields");
+    }
+
+    // 1. Save to DB
+    const ContactMessage = (await import("../../models/contactMessageModel.js")).default;
+    const newMsg = new ContactMessage({ name, email, subject, message });
+    await newMsg.save();
+
+    // 2. Notify admin by email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.NODEMAILER_EMAIL,
+        pass: process.env.NODEMAILER_PASSWORD
+      }
+    });
+
+    await transporter.sendMail({
+      from: `"Cake O'Clock" <${process.env.NODEMAILER_EMAIL}>`,
+      to:   process.env.NODEMAILER_EMAIL,
+      subject: `📩 New Contact Message: ${subject}`,
+      html: `
+        <div style="font-family:sans-serif;max-width:560px;margin:auto;border:1px solid #eee;border-radius:10px;overflow:hidden;">
+          <div style="background:#3d1a24;padding:20px 24px;">
+            <h2 style="color:#e8a0b0;margin:0;font-size:1.1rem;">New Contact Message — Cake O'Clock</h2>
+          </div>
+          <div style="padding:24px;">
+            <p><strong>From:</strong> ${name} (${email})</p>
+            <p><strong>Subject:</strong> ${subject}</p>
+            <hr style="border:none;border-top:1px solid #eee;margin:16px 0;">
+            <p style="color:#444;line-height:1.7;">${message.replace(/\n/g, '<br>')}</p>
+            <hr style="border:none;border-top:1px solid #eee;margin:16px 0;">
+            <a href="${process.env.BASE_URL}/admin/contact-messages"
+               style="display:inline-block;background:#3d1a24;color:#fff;padding:10px 20px;
+                      border-radius:8px;text-decoration:none;font-size:.85rem;">
+              View in Admin Panel →
+            </a>
+          </div>
+        </div>
+      `
+    });
+
+    res.redirect("/contact-us?success=true");
+  } catch (error) {
+    console.error("Contact form error:", error);
+    res.redirect("/contact-us");
+  }
+};
+
+const getCustomerSupport = async (req, res) => {
+  try {
+    let userData = null;
+    if (req.session.user) {
+      userData = await User.findById(req.session.user.id).lean();
+    }
+    res.render("customerSupport", { user: userData, title: "Customer Support" });
+  } catch (error) {
+    console.error("Support page error:", error);
+    res.redirect("/pageNotFound");
+  }
+};
+
 // ─────────────────────────────────────────
 // EXPORTS
 // ─────────────────────────────────────────
@@ -466,7 +589,7 @@ export {
   verifyOtpPage,
   createUser,
   verifyOtp,
-  resendOtp,  
+  resendOtp,
   loadlogin,
   loginUser,
   logout,
@@ -475,5 +598,9 @@ export {
   verifyForgotOtpPage,
   verifyForgotOtp,
   resetPasswordPage,
-  updatePassword
+  updatePassword,
+  getAbout,          
+  getContactUs,      
+  postContactUs,     
+  getCustomerSupport 
 };

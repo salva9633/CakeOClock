@@ -30,7 +30,7 @@ const addCoupon = async (req, res) => {
       description,
     } = req.body;
 
-    // Required fields
+    
     if (!code || !discountType || !discountValue || !expiryDate) {
       return res.status(400).json({
         success: false,
@@ -38,7 +38,7 @@ const addCoupon = async (req, res) => {
       });
     }
 
-    // Discount validation
+    
     if (Number(discountValue) <= 0) {
       return res.status(400).json({
         success: false,
@@ -56,7 +56,7 @@ const addCoupon = async (req, res) => {
       });
     }
 
-    // Expiry validation
+    
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -69,7 +69,7 @@ const addCoupon = async (req, res) => {
       });
     }
 
-    // Duplicate coupon check
+    
     const existingCoupon = await Coupon.findOne({
       code: code.toUpperCase(),
     });
@@ -166,7 +166,7 @@ const updateCoupon = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Duplicate code check
+    
     const existingCoupon = await Coupon.findOne({
       code: req.body.code.toUpperCase(),
       _id: { $ne: id },
@@ -179,7 +179,7 @@ const updateCoupon = async (req, res) => {
       });
     }
 
-    // Validation
+    
     if (Number(req.body.discountValue) <= 0) {
       return res.status(400).json({
         success: false,

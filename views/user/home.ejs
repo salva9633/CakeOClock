@@ -37,35 +37,6 @@ body {
 a { text-decoration: none; color: inherit; }
 img { display: block; }
 
-/* ── SECONDARY NAV ── */
-.secondary-nav {
-  background: var(--warm-white);
-  border-bottom: 1px solid var(--border);
-}
-.secondary-nav ul {
-  display: flex;
-  justify-content: center;
-  gap: 0;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.secondary-nav li a {
-  display: block;
-  padding: 14px 22px;
-  font-size: .78rem;
-  font-weight: 600;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--muted);
-  transition: color .2s, border-bottom-color .2s;
-  border-bottom: 2px solid transparent;
-}
-.secondary-nav li a:hover,
-.secondary-nav li a.active {
-  color: var(--rose-dk);
-  border-bottom-color: var(--rose-dk);
-}
 
 /* ══════════════════════════════════════
    HERO — Soft Pink Split
@@ -801,7 +772,7 @@ width: 80px;
 <%- include("../../views/partials/user/navbar") %>
 
 <!-- ── SECONDARY NAV ── -->
-<nav class="secondary-nav">
+<!-- <nav class="secondary-nav">
   <ul>
     <li><a href="/" class="active">Home</a></li>
     <li><a href="/products">Shop</a></li>
@@ -809,7 +780,7 @@ width: 80px;
     <li><a href="#">Contact Us</a></li>
     <li><a href="#">Customer Support</a></li>
   </ul>
-</nav>
+</nav> -->
 
 <!-- ══════════════════════════════════════
      HERO
@@ -928,10 +899,10 @@ width: 80px;
         From birthdays and weddings to any special moment, we make your celebrations sweeter and more meaningful — one slice at a time.
       </p>
       <div class="about-features">
-        <div class="about-feat"><div class="feat-icon">🌿</div> Fresh Ingredients</div>
-        <div class="about-feat"><div class="feat-icon">🎨</div> Custom Designs</div>
-        <div class="about-feat"><div class="feat-icon">⚡</div> Same-Day Delivery</div>
-        <div class="about-feat"><div class="feat-icon">🍰</div> 50+ Flavours</div>
+        <div class="about-feat"><div class="feat-icon"><i class="fa-solid fa-leaf" style="color:#7AAE5C;"></i></div> Fresh Ingredients</div>
+        <div class="about-feat"><div class="feat-icon"><i class="fa-solid fa-palette" style="color:#C97B8A;"></i></div> Custom Designs</div>
+        <div class="about-feat"><div class="feat-icon"><i class="fa-solid fa-bolt" style="color:#D4A574;"></i></div> Same-Day Delivery</div>
+        <div class="about-feat"><div class="feat-icon"><i class="fa-solid fa-cake-candles" style="color:#A85F6E;"></i></div> 50+ Flavours</div>
       </div>
     </div>
     <div class="about-img-stack">
@@ -939,7 +910,7 @@ width: 80px;
         <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1780683245/5png_e4engj.png" alt="Team Baking" loading="lazy">
       </div>
       <div class="about-img-float">
-        <img src="/media/4.png" alt="Cake Detail" loading="lazy">
+        <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1782823931/88aac0_1c56659ce1bf40fa9502e04d79cba6cf_mv2_cnbfad.png" alt="Cake Detail" loading="lazy">
       </div>
     </div>
   </div>
@@ -981,26 +952,8 @@ width: 80px;
          data-bs-ride="carousel" data-bs-interval="4000" data-bs-pause="hover">
       <div class="carousel-inner">
 
+<% if (showExpiryBanner) { %>
         <div class="carousel-item active">
-          <div class="promo-slide promo-slide-1">
-            <div class="promo-content">
-              <div class="promo-tag">Limited Time</div>
-              <h3 class="promo-heading">Seasonal Sweet<br>Deals Are Here</h3>
-              <p class="promo-body">
-                Celebrate the season with something extraordinary. Exclusive discounts on wedding cakes and cupcake towers.
-              </p>
-              <a href="/products" class="btn-promo">Explore Offers →</a>
-            </div>
-            <div class="promo-img-side">
-              <div class="promo-img-card">
-                <img src="/media/cake_slice.png" alt="Seasonal Sale" loading="lazy">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <% if (showExpiryBanner) { %>
-        <div class="carousel-item">
           <div class="promo-slide promo-slide-2">
             <div class="promo-content">
               <div class="promo-tag promo-tag-peach">Flash Deals</div>
@@ -1024,6 +977,26 @@ width: 80px;
           </div>
         </div>
         <% } %>
+
+        <div class="carousel-item<% if (!showExpiryBanner) { %> active<% } %>">
+          <div class="promo-slide promo-slide-1">
+            <div class="promo-content">
+              <div class="promo-tag">Limited Time</div>
+              <h3 class="promo-heading">Seasonal Sweet<br>Deals Are Here</h3>
+              <p class="promo-body">
+                Celebrate the season with something extraordinary. Exclusive discounts on wedding cakes and cupcake towers.
+              </p>
+              <a href="/products" class="btn-promo">Explore Offers →</a>
+            </div>
+         <div class="promo-img-side">
+              <div class="promo-img-card">
+                <video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+                  <source src="https://res.cloudinary.com/dtfzp8rwt/video/upload/v1781797940/8477944-hd_1920_1080_24fps_wixbe0.mp4" type="video/mp4">
+                </video>
+              </div>
+            </div>
+          </div>
+        </div>
 
       </div>
       <button class="carousel-control-prev" type="button" data-bs-target="#promoCarousel" data-bs-slide="prev">
@@ -1051,19 +1024,19 @@ width: 80px;
         <div class="carousel-item active">
           <div class="gallery-grid">
             <div class="gallery-item">
-              <img src="/media/n1.png" alt="Rose Cake" loading="lazy">
+              <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1782824080/n1_uclkw8.png" alt="Rose Cake" loading="lazy">
               <div class="gallery-item-overlay"></div>
             </div>
             <div class="gallery-item">
-              <img src="/media/n5.png" alt="Wedding" loading="lazy">
+              <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1782824098/n5_hkkcmf.png" alt="Wedding" loading="lazy">
               <div class="gallery-item-overlay"></div>
             </div>
             <div class="gallery-item">
-              <img src="/media/baby copy.jpg" alt="Gift Box" loading="lazy">
+              <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1782824313/baby_cvdty7.jpg" alt="Gift Box" loading="lazy">
               <div class="gallery-item-overlay"></div>
             </div>
             <div class="gallery-item">
-              <img src="/media/n4.jpg" alt="Cupcake" loading="lazy">
+              <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1782824286/n4_v48dmo.jpg" alt="Cupcake" loading="lazy">
               <div class="gallery-item-overlay"></div>
             </div>
           </div>
@@ -1072,19 +1045,19 @@ width: 80px;
         <div class="carousel-item">
           <div class="gallery-grid">
             <div class="gallery-item">
-              <img src="/media/s1.png" alt="Cake Slice" loading="lazy">
+              <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1782823873/s1_u6xsiw.png" alt="Cake Slice" loading="lazy">
               <div class="gallery-item-overlay"></div>
             </div>
             <div class="gallery-item">
-              <img src="/media/s2.png" alt="White Cake" loading="lazy">
+              <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1782823988/s2_mojimw.png" alt="White Cake" loading="lazy">
               <div class="gallery-item-overlay"></div>
             </div>
             <div class="gallery-item">
-              <img src="/media/s3.png" alt="Pink Cake" loading="lazy">
+              <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1782824027/s3_es6tgu.png" alt="Pink Cake" loading="lazy">
               <div class="gallery-item-overlay"></div>
             </div>
             <div class="gallery-item">
-              <img src="/media/s4.png" alt="Chocolate" loading="lazy">
+              <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1782824048/s4_j4at2j.png" alt="Chocolate" loading="lazy">
               <div class="gallery-item-overlay"></div>
             </div>
           </div>

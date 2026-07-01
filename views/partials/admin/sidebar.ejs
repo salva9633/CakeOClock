@@ -1,265 +1,285 @@
 <style>
   :root {
-    --bg-color: #FFF5F2;
+    --bg-color:      #FFF5F2;
     --sidebar-width: 260px;
     --header-height: 64px;
-    --text-color: #4A3B32;
-    --hover-color: #F4D0CB;
-    --active-text: #FFFFFF;
-    --btn-color:  #8B4A5A;;
-  }
-
-  *, *::before, *::after { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; }
-
-  .sidebar {
-    width: var(--sidebar-width);
-    background-color: var(--bg-color);
-    padding: 2rem 1.5rem;
-    position: fixed;
-    top: var(--header-height);
-    left: 0;
-    height: calc(100vh - var(--header-height));
-    overflow-y: auto;
-    z-index: 1000;
-    border-right: 1px solid rgba(0, 0, 0, 0.05);
-  }
-
-  .menu-item {
-    display: flex;
-    align-items: center;
-    padding: 12px 16px;
-    margin-bottom: 8px;
-    border-radius: 12px;
-    color: var(--text-color);
-    text-decoration: none;
-    transition: 0.2s;
-    font-weight: 500;
-  }
-
-  .menu-item i {
-    width: 24px;
-    margin-right: 12px;
-  }
-
-  .menu-item:hover { background-color: var(--hover-color); }
-
-  .menu-item.active {
-    background-color: var(--btn-color);
-    color: var(--active-text);
-  }
-
-  /* ── MAIN CONTENT LAYOUT (global, defined once here) ── */
- .main-content {
-  margin-left: var(--sidebar-width);
-  margin-top: var(--header-height);
-  margin-right: 0;
-  margin-bottom: 0;
-  width: calc(100% - var(--sidebar-width));
-  min-height: calc(100vh - var(--header-height));
-  padding: 30px;                    /* ← uniform padding, fixes orange shade */
-  background: var(--bg-color);
-  overflow-x: hidden;
-  box-sizing: border-box;
-}
-
-  /* Mobile toggle */
-  .mobile-toggle {
-    display: none;
-    position: fixed;
-    top: 18px;
-    right: 18px;
-    z-index: 1100;
-    font-size: 1.5rem;
-    cursor: pointer;
-  }
-
-  .overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.3);
-    z-index: 900;
-  }
-  .sidebar-logo{
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.sidebar-logo img{
-  width: 140px;
-  height: auto;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto;
-}
-
-.sidebar-logo h3{
-  margin-top: 10px;
-  color: #8B4A5A;
-  font-size: 22px;
-  font-weight: 700;
-}
-
-  @media (max-width: 992px) {
-    .sidebar {
-      transform: translateX(-100%);
-      transition: 0.3s;
-      top: 0;
-      height: 100vh;
-    }
-
-    .sidebar.active {
-      transform: translateX(0);
-    }
-
-    .mobile-toggle { display: block; }
-
-    .overlay.active { display: block; }
-
-    .main-content {
-      margin-left: 0;
-      width: 100%;
-      max-width: 100%;
-    }
-  }
-
-  @media (max-width: 600px) {
-  .main-content { padding: 16px; }
-}
-</style>
-
-<div class="mobile-toggle" onclick="toggleSidebar()">
-  <i class="fas fa-bars"></i>
-</div>
-
-<div class="overlay" onclick="toggleSidebar()"></div>
-
-<aside class="sidebar">
-
-    <div class="sidebar-logo">
-    <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1780840131/WhatsApp_Image_2026-06-07_at_4.24.57_PM-removebg-preview_cmrltl.png"
-         alt="Cake O Clock Logo">
-  </div>
-
-  <nav>
-    <a href="/admin/dashboard"            class="menu-item"><i class="fas fa-th-large"></i>Dashboard</a>
-    <a href="/admin/orders"     class="menu-item"><i class="fas fa-shopping-bag"></i>Order</a>
-    <a href="/admin/products"   class="menu-item"><i class="fas fa-box"></i>Products</a>
-    <a href="/admin/sales-report" class="menu-item"><i class="fas fa-chart-line"></i>Sales report</a>
-    <a href="/admin/users"      class="menu-item"><i class="fas fa-users"></i>Customer</a>
-    <a href="/admin/coupons"    class="menu-item"><i class="fas fa-tag"></i>Coupon</a>
-    <a href="/admin/category"   class="menu-item"><i class="fas fa-layer-group"></i>Category</a>
-  </nav>
-</aside>
-
-<script>
-  function toggleSidebar() {
-    document.querySelector('.sidebar')?.classList.toggle('active');
-    document.querySelector('.overlay')?.classList.toggle('active');
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const currentPath = window.location.pathname;
-    document.querySelectorAll(".menu-item").forEach(item => {
-      const href = item.getAttribute("href");
-      if (currentPath === href || (currentPath.startsWith(href) && href !== "/admin")) {
-        item.classList.add("active");
-      }
-    });
-  });
-</script><style>
-  :root {
-    --bg-color: #FFF5F2;
-    --sidebar-width: 260px;
-    --header-height: 64px;
-    --text-color: #4A3B32;
-    --hover-color: #F4D0CB;
-    --active-text: #FFFFFF;
-    --btn-color: #8B4A5A;
+    --text-color:    #4A3B32;
+    --hover-color:   #F4D0CB;
+    --active-text:   #FFFFFF;
+    --btn-color:     #8B4A5A;
+    --btn-dk:        #6e3547;
+    --muted:         #b08a90;
+    --border:        rgba(139,74,90,0.09);
   }
 
   *, *::before, *::after { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; overflow-x: hidden; }
 
+  /* ══════════════════════════════
+     SIDEBAR SHELL
+  ══════════════════════════════ */
   .sidebar {
     width: var(--sidebar-width);
-    background: var(--bg-color);
-    padding: 20px 14px;
+    background: linear-gradient(180deg, #fff8f9 0%, #fff0f4 100%);
+    padding: 0;
     position: fixed;
     top: var(--header-height); left: 0;
     height: calc(100vh - var(--header-height));
     overflow-y: auto;
+    overflow-x: hidden;
     z-index: 1000;
-    border-right: 1px solid rgba(139,74,90,0.08);
-    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    border-right: 1px solid var(--border);
+    box-shadow: 4px 0 24px rgba(139,74,90,0.06);
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
   }
 
-  .sidebar-brand { text-align: center; padding: 14px 0 18px; margin-bottom: 6px; }
-  .sidebar-brand img {
-    width: 90px; height: auto; display: block; margin: 0 auto 8px;
-    transition: transform 0.4s ease;
+  .sidebar::-webkit-scrollbar { width: 3px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: rgba(139,74,90,0.12); border-radius: 4px; }
+
+  /* ── BRAND ── */
+  .sidebar-brand {
+    padding: 22px 20px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: sideDown 0.5s ease both;
   }
-  .sidebar-brand img:hover { transform: scale(1.05) rotate(-2deg); }
-  .sidebar-tagline { font-size: 11px; color: #b08a90; letter-spacing: 0.5px; text-transform: uppercase; }
 
-  .nav-section-label {
-    font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px;
-    color: #c4a0a7; padding: 12px 12px 6px; font-weight: 600;
-  }
-
-  .sep { height: 1px; background: rgba(139,74,90,0.08); margin: 10px 12px; }
-
-  .menu-item {
-    display: flex; align-items: center; gap: 11px;
-    padding: 11px 13px; margin-bottom: 3px;
+  .brand-logo-wrap {
+    width: 44px; height: 44px;
     border-radius: 12px;
-    color: var(--text-color);
-    text-decoration: none; font-size: 14px; font-weight: 500;
-    transition: background 0.22s, color 0.22s, transform 0.18s, box-shadow 0.22s;
-    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, var(--btn-color), var(--btn-dk));
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(139,74,90,0.3);
+    flex-shrink: 0;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
 
+  .brand-logo-wrap:hover {
+    transform: rotate(-4deg) scale(1.08);
+    box-shadow: 0 8px 22px rgba(139,74,90,0.35);
+  }
+
+  .brand-logo-wrap img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+
+  .brand-text-wrap { flex: 1; min-width: 0; }
+
+  .brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--btn-color);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .brand-sub {
+    font-size: .64rem;
+    color: var(--muted);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  /* ── SECTION LABELS ── */
+  .nav-section-label {
+    font-size: .6rem;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: var(--muted);
+    padding: 18px 20px 7px;
+    font-weight: 800;
+    opacity: 0;
+    animation: sideDown 0.45s ease 0.1s both;
+  }
+
+  /* ── SEPARATORS ── */
+  .sep {
+    height: 1px;
+    background: var(--border);
+    margin: 6px 16px;
+  }
+
+  /* ── NAV WRAPPER ── */
+  .sidebar nav { padding: 4px 10px; }
+
+  /* ── MENU ITEMS ── */
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 11px 14px;
+    margin-bottom: 3px;
+    border-radius: 13px;
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: .86rem;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    animation: sideItem 0.4s ease both;
+    transition: background 0.22s, color 0.22s, transform 0.2s, box-shadow 0.22s;
+  }
+
+  /* staggered delays */
+  .menu-item:nth-child(1)  { animation-delay: .12s; }
+  .menu-item:nth-child(2)  { animation-delay: .17s; }
+  .menu-item:nth-child(3)  { animation-delay: .22s; }
+  .menu-item:nth-child(4)  { animation-delay: .27s; }
+  .menu-item:nth-child(5)  { animation-delay: .32s; }
+  .menu-item:nth-child(6)  { animation-delay: .37s; }
+  .menu-item:nth-child(7)  { animation-delay: .42s; }
+  .menu-item:nth-child(8)  { animation-delay: .47s; }
+  .menu-item:nth-child(9)  { animation-delay: .52s; }
+
+  /* left accent bar */
   .menu-item::before {
     content: '';
-    position: absolute; left: 0; top: 0;
-    width: 3px; height: 100%;
+    position: absolute;
+    left: 0; top: 20%; bottom: 20%;
+    width: 3px;
     background: var(--btn-color);
-    border-radius: 0 4px 4px 0;
-    opacity: 0; transform: scaleY(0);
-    transition: opacity 0.2s, transform 0.2s cubic-bezier(0.4,0,0.2,1);
+    border-radius: 0 3px 3px 0;
+    opacity: 0;
+    transform: scaleY(0);
+    transition: opacity 0.2s, transform 0.25s cubic-bezier(0.4,0,0.2,1);
   }
 
-  .menu-item i { font-size: 18px; width: 22px; text-align: center; flex-shrink: 0; transition: transform 0.2s; }
+  /* ripple on click */
+  .menu-item::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(139,74,90,0.07);
+    opacity: 0;
+    border-radius: inherit;
+    transition: opacity 0.3s;
+  }
 
-  .menu-item .badge {
-    margin-left: auto; background: var(--hover-color); color: var(--btn-color);
-    font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px;
+  .menu-item:active::after { opacity: 1; }
+
+  .menu-icon {
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .9rem;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: background 0.22s, color 0.22s, transform 0.22s;
+  }
+
+  .menu-label { flex: 1; line-height: 1; }
+
+  .menu-badge {
+    background: var(--hover-color);
+    color: var(--btn-color);
+    font-size: .63rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 20px;
     transition: background 0.2s, color 0.2s;
+    letter-spacing: .02em;
   }
 
-  .menu-item:hover { background: var(--hover-color); transform: translateX(3px); }
-  .menu-item:hover i { transform: scale(1.12); }
-  .menu-item:not(.active):hover::before { opacity: 1; transform: scaleY(1); }
+  /* HOVER */
+  .menu-item:hover {
+    background: rgba(139,74,90,0.07);
+    color: var(--btn-color);
+    transform: translateX(4px);
+  }
 
+  .menu-item:hover .menu-icon {
+    background: #fde8ef;
+    color: var(--btn-color);
+    transform: scale(1.1);
+  }
+
+  .menu-item:hover::before {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+
+  /* ACTIVE */
   .menu-item.active {
-    background: var(--btn-color); color: var(--active-text);
-    box-shadow: 0 4px 16px rgba(139,74,90,0.25);
+    background: linear-gradient(135deg, var(--btn-color) 0%, var(--btn-dk) 100%);
+    color: #fff !important;
+    box-shadow: 0 6px 20px rgba(139,74,90,0.28);
+    transform: translateX(4px);
   }
-  .menu-item.active .badge { background: rgba(255,255,255,0.25); color: #fff; }
 
+  .menu-item.active .menu-icon {
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+  }
+
+  .menu-item.active .menu-badge {
+    background: rgba(255,255,255,0.22);
+    color: #fff;
+  }
+
+  .menu-item.active::before { display: none; }
+
+  /* ── LOGOUT ── */
+  .menu-item.logout-item:hover {
+    background: rgba(192,57,43,0.07);
+    color: #c0392b;
+  }
+
+  .menu-item.logout-item:hover .menu-icon {
+    background: #fff0f0;
+    color: #c0392b;
+  }
+
+  /* ── FOOTER CARD ── */
   .sidebar-footer {
-    margin-top: 20px; padding: 14px 12px;
-    background: linear-gradient(135deg, #f9e8ec 0%, #fce6de 100%);
-    border-radius: 14px; text-align: center;
+    margin: 12px 10px 20px;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, #fde8ef 0%, #fce6de 100%);
+    border-radius: 14px;
+    border: 1px solid rgba(139,74,90,0.1);
+    text-align: center;
+    animation: sideDown 0.5s ease 0.55s both;
+    opacity: 0;
   }
-  .sidebar-footer p { font-size: 12px; color: #9b6a72; line-height: 1.5; }
-  .sidebar-footer strong { color: var(--btn-color); font-size: 13px; }
 
-  .sidebar::-webkit-scrollbar { width: 4px; }
-  .sidebar::-webkit-scrollbar-track { background: transparent; }
-  .sidebar::-webkit-scrollbar-thumb { background: rgba(139,74,90,0.15); border-radius: 4px; }
+  .sidebar-footer p {
+    font-size: .73rem;
+    color: #9b6a72;
+    line-height: 1.6;
+    margin: 0;
+  }
 
+  .sidebar-footer strong {
+    display: block;
+    color: var(--btn-color);
+    font-size: .8rem;
+    margin-bottom: 3px;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes sideItem {
+    from { opacity: 0; transform: translateX(-18px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes sideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── MAIN CONTENT ── */
   .main-content {
     margin-left: var(--sidebar-width);
     margin-top: var(--header-height);
@@ -270,21 +290,36 @@
     box-sizing: border-box;
   }
 
-  /* Mobile */
+  /* ── MOBILE TOGGLE ── */
   .mobile-toggle {
-    display: none; position: fixed;
+    display: none;
+    position: fixed;
     top: 18px; right: 18px;
-    z-index: 1100; font-size: 1.4rem; cursor: pointer; color: #fff;
+    z-index: 1100;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: #fff;
+    width: 36px; height: 36px;
+    align-items: center; justify-content: center;
+    border-radius: 8px;
+    background: rgba(139,74,90,0.2);
+    transition: background 0.2s;
   }
+
+  .mobile-toggle:hover { background: rgba(139,74,90,0.35); }
+
   .overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.3); z-index: 900;
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.32);
+    z-index: 900;
+    backdrop-filter: blur(2px);
   }
 
   @media (max-width: 992px) {
     .sidebar { transform: translateX(-100%); top: 0; height: 100vh; }
     .sidebar.active { transform: translateX(0); }
-    .mobile-toggle { display: block; }
+    .mobile-toggle { display: flex; }
     .overlay.active { display: block; }
     .main-content { margin-left: 0; width: 100%; }
   }
@@ -292,59 +327,99 @@
   @media (max-width: 600px) { .main-content { padding: 16px; } }
 </style>
 
+<!-- Mobile toggle -->
 <div class="mobile-toggle" onclick="toggleSidebar()">
   <i class="fas fa-bars"></i>
 </div>
 <div class="overlay" onclick="toggleSidebar()"></div>
 
 <aside class="sidebar">
+
+  <!-- Brand -->
   <div class="sidebar-brand">
-    <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1780840131/WhatsApp_Image_2026-06-07_at_4.24.57_PM-removebg-preview_cmrltl.png" alt="Cake O Clock Logo">
-    <div class="sidebar-tagline">Catching Sweet Delights</div>
+    <div class="brand-logo-wrap">
+      <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1780840131/WhatsApp_Image_2026-06-07_at_4.24.57_PM-removebg-preview_cmrltl.png"
+           alt="Cake O Clock">
+    </div>
+    <div class="brand-text-wrap">
+      <div class="brand-name">Cake O'Clock</div>
+      <div class="brand-sub">Admin Panel</div>
+    </div>
   </div>
 
+  <!-- MAIN -->
   <div class="nav-section-label">Main</div>
   <nav>
     <a href="/admin/dashboard" class="menu-item">
-      <i class="fas fa-th-large"></i> Dashboard
+      <div class="menu-icon"><i class="fas fa-th-large"></i></div>
+      <span class="menu-label">Dashboard</span>
     </a>
     <a href="/admin/orders" class="menu-item">
-  <i class="fas fa-shopping-bag"></i>Orders
-  <% if (locals.pendingOrderCount > 0) { %>
-    <span class="badge"><%= pendingOrderCount %></span>
-  <% } %>
-</a>
+      <div class="menu-icon"><i class="fas fa-shopping-bag"></i></div>
+      <span class="menu-label">Orders</span>
+      <% if (locals.pendingOrderCount > 0) { %>
+        <span class="menu-badge"><%= pendingOrderCount %></span>
+      <% } %>
+    </a>
     <a href="/admin/products" class="menu-item">
-      <i class="fas fa-box"></i> Products
+      <div class="menu-icon"><i class="fas fa-box"></i></div>
+      <span class="menu-label">Products</span>
     </a>
   </nav>
 
   <div class="sep"></div>
+
+  <!-- ANALYTICS -->
   <div class="nav-section-label">Analytics</div>
   <nav>
     <a href="/admin/sales-report" class="menu-item">
-      <i class="fas fa-chart-line"></i> Sales Report
+      <div class="menu-icon"><i class="fas fa-chart-line"></i></div>
+      <span class="menu-label">Sales Report</span>
     </a>
     <a href="/admin/users" class="menu-item">
-      <i class="fas fa-users"></i> Customers
+      <div class="menu-icon"><i class="fas fa-users"></i></div>
+      <span class="menu-label">Customers</span>
     </a>
   </nav>
 
   <div class="sep"></div>
+
+  <!-- MANAGE -->
   <div class="nav-section-label">Manage</div>
   <nav>
     <a href="/admin/coupons" class="menu-item">
-      <i class="fas fa-tag"></i> Coupons
+      <div class="menu-icon"><i class="fas fa-tag"></i></div>
+      <span class="menu-label">Coupons</span>
     </a>
     <a href="/admin/category" class="menu-item">
-      <i class="fas fa-layer-group"></i> Category
+      <div class="menu-icon"><i class="fas fa-layer-group"></i></div>
+      <span class="menu-label">Category</span>
+    </a>
+    <a href="/admin/contact-messages" class="menu-item">
+      <div class="menu-icon"><i class="fas fa-envelope"></i></div>
+      <span class="menu-label">Messages</span>
+      <% if (locals.unreadMessagesCount > 0) { %>
+        <span class="menu-badge"><%= unreadMessagesCount %></span>
+      <% } %>
     </a>
   </nav>
 
+  <div class="sep"></div>
+
+  <!-- LOGOUT -->
+  <nav style="padding: 4px 10px;">
+    <a href="/admin/logout" class="menu-item logout-item">
+      <div class="menu-icon"><i class="fas fa-right-from-bracket"></i></div>
+      <span class="menu-label">Logout</span>
+    </a>
+  </nav>
+
+  <!-- Footer card -->
   <div class="sidebar-footer">
-    <strong>🍰 Cake O Clock</strong>
-    <p>Admin Panel v2.0<br>All systems operational</p>
+    <strong>Cake O'Clock</strong>
+    <p>Catching Sweet Delights ✨</p>
   </div>
+
 </aside>
 
 <script>
@@ -352,11 +427,12 @@
     document.querySelector('.sidebar')?.classList.toggle('active');
     document.querySelector('.overlay')?.classList.toggle('active');
   }
+
   document.addEventListener("DOMContentLoaded", () => {
     const path = window.location.pathname;
     document.querySelectorAll(".menu-item").forEach(item => {
       const href = item.getAttribute("href");
-      if (path === href || (path.startsWith(href) && href !== "/admin")) {
+      if (href && (path === href || (path.startsWith(href) && href !== "/admin"))) {
         item.classList.add("active");
       }
     });

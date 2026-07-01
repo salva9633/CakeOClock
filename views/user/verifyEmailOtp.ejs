@@ -101,27 +101,40 @@
 
 <body>
 
-  <form class="otp-card" action="/verifyEmailOtp" method="POST">
-    <h2>Verify Email</h2>
-    <p>Enter the 6-digit OTP sent to your new email address</p>
 
-    <div class="otp-box">
-      <input class="otp-input" type="text" name="otp1" maxlength="1" required>
-      <input class="otp-input" type="text" name="otp2" maxlength="1" required>
-      <input class="otp-input" type="text" name="otp3" maxlength="1" required>
-      <input class="otp-input" type="text" name="otp4" maxlength="1" required>
-      <input class="otp-input" type="text" name="otp5" maxlength="1" required>
-      <input class="otp-input" type="text" name="otp6" maxlength="1" required>
-    </div>
 
-    <% if (typeof error !== "undefined") { %>
-      <div class="error"><%= error %></div>
-    <% } %>
 
-    <button type="submit" class="btn">Verify & Update Email</button>
 
-    <a href="/editProfile" class="back-link">Cancel and go back</a>
-  </form>
+<form class="otp-card" action="/verifyEmailOtp?step=<%= locals.step || 'old' %>" method="POST">
+
+  <h2><%= (locals.step === 'new') ? 'Verify New Email' : 'Verify Current Email' %></h2>
+
+  <p>
+    <%= (locals.step === 'new')
+      ? 'Enter the 6-digit OTP sent to your new email address'
+      : 'Enter the 6-digit OTP sent to your current email address' %>
+  </p>
+
+  <div class="otp-box">
+    <input class="otp-input" type="text" name="otp1" maxlength="1" required>
+    <input class="otp-input" type="text" name="otp2" maxlength="1" required>
+    <input class="otp-input" type="text" name="otp3" maxlength="1" required>
+    <input class="otp-input" type="text" name="otp4" maxlength="1" required>
+    <input class="otp-input" type="text" name="otp5" maxlength="1" required>
+    <input class="otp-input" type="text" name="otp6" maxlength="1" required>
+  </div>
+
+ <% if (typeof error !== "undefined" && error) { %>
+  <div class="error"><%= error %></div>
+<% } %>
+
+  <button type="submit" class="btn">
+    <%= (locals.step === 'new') ? 'Verify & Update Email' : 'Verify & Continue' %>
+  </button>
+
+  <a href="/editProfile" class="back-link">Cancel and go back</a>
+
+</form>
 
   <script>
     const inputs = document.querySelectorAll(".otp-input");

@@ -3,14 +3,15 @@ import Batch from "../../models/batchModel.js";
 import PDFDocument from "pdfkit";
 import User from "../../models/userModel.js";
 import WalletTransaction from "../../models/walletModel.js";
+import Coupon from "../../models/couponModel.js";
  
 /* ── GET /orders ────────────────────────────────────────────────────── */
 export const listOrders = async (req, res) => {
   try {
-    const userId  = req.user._id;
-    const page    = parseInt(req.query.page) || 1;
-    const limit   = 8;
-    const search  = req.query.search?.trim() || "";
+    const userId = req.user._id;
+    const page   = parseInt(req.query.page) || 1;
+    const limit  = 8;
+    const search = req.query.search?.trim() || "";
  
     const query = { userId };
     if (search) query.orderId = { $regex: search, $options: "i" };
@@ -65,8 +66,11 @@ export const cancelOrder = async (req, res) => {
       await restoreStock(item.variantId, item.quantity);
       item.status = "Cancelled";
     }
+ 
+    const refundAmount   = order.finalTotal || order.itemTotal || 0;
     order.status         = "Cancelled";
     order.cancelReason   = reason || null;
+    order.cancelledAt    = new Date();   
     order.finalTotal     = 0;
     order.itemTotal      = 0;
     order.shippingCharge = 0;
@@ -74,7 +78,6 @@ export const cancelOrder = async (req, res) => {
     await order.save();
  
     if (["Razorpay", "Wallet", "Online"].includes(order.paymentMethod) && order.paymentStatus === "Paid") {
-      const refundAmount = order.finalTotal || order.itemTotal || 0;
       if (refundAmount > 0) {
         const user = await User.findById(order.userId);
         const newBalance = (user.walletBalance || 0) + refundAmount;
@@ -97,6 +100,7 @@ export const cancelOrder = async (req, res) => {
   }
 };
  
+/* ── POST /orders/item/cancel ───────────────────────────────────────── */
 export const cancelOrderItem = async (req, res) => {
   try {
     const { orderId, itemId, reason } = req.body;
@@ -121,15 +125,32 @@ export const cancelOrderItem = async (req, res) => {
     const newItemTotal = activeItems.reduce((s, i) => s + i.price * i.quantity, 0);
     const newShipping  = newItemTotal === 0 ? 0 : newItemTotal >= 499 ? 0 : 49;
     const newTax       = Math.round(newItemTotal * 0);
+ 
+    // Re-check the coupon's minPurchase against the new total
+    let newDiscount = 0;
+    if (order.couponCode) {
+      const couponDoc = await Coupon.findOne({ code: order.couponCode });
+      if (couponDoc && newItemTotal >= couponDoc.minPurchase) {
+        newDiscount = couponDoc.discountType === "percentage"
+          ? Math.min((newItemTotal * couponDoc.discountValue) / 100, couponDoc.maxDiscount || Infinity)
+          : couponDoc.discountValue;
+        newDiscount = Math.round(Math.min(newDiscount, newItemTotal));
+      } else {
+        order.couponCode = null;
+      }
+    }
+ 
     order.itemTotal      = newItemTotal;
+    order.discount       = newDiscount;
     order.shippingCharge = newShipping;
     order.tax            = newTax;
-    order.finalTotal     = newItemTotal - order.discount + newTax + newShipping;
+    order.finalTotal     = newItemTotal - newDiscount + newTax + newShipping;
  
     const allCancelled = order.items.every(i => i.status === "Cancelled");
     if (allCancelled) {
-      order.status     = "Cancelled";
-      order.finalTotal = 0;
+      order.status      = "Cancelled";
+      order.cancelledAt = new Date();   // ← track cancellation date
+      order.finalTotal  = 0;
     }
  
     await order.save();
@@ -163,7 +184,7 @@ export const returnOrder = async (req, res) => {
   try {
     const { reason } = req.body;
  
-  if (!reason || !reason.trim()) {
+    if (!reason || !reason.trim()) {
       return res.json({ success: false, message: "Please provide a reason for return (min 5 characters)" });
     }
  
@@ -178,14 +199,14 @@ export const returnOrder = async (req, res) => {
  
     for (const item of order.items) {
       if (item.status === "Delivered") {
-        item.status = "Return Requested";
+        item.status       = "Return Requested";
         item.returnReason = reason.trim();
         await restoreStock(item.variantId, item.quantity);
       }
     }
  
-    order.status       = "Return Requested";
-    order.returnReason = reason.trim();
+    order.status         = "Return Requested";
+    order.returnReason   = reason.trim();
     order.itemTotal      = 0;
     order.shippingCharge = 0;
     order.tax            = 0;
@@ -208,12 +229,12 @@ export const downloadInvoice = async (req, res) => {
       return res.redirect("/orders");
     }
  
-    // ── only allow invoice download for delivered orders ───────────
+    // ── only allow invoice download for delivered orders ──────────
     if (order.status !== "Delivered") {
       return res.status(403).json({ success: false, message: "Invoice is only available for delivered orders." });
     }
  
-    // ── colours ────────────────────────────────────────────────────
+    // ── colours ───────────────────────────────────────────────────
     const ROSE    = "#C97B8A";
     const ROSE_DK = "#A85F6E";
     const ROSE_LT = "#FAE8ED";
@@ -224,16 +245,18 @@ export const downloadInvoice = async (req, res) => {
     const GREEN   = "#2A7D3A";
     const WHITE   = "#FFFFFF";
  
-    // ── invoice data ───────────────────────────────────────────────
+    // ── invoice data ──────────────────────────────────────────────
     const invoiceItems     = order.items.filter(i => !["Cancelled", "Returned"].includes(i.status));
     const returnedItems    = order.items.filter(i => i.status === "Returned");
+    const cancelledItems   = order.items.filter(i => i.status === "Cancelled");
+
     const invoiceItemTotal = invoiceItems.reduce((s, i) => s + i.price * i.quantity, 0);
     const invoiceShipping  = invoiceItems.length === 0 ? 0 : order.shippingCharge;
     const invoiceTax       = order.tax || 0;
     const invoiceDiscount  = order.discount || 0;
     const invoiceFinal     = Math.max(0, invoiceItemTotal - invoiceDiscount + invoiceTax + invoiceShipping);
  
-    // ── page setup ─────────────────────────────────────────────────
+    // ── page setup ────────────────────────────────────────────────
     const doc = new PDFDocument({ margin: 0, size: "A4" });
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename=invoice-${order.orderId}.pdf`);
@@ -243,9 +266,9 @@ export const downloadInvoice = async (req, res) => {
     const PH  = doc.page.height;  // 841
     const PAD = 40;
  
-    // ══════════════════════════════════════════════════════════════
+    // ═════════════════════════════════════════════════════════════
     // HEADER BAND
-    // ══════════════════════════════════════════════════════════════
+    // ═════════════════════════════════════════════════════════════
     doc.rect(0, 0, PW, 100).fill(ROSE);
  
     // subtle lighter left overlay
@@ -298,13 +321,13 @@ export const downloadInvoice = async (req, res) => {
        .text(invDate, badgeX + 8, 62, { width: 114, align: "right" });
     doc.fillOpacity(1);
  
-    // ══════════════════════════════════════════════════════════════
+    // ═════════════════════════════════════════════════════════════
     // META SECTION  (two blush boxes side by side)
-    // ══════════════════════════════════════════════════════════════
+    // ═════════════════════════════════════════════════════════════
     let y = 116;
     const boxW = (PW - PAD * 2 - 10) / 2;
  
-    // ── left box: Invoice details ──────────────────────────────────
+    // ── left box: Invoice details ─────────────────────────────────
     doc.roundedRect(PAD, y, boxW, 88, 6).fill(BLUSH);
     let bx = PAD + 12;
     let by = y + 10;
@@ -324,7 +347,7 @@ export const downloadInvoice = async (req, res) => {
       by += 17;
     });
  
-    // ── right box: Customer ────────────────────────────────────────
+    // ── right box: Customer ───────────────────────────────────────
     const rx = PAD + boxW + 10;
     doc.roundedRect(rx, y, boxW, 88, 6).fill(BLUSH);
     bx = rx + 12;
@@ -338,7 +361,7 @@ export const downloadInvoice = async (req, res) => {
     [
       ["Name",    a.name],
       ["Phone",   a.phone],
-      ["Address", `${a.city}, ${a.state} – ${a.pincode}`],
+      ["Address", `${a.city}, ${a.state} - ${a.pincode}`],
     ].forEach(([lbl, val]) => {
       doc.font("Helvetica").fontSize(8).fillColor(MUTED).text(lbl, bx, by);
       doc.font("Helvetica-Bold").fontSize(8.5).fillColor(BROWN)
@@ -348,13 +371,13 @@ export const downloadInvoice = async (req, res) => {
  
     y += 102;
  
-    // ── divider ────────────────────────────────────────────────────
+    // ── divider ───────────────────────────────────────────────────
     doc.moveTo(PAD, y).lineTo(PW - PAD, y).lineWidth(0.5).stroke(BORDER);
     y += 14;
  
-    // ══════════════════════════════════════════════════════════════
+    // ═════════════════════════════════════════════════════════════
     // ITEMS SECTION
-    // ══════════════════════════════════════════════════════════════
+    // ═════════════════════════════════════════════════════════════
     doc.font("Helvetica-Bold").fontSize(7).fillColor(ROSE)
        .text("ORDER ITEMS", PAD, y, { characterSpacing: 0.8 });
  
@@ -367,7 +390,7 @@ export const downloadInvoice = async (req, res) => {
  
     y += 18;
  
-    // ── column header ──────────────────────────────────────────────
+    // ── column header ─────────────────────────────────────────────
     const tableW = PW - PAD * 2;
     doc.rect(PAD, y, tableW, 22).fill(ROSE);
  
@@ -385,12 +408,12 @@ export const downloadInvoice = async (req, res) => {
     doc.text("SUBTOTAL", C.subtotal.x, y + 7, { width: C.subtotal.w, align: "right"  });
     y += 22;
  
-    // ── item rows ──────────────────────────────────────────────────
+    // ── item rows ─────────────────────────────────────────────────
     invoiceItems.forEach((item, idx) => {
       const rowH = 34;
       doc.rect(PAD, y, tableW, rowH).fill(idx % 2 === 0 ? WHITE : BLUSH);
  
-      // rose dot bullet (no emoji — PDFKit built-in fonts don't support them)
+      // rose dot bullet
       doc.circle(PAD + 10, y + 17, 4).fill(ROSE);
  
       // name + weight
@@ -405,67 +428,87 @@ export const downloadInvoice = async (req, res) => {
       doc.font("Helvetica-Bold").fontSize(9).fillColor(BROWN)
          .text(String(item.quantity), C.qty.x, y + 13, { width: C.qty.w, align: "center" });
  
-      // unit price
+      // unit price  ← Rs. instead of ₹ (Helvetica doesn't support ₹)
       doc.font("Helvetica").fontSize(8.5).fillColor(MUTED)
-         .text(`₹${item.price.toLocaleString("en-IN")}`, C.price.x, y + 13, { width: C.price.w, align: "center" });
+         .text(`Rs.${item.price.toLocaleString("en-IN")}`, C.price.x, y + 13, { width: C.price.w, align: "center" });
  
-      // subtotal
+      // subtotal  ← Rs. instead of ₹
       doc.font("Helvetica-Bold").fontSize(9).fillColor(BROWN)
-         .text(`₹${(item.price * item.quantity).toLocaleString("en-IN")}`, C.subtotal.x, y + 13, { width: C.subtotal.w, align: "right" });
+         .text(`Rs.${(item.price * item.quantity).toLocaleString("en-IN")}`, C.subtotal.x, y + 13, { width: C.subtotal.w, align: "right" });
  
       y += rowH;
     });
  
-    // ── returned items ─────────────────────────────────────────────
+// ── returned items ────────────────────────────────────────────
     if (returnedItems.length > 0) {
       y += 8;
       doc.font("Helvetica-Bold").fontSize(7).fillColor("#7030C9")
          .text("RETURNED ITEMS", PAD, y, { characterSpacing: 0.8 });
       y += 14;
- 
+
       returnedItems.forEach(item => {
         doc.rect(PAD, y, tableW, 28).fill("#F3ECFE");
         doc.font("Helvetica").fontSize(8.5).fillColor("#7030C9")
            .text(
-             `${item.productName}${item.weight ? ` (${item.weight}g)` : ""} × ${item.quantity}   —   RETURNED${item.returnReason ? "  (" + item.returnReason + ")" : ""}`,
+             `${item.productName}${item.weight ? ` (${item.weight}g)` : ""} x ${item.quantity}   --   RETURNED${item.returnReason ? "  (" + item.returnReason + ")" : ""}`,
              PAD + 10, y + 9,
              { width: tableW - 20 }
            );
         y += 28;
       });
     }
- 
+
+    // ── cancelled items ──────────────────────────────────────────
+    if (cancelledItems.length > 0) {
+      y += 8;
+      doc.font("Helvetica-Bold").fontSize(7).fillColor("#C0392B")
+         .text("CANCELLED ITEMS", PAD, y, { characterSpacing: 0.8 });
+      y += 14;
+
+      cancelledItems.forEach(item => {
+        const reason = item.cancelReason || order.cancelReason;
+        doc.rect(PAD, y, tableW, 28).fill("#FBE5E5");
+        doc.font("Helvetica").fontSize(8.5).fillColor("#C0392B")
+           .text(
+             `${item.productName}${item.weight ? ` (${item.weight}g)` : ""} x ${item.quantity}   --   CANCELLED${reason ? "  (" + reason + ")" : ""}`,
+             PAD + 10, y + 9,
+             { width: tableW - 20 }
+           );
+        y += 28;
+      });
+    }
+
     y += 12;
     doc.moveTo(PAD, y).lineTo(PW - PAD, y).lineWidth(0.5).stroke(BORDER);
     y += 16;
  
-    // ══════════════════════════════════════════════════════════════
+    // ═════════════════════════════════════════════════════════════
     // PAYMENT SUMMARY BOX
-    // ══════════════════════════════════════════════════════════════
+    // ═════════════════════════════════════════════════════════════
     doc.font("Helvetica-Bold").fontSize(7).fillColor(ROSE)
        .text("PAYMENT SUMMARY", PAD, y, { characterSpacing: 0.8 });
     y += 16;
  
     const summaryRows = [
-      ["Item total", `₹${invoiceItemTotal.toLocaleString("en-IN")}`, BROWN],
+      ["Item total", `Rs.${invoiceItemTotal.toLocaleString("en-IN")}`, BROWN],
     ];
     if (invoiceDiscount > 0) {
-      summaryRows.push(["Discount", `−₹${invoiceDiscount.toLocaleString("en-IN")}`, GREEN]);
+      summaryRows.push(["Discount", `-Rs.${invoiceDiscount.toLocaleString("en-IN")}`, GREEN]);
     }
     if (order.couponCode) {
       summaryRows.push([`Coupon  (${order.couponCode})`, "Applied", ROSE_DK]);
     }
     if (invoiceTax > 0) {
-      summaryRows.push(["Tax", `₹${invoiceTax.toLocaleString("en-IN")}`, BROWN]);
+      summaryRows.push(["Tax", `Rs.${invoiceTax.toLocaleString("en-IN")}`, BROWN]);
     }
     summaryRows.push([
       "Shipping",
-      invoiceShipping === 0 ? "Free" : `₹${invoiceShipping.toLocaleString("en-IN")}`,
+      invoiceShipping === 0 ? "Free" : `Rs.${invoiceShipping.toLocaleString("en-IN")}`,
       invoiceShipping === 0 ? GREEN : BROWN
     ]);
  
-    const rowH2   = 22;
-    const boxH    = summaryRows.length * rowH2 + 54; // rows + grand total area
+    const rowH2 = 22;
+    const boxH  = summaryRows.length * rowH2 + 54;
     doc.roundedRect(PAD, y, tableW, boxH, 8).fill(BLUSH);
  
     let sy = y + 12;
@@ -482,17 +525,17 @@ export const downloadInvoice = async (req, res) => {
     doc.moveTo(PAD + 14, sy + 2).lineTo(PW - PAD - 14, sy + 2).lineWidth(0.5).stroke(BORDER);
     sy += 12;
  
-    // grand total
+    // grand total  ← Rs. instead of ₹
     doc.font("Helvetica-Bold").fontSize(13).fillColor(BROWN)
        .text("Grand total", lx, sy);
     doc.font("Helvetica-Bold").fontSize(17).fillColor(ROSE)
-       .text(`₹${invoiceFinal.toLocaleString("en-IN")}`, lx, sy - 3, { width: tableW - 32, align: "right" });
+       .text(`Rs.${invoiceFinal.toLocaleString("en-IN")}`, lx, sy - 3, { width: tableW - 32, align: "right" });
  
     y += boxH + 18;
  
-    // ══════════════════════════════════════════════════════════════
+    // ═════════════════════════════════════════════════════════════
     // FOOTER
-    // ══════════════════════════════════════════════════════════════
+    // ═════════════════════════════════════════════════════════════
     const footerY = Math.max(y + 16, PH - 64);
  
     doc.moveTo(PAD, footerY).lineTo(PW - PAD, footerY).lineWidth(0.5).stroke(BORDER);
@@ -501,7 +544,7 @@ export const downloadInvoice = async (req, res) => {
        .text("Thank you for choosing Cake O'Clock!", 0, footerY + 14, { align: "center" });
  
     doc.font("Helvetica").fontSize(8).fillColor(MUTED)
-       .text("support@cakeoclock.com   ·   cakeoclock.com", 0, footerY + 32, { align: "center" });
+       .text("support@cakeoclock.com   .   cakeoclock.com", 0, footerY + 32, { align: "center" });
  
     doc.end();
   } catch (err) {
@@ -514,8 +557,8 @@ export const downloadInvoice = async (req, res) => {
 export const returnOrderItem = async (req, res) => {
   try {
     const { orderId, itemId, reason } = req.body;
-    
- if (!reason || !reason.trim()) {
+ 
+    if (!reason || !reason.trim()) {
       return res.json({ success: false, message: "Please provide a reason (min 5 characters)" });
     }
  
@@ -531,7 +574,7 @@ export const returnOrderItem = async (req, res) => {
       return res.json({ success: false, message: "Only delivered items can be returned" });
     }
  
-    item.status = "Return Requested";
+    item.status       = "Return Requested";
     item.returnReason = reason.trim();
     await restoreStock(item.variantId, item.quantity);
  
@@ -544,10 +587,25 @@ export const returnOrderItem = async (req, res) => {
     const newItemTotal = activeItems.reduce((s, i) => s + i.price * i.quantity, 0);
     const newShipping  = newItemTotal === 0 ? 0 : newItemTotal >= 499 ? 0 : 49;
     const newTax       = Math.round(newItemTotal * 0);
+ 
+    let newDiscount = 0;
+    if (order.couponCode) {
+      const couponDoc = await Coupon.findOne({ code: order.couponCode });
+      if (couponDoc && newItemTotal >= couponDoc.minPurchase) {
+        newDiscount = couponDoc.discountType === "percentage"
+          ? Math.min((newItemTotal * couponDoc.discountValue) / 100, couponDoc.maxDiscount || Infinity)
+          : couponDoc.discountValue;
+        newDiscount = Math.round(Math.min(newDiscount, newItemTotal));
+      } else {
+        order.couponCode = null;
+      }
+    }
+ 
     order.itemTotal      = newItemTotal;
+    order.discount       = newDiscount;
     order.shippingCharge = newShipping;
     order.tax            = newTax;
-    order.finalTotal     = allReturned ? 0 : newItemTotal - (order.discount || 0) + newTax + newShipping;
+    order.finalTotal     = allReturned ? 0 : newItemTotal - newDiscount + newTax + newShipping;
  
     await order.save();
     res.json({ success: true, message: "Return request submitted successfully" });
@@ -571,6 +629,7 @@ async function restoreStock(variantId, quantity) {
   }
 }
  
+/* ── GET /orders/:id/status ─────────────────────────────────────────── */
 export const getOrderStatus = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)

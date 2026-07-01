@@ -150,9 +150,18 @@ const addCategoryOffer = async (req, res) => {
 
     const { categoryId, offerPercentage } = req.body;
 
+    const pct = Number(offerPercentage);
+
+    if (isNaN(pct) || pct <= 0 || pct > 90) {
+      return res.json({
+        success: false,
+        message: "Offer percentage must be between 1 and 90"
+      });
+    }
+
     const category = await Category.findById(categoryId);
 
-    category.categoryOffer = offerPercentage;
+    category.categoryOffer = pct;
 
     await category.save();
 

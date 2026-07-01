@@ -4,13 +4,14 @@ import passport from "passport";
 import { loadProductsPage } from "../controllers/user/productController.js";
 import { loadProductDetailsPage, getVariantDetails } from "../controllers/user/productDetailsController.js";
 import * as userController from "../controllers/user/userController.js";
+import User from "../models/userModel.js";
 import * as profileController from "../controllers/user/profileController.js";
 import { userAuth, userNotLoggedIn } from "../middlewares/auth.js";
 import upload from "../middlewares/multer.js";
 import { loadNearExpiryDeals } from "../controllers/user/expiryDealsController.js";
 import { addReview, getReviews } from "../controllers/user/reviewController.js";
 import { toggleWishlist, getWishlist } from "../controllers/user/wishlistController.js";
-import { addToCart, getCart, updateCartItem, removeCartItem, getVariantsByProduct } from "../controllers/user/cartController.js";
+import { addToCart, getCart, updateCartItem, removeCartItem, getVariantsByProduct, validateCart } from "../controllers/user/cartController.js";
 import {
   loadCheckout,
   loadPaymentPage,
@@ -19,10 +20,15 @@ import {
   createRazorpayOrder,      
   verifyRazorpayPayment,     
   razorpayFailure, 
-  applyCoupon, removeCoupon           
+  loadPaymentFailed,
+  applyCoupon, removeCoupon,
+  retryRazorpayOrder,
+  verifyRetryPayment          
 } from "../controllers/user/checkoutController.js";
 import { listOrders, orderDetail, cancelOrder, cancelOrderItem, returnOrder, returnOrderItem, downloadInvoice, getOrderStatus } from "../controllers/user/orderController.js";
-import { loadWallet, createWalletOrder, verifyWalletPayment } from "../controllers/user/walletController.js";
+import { loadWallet, createWalletOrder, verifyWalletPayment, paymentFailed } from "../controllers/user/walletController.js";
+import { loadContactMessages, viewContactMessage, replyContactMessage, deleteContactMessage } from "../controllers/admin/contactMessageController.js";
+import { myMessages, viewMyMessage } from "../controllers/user/contactMessageController.js";
 const router = express.Router();
  
 // ── AUTH ──────────────────────────────────────────────
@@ -64,6 +70,11 @@ router.post("/update-password", userController.updatePassword);
  
 // ── HOME ──────────────────────────────────────────────
 router.get("/", userController.loadHomePage);
+
+router.get("/about", userController.getAbout);
+router.get("/contact-us", userController.getContactUs);
+router.post("/contact-us", userController.postContactUs);
+router.get("/customer-support", userController.getCustomerSupport);
  
 // ── PRODUCTS ──────────────────────────────────────────
 router.get("/products",           loadProductsPage);
@@ -113,6 +124,7 @@ router.get("/cart",          userAuth, getCart);
 router.post("/cart/add",     userAuth, addToCart);
 router.post("/cart/update",  userAuth, updateCartItem);
 router.post("/cart/remove",  userAuth, removeCartItem);
+router.get("/cart/validate",      userAuth, validateCart);   
 router.get("/variant/by-product/:productId", getVariantsByProduct);
 router.get("/cart/count", userAuth, async (req, res) => {
   try {
@@ -135,13 +147,15 @@ router.post("/checkout/remove-coupon", userAuth, removeCoupon);
 router.post("/checkout/create-razorpay-order",   userAuth, createRazorpayOrder);
 router.post("/checkout/verify-razorpay-payment", userAuth, verifyRazorpayPayment);
 router.post("/checkout/razorpay-failure",        userAuth, razorpayFailure);
-
+router.get("/payment-failed", userAuth, loadPaymentFailed);
+router.post("/checkout/retry-razorpay-order", userAuth, retryRazorpayOrder);
+router.post("/checkout/verify-retry-payment", userAuth, verifyRetryPayment);
 
 // ── WALLET ────────────────────────────────────────────
 router.get("/wallet",                    userAuth, loadWallet);
 router.post("/wallet/create-order",      userAuth, createWalletOrder);
 router.post("/wallet/verify-payment",    userAuth, verifyWalletPayment);
-
+router.get('/wallet/payment-failed', userAuth, paymentFailed);
 // ── ORDERS ────────────────────────────────────────────
 router.get("/orders",                userAuth, listOrders);
 router.post("/orders/item/cancel",   userAuth, cancelOrderItem);
@@ -154,5 +168,24 @@ router.get("/orders/:id",            userAuth, orderDetail);
 router.get("/api/check-session", (req, res) => {
   res.json({ loggedIn: !!req.session?.user });
 });
- 
+ // ✅ Block status poller
+router.get("/api/check-block-status", async (req, res) => {
+  try {
+    if (!req.session?.user?.id) {
+      return res.json({ loggedIn: false, blocked: false });
+    }
+    const user = await User.findById(req.session.user.id).select("isBlocked").lean();
+    if (!user) return res.json({ loggedIn: false, blocked: false });
+
+    if (user.isBlocked) {
+      req.session.destroy(() => {});
+      return res.json({ loggedIn: true, blocked: true });
+    }
+    return res.json({ loggedIn: true, blocked: false });
+  } catch {
+    return res.json({ loggedIn: true, blocked: false });
+  }
+});
+router.get("/my-messages",     userAuth, myMessages);
+router.get("/my-messages/:id", userAuth, viewMyMessage);
 export default router;

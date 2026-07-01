@@ -76,15 +76,19 @@ const { productName, description, longDescription, categoryId, brand, discount, 
         imageUrls.push(uploadResult.secure_url);
       }
     }
+const cleanProductOffer = Number(productOffer) || 0;
+    if (cleanProductOffer > 90) {
+      return res.status(400).json({ success: false, message: "Product offer cannot exceed 90%" });
+    }
 
-const product = await Product.create({
+    const product = await Product.create({
       productName: cleanName,
       description,
       longDescription,
       categoryId,
       brand,
       discount,
-      productOffer:  Number(productOffer) || 0,
+      productOffer:  cleanProductOffer,
       productImages: imageUrls,
       isListed: true
     });
@@ -124,8 +128,11 @@ const cleanName = productName.trim();
     product.categoryId = categoryId;
     product.brand = brand;
 
-    product.productOffer    = Number(productOffer) || 0;
-
+const cleanProductOffer = Number(productOffer) || 0;
+    if (cleanProductOffer > 90) {
+      return res.status(400).json({ success: false, message: "Product offer cannot exceed 90%" });
+    }
+    product.productOffer    = cleanProductOffer;
     while (product.productImages.length < 5) {
       product.productImages.push("");
     }

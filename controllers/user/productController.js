@@ -4,6 +4,7 @@ import Category from "../../models/categoryModel.js";
 import Review   from "../../models/reviewModel.js";
 import Offer    from "../../models/offerModel.js";
 import { getOrderStatus } from "./orderController.js";
+
 const loadProductsPage = async (req, res) => {
   try {
     const { search, category, brand, price, sort, page = 1 } = req.query;
@@ -55,17 +56,42 @@ const loadProductsPage = async (req, res) => {
       productId: { $in: productIds },
       ...priceFilter
     })
-.sort({ regularPrice: 1 })
+      .sort({ regularPrice: 1 })
       .lean();
  
-    const variantMap = {};
-    for (const variant of allVariants) {
-      const key = variant.productId.toString();
-      if (!variantMap[key]) {
-        variantMap[key] = variant;
-      }
-    }
+   const variantMap = {};
+const allVariantIds = allVariants.map(v => v._id);
 
+// Check stock for all variants in one query
+const { default: Batch } = await import("../../models/batchModel.js");
+const activeBatches = await Batch.find({
+  variantId:      { $in: allVariantIds },
+  status:         "active",
+  expiryAt:       { $gt: new Date() },
+  availableStock: { $gt: 0 }
+}).lean();
+
+const inStockVariantIds = new Set(
+  activeBatches.map(b => b.variantId.toString())
+);
+
+for (const variant of allVariants) {
+  const key = variant.productId.toString();
+  if (!variantMap[key]) {
+    // Prefer an in-stock variant; fall back to first if all OOS
+    if (inStockVariantIds.has(variant._id.toString()) || !variantMap[key]) {
+      variantMap[key] = variant;
+    }
+  }
+}
+
+// Track which products have ANY in-stock variant
+const inStockProductIds = new Set();
+for (const variant of allVariants) {
+  if (inStockVariantIds.has(variant._id.toString())) {
+    inStockProductIds.add(variant.productId.toString());
+  }
+}
     
  
     // ── 5. RATINGS — single aggregation, not N queries ────
@@ -111,9 +137,21 @@ const offerLabel = categoryOfferPct > productOfferPct ? "category" : "product";
         const { avgRating = "0.0", totalReviews = 0 } =
           ratingMap[product._id.toString()] || {};
  
+// Check actual stock across batches
+const { default: Batch } = await import("../../models/batchModel.js");
+const batches = await Batch.find({
+  variantId:      variant._id,
+  status:         "active",
+  expiryAt:       { $gt: new Date() },
+  availableStock: { $gt: 0 }
+}).lean();
+const totalStock = batches.reduce((sum, b) => sum + b.availableStock, 0);
+
+const hasStock = inStockProductIds.has(product._id.toString());
+
 return {
   ...product,
-  startingPrice: finalPrice,
+  startingPrice: hasStock ? finalPrice : null,
   regularPrice,
   discount:      effectiveDiscount,
   offerLabel,

@@ -418,8 +418,7 @@
         modal: { ondismiss: function() { btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Money via Razorpay'; } }
       };
       const rzp = new Razorpay(options);
-      rzp.on('payment.failed', function(r) { showMsg('Payment failed: ' + r.error.description, 'error'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Money via Razorpay'; });
-      rzp.open();
+rzp.on('payment.failed', function(r) { showMsg('Payment failed: ' + r.error.description, 'error'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Money via Razorpay'; });     rzp.open();
     } catch (err) { showMsg('Something went wrong. Please try again.', 'error'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Money via Razorpay'; }
   }
   function showMsg(text, type) {

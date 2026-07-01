@@ -40,6 +40,11 @@
            background:none; border:none; padding:6px 12px; cursor:pointer;">
     <i class="fas fa-search" style="color:#8B3A52; font-size:1rem;"></i>
   </button>
+
+<input type="hidden" name="sort"     id="hdr-sort">
+  <input type="hidden" name="category" id="hdr-category">
+  <input type="hidden" name="price"    id="hdr-price">
+  <input type="hidden" name="brand"    id="hdr-brand">
 </form>
 
 <script>
@@ -49,10 +54,10 @@
   const form     = document.getElementById('searchForm');
 
   // ── 1. Preserve search value from URL on page load ──
-  const params      = new URLSearchParams(window.location.search);
-  const urlSearch   = params.get('search') || '';
+  const params    = new URLSearchParams(window.location.search);
+  const urlSearch = params.get('search') || '';
   if (urlSearch) {
-    input.value          = urlSearch;
+    input.value            = urlSearch;
     clearBtn.style.display = 'block';
   }
 
@@ -61,24 +66,47 @@
     clearBtn.style.display = input.value.trim() ? 'block' : 'none';
   });
 
-  // ── 3. Clear button ──
+  // ── 3. Clear button — preserve other filters ──
   clearBtn.addEventListener('click', () => {
     input.value            = '';
     clearBtn.style.display = 'none';
     input.focus();
-    // Also redirect to /products without search param
-    window.location.href = '/products';
+
+    // If on products page, keep existing filters but remove search
+    const cp = new URLSearchParams(window.location.search);
+    cp.delete('search');
+    cp.set('page', '1');
+    window.location.href = '/products?' + cp.toString();
   });
 
-  // ── 4. Debounce — auto-submit after 500ms of no typing ──
+  // ── 4. On submit, carry current sidebar filters (only on /products page) ──
+  form.addEventListener('submit', function (e) {
+    const onProductsPage = window.location.pathname === '/products';
+    if (!onProductsPage) return; // normal submit on other pages
+
+    e.preventDefault();
+
+    // Pick up whatever filters are currently active in the sidebar
+    const cat   = document.querySelector('input[name="category"]:checked')?.value || '';
+    const price = document.querySelector('input[name="price"]:checked')?.value    || '';
+    const brand = document.querySelector('input[name="brand"]:checked')?.value    || '';
+    const sort  = document.getElementById('sortOptions')?.value                   || '';
+
+    document.getElementById('hdr-sort').value     = sort;
+    document.getElementById('hdr-category').value = cat;
+    document.getElementById('hdr-price').value    = price;
+    document.getElementById('hdr-brand').value    = brand;
+
+    form.submit();
+  });
+
+  // ── 5. Debounce — auto-submit after 500ms of no typing ──
   let debounceTimer;
   input.addEventListener('input', () => {
     clearTimeout(debounceTimer);
     const val = input.value.trim();
-    if (val.length === 0) return; // don't auto-submit empty
-    debounceTimer = setTimeout(() => {
-      form.submit();
-    }, 500);
+    if (val.length === 0) return;
+    debounceTimer = setTimeout(() => form.dispatchEvent(new Event('submit')), 500);
   });
 
 })();
@@ -91,26 +119,29 @@
 <a href="/cart" class="text-reset header-icon" title="My Cart" 
    style="position:relative; display:inline-flex;">
   <img width="25" height="25" src="media/icons8-cart-50.png" alt="cart" />
-  <span id="cart-count" style="
+ <% const _cc2 = locals.cartCount || 0; %>
+<span id="cart-count" style="
     position:absolute; top:-8px; right:-8px;
     background:#8B3A52; color:#fff;
     border-radius:50%; width:18px; height:18px;
     font-size:.62rem; font-weight:700;
-    display:none; align-items:center; justify-content:center;
-    line-height:1;">0</span>
+    display:<%= _cc2 > 0 ? 'flex' : 'none' %>; align-items:center; justify-content:center;
+    line-height:1;"><%= _cc2 > 0 ? _cc2 : '' %></span>
 </a>
 
             <!-- ❤ Wishlist Icon -->
+<!-- ❤ Wishlist Icon -->
 <a href="/wishlist" class="text-reset header-icon" title="My Wishlist"
-   style="position:relative; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px;">
+   style="position:relative; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; text-decoration:none;">
   <i class="fas fa-heart fa-lg" style="color:#8B3A52;"></i>
-  <span id="wishlist-count" style="
+  <% const _wc2 = locals.wishlistCount || 0; %>
+<span id="wishlist-count" style="
     position:absolute; top:-8px; right:-8px;
     background:#8B3A52; color:#fff;
     border-radius:50%; width:18px; height:18px;
     font-size:.62rem; font-weight:700;
-    display:none; align-items:center; justify-content:center;
-    line-height:1;">0</span>
+    display:<%= _wc2 > 0 ? 'flex' : 'none' %>; align-items:center; justify-content:center;
+    line-height:1;"><%= _wc2 > 0 ? _wc2 : '' %></span>
 </a>
             <!-- User Dropdown / Auth Links -->
             <% if (locals.user) { %>
@@ -130,12 +161,12 @@
                     </ul>
                 </div>
 
-            <% } else { %>
+          <% } else { %>
                 <!-- Guest Links -->
-                <a href="/signUp" class="text-reset header-action">
+                <a href="/signUp" class="text-reset header-action" style="text-decoration:none;">
                     <span class="small fw-bold">Sign Up</span>
                 </a>
-                <a href="/login" class="text-reset header-action">
+                <a href="/login" class="text-reset header-action" style="text-decoration:none;">
                     <span class="small fw-bold">Log In</span>
                 </a>
             <% } %>
@@ -144,6 +175,54 @@
 
     </div> <!-- container-fluid -->
 
-    
+    <!-- ✅ Block status poller — auto logout if admin blocks user -->
+<script>
+(function () {
+  let warningShown = false;
+
+  async function checkBlockStatus() {
+    try {
+      const res  = await fetch('/api/check-block-status');
+      const data = await res.json();
+
+      if (!data.loggedIn) {
+        clearInterval(blockPoller);
+        return;
+      }
+
+      if (data.blocked && !warningShown) {
+        warningShown = true;
+        clearInterval(blockPoller);
+
+        await Swal.fire({
+          icon: 'error',
+          title: 'Account Blocked',
+          text: 'Your account has been blocked by the administrator.',
+          confirmButtonColor: '#8b3a52',
+          confirmButtonText: 'OK',
+          allowOutsideClick: false,
+          allowEscapeKey: false
+        });
+
+        window.location.href = '/login';
+      }
+    } catch {
+      // silent fail — keep polling
+    }
+  }
+
+  const blockPoller = setInterval(checkBlockStatus, 10000);
+  checkBlockStatus(); // run immediately on page load
+})();
+</script>
 
 </nav>
+
+<!-- ── Secondary Nav ── -->
+<div style="background:#fff; border-bottom: 1px solid rgba(139,58,82,0.12); text-align:center; padding: 10px 0;">
+  <a href="/" style="margin: 0 20px; font-size:.85rem; font-weight:600; letter-spacing:.08em; color:#5a2d3a; text-decoration:none;">HOME</a>
+  <a href="/products" style="margin: 0 20px; font-size:.85rem; font-weight:600; letter-spacing:.08em; color:#5a2d3a; text-decoration:none;">SHOP</a>
+  <a href="/about" style="margin: 0 20px; font-size:.85rem; font-weight:600; letter-spacing:.08em; color:#5a2d3a; text-decoration:none;">ABOUT US</a>
+  <a href="/contact-us" style="margin: 0 20px; font-size:.85rem; font-weight:600; letter-spacing:.08em; color:#5a2d3a; text-decoration:none;">CONTACT US</a>
+  <a href="/customer-support" style="margin: 0 20px; font-size:.85rem; font-weight:600; letter-spacing:.08em; color:#5a2d3a; text-decoration:none;">CUSTOMER SUPPORT</a>
+</div>

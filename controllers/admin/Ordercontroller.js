@@ -1,6 +1,7 @@
 import Order from "../../models/orderModel.js";
 import WalletTransaction from "../../models/walletModel.js";
 import User from "../../models/userModel.js";
+import Coupon from "../../models/couponModel.js"; 
 
 // ─────────────────────────────────────────
 // GET /admin/orders
@@ -40,10 +41,9 @@ export const loadOrders = async (req, res) => {
       Order.countDocuments(filter),
       Order.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
     ]);
- 
-    const counts = {
+const counts = {
       All: 0, Pending: 0, Processing: 0,
-      Shipped: 0, Delivered: 0, Cancelled: 0, Returned: 0,
+      Shipped: 0, Delivered: 0, Cancelled: 0, Returned: 0, "Return Requested": 0,
     };
     let grandTotal = 0;
     statusCounts.forEach(({ _id, count }) => {
@@ -267,13 +267,21 @@ export const approveReturnRequest = async (req, res) => {
     const newItemTotal = activeItems.reduce(
       (sum, i) => sum + i.price * i.quantity, 0
     );
-    const newDiscount = orderItemTotal > 0
-      ? Math.round((newItemTotal / orderItemTotal) * (order.discount || 0))
-      : 0;
+let newDiscount = 0;
+    if (order.couponCode) {
+      const couponDoc = await Coupon.findOne({ code: order.couponCode });
+      if (couponDoc && newItemTotal >= couponDoc.minPurchase) {
+        newDiscount = couponDoc.discountType === "percentage"
+          ? Math.min((newItemTotal * couponDoc.discountValue) / 100, couponDoc.maxDiscount || Infinity)
+          : couponDoc.discountValue;
+        newDiscount = Math.round(Math.min(newDiscount, newItemTotal));
+      } else {
+        order.couponCode = null;
+      }
+    }
     order.itemTotal  = newItemTotal;
     order.discount   = newDiscount;
-    order.finalTotal = newItemTotal - newDiscount + (order.tax || 0) + (order.shippingCharge || 0);
-    // ──────────────────────────────────────────
+    order.finalTotal = newItemTotal - newDiscount + (order.tax || 0) + (order.shippingCharge || 0);    // ──────────────────────────────────────────
 
     // credit wallet
     const user = await User.findById(order.userId);

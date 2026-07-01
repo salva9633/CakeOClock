@@ -1,0 +1,275 @@
+<%- include('../partials/user/header') %>
+<%- include('../partials/user/navbar') %>
+
+<!-- ============================================================
+     CAKE O'CLOCK — CUSTOMER SUPPORT
+     Same token system / motion language as the About page.
+============================================================= -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --blush:#FDF1F4;
+    --cream:#FFF9F7;
+    --rosegold:#C97B84;
+    --choco:#3B1F29;
+    --beige:#F6E8E3;
+    --gold:#D9A857;
+  }
+
+  .coc-support{ background:var(--cream); color:var(--choco); overflow:hidden; }
+  .coc-support *{ box-sizing:border-box; }
+  .coc-support h1,.coc-support h2,.coc-support h3,.coc-support h4{ font-family:'Playfair Display',serif; font-weight:600; letter-spacing:-0.01em; }
+  .coc-support, .coc-support p, .coc-support span, .coc-support a, .coc-support button{ font-family:'Poppins',sans-serif; }
+  .coc-wrap{ max-width:1080px; margin:0 auto; padding:0 28px; }
+
+  .coc-reveal{ opacity:0; transform:translateY(28px); transition:opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
+  .coc-reveal.is-in{ opacity:1; transform:translateY(0); }
+  @media (prefers-reduced-motion: reduce){ .coc-reveal{ transition:none; opacity:1; transform:none; } .coc-s-float{ animation:none !important; } }
+
+  .coc-scallop{ display:block; width:100%; height:34px; margin-top:-1px; }
+
+  .coc-eyebrow{
+    display:inline-flex; align-items:center; gap:8px; font-size:.74rem; letter-spacing:.22em;
+    font-weight:600; color:var(--rosegold); text-transform:uppercase; margin-bottom:18px;
+  }
+  .coc-eyebrow svg{ width:14px; height:14px; }
+
+  /* ---------- hero (split, image right, like About) ---------- */
+  .coc-s-hero{
+    position:relative; padding:110px 0 90px;
+    background:
+      radial-gradient(55% 50% at 85% 10%, rgba(201,123,132,.16), transparent 60%),
+      radial-gradient(45% 40% at 8% 90%, rgba(217,168,87,.14), transparent 60%),
+      var(--blush);
+  }
+  .coc-s-hero-grid{ display:grid; grid-template-columns:1.05fr .95fr; gap:60px; align-items:center; }
+  .coc-s-hero h1{ font-size:clamp(2.2rem,4.2vw,3.2rem); line-height:1.1; color:var(--choco); margin:0 0 18px; }
+  .coc-s-hero h1 em{ font-style:italic; color:var(--rosegold); }
+  .coc-s-hero p.sub{ color:#7a5a62; font-size:1rem; max-width:440px; line-height:1.8; margin:0; }
+
+  .coc-s-hero-art{ position:relative; }
+  .coc-s-hero-frame{
+    position:relative; border-radius:28px; overflow:hidden; transform:rotate(-2deg);
+    box-shadow:0 28px 70px rgba(59,31,41,.2); border:6px solid #fff;
+  }
+  .coc-s-hero-frame img{ width:100%; display:block; aspect-ratio:4/4.6; object-fit:cover; }
+  .coc-s-glow{ position:absolute; width:300px; height:300px; border-radius:50%; filter:blur(60px); background:rgba(201,123,132,.32); top:-30px; left:-10%; z-index:-1; }
+  .coc-s-badge{
+    position:absolute; right:-20px; bottom:30px; background:rgba(255,255,255,.78); backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.6); border-radius:18px; padding:13px 18px; box-shadow:0 14px 34px rgba(59,31,41,.15);
+    font-size:.78rem; font-weight:600; color:var(--choco); display:flex; align-items:center; gap:8px;
+    animation:coc-float 5s ease-in-out infinite;
+  }
+  .coc-s-float{ position:absolute; font-size:1.6rem; filter:drop-shadow(0 6px 10px rgba(0,0,0,.1)); animation:coc-float 6s ease-in-out infinite; }
+  .coc-s-float.f1{ top:4%; right:4%; }
+  .coc-s-float.f2{ bottom:2%; left:-6%; font-size:1.4rem; animation-delay:1.2s; }
+  @keyframes coc-float{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-12px);} }
+
+  /* ---------- quick help cards ---------- */
+  .coc-quick{ padding:90px 0 0; }
+  .coc-quick-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .coc-quick-card{
+    display:block; text-decoration:none; background:rgba(255,255,255,.55); backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.7); border-radius:22px; padding:30px 24px; text-align:center;
+    box-shadow:0 14px 34px rgba(59,31,41,.07); transition:transform .4s cubic-bezier(.2,.7,.2,1), box-shadow .4s ease, background .4s ease;
+  }
+  .coc-quick-card:hover{ transform:translateY(-8px); box-shadow:0 24px 48px rgba(59,31,41,.15); background:#fff; }
+  .coc-quick-card .ic{
+    width:54px; height:54px; margin:0 auto 16px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background:var(--rosegold); color:#fff;
+  }
+  .coc-quick-card h4{ color:var(--choco); font-size:.96rem; margin:0 0 6px; }
+  .coc-quick-card p{ color:#806369; font-size:.84rem; margin:0; }
+
+  /* ---------- FAQ ---------- */
+  .coc-faq-section{ padding:90px 0; }
+  .coc-faq-card{ background:#fff; border-radius:24px; padding:46px; box-shadow:0 24px 60px rgba(59,31,41,.09); }
+  .coc-faq-card > h2{ font-size:clamp(1.5rem,2.4vw,1.9rem); margin:0 0 30px; color:var(--choco); }
+
+  .coc-faq-item{ border-bottom:1px solid rgba(201,123,132,.16); padding:20px 0; }
+  .coc-faq-item:last-child{ border-bottom:none; }
+  .coc-faq-q{
+    width:100%; background:none; border:none; cursor:pointer; display:flex; align-items:center;
+    justify-content:space-between; gap:16px; padding:0; text-align:left;
+  }
+  .coc-faq-q span.txt{ color:var(--choco); font-weight:600; font-size:.95rem; }
+  .coc-faq-q .plus{
+    flex:0 0 30px; width:30px; height:30px; border-radius:50%; background:var(--blush); color:var(--rosegold);
+    display:flex; align-items:center; justify-content:center; transition:transform .4s cubic-bezier(.2,.7,.2,1), background .3s ease, color .3s ease;
+  }
+  .coc-faq-q .plus svg{ width:14px; height:14px; transition:transform .4s cubic-bezier(.2,.7,.2,1); }
+  .coc-faq-item.open .coc-faq-q .plus{ background:var(--rosegold); color:#fff; }
+  .coc-faq-item.open .coc-faq-q .plus svg{ transform:rotate(135deg); }
+
+  .coc-faq-a{ max-height:0; overflow:hidden; transition:max-height .45s cubic-bezier(.2,.7,.2,1), opacity .4s ease; opacity:0; }
+  .coc-faq-item.open .coc-faq-a{ opacity:1; }
+  .coc-faq-a p{ color:#777; font-size:.9rem; line-height:1.85; margin:14px 0 0; max-width:600px; }
+
+  /* ---------- still need help ---------- */
+  .coc-still{ position:relative; text-align:center; padding:70px 50px; background:var(--choco); border-radius:26px; overflow:hidden; }
+  .coc-still::before{ content:""; position:absolute; inset:0; background:radial-gradient(55% 80% at 50% 100%, rgba(217,168,87,.16), transparent 70%); }
+  .coc-still h3{ position:relative; color:#fff; font-size:1.5rem; margin:0 0 10px; }
+  .coc-still p{ position:relative; color:rgba(255,255,255,.65); margin-bottom:26px; font-size:.92rem; }
+
+  .coc-btn{
+    position:relative; display:inline-flex; align-items:center; gap:10px;
+    background:var(--rosegold); color:#fff; padding:15px 34px; border-radius:50px;
+    text-decoration:none; font-weight:500; font-size:.92rem; letter-spacing:.02em;
+    transition:transform .35s ease, box-shadow .35s ease; box-shadow:0 14px 30px rgba(201,123,132,.3);
+  }
+  .coc-btn:hover{ transform:translateY(-3px); box-shadow:0 18px 36px rgba(201,123,132,.4); }
+
+  @media (max-width: 900px){
+    .coc-s-hero-grid{ grid-template-columns:1fr; }
+    .coc-s-hero-art{ order:-1; max-width:360px; margin:0 auto; }
+    .coc-quick-grid{ grid-template-columns:1fr; }
+    .coc-faq-card{ padding:30px 22px; }
+    .coc-still{ padding:50px 26px; }
+  }
+</style>
+
+<div class="coc-support">
+
+  <!-- ============ HERO ============ -->
+  <section class="coc-s-hero">
+    <div class="coc-wrap coc-s-hero-grid">
+      <div class="coc-reveal">
+        <span class="coc-eyebrow">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.6 7.9H22l-6.3 4.9 2.4 8L12 16l-6.1 4.8 2.4-8L2 7.9h7.4z"/></svg>
+          We're here to help
+        </span>
+        <h1>Customer <em>Support</em></h1>
+        <p class="sub">From order tracking to custom cake consultations, our team is one message away. Find quick answers below or reach out directly.</p>
+      </div>
+
+      <div class="coc-s-hero-art coc-reveal">
+        <div class="coc-s-glow"></div>
+        <div class="coc-s-hero-frame">
+          <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1782813423/luxury-kitchen-cake-consultation-pink-apron-makai-cake._b1828c80-629e-4db2-850c-17b049332883_x1y63z.webp" alt="Cake O'Clock team helping with a cake consultation" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </section>
+  <svg class="coc-scallop" viewBox="0 0 1200 34" preserveAspectRatio="none"><path d="M0,0 H1200 V14 C1150,30 1110,2 1060,16 C1010,30 970,2 920,16 C870,30 830,2 780,16 C730,30 690,2 640,16 C590,30 550,2 500,16 C450,30 410,2 360,16 C310,30 270,2 220,16 C170,30 130,2 80,16 C40,28 10,10 0,14 Z" fill="#FFF9F7"/></svg>
+
+  <!-- ============ QUICK HELP ============ -->
+  <section class="coc-quick">
+    <div class="coc-wrap">
+      <div class="coc-quick-grid">
+
+        <a href="/orders" class="coc-quick-card coc-reveal">
+          <div class="ic">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>
+          </div>
+          <h4>Track Order</h4>
+          <p>Check your order status</p>
+        </a>
+
+        <a href="/orders" class="coc-quick-card coc-reveal">
+          <div class="ic">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M9 14l-4-4 4-4"/><path d="M5 10h11a4 4 0 0 1 0 8h-1"/></svg>
+          </div>
+          <h4>Returns</h4>
+          <p>Easy return process</p>
+        </a>
+
+        <a href="/contact-us" class="coc-quick-card coc-reveal">
+          <div class="ic">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </div>
+          <h4>Live Chat</h4>
+          <p>Chat with our team</p>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="coc-faq-section">
+    <div class="coc-wrap">
+      <div class="coc-faq-card coc-reveal">
+        <h2>Frequently Asked Questions</h2>
+
+        <%
+        const faqs = [
+          { q: 'How do I place a custom cake order?', a: 'Browse our Shop, select a product and choose your variant. For fully custom cakes, use the Contact Us form with your requirements and we\'ll get back to you within 24 hours.' },
+          { q: 'What is the delivery time?', a: 'Standard delivery is 2–3 business days. Express same-day delivery is available for orders placed before 10am.' },
+          { q: 'Can I cancel or modify my order?', a: 'Orders can be cancelled or modified within 2 hours of placing. Go to My Orders, select the order, and click Cancel or contact us directly.' },
+          { q: 'What is your return/refund policy?', a: 'If your cake arrives damaged or incorrect, contact us within 24 hours with a photo. We\'ll arrange a replacement or full refund.' },
+          { q: 'Do you cater to allergies or dietary requirements?', a: 'Yes! We offer eggless, gluten-free, and sugar-free options. Please mention your requirements in the order notes or contact us.' },
+          { q: 'How do I use my referral code or wallet balance?', a: 'Your wallet balance and referral coupons are automatically applied at checkout. You can view them under My Profile > Wallet.' }
+        ];
+        %>
+
+        <% faqs.forEach((faq, i) => { %>
+        <div class="coc-faq-item" id="faq-<%= i %>">
+          <button type="button" class="coc-faq-q" onclick="toggleFaq(<%= i %>)">
+            <span class="txt"><%= faq.q %></span>
+            <span class="plus">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </span>
+          </button>
+          <div class="coc-faq-a" id="ans-<%= i %>">
+            <p><%= faq.a %></p>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STILL NEED HELP ============ -->
+  <section style="padding-bottom:100px;">
+    <div class="coc-wrap">
+      <div class="coc-still coc-reveal">
+        <h3>Still need help?</h3>
+        <p>Our team is available Mon–Sat, 9am–7pm</p>
+        <a href="/contact-us" class="coc-btn">Contact Us →</a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // Scroll reveal
+  (function(){
+    var els = document.querySelectorAll('.coc-support .coc-reveal');
+    if(!('IntersectionObserver' in window)){ els.forEach(function(e){ e.classList.add('is-in'); }); return; }
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){ entry.target.classList.add('is-in'); io.unobserve(entry.target); }
+      });
+    }, { threshold: 0.12 });
+    els.forEach(function(e){ io.observe(e); });
+  })();
+
+  // FAQ accordion with smooth max-height animation
+  function toggleFaq(i){
+    var item = document.getElementById('faq-' + i);
+    var ans  = document.getElementById('ans-' + i);
+    var isOpen = item.classList.contains('open');
+
+    document.querySelectorAll('.coc-faq-item.open').forEach(function(openItem){
+      if(openItem !== item){
+        openItem.classList.remove('open');
+        var openAns = openItem.querySelector('.coc-faq-a');
+        openAns.style.maxHeight = null;
+      }
+    });
+
+    if(isOpen){
+      item.classList.remove('open');
+      ans.style.maxHeight = null;
+    } else {
+      item.classList.add('open');
+      ans.style.maxHeight = ans.scrollHeight + 'px';
+    }
+  }
+</script>
+
+<%- include('../partials/user/footer') %>

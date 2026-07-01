@@ -1,4 +1,3 @@
-<%- include("../../views/partials/user/header") %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -152,8 +151,9 @@
       padding: 2px 9px; border-radius: 20px;
       margin-bottom: 8px;
     }
-    .stock-tag.oos     { background: #fde8e8; color: #b03030; }
-    .stock-tag.exceeds { background: #fff3d6; color: #7a5000; }
+    .stock-tag.oos        { background: #fde8e8; color: #b03030; }
+    .stock-tag.exceeds    { background: #fff3d6; color: #7a5000; }
+    .stock-tag.unavailable{ background: #f0e8ff; color: #5a00a0; }
 
     /* PRICING */
     .item-pricing {
@@ -266,6 +266,7 @@
       box-shadow: 0 4px 14px rgba(175,84,84,.3);
       transition: opacity .2s, transform .15s;
       text-align: center;
+      text-decoration: none;
     }
     .checkout-btn:hover:not(:disabled) { opacity: .9; transform: translateY(-1px); }
     .checkout-btn:disabled {
@@ -289,6 +290,14 @@
       color: var(--muted); transition: color .2s;
     }
     .continue-link:hover { color: var(--rose); }
+
+    /* Savings pill */
+    #savings-pill {
+      margin-top: 10px; padding: 8px 12px;
+      background: #e6fdf0; border-radius: 10px;
+      font-size: .78rem; color: #196638; font-weight: 700;
+      text-align: center;
+    }
 
     /* TOAST */
     #toast-rack {
@@ -319,7 +328,7 @@
 </head>
 
 <body>
-<%- include("../../views/partials/user/navbar") %>
+<%- include("../../views/partials/user/h2") %>
 
 <!-- BREADCRUMB -->
 <div class="breadcrumb-strip">
@@ -341,12 +350,17 @@
     <div class="section-card">
       <div class="section-head">
         <h2>🛒 My Cart</h2>
-        <span class="item-count"><%= items.length %> item<%= items.length !== 1 ? 's' : '' %></span>
+        <span class="item-count" id="item-count-label"><%= items.length %> item<%= items.length !== 1 ? 's' : '' %></span>
       </div>
 
       <!-- Out-of-stock warning banner -->
       <% if (hasOutOfStock) { %>
-        <div class="oos-banner">
+        <div class="oos-banner" id="oos-banner">
+          <i class="fas fa-exclamation-circle"></i>
+          <span>Some items are <strong>out of stock</strong> or unavailable. Remove them to proceed to checkout.</span>
+        </div>
+      <% } else { %>
+        <div class="oos-banner" id="oos-banner" style="display:none;">
           <i class="fas fa-exclamation-circle"></i>
           <span>Some items are <strong>out of stock</strong> or unavailable. Remove them to proceed to checkout.</span>
         </div>
@@ -362,15 +376,22 @@
       <% } else { %>
         <% items.forEach(item => { %>
           <%
-            const name    = item.productId?.productName || 'Product';
-            const img     = item.productId?.productImages?.[0] || 'https://placehold.co/160x160/fde2d9/C2607A?text=';
-            const variant = item.variantId?.weight || item.variantId?.size || '';
-            const price   = item.effectivePrice || item.price;
-            const regular = item.regularPrice || price;
-            const disc    = item.discountPercent || 0;
-            const blocked = item.isBlocked;
-            const oos     = item.outOfStock || item.variantUnavailable;
-            const exceeds = item.exceedsStock;
+            const name       = item.productId?.productName || 'Product';
+            const img        = item.productId?.productImages?.[0] || 'https://placehold.co/160x160/fde2d9/C2607A?text=';
+            const variant    = item.variantId?.weight || item.variantId?.size || '';
+            const price      = item.effectivePrice || item.price;
+            const regular    = item.regularPrice || price;
+            const disc       = item.discountPercent || 0;
+            const blocked    = item.isBlocked;
+            const unlisted   = !item.productId?.isListed;
+            const varUnavail = item.variantUnavailable || item.variantId?.isAvailable === false;
+            const oos        = item.outOfStock;
+            const exceeds    = item.exceedsStock;
+            /* stamp label & tag label per reason */
+            const stampLabel = unlisted   ? 'Unavailable'
+                             : varUnavail ? 'Unavailable'
+                             : oos        ? 'Out of Stock'
+                             : null;
           %>
           <div class="cart-item <%= blocked ? 'item-blocked' : '' %>"
                id="cart-item-<%= item._id %>">
@@ -378,8 +399,8 @@
             <!-- Image -->
             <div class="item-img">
               <img src="<%= img %>" alt="<%= name %>">
-              <% if (oos) { %>
-                <div class="oos-stamp"><span>Out of Stock</span></div>
+              <% if (stampLabel) { %>
+                <div class="oos-stamp"><span><%= stampLabel %></span></div>
               <% } %>
             </div>
 
@@ -390,8 +411,12 @@
                 <div class="item-variant"><i class="fas fa-weight-scale" style="font-size:.6rem;margin-right:3px;"></i><%= variant %></div>
               <% } %>
 
-              <!-- Stock tag -->
-              <% if (oos) { %>
+              <!-- Stock / availability tag -->
+              <% if (unlisted) { %>
+                <span class="stock-tag oos"><i class="fas fa-ban"></i> Product Unavailable</span>
+              <% } else if (varUnavail) { %>
+                <span class="stock-tag oos"><i class="fas fa-ban"></i> Option Unavailable</span>
+              <% } else if (oos) { %>
                 <span class="stock-tag oos"><i class="fas fa-ban"></i> Out of Stock</span>
               <% } else if (exceeds) { %>
                 <span class="stock-tag exceeds"><i class="fas fa-exclamation-triangle"></i> Only <%= item.totalStock %> left — reduce quantity</span>
@@ -402,7 +427,6 @@
                 <span class="item-price-now">₹<%= price.toLocaleString('en-IN') %></span>
                 <% if (regular > price) { %>
                   <span class="item-price-old">₹<%= regular.toLocaleString('en-IN') %></span>
-                  <span class="item-disc-pill"><%= disc %>% OFF</span>
                 <% } %>
               </div>
 
@@ -447,16 +471,17 @@
           const discountTotal = validItems.reduce((s, i) => s + ((i.regularPrice || i.price) - (i.effectivePrice || i.price)) * i.quantity, 0);
         %>
 
-        <div class="summary-row">
-          <span>Subtotal (<%= validItems.length %> item<%= validItems.length !== 1 ? 's' : '' %>)</span>
-          <span>₹<%= subtotal.toLocaleString('en-IN') %></span>
+        <div class="summary-row" id="subtotal-row">
+          <span>Subtotal (<span id="valid-item-count"><%= validItems.length %></span> item<span id="valid-item-suffix"><%= validItems.length !== 1 ? 's' : '' %></span>)</span>
+          <span id="subtotal-val">₹<%= subtotal.toLocaleString('en-IN') %></span>
         </div>
-        <% if (discountTotal > 0) { %>
-          <div class="summary-row savings">
-            <span><i class="fas fa-tag" style="margin-right:4px;"></i> Offer Savings</span>
-            <span>−₹<%= discountTotal.toLocaleString('en-IN') %></span>
-          </div>
-        <% } %>
+
+        <!-- FIX 1: savings row is always in DOM, shown/hidden dynamically -->
+        <div class="summary-row savings" id="savings-row" style="<%= discountTotal > 0 ? '' : 'display:none;' %>">
+          <span><i class="fas fa-tag" style="margin-right:4px;"></i> Offer Savings</span>
+          <span id="savings-val">−₹<%= discountTotal.toLocaleString('en-IN') %></span>
+        </div>
+
         <div class="summary-row">
           <span>Delivery</span>
           <span style="color:#196638;font-weight:700;">FREE</span>
@@ -464,30 +489,30 @@
 
         <div class="summary-total">
           <span>Total</span>
-          <span class="total-price">₹<%= total.toLocaleString('en-IN') %></span>
+          <span class="total-price" id="total-price-val">₹<%= total.toLocaleString('en-IN') %></span>
         </div>
 
-        <% if (savings > 0) { %>
-          <div style="margin-top:10px;padding:8px 12px;background:#e6fdf0;border-radius:10px;
-                      font-size:.78rem;color:#196638;font-weight:700;text-align:center;">
-            🎉 You save ₹<%= savings.toLocaleString('en-IN') %> on this order!
-          </div>
-        <% } %>
+        <!-- FIX 1: savings pill always in DOM, shown/hidden dynamically -->
+        <div id="savings-pill" style="<%= savings > 0 ? '' : 'display:none;' %>">
+          🎉 You save <span id="savings-pill-val">₹<%= savings.toLocaleString('en-IN') %></span> on this order!
+        </div>
 
-        <!-- Checkout button -->
-        <% if (items.length === 0) { %>
-          <button class="checkout-btn" disabled>Proceed to Checkout</button>
-        <% } else if (hasOutOfStock) { %>
-          <button class="checkout-btn" disabled>Proceed to Checkout</button>
-          <div class="checkout-blocked">
-            <i class="fas fa-lock"></i>
-            Remove out-of-stock items to unlock checkout.
-          </div>
-        <% } else { %>
-          <a href="/checkout" class="checkout-btn">
-            🔒 Proceed to Checkout
-          </a>
-        <% } %>
+        <!-- Checkout button: always a button, JS validates cart on click before navigating -->
+        <button
+          class="checkout-btn"
+          id="checkout-btn"
+          onclick="handleCheckout()"
+          <%= items.length === 0 ? 'disabled' : '' %>
+        >
+          🔒 Proceed to Checkout
+        </button>
+
+        <!-- Shown when server-side render already knows items are blocked -->
+        <div class="checkout-blocked" id="checkout-blocked-msg"
+             style="<%= hasOutOfStock ? '' : 'display:none;' %>">
+          <i class="fas fa-lock"></i>
+          Remove out-of-stock or unavailable items to unlock checkout.
+        </div>
 
         <a href="/products" class="continue-link">
           ← Continue Shopping
@@ -519,11 +544,127 @@
     setTimeout(() => el.remove(), 2800);
   }
 
+  function formatINR(amount) {
+    return '₹' + Number(amount).toLocaleString('en-IN');
+  }
+
   function updateNavBadge(id, count) {
     const el = document.getElementById(id);
     if (!el) return;
     el.textContent   = count;
     el.style.display = count > 0 ? 'inline-flex' : 'none';
+  }
+
+  /* ── FIX 1 + FIX 2: Update summary panel after any cart change ── */
+  function updateSummaryUI(data) {
+    // Total
+    const totalEl = document.getElementById('total-price-val');
+    if (totalEl && typeof data.total !== 'undefined') {
+      totalEl.textContent = formatINR(data.total);
+    }
+
+    // Subtotal
+    const subtotalEl = document.getElementById('subtotal-val');
+    if (subtotalEl && typeof data.subtotal !== 'undefined') {
+      subtotalEl.textContent = formatINR(data.subtotal);
+    }
+
+    // Savings row
+    const savingsRowEl  = document.getElementById('savings-row');
+    const savingsValEl  = document.getElementById('savings-val');
+    const savingsPillEl = document.getElementById('savings-pill');
+    const savingsPillValEl = document.getElementById('savings-pill-val');
+
+    if (savingsRowEl && savingsValEl && typeof data.savings !== 'undefined') {
+      if (data.savings > 0) {
+        savingsValEl.textContent = '−' + formatINR(data.savings);
+        savingsRowEl.style.display = '';
+      } else {
+        savingsRowEl.style.display = 'none';
+      }
+    }
+    if (savingsPillEl && savingsPillValEl && typeof data.savings !== 'undefined') {
+      if (data.savings > 0) {
+        savingsPillValEl.textContent = formatINR(data.savings);
+        savingsPillEl.style.display  = '';
+      } else {
+        savingsPillEl.style.display = 'none';
+      }
+    }
+
+    // Cart count badge
+    if (typeof data.cartCount !== 'undefined') {
+      updateNavBadge('cart-count', data.cartCount);
+    }
+
+    // Update checkout button + blocked message based on hasBlocked flag
+    if (typeof data.hasBlocked !== 'undefined') {
+      const checkoutBtn = document.getElementById('checkout-btn');
+      const blockedMsg  = document.getElementById('checkout-blocked-msg');
+      const oosBanner   = document.getElementById('oos-banner');
+
+      if (data.hasBlocked) {
+        if (checkoutBtn) checkoutBtn.disabled = true;
+        if (blockedMsg)  blockedMsg.style.display = '';
+        if (oosBanner)   oosBanner.style.display  = '';
+      } else {
+        if (checkoutBtn) checkoutBtn.disabled = false;
+        if (blockedMsg)  blockedMsg.style.display = 'none';
+        if (oosBanner)   oosBanner.style.display  = 'none';
+      }
+    }
+  }
+
+  /* ── HANDLE CHECKOUT CLICK — validate cart with server first ─────────────── */
+  async function handleCheckout() {
+    const btn = document.getElementById('checkout-btn');
+    const originalHTML = btn.innerHTML;
+
+    // Show loading state
+    btn.disabled  = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:6px;"></i> Checking...';
+
+    try {
+      const res  = await fetch('/cart/validate', { method: 'GET' });
+      const data = await res.json();
+
+      if (data.success) {
+        // All items valid — navigate to checkout
+        window.location.href = '/checkout';
+        return;
+      }
+
+      // Restore button
+      btn.disabled  = false;
+      btn.innerHTML = originalHTML;
+
+      if (data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+        return;
+      }
+
+      // Show blocked items alert
+      Swal.fire({
+        icon:             'warning',
+        iconColor:        '#e07040',
+        title:            swalTitle('Cart Has Unavailable Items'),
+        html:             `<p style="color:#6b4c4c;font-size:.9rem;margin:0;">${data.message || 'Please remove unavailable items before checkout.'}</p>`,
+        confirmButtonText: 'OK, I\'ll review my cart',
+        confirmButtonColor: '#8b3a52',
+        customClass: { popup: 'swal-custom-popup', confirmButton: 'swal-custom-btn' }
+      });
+
+      // Show the blocked message banner and OOS banner
+      const blockedMsg = document.getElementById('checkout-blocked-msg');
+      const oosBanner  = document.getElementById('oos-banner');
+      if (blockedMsg) blockedMsg.style.display = '';
+      if (oosBanner)  oosBanner.style.display  = '';
+
+    } catch {
+      btn.disabled  = false;
+      btn.innerHTML = originalHTML;
+      toast('⚠️ Network error. Please try again.');
+    }
   }
 
   /* ── CHANGE QTY ─────────────────────────────────────────────────────────── */
@@ -554,16 +695,13 @@
         return;
       }
 
+      // Update qty display
       qtyEl.textContent = newQty;
-      if (typeof data.cartCount !== 'undefined') updateNavBadge('cart-count', data.cartCount);
-      toast('✅ Quantity updated');
 
-      // Refresh total display
-      if (typeof data.total !== 'undefined') {
-        document.querySelectorAll('.total-price').forEach(el => {
-          el.textContent = '₹' + data.total.toLocaleString('en-IN');
-        });
-      }
+      // FIX 1 + FIX 2: update all summary figures and checkout state
+      updateSummaryUI(data);
+
+      toast('✅ Quantity updated');
 
     } catch {
       toast('⚠️ Network error. Please try again.');
@@ -603,10 +741,15 @@
         row.style.transition = 'opacity .3s, transform .3s';
         row.style.opacity    = '0';
         row.style.transform  = 'translateX(20px)';
-        setTimeout(() => { row.remove(); location.reload(); }, 320);
+        setTimeout(() => {
+          row.remove();
+          // FIX 1 + FIX 2: update summary after DOM removal
+          updateSummaryUI(data);
+        }, 320);
+      } else {
+        updateSummaryUI(data);
       }
 
-      if (typeof data.cartCount !== 'undefined') updateNavBadge('cart-count', data.cartCount);
       toast('🗑️ Item removed from cart');
 
     } catch {

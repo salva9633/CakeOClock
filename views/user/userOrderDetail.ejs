@@ -240,9 +240,14 @@
   <div class="order-hero page-enter">
     <div class="flex-grow-1">
       <div class="order-hero-id"><%= order.orderId %></div>
-      <div class="order-hero-meta">
+     <div class="order-hero-meta">
         Placed on <%= new Date(order.createdAt).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}) %>
         &nbsp;·&nbsp; <%= order.items.length %> item<%= order.items.length !== 1 ? 's' : '' %>
+        <% if (order.status === 'Delivered' && order.deliveredAt) { %>
+          &nbsp;·&nbsp; <span style="color:#155724;font-weight:700;">✓ Delivered on <%= new Date(order.deliveredAt).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}) %></span>
+        <% } else if (order.status === 'Cancelled' && order.cancelledAt) { %>
+          &nbsp;·&nbsp; <span style="color:#721c24;font-weight:700;">✕ Cancelled on <%= new Date(order.cancelledAt).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}) %></span>
+        <% } %>
       </div>
     </div>
     <span id="order-status-badge" class="status-badge status-<%= order.status %>">
@@ -264,24 +269,8 @@
     const isReturned  = ['Returned','Return Requested'].includes(order.status);
     const currentIdx  = STEPS.indexOf(order.status);
   %>
-  <% if (!isCancelled && !isReturned) { %>
-  <div class="section-card page-enter" style="padding:14px 22px 10px;">
-    <div class="order-track">
-      <% STEPS.forEach((step, idx) => {
-           let cls = '';
-           if (currentIdx > idx) cls = 'done';
-           else if (currentIdx === idx) cls = 'active';
-      %>
-      <div class="track-step <%= cls %>">
-        <div class="track-dot">
-          <% if (currentIdx > idx) { %>✓<% } else { %><%= idx+1 %><% } %>
-        </div>
-        <div class="track-label"><%= step %></div>
-      </div>
-      <% }) %>
-    </div>
-  </div>
-  <% } %>
+
+  
 
   <!-- ── Cancelled / Returned banner ────────────────────────── -->
   <% if (isCancelled) { %>

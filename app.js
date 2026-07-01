@@ -26,10 +26,6 @@ const app = express();
 db();
 
 
-// ─────────────────────────────────────────
-// LOGGING
-// ─────────────────────────────────────────
-
 app.use(
   morgan("dev", {
     stream: {
@@ -39,9 +35,7 @@ app.use(
 );
 
 
-// ─────────────────────────────────────────
-// BODY PARSING
-// ─────────────────────────────────────────
+
 
 app.use(express.json());
 
@@ -52,21 +46,15 @@ app.use(
 );
 
 
-// ─────────────────────────────────────────
-// VIEW ENGINE
-// ─────────────────────────────────────────
-
 app.set("view engine", "ejs");
 
 app.set("views", [
   path.join(__dirname, "views/admin"),
   path.join(__dirname, "views/user"),
+  path.join(__dirname, "views"),       
+
 ]);
 
-
-// ─────────────────────────────────────────
-// STATIC FILES
-// ─────────────────────────────────────────
 
 app.use(
   express.static(
@@ -74,10 +62,6 @@ app.use(
   )
 );
 
-
-// ─────────────────────────────────────────
-// CACHE CONTROL
-// ─────────────────────────────────────────
 
 app.use((req, res, next) => {
 
@@ -94,10 +78,6 @@ app.use((req, res, next) => {
 });
 
 
-// ─────────────────────────────────────────
-// DEFAULT LOCALS
-// ─────────────────────────────────────────
-
 app.use((req, res, next) => {
 
   res.locals.user = null;
@@ -107,9 +87,6 @@ app.use((req, res, next) => {
 });
 
 
-// ─────────────────────────────────────────
-// USER SESSION
-// ─────────────────────────────────────────
 
 const userSession = session({
 
@@ -148,9 +125,6 @@ const userSession = session({
 });
 
 
-// ─────────────────────────────────────────
-// ADMIN SESSION
-// ─────────────────────────────────────────
 
 const adminSession = session({
 
@@ -189,10 +163,6 @@ const adminSession = session({
 });
 
 
-// ─────────────────────────────────────────
-// ADMIN ROUTES
-// ─────────────────────────────────────────
-
 app.use(
 
   "/admin",
@@ -217,9 +187,6 @@ app.use(
 );
 
 
-// ─────────────────────────────────────────
-// USER ROUTES
-// ─────────────────────────────────────────
 
 app.use(
 
@@ -245,9 +212,6 @@ app.use(
 );
 
 
-// ─────────────────────────────────────────
-// 404 PAGE
-// ─────────────────────────────────────────
 
 app.use((req, res) => {
 
@@ -260,11 +224,6 @@ app.use((req, res) => {
     .render("pagenotfound");
 });
 
-
-// ─────────────────────────────────────────
-// GLOBAL ERROR HANDLER
-// ─────────────────────────────────────────
-
 app.use((err, req, res, next) => {
 
   logger.error(
@@ -272,14 +231,11 @@ app.use((err, req, res, next) => {
   );
 
   return res
-    .status(500)
-    .send("Something went wrong");
+    .status(err.status || 500)
+    .render("pagenotfound");
 });
 
 
-// ─────────────────────────────────────────
-// SERVER
-// ─────────────────────────────────────────
 
 const PORT =
   process.env.PORT || 3000;
