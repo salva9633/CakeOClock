@@ -28,7 +28,7 @@ import {
 import { listOrders, orderDetail, cancelOrder, cancelOrderItem, returnOrder, returnOrderItem, downloadInvoice, getOrderStatus } from "../controllers/user/orderController.js";
 import { loadWallet, createWalletOrder, verifyWalletPayment, paymentFailed } from "../controllers/user/walletController.js";
 import { loadContactMessages, viewContactMessage, replyContactMessage, deleteContactMessage } from "../controllers/admin/contactMessageController.js";
-import { myMessages, viewMyMessage } from "../controllers/user/contactMessageController.js";
+import { myMessages, viewMyMessage, replyToTicket } from "../controllers/user/contactMessageController.js";
 const router = express.Router();
  
 // ── AUTH ──────────────────────────────────────────────
@@ -186,6 +186,9 @@ router.get("/api/check-block-status", async (req, res) => {
     return res.json({ loggedIn: true, blocked: false });
   }
 });
+
 router.get("/my-messages",     userAuth, myMessages);
 router.get("/my-messages/:id", userAuth, viewMyMessage);
+router.post("/my-messages/:id/reply", userAuth, replyToTicket);
+
 export default router;

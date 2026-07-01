@@ -5,24 +5,23 @@
 
   <div class="main-content msg-detail-page">
 
-    <!-- Back -->
     <a href="/admin/contact-messages" class="back-link">
       <i class="ti ti-arrow-left" aria-hidden="true"></i> Back to messages
     </a>
 
-    <!-- Page Header -->
     <div class="page-header">
       <div>
-        <h1 class="page-title">Message details</h1>
-        <p class="page-subtitle">View customer inquiries and manage responses.</p>
+        <h1 class="page-title">Ticket #<%= msg.ticketNumber %></h1>
+        <p class="page-subtitle"><%= msg.subject %></p>
       </div>
       <%
         const badges = {
-          unread:  { cls:'badge-unread',  icon:'ti-mail',         label:'Unread'  },
-          read:    { cls:'badge-read',    icon:'ti-eye',          label:'Read'    },
-          replied: { cls:'badge-replied', icon:'ti-circle-check', label:'Replied' }
+          open:        { cls:'badge-open',        icon:'ti-alert-circle', label:'Open'         },
+          in_progress: { cls:'badge-in_progress', icon:'ti-messages',     label:'In Progress'  },
+          resolved:    { cls:'badge-resolved',    icon:'ti-circle-check', label:'Resolved'     },
+          closed:      { cls:'badge-closed',      icon:'ti-lock',         label:'Closed'       }
         };
-        const b = badges[msg.status] || badges.read;
+        const b = badges[msg.status] || badges.open;
       %>
       <span class="status-badge <%= b.cls %>">
         <i class="ti <%= b.icon %>" aria-hidden="true"></i> <%= b.label %>
@@ -49,122 +48,44 @@
               </span>
               <span class="meta-item">
                 <i class="ti ti-calendar" aria-hidden="true"></i>
-                <%= new Date(msg.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) %>
+                Opened <%= new Date(msg.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) %>
               </span>
-              <span class="meta-item">
-                <i class="ti ti-clock" aria-hidden="true"></i>
-                <%= new Date(msg.createdAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) %>
-              </span>
+              <% if (msg.status === 'resolved' && msg.resolvedAt) { %>
+                <span class="meta-item">
+                  <i class="ti ti-clock" aria-hidden="true"></i>
+                  Resolved <%= new Date(msg.resolvedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) %>
+                  — auto-closes if no reply in 3 days
+                </span>
+              <% } %>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Customer Message Card -->
+    <!-- Conversation Thread Card -->
     <div class="card anim-card" style="animation-delay:.1s">
       <div class="card-body">
         <div class="section-label">
-          <i class="ti ti-message" aria-hidden="true"></i> Customer message
+          <i class="ti ti-message" aria-hidden="true"></i> Conversation
         </div>
-        <div class="msg-bubble">
-          <p class="msg-text"><%= msg.message %></p>
-          <div class="msg-time">
-            <i class="ti ti-clock" aria-hidden="true"></i>
-            <%= new Date(msg.createdAt).toLocaleString('en-IN',{
-              day:'numeric', month:'short', year:'numeric',
-              hour:'2-digit', minute:'2-digit'
-            }) %>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Previous Reply Card -->
-    <% if (msg.adminReply && msg.adminReply.text) { %>
-    <div class="card anim-card" style="animation-delay:.15s">
-      <div class="card-body">
-        <div class="section-label">
-          <i class="ti ti-corner-down-right" aria-hidden="true"></i> Your reply
-        </div>
-        <div class="reply-row">
-          <div class="avatar avatar-sm" aria-hidden="true">A</div>
-          <div style="flex:1;min-width:0;">
-            <div class="reply-meta">
-              <span class="reply-label">
-                <i class="ti ti-check" aria-hidden="true"></i> Sent by admin
-              </span>
-              <span class="reply-time-tag">
-                <i class="ti ti-clock" aria-hidden="true"></i>
-                <%= new Date(msg.adminReply.repliedAt).toLocaleString('en-IN',{
-                  day:'numeric', month:'short', year:'numeric',
-                  hour:'2-digit', minute:'2-digit'
-                }) %>
-              </span>
-            </div>
-            <div class="reply-bubble">
-              <p class="reply-text"><%= msg.adminReply.text %></p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <% } %>
-
-    <!-- Activity Timeline Card -->
-    <div class="card anim-card" style="animation-delay:.2s">
-      <div class="card-body">
-        <div class="section-label">
-          <i class="ti ti-timeline" aria-hidden="true"></i> Activity timeline
-        </div>
-        <div class="timeline">
-          <div class="tl-item">
-            <div class="tl-dot-wrap">
-              <div class="tl-dot tl-dot-accent"></div>
-              <div class="tl-line"></div>
-            </div>
-            <div class="tl-content">
-              <div class="tl-title">Message received</div>
-              <div class="tl-time">
-                <%= new Date(msg.createdAt).toLocaleString('en-IN',{
-                  day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'
-                }) %>
+        <div class="thread" id="threadList">
+          <% (msg.messages || []).forEach(m => { %>
+            <div class="thread-row <%= m.sender === 'admin' ? 'from-admin' : 'from-user' %>">
+              <div class="avatar avatar-sm" aria-hidden="true"><%= m.sender === 'admin' ? 'A' : msg.name[0].toUpperCase() %></div>
+              <div style="flex:1;min-width:0;">
+                <div class="thread-meta">
+                  <span class="thread-label"><%= m.sender === 'admin' ? 'You (Admin)' : msg.name %></span>
+                  <span class="thread-time">
+                    <%= new Date(m.createdAt).toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) %>
+                  </span>
+                </div>
+                <div class="thread-bubble <%= m.sender === 'admin' ? 'bubble-admin' : 'bubble-user' %>">
+                  <p><%= m.text %></p>
+                </div>
               </div>
             </div>
-          </div>
-
-          <% if (msg.status !== 'unread') { %>
-          <div class="tl-item">
-            <div class="tl-dot-wrap">
-              <div class="tl-dot tl-dot-blue"></div>
-              <% if (msg.adminReply && msg.adminReply.text) { %><div class="tl-line"></div><% } %>
-            </div>
-            <div class="tl-content">
-              <div class="tl-title">Marked as read</div>
-              <div class="tl-time">
-                <%= new Date(msg.createdAt).toLocaleString('en-IN',{
-                  day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'
-                }) %>
-              </div>
-            </div>
-          </div>
-          <% } %>
-
-          <% if (msg.adminReply && msg.adminReply.text) { %>
-          <div class="tl-item">
-            <div class="tl-dot-wrap">
-              <div class="tl-dot tl-dot-success"></div>
-            </div>
-            <div class="tl-content">
-              <div class="tl-title">Reply sent</div>
-              <div class="tl-time">
-                <%= new Date(msg.adminReply.repliedAt).toLocaleString('en-IN',{
-                  day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'
-                }) %>
-              </div>
-            </div>
-          </div>
-          <% } %>
+          <% }) %>
         </div>
       </div>
     </div>
@@ -174,11 +95,18 @@
       <button class="btn btn-danger" onclick="deleteMessage('<%= msg._id %>')">
         <i class="ti ti-trash" aria-hidden="true"></i> Delete
       </button>
-      <button class="btn btn-primary" onclick="openReplyModal()">
-        <i class="ti ti-send" aria-hidden="true"></i>
-        <%= msg.adminReply && msg.adminReply.text ? 'Reply again' : 'Reply to customer' %>
-      </button>
+      <% if (msg.status !== 'closed') { %>
+        <% if (msg.status !== 'resolved') { %>
+          <button class="btn btn-ghost" onclick="resolveTicket('<%= msg._id %>')">
+            <i class="ti ti-circle-check" aria-hidden="true"></i> Mark Resolved
+          </button>
+        <% } %>
+        <button class="btn btn-primary" onclick="openReplyModal()">
+          <i class="ti ti-send" aria-hidden="true"></i> Reply
+        </button>
+      <% } %>
     </div>
+
   </div>
 </div>
 
@@ -191,16 +119,11 @@
           <i class="ti ti-mail-forward" aria-hidden="true"></i>
           Reply to <%= msg.name %>
         </div>
-        <div class="modal-sub"><%= msg.email %></div>
+        <div class="modal-sub"><%= msg.email %> · Ticket #<%= msg.ticketNumber %></div>
       </div>
       <button class="modal-close" onclick="closeReplyModal()" aria-label="Close modal">
         <i class="ti ti-x" aria-hidden="true"></i>
       </button>
-    </div>
-
-    <div class="modal-quote">
-      <p class="modal-quote-label">Replying to</p>
-      <p class="modal-quote-text"><%= msg.message %></p>
     </div>
 
     <div class="modal-body">
@@ -219,7 +142,6 @@
 </div>
 
 <style>
-/* ── Page layout ── */
 .msg-detail-page {
   padding: 32px;
   max-width: 840px;
@@ -232,7 +154,6 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Back link ── */
 .back-link {
   display: inline-flex;
   align-items: center;
@@ -249,7 +170,6 @@
 }
 .back-link:hover { border-color: var(--rose); color: var(--rose); }
 
-/* ── Page header ── */
 .page-header {
   display: flex;
   align-items: flex-start;
@@ -261,7 +181,6 @@
 .page-title { font-size: 22px; font-weight: 700; color: var(--brown); line-height: 1.2; }
 .page-subtitle { font-size: 13px; color: #9ca3af; margin-top: 4px; }
 
-/* ── Status badge ── */
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -273,11 +192,11 @@
   white-space: nowrap;
   margin-top: 4px;
 }
-.badge-unread  { background: #fce8ed; color: #c0394f; border: 1px solid #f5c6cb; }
-.badge-read    { background: #e8f0fe; color: #3367d6; border: 1px solid #c5d4f8; }
-.badge-replied { background: #e6f4ea; color: #2e7d32; border: 1px solid #b7dfbf; }
+.badge-open        { background: #fce8ed; color: #c0394f; border: 1px solid #f5c6cb; }
+.badge-in_progress { background: #e8f0fe; color: #3367d6; border: 1px solid #c5d4f8; }
+.badge-resolved    { background: #fff8e1; color: #b9840a; border: 1px solid #f0dca0; }
+.badge-closed      { background: #eee; color: #777; border: 1px solid #ddd; }
 
-/* ── Cards ── */
 .card {
   background: #fff;
   border: 1px solid #f0e8ea;
@@ -290,7 +209,6 @@
 .card-body { padding: 24px; }
 .anim-card { animation: mdFadeIn .4s ease both; }
 
-/* ── Section label ── */
 .section-label {
   font-size: 11px;
   font-weight: 700;
@@ -303,7 +221,6 @@
   gap: 6px;
 }
 
-/* ── Customer grid ── */
 .customer-grid { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start; }
 .avatar {
   width: 48px; height: 48px; border-radius: 50%;
@@ -312,7 +229,7 @@
   font-size: 16px; font-weight: 700; color: var(--rose-dk, #A85F6E);
   flex-shrink: 0;
 }
-.avatar-sm { width: 32px; height: 32px; font-size: 12px; background: #e6f4ea; color: #2e7d32; }
+.avatar-sm { width: 32px; height: 32px; font-size: 12px; }
 .customer-name  { font-size: 16px; font-weight: 700; color: var(--brown); margin-bottom: 2px; }
 .customer-subject { font-size: 14px; color: #6b7280; margin-bottom: 10px; }
 .meta-row { display: flex; flex-wrap: wrap; gap: 14px; }
@@ -321,38 +238,19 @@
 .meta-item a { color: var(--rose-dk, #A85F6E); text-decoration: none; }
 .meta-item a:hover { text-decoration: underline; }
 
-/* ── Message bubble ── */
-.msg-bubble {
-  background: #f9f5f6;
-  border: 1px solid #f0e8ea;
-  border-radius: 12px;
-  padding: 18px 20px;
-}
-.msg-text  { font-size: 15px; color: #374151; line-height: 1.8; white-space: pre-wrap; }
-.msg-time  { font-size: 12px; color: #9ca3af; margin-top: 10px; display: flex; align-items: center; gap: 4px; }
+/* ── THREAD ── */
+.thread { display: flex; flex-direction: column; gap: 18px; max-height: 520px; overflow-y: auto; padding-right: 4px; }
+.thread-row { display: flex; align-items: flex-start; gap: 12px; }
+.thread-row.from-admin .avatar-sm { background: #fce8ed; color: #A85F6E; }
+.thread-row.from-user  .avatar-sm { background: #e6f4ea; color: #2e7d32; }
+.thread-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+.thread-label { font-size: 12px; font-weight: 600; color: #374151; }
+.thread-time { font-size: 12px; color: #9ca3af; }
+.thread-bubble { border-radius: 12px; padding: 14px 16px; }
+.thread-bubble p { font-size: 14px; color: #1f2937; line-height: 1.8; white-space: pre-wrap; }
+.bubble-user  { background: #f9f5f6; border: 1px solid #f0e8ea; }
+.bubble-admin { background: #eef8f0; border: 1px solid #b7dfbf; }
 
-/* ── Reply section ── */
-.reply-row { display: flex; align-items: flex-start; gap: 12px; }
-.reply-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
-.reply-label { font-size: 12px; font-weight: 600; color: #2e7d32; display: flex; align-items: center; gap: 5px; }
-.reply-time-tag { font-size: 12px; color: #9ca3af; display: flex; align-items: center; gap: 4px; }
-.reply-bubble { background: #eef8f0; border: 1px solid #b7dfbf; border-radius: 12px; padding: 16px 18px; }
-.reply-text { font-size: 15px; color: #1f2937; line-height: 1.8; white-space: pre-wrap; }
-
-/* ── Timeline ── */
-.timeline { display: flex; flex-direction: column; }
-.tl-item { display: flex; align-items: flex-start; gap: 14px; padding-bottom: 20px; }
-.tl-item:last-child { padding-bottom: 0; }
-.tl-dot-wrap { display: flex; flex-direction: column; align-items: center; width: 24px; flex-shrink: 0; }
-.tl-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid; flex-shrink: 0; margin-top: 4px; }
-.tl-dot-accent  { background: #fce8ed; border-color: var(--rose, #C86A7A); }
-.tl-dot-blue    { background: #e8f0fe; border-color: #3367d6; }
-.tl-dot-success { background: #e6f4ea; border-color: #2e7d32; }
-.tl-line { width: 1.5px; background: #f0e8ea; flex: 1; min-height: 22px; margin-top: 5px; }
-.tl-title { font-size: 13px; font-weight: 600; color: var(--brown); }
-.tl-time  { font-size: 12px; color: #9ca3af; margin-top: 2px; }
-
-/* ── Action buttons ── */
 .actions-row { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
 .btn {
   display: inline-flex; align-items: center; gap: 7px;
@@ -369,7 +267,6 @@
 .btn-ghost  { background: #f7f0f2; color: #9ca3af; border: 1px solid #e8d0d6; }
 .btn-ghost:hover  { background: #f0e8ea; color: #555; }
 
-/* ── Reply Modal ── */
 .coc-overlay {
   display: none;
   position: fixed; inset: 0;
@@ -408,12 +305,6 @@
   color: #9ca3af; font-size: 15px; transition: all .15s;
 }
 .modal-close:hover { border-color: var(--rose); color: var(--rose); }
-.modal-quote       { padding: 12px 24px; background: #fdf6f8; border-bottom: 1px solid #f0e8ea; }
-.modal-quote-label { font-size: 11px; color: #bbb; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
-.modal-quote-text  {
-  font-size: 13px; color: #9ca3af; line-height: 1.6;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-}
 .modal-body { padding: 20px 24px; }
 .reply-input {
   width: 100%; box-sizing: border-box;
@@ -429,12 +320,10 @@
 .feedback.ok   { color: #2e7d32; }
 .modal-footer  { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; }
 
-/* ── Responsive ── */
 @media (max-width: 640px) {
   .msg-detail-page { padding: 20px 16px; }
   .customer-grid { grid-template-columns: 1fr; }
   .avatar { display: none; }
-  .modal { border-radius: 14px; }
 }
 </style>
 
@@ -478,7 +367,7 @@ async function sendReply(msgId) {
     if (data.success) {
       fb.className = 'feedback show ok';
       fb.innerHTML = '<i class="ti ti-circle-check"></i> Reply sent! Reloading…';
-      setTimeout(() => window.location.reload(), 1500);
+      setTimeout(() => window.location.reload(), 1200);
     } else {
       throw new Error(data.message || 'Something went wrong.');
     }
@@ -490,8 +379,20 @@ async function sendReply(msgId) {
   }
 }
 
+async function resolveTicket(msgId) {
+  if (!confirm('Mark this ticket as resolved? Customer will have 3 days to reply before it auto-closes.')) return;
+  try {
+    const res = await fetch(`/admin/contact-messages/${msgId}/resolve`, { method: 'PATCH' });
+    const data = await res.json();
+    if (data.success) window.location.reload();
+    else alert(data.message || 'Could not resolve.');
+  } catch {
+    alert('Something went wrong. Please try again.');
+  }
+}
+
 async function deleteMessage(msgId) {
-  if (!confirm('Delete this message permanently?')) return;
+  if (!confirm('Delete this ticket permanently?')) return;
   try {
     const res  = await fetch(`/admin/contact-messages/${msgId}`, { method: 'DELETE' });
     const data = await res.json();

@@ -62,7 +62,6 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── HERO BANNER ── */
     .msg-hero {
       background: linear-gradient(135deg, var(--rose) 0%, #c27090 50%, #d4889a 100%);
       border-radius: 24px;
@@ -127,6 +126,7 @@
       gap: 16px;
       position: relative; z-index: 2;
       margin-left: auto;
+      flex-wrap: wrap;
     }
 
     .hero-stat {
@@ -156,7 +156,6 @@
       margin-top: 4px;
     }
 
-    /* ── MESSAGES CARD ── */
     .messages-card {
       background: #fff;
       border-radius: 22px;
@@ -214,7 +213,6 @@
       color: #fff;
     }
 
-    /* ── EMPTY STATE ── */
     .empty-state {
       text-align: center;
       padding: 72px 24px;
@@ -243,7 +241,6 @@
       margin-bottom: 20px;
     }
 
-    /* ── TABLE ── */
     .msg-table { width: 100%; border-collapse: collapse; }
 
     .msg-table thead tr {
@@ -281,7 +278,15 @@
       margin-bottom: 3px;
     }
 
-    .subject-cell span {
+    .subject-cell .ticket-no {
+      font-size: .68rem;
+      font-weight: 700;
+      color: var(--rose);
+      letter-spacing: .04em;
+      margin-right: 6px;
+    }
+
+    .subject-cell span.preview {
       font-size: .75rem;
       color: #bbb;
     }
@@ -297,8 +302,10 @@
       letter-spacing: .04em;
     }
 
-    .badge-replied { background: #e6f4ea; color: #2e7d32; }
-    .badge-pending { background: #fce8ed; color: #c0394f; }
+    .badge-open        { background: #fce8ed; color: #c0394f; }
+    .badge-in_progress { background: #e8f0fe; color: #3367d6; }
+    .badge-resolved    { background: #fff8e1; color: #b9840a; }
+    .badge-closed      { background: #eee; color: #888; }
 
     .date-cell {
       font-size: .8rem;
@@ -350,22 +357,30 @@
 
 <div class="page-wrap">
 
-  <!-- SIDEBAR -->
   <aside class="dash-sidebar">
     <%- include("../../views/partials/user/sider") %>
   </aside>
 
-  <!-- MAIN -->
   <main class="dash-main">
 
-    <!-- HERO -->
+    <%
+      const badgeMap = {
+        open:        { cls: 'badge-open',        icon: 'fa-circle-exclamation', label: 'Open' },
+        in_progress: { cls: 'badge-in_progress', icon: 'fa-comments',           label: 'In Progress' },
+        resolved:    { cls: 'badge-resolved',    icon: 'fa-check-circle',       label: 'Resolved' },
+        closed:      { cls: 'badge-closed',      icon: 'fa-lock',               label: 'Closed' },
+      };
+      const activeCount = messages.filter(m => m.status === 'open' || m.status === 'in_progress').length;
+      const resolvedCount = messages.filter(m => m.status === 'resolved').length;
+    %>
+
     <div class="msg-hero">
       <div class="hero-icon-wrap">
         <i class="fas fa-envelope-open-text"></i>
       </div>
       <div class="hero-text">
         <h1>My Messages</h1>
-        <p>Track your enquiries and view replies from our team</p>
+        <p>Track your support tickets and chat with our team until it's sorted</p>
       </div>
       <div class="hero-stats">
         <div class="hero-stat">
@@ -373,25 +388,24 @@
           <div class="hero-stat-label">Total</div>
         </div>
         <div class="hero-stat">
-          <div class="hero-stat-num"><%= messages.filter(m => m.status === 'replied').length %></div>
-          <div class="hero-stat-label">Replied</div>
+          <div class="hero-stat-num"><%= activeCount %></div>
+          <div class="hero-stat-label">Active</div>
         </div>
         <div class="hero-stat">
-          <div class="hero-stat-num"><%= messages.filter(m => m.status !== 'replied').length %></div>
-          <div class="hero-stat-label">Pending</div>
+          <div class="hero-stat-num"><%= resolvedCount %></div>
+          <div class="hero-stat-label">Resolved</div>
         </div>
       </div>
     </div>
 
-    <!-- MESSAGES TABLE -->
     <div class="messages-card">
       <div class="card-header">
         <div class="card-header-title">
           <i class="fas fa-inbox"></i>
-          Your Enquiries
+          Your Tickets
         </div>
         <a href="/contact-us" class="new-msg-btn">
-          <i class="fas fa-plus"></i> New Message
+          <i class="fas fa-plus"></i> New Ticket
         </a>
       </div>
 
@@ -400,7 +414,7 @@
         <div class="empty-icon">
           <i class="fas fa-inbox"></i>
         </div>
-        <h3>No messages yet</h3>
+        <h3>No tickets yet</h3>
         <p>Have a question or a custom cake order in mind?</p>
         <a href="/contact-us" class="new-msg-btn">
           <i class="fas fa-paper-plane"></i> Send your first message
@@ -412,30 +426,27 @@
           <tr>
             <th>Subject</th>
             <th>Status</th>
-            <th>Sent On</th>
+            <th>Last Activity</th>
             <th style="text-align:center;">Action</th>
           </tr>
         </thead>
         <tbody>
-          <% messages.forEach(msg => { %>
+          <% messages.forEach(msg => {
+            const firstMsg = msg.messages && msg.messages.length ? msg.messages[0].text : '';
+            const b = badgeMap[msg.status] || badgeMap.open;
+          %>
           <tr onclick="window.location='/my-messages/<%= msg._id %>'">
             <td class="subject-cell">
-              <strong><%= msg.subject %></strong>
-              <span><%= msg.message.length > 60 ? msg.message.substring(0,60)+'…' : msg.message %></span>
+              <strong><span class="ticket-no">#<%= msg.ticketNumber %></span><%= msg.subject %></strong>
+              <span class="preview"><%= firstMsg.length > 60 ? firstMsg.substring(0,60)+'…' : firstMsg %></span>
             </td>
             <td>
-              <% if (msg.status === 'replied') { %>
-                <span class="badge badge-replied">
-                  <i class="fas fa-check-circle"></i> Replied
-                </span>
-              <% } else { %>
-                <span class="badge badge-pending">
-                  <i class="fas fa-clock"></i> Pending
-                </span>
-              <% } %>
+              <span class="badge <%= b.cls %>">
+                <i class="fas <%= b.icon %>"></i> <%= b.label %>
+              </span>
             </td>
             <td class="date-cell">
-              <%= new Date(msg.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) %>
+              <%= new Date(msg.lastActivityAt || msg.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) %>
             </td>
             <td style="text-align:center;" onclick="event.stopPropagation()">
               <a href="/my-messages/<%= msg._id %>" class="view-btn">

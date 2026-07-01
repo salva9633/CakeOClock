@@ -53,9 +53,9 @@ import {
   loadContactMessages,
   viewContactMessage,
   replyContactMessage,
+  resolveTicket,
   deleteContactMessage
 } from "../controllers/admin/contactMessageController.js";
-
 
 
 // ── AUTH (no guard needed) ────────────────────────────────
@@ -184,11 +184,9 @@ router.get(
   loadDashboard
 );
 
-/* CONTACT MESSAGES */
-router.get("/contact-messages",           adminAuth, loadContactMessages);
-router.get("/contact-messages/:id",       adminAuth, viewContactMessage);
-router.post("/contact-messages/:id/reply",adminAuth, replyContactMessage);
-router.delete("/contact-messages/:id",    adminAuth, deleteContactMessage);
-
-
+router.get("/contact-messages",             adminAuth, loadContactMessages);
+router.get("/contact-messages/:id",         adminAuth, viewContactMessage);
+router.post("/contact-messages/:id/reply",  adminAuth, replyContactMessage);
+router.patch("/contact-messages/:id/resolve", adminAuth, resolveTicket);
+router.delete("/contact-messages/:id",      adminAuth, deleteContactMessage);
 export default router;

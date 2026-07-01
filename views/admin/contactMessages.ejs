@@ -227,6 +227,12 @@
 .b-read    { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
 .b-replied { background: #ECFDF5; color: #047857; border-color: #A7F3D0; }
 
+
+.b-open        { background: #FDE8EC; color: #C0394F; border-color: #F5C6CB; }
+.b-in_progress { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
+.b-resolved    { background: #FFFBEB; color: #B45309; border-color: #FDE68A; }
+.b-closed      { background: #F3F4F6; color: #6B7280; border-color: #E5E7EB; }
+
 /* Date */
 .cm-date-main { font-size: 13px; color: var(--text-2); font-weight: 500; }
 .cm-date-rel  { font-size: 11px; color: var(--text-faint); margin-top: 2px; }
@@ -312,81 +318,78 @@
     </div>
 
     <!-- ── STATS ── -->
-    <%
-      const totalPct   = 100;
-      const unreadPct  = totalCount > 0 ? Math.round(unreadCount  / totalCount * 100) : 0;
-      const readPct    = totalCount > 0 ? Math.round(readCount    / totalCount * 100) : 0;
-      const repliedPct = totalCount > 0 ? Math.round(repliedCount / totalCount * 100) : 0;
-    %>
-    <div class="cm-stats">
-      <div class="cm-stat c-pink">
-        <div class="cm-stat-head">
-          <div class="cm-stat-ico"><i class="ti ti-inbox" aria-hidden="true"></i></div>
-          <span class="cm-trend trend-up">
-            <i class="ti ti-arrow-up" style="font-size:10px"></i>+2 today
-          </span>
-        </div>
-        <div>
-          <div class="cm-stat-num"><%= totalCount %></div>
-          <div class="cm-stat-lbl">Total messages</div>
-          <div class="cm-stat-hint">All time received</div>
-        </div>
-      </div>
-      <div class="cm-stat c-amber">
-        <div class="cm-stat-head">
-          <div class="cm-stat-ico"><i class="ti ti-bell" aria-hidden="true"></i></div>
-          <span class="cm-trend trend-neu">Pending</span>
-        </div>
-        <div>
-          <div class="cm-stat-num"><%= unreadCount %></div>
-          <div class="cm-stat-lbl">Unread</div>
-          <div class="cm-stat-hint">Needs attention</div>
-        </div>
-      </div>
-      <div class="cm-stat c-blue">
-        <div class="cm-stat-head">
-          <div class="cm-stat-ico"><i class="ti ti-eye" aria-hidden="true"></i></div>
-          <span class="cm-trend trend-neu">Opened</span>
-        </div>
-        <div>
-          <div class="cm-stat-num"><%= readCount %></div>
-          <div class="cm-stat-lbl">Read</div>
-          <div class="cm-stat-hint">Pending reply</div>
-        </div>
-      </div>
-      <div class="cm-stat c-green">
-        <div class="cm-stat-head">
-          <div class="cm-stat-ico"><i class="ti ti-send" aria-hidden="true"></i></div>
-          <span class="cm-trend trend-up">
-            <i class="ti ti-arrow-up" style="font-size:10px"></i><%= repliedPct %>%
-          </span>
-        </div>
-        <div>
-          <div class="cm-stat-num"><%= repliedCount %></div>
-          <div class="cm-stat-lbl">Replied</div>
-          <div class="cm-stat-hint">Response rate</div>
-        </div>
-      </div>
+   <%
+  const totalPct       = 100;
+  const openPct        = totalCount > 0 ? Math.round(openCount       / totalCount * 100) : 0;
+  const inProgressPct  = totalCount > 0 ? Math.round(inProgressCount / totalCount * 100) : 0;
+  const resolvedPct    = totalCount > 0 ? Math.round(resolvedCount   / totalCount * 100) : 0;
+  const closedPct      = totalCount > 0 ? Math.round(closedCount     / totalCount * 100) : 0;
+%>
+    <!-- ── STATS ── (replace the existing .cm-stats block) -->
+<div class="cm-stats">
+  <div class="cm-stat c-pink">
+    <div class="cm-stat-head">
+      <div class="cm-stat-ico"><i class="ti ti-inbox" aria-hidden="true"></i></div>
     </div>
+    <div>
+      <div class="cm-stat-num"><%= totalCount %></div>
+      <div class="cm-stat-lbl">Total tickets</div>
+      <div class="cm-stat-hint">All time received</div>
+    </div>
+  </div>
+  <div class="cm-stat c-amber">
+    <div class="cm-stat-head">
+      <div class="cm-stat-ico"><i class="ti ti-bell" aria-hidden="true"></i></div>
+      <span class="cm-trend trend-neu">New</span>
+    </div>
+    <div>
+      <div class="cm-stat-num"><%= openCount %></div>
+      <div class="cm-stat-lbl">Open</div>
+      <div class="cm-stat-hint">Needs first reply</div>
+    </div>
+  </div>
+  <div class="cm-stat c-blue">
+    <div class="cm-stat-head">
+      <div class="cm-stat-ico"><i class="ti ti-messages" aria-hidden="true"></i></div>
+      <span class="cm-trend trend-neu">Active</span>
+    </div>
+    <div>
+      <div class="cm-stat-num"><%= inProgressCount %></div>
+      <div class="cm-stat-lbl">In Progress</div>
+      <div class="cm-stat-hint">Ongoing conversation</div>
+    </div>
+  </div>
+  <div class="cm-stat c-green">
+    <div class="cm-stat-head">
+      <div class="cm-stat-ico"><i class="ti ti-circle-check" aria-hidden="true"></i></div>
+    </div>
+    <div>
+      <div class="cm-stat-num"><%= resolvedCount %></div>
+      <div class="cm-stat-lbl">Resolved</div>
+      <div class="cm-stat-hint">Awaiting customer</div>
+    </div>
+  </div>
+</div>
 
-    <!-- ── FILTER PILLS ── -->
-    <div class="cm-filters">
-      <%
-        const filters = [
-          { key: 'all',     label: 'All',     count: totalCount   },
-          { key: 'unread',  label: 'Unread',  count: unreadCount  },
-          { key: 'read',    label: 'Read',    count: readCount    },
-          { key: 'replied', label: 'Replied', count: repliedCount },
-        ];
-      %>
-      <% filters.forEach(f => { %>
-        <a href="/admin/contact-messages<%= f.key !== 'all' ? '?status='+f.key : '' %>"
-           class="cm-pill <%= activeFilter === f.key ? 'active' : '' %>">
-          <%= f.label %>
-          <span class="cm-pill-count"><%= f.count %></span>
-        </a>
-      <% }) %>
-    </div>
+<!-- ── FILTER PILLS ── (replace filters array) -->
+<div class="cm-filters">
+  <%
+    const filters = [
+      { key: 'all',         label: 'All',         count: totalCount      },
+      { key: 'open',        label: 'Open',        count: openCount       },
+      { key: 'in_progress', label: 'In Progress', count: inProgressCount },
+      { key: 'resolved',    label: 'Resolved',    count: resolvedCount   },
+      { key: 'closed',      label: 'Closed',      count: closedCount     },
+    ];
+  %>
+  <% filters.forEach(f => { %>
+    <a href="/admin/contact-messages<%= f.key !== 'all' ? '?status='+f.key : '' %>"
+       class="cm-pill <%= activeFilter === f.key ? 'active' : '' %>">
+      <%= f.label %>
+      <span class="cm-pill-count"><%= f.count %></span>
+    </a>
+  <% }) %>
+</div>
 
     <!-- ── TABLE ── -->
     <div class="cm-table-card">
@@ -396,82 +399,82 @@
           <h3>No Messages Found</h3>
           <p>Customer messages will appear here once they reach out.</p>
         </div>
-      <% } else { %>
+     <% } else { %>
       <%
-        const avClasses = ['av-0','av-1','av-2','av-3','av-4'];
-        const badgeMap  = {
-          unread:  { cls: 'b-unread',  icon: 'ti-clock', label: 'Unread'  },
-          read:    { cls: 'b-read',    icon: 'ti-eye',   label: 'Read'    },
-          replied: { cls: 'b-replied', icon: 'ti-check', label: 'Replied' },
-        };
-        function timeAgo(date) {
-          const diff = Math.floor((Date.now() - new Date(date)) / 1000);
-          if (diff < 3600)   return Math.floor(diff/60) + ' min ago';
-          if (diff < 86400)  return Math.floor(diff/3600) + ' hours ago';
-          if (diff < 172800) return 'Yesterday';
-          return Math.floor(diff/86400) + ' days ago';
-        }
+  const avClasses = ['av-0','av-1','av-2','av-3','av-4'];
+  const badgeMap  = {
+    open:        { cls: 'b-open',        icon: 'ti-alert-circle', label: 'Open'        },
+    in_progress: { cls: 'b-in_progress', icon: 'ti-messages',     label: 'In Progress' },
+    resolved:    { cls: 'b-resolved',    icon: 'ti-check',        label: 'Resolved'    },
+    closed:      { cls: 'b-closed',      icon: 'ti-lock',         label: 'Closed'      },
+  };
+  function timeAgo(date) {
+    const diff = Math.floor((Date.now() - new Date(date)) / 1000);
+    if (diff < 3600)   return Math.floor(diff/60) + ' min ago';
+    if (diff < 86400)  return Math.floor(diff/3600) + ' hours ago';
+    if (diff < 172800) return 'Yesterday';
+    return Math.floor(diff/86400) + ' days ago';
+  }
+%>
+<div class="cm-table-scroll">
+  <table class="cm-table">
+    <thead>
+      <tr>
+        <th style="width:20%">Sender</th>
+        <th style="width:26%">Ticket</th>
+        <th style="width:13%">Status</th>
+        <th style="width:18%">Last Activity</th>
+        <th style="width:17%;text-align:center">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% messages.forEach((msg, i) => {
+        const initials = msg.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+        const avCls    = avClasses[i % avClasses.length];
+        const b        = badgeMap[msg.status] || badgeMap.open;
+        const dateStr  = new Date(msg.lastActivityAt || msg.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+        const relTime  = timeAgo(msg.lastActivityAt || msg.createdAt);
+        const firstMsg = msg.messages && msg.messages.length ? msg.messages[0].text : '';
       %>
-      <div class="cm-table-scroll">
-        <table class="cm-table">
-          <thead>
-            <tr>
-              <th style="width:22%">Sender</th>
-              <th style="width:30%">Subject</th>
-              <th style="width:13%">Status</th>
-              <th style="width:18%">Received</th>
-              <th style="width:17%;text-align:center">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% messages.forEach((msg, i) => {
-              const initials = msg.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
-              const avCls    = avClasses[i % avClasses.length];
-              const isUnread = msg.status === 'unread';
-              const b        = badgeMap[msg.status];
-              const dateStr  = new Date(msg.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
-              const relTime  = timeAgo(msg.createdAt);
-            %>
-            <tr onclick="window.location='/admin/contact-messages/<%= msg._id %>'">
-              <td>
-                <div class="cm-sender">
-                  <div class="cm-av <%= avCls %>"><%= initials %></div>
-                  <div>
-                    <div class="cm-sname"><%= msg.name %></div>
-                    <div class="cm-semail"><%= msg.email %></div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="cm-subj <%= isUnread ? '' : 'dim' %>">
-                  <%= msg.subject.length > 50 ? msg.subject.substring(0,50)+'…' : msg.subject %>
-                </div>
-                <% if (msg.message) { %>
-                  <div class="cm-preview">
-                    <%= msg.message.substring(0, 60) %>…
-                  </div>
-                <% } %>
-              </td>
-              <td>
-                <span class="cm-badge <%= b.cls %>">
-                  <i class="ti <%= b.icon %>" aria-hidden="true"></i>
-                  <%= b.label %>
-                </span>
-              </td>
-              <td>
-                <div class="cm-date-main"><%= dateStr %></div>
-                <div class="cm-date-rel"><%= relTime %></div>
-              </td>
-              <td style="text-align:center;" onclick="event.stopPropagation()">
-                <a href="/admin/contact-messages/<%= msg._id %>" class="cm-btn-view">
-                  <i class="ti ti-eye" aria-hidden="true"></i> View
-                </a>
-              </td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
+      <tr onclick="window.location='/admin/contact-messages/<%= msg._id %>'">
+        <td>
+          <div class="cm-sender">
+            <div class="cm-av <%= avCls %>"><%= initials %></div>
+            <div>
+              <div class="cm-sname"><%= msg.name %></div>
+              <div class="cm-semail"><%= msg.email %></div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="cm-subj">
+            <span style="color:#C86A7A;font-weight:700;">#<%= msg.ticketNumber %></span>
+            &nbsp;<%= msg.subject.length > 40 ? msg.subject.substring(0,40)+'…' : msg.subject %>
+          </div>
+          <% if (firstMsg) { %>
+            <div class="cm-preview"><%= firstMsg.substring(0, 60) %>…</div>
+          <% } %>
+        </td>
+        <td>
+          <span class="cm-badge <%= b.cls %>">
+            <i class="ti <%= b.icon %>" aria-hidden="true"></i>
+            <%= b.label %>
+          </span>
+        </td>
+        <td>
+          <div class="cm-date-main"><%= dateStr %></div>
+          <div class="cm-date-rel"><%= relTime %></div>
+        </td>
+        <td style="text-align:center;" onclick="event.stopPropagation()">
+          <a href="/admin/contact-messages/<%= msg._id %>" class="cm-btn-view">
+            <i class="ti ti-eye" aria-hidden="true"></i> View
+          </a>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
 
       <!-- PAGINATION -->
       <div class="cm-tbl-footer">

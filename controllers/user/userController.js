@@ -521,12 +521,17 @@ const postContactUs = async (req, res) => {
       return res.redirect("/contact-us?error=Please fill in all fields");
     }
 
-    // 1. Save to DB
     const ContactMessage = (await import("../../models/contactMessageModel.js")).default;
-    const newMsg = new ContactMessage({ name, email, subject, message });
+    const newMsg = new ContactMessage({
+      name,
+      email,
+      subject,
+      messages: [{ sender: 'user', text: message.trim() }],
+      status: 'open',
+      lastActivityAt: new Date()
+    });
     await newMsg.save();
 
-    // 2. Notify admin by email
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -538,11 +543,12 @@ const postContactUs = async (req, res) => {
     await transporter.sendMail({
       from: `"Cake O'Clock" <${process.env.NODEMAILER_EMAIL}>`,
       to:   process.env.NODEMAILER_EMAIL,
-      subject: `📩 New Contact Message: ${subject}`,
+      subject: `📩 New Ticket #${newMsg.ticketNumber}: ${subject}`,
       html: `
         <div style="font-family:sans-serif;max-width:560px;margin:auto;border:1px solid #eee;border-radius:10px;overflow:hidden;">
           <div style="background:#3d1a24;padding:20px 24px;">
-            <h2 style="color:#e8a0b0;margin:0;font-size:1.1rem;">New Contact Message — Cake O'Clock</h2>
+            <h2 style="color:#e8a0b0;margin:0;font-size:1.1rem;">New Ticket — Cake O'Clock</h2>
+            <p style="color:#e8a0b0cc;margin:4px 0 0;font-size:.75rem;">#${newMsg.ticketNumber}</p>
           </div>
           <div style="padding:24px;">
             <p><strong>From:</strong> ${name} (${email})</p>
@@ -550,7 +556,7 @@ const postContactUs = async (req, res) => {
             <hr style="border:none;border-top:1px solid #eee;margin:16px 0;">
             <p style="color:#444;line-height:1.7;">${message.replace(/\n/g, '<br>')}</p>
             <hr style="border:none;border-top:1px solid #eee;margin:16px 0;">
-            <a href="${process.env.BASE_URL}/admin/contact-messages"
+            <a href="${process.env.BASE_URL}/admin/contact-messages/${newMsg._id}"
                style="display:inline-block;background:#3d1a24;color:#fff;padding:10px 20px;
                       border-radius:8px;text-decoration:none;font-size:.85rem;">
               View in Admin Panel →
@@ -566,6 +572,7 @@ const postContactUs = async (req, res) => {
     res.redirect("/contact-us");
   }
 };
+
 
 const getCustomerSupport = async (req, res) => {
   try {

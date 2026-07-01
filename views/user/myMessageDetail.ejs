@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Message Detail – Cake O'Clock</title>
+  <title>Ticket Detail – Cake O'Clock</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="/css/cake.css">
@@ -62,11 +62,11 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── TOP NAV ── */
     .top-nav {
       display: flex;
       align-items: center;
       gap: 14px;
+      flex-wrap: wrap;
     }
 
     .back-btn {
@@ -98,7 +98,17 @@
       color: var(--text);
     }
 
-    /* ── MESSAGE CARD ── */
+    .ticket-tag {
+      font-size: .72rem;
+      font-weight: 800;
+      color: var(--rose);
+      background: var(--rose-lt);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: .04em;
+    }
+
     .msg-card {
       background: #fff;
       border-radius: 22px;
@@ -169,149 +179,174 @@
       position: relative; z-index: 2;
     }
 
-    .badge-replied {
-      background: rgba(230,244,234,.9);
-      color: #2e7d32;
-    }
+    .badge-open        { background: rgba(252,232,237,.9); color: #c0394f; }
+    .badge-in_progress { background: rgba(232,240,254,.9); color: #3367d6; }
+    .badge-resolved    { background: rgba(255,248,225,.9); color: #b9840a; }
+    .badge-closed      { background: rgba(238,238,238,.9); color: #777; }
 
-    .badge-pending {
-      background: rgba(252,232,237,.9);
-      color: #c0394f;
-    }
-
-    .msg-body {
-      padding: 28px 32px;
-      border-bottom: 1px solid #fdf0f2;
-    }
-
-    .msg-body-label {
-      font-size: .68rem;
-      font-weight: 800;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .msg-body-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    .msg-body p {
-      font-size: .92rem;
-      color: #555;
-      line-height: 1.9;
-      white-space: pre-wrap;
-    }
-
-    /* ── REPLY CARD ── */
-    .reply-card {
+    /* ── THREAD ── */
+    .thread-card {
       background: #fff;
       border-radius: 22px;
       overflow: hidden;
       box-shadow: 0 4px 20px rgba(139,74,90,.08);
       border: 1px solid var(--border);
-      animation: fadeCard .5s ease .2s both;
+      animation: fadeCard .5s ease .15s both;
     }
 
-    .reply-header {
-      background: linear-gradient(135deg, #f0faf2, #e8f5ea);
-      border-bottom: 1px solid #b7dfbf;
-      padding: 18px 28px;
+    .thread-list {
+      padding: 28px 32px;
       display: flex;
-      align-items: center;
-      gap: 10px;
+      flex-direction: column;
+      gap: 16px;
+      max-height: 560px;
+      overflow-y: auto;
     }
 
-    .reply-icon {
-      width: 36px; height: 36px;
-      border-radius: 10px;
-      background: #e6f4ea;
-      border: 1.5px solid #b7dfbf;
-      display: flex; align-items: center; justify-content: center;
-      color: #2e7d32;
+    .bubble-row { display: flex; }
+    .bubble-row.me   { justify-content: flex-end; }
+    .bubble-row.them { justify-content: flex-start; }
+
+    .bubble {
+      max-width: 70%;
+      padding: 14px 18px;
+      border-radius: 16px;
       font-size: .9rem;
-    }
-
-    .reply-from {
-      font-size: .72rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      color: #2e7d32;
-    }
-
-    .reply-from span {
-      display: block;
-      font-size: .75rem;
-      font-weight: 600;
-      color: #5a9463;
-      text-transform: none;
-      letter-spacing: 0;
-      margin-top: 1px;
-    }
-
-    .reply-time {
-      margin-left: auto;
-      font-size: .74rem;
-      color: #aaa;
-      font-weight: 600;
-    }
-
-    .reply-body {
-      padding: 24px 28px;
-    }
-
-    .reply-body p {
-      font-size: .92rem;
-      color: #444;
-      line-height: 1.9;
+      line-height: 1.7;
       white-space: pre-wrap;
     }
 
-    /* ── PENDING CARD ── */
-    .pending-card {
+    .bubble-row.me .bubble {
+      background: var(--rose);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .bubble-row.them .bubble {
+      background: #f3f0f1;
+      color: #333;
+      border-bottom-left-radius: 4px;
+    }
+
+    .bubble-label {
+      font-size: .65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 4px;
+      opacity: .8;
+    }
+
+    .bubble-time {
+      font-size: .65rem;
+      margin-top: 6px;
+      opacity: .65;
+    }
+
+    /* ── REPLY BOX ── */
+    .reply-box {
+      border-top: 1px solid var(--border);
+      padding: 20px 32px;
+      background: #fdf6f8;
+    }
+
+    .reply-box textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: .88rem;
+      font-family: 'Lato', sans-serif;
+      color: var(--text);
+      background: #fff;
+      resize: vertical;
+      outline: none;
+      line-height: 1.7;
+      transition: border-color .15s;
+    }
+
+    .reply-box textarea:focus { border-color: var(--rose); }
+
+    .reply-box-footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .reply-feedback {
+      font-size: .78rem;
+      display: none;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .reply-feedback.show { display: flex; }
+    .reply-feedback.err  { color: #c0394f; }
+    .reply-feedback.ok   { color: #2e7d32; }
+
+    .send-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 22px;
+      background: linear-gradient(135deg, var(--rose), var(--rose-dk));
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: .85rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Lato', sans-serif;
+      transition: transform .18s, box-shadow .18s;
+    }
+
+    .send-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(139,74,90,.28);
+    }
+
+    .send-btn:disabled { opacity: .6; cursor: not-allowed; }
+
+    /* ── RESOLVED / CLOSED NOTICE ── */
+    .notice-card {
       background: #fff;
       border-radius: 22px;
       border: 2px dashed var(--border);
-      padding: 36px 28px;
+      padding: 28px;
       text-align: center;
       box-shadow: 0 4px 20px rgba(139,74,90,.04);
       animation: fadeCard .5s ease .2s both;
     }
 
-    .pending-icon {
-      width: 64px; height: 64px;
+    .notice-card.resolved { border-color: #f0dca0; }
+    .notice-card.closed   { border-color: #ddd; }
+
+    .notice-icon {
+      width: 56px; height: 56px;
       border-radius: 50%;
-      background: var(--rose-lt);
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem;
-      color: var(--muted);
-      margin: 0 auto 16px;
+      font-size: 1.3rem;
+      margin: 0 auto 14px;
     }
 
-    .pending-card h3 {
+    .notice-card.resolved .notice-icon { background: #fff8e1; color: #b9840a; }
+    .notice-card.closed   .notice-icon { background: #eee; color: #888; }
+
+    .notice-card h3 {
       font-family: 'Playfair Display', serif;
       font-size: 1rem;
       color: var(--text);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
-    .pending-card p {
-      font-size: .84rem;
-      color: #bbb;
+    .notice-card p {
+      font-size: .82rem;
+      color: #aaa;
     }
 
-    /* ── BACK FOOTER ── */
-    .footer-nav {
-      animation: fadeCard .5s ease .3s both;
-    }
+    .footer-nav { animation: fadeCard .5s ease .3s both; }
 
     .back-link {
       display: inline-flex;
@@ -338,8 +373,9 @@
     @media (max-width: 900px) {
       .page-wrap { flex-direction: column; padding: 16px; }
       .dash-sidebar { width: 100%; min-width: unset; }
-      .msg-card-header, .msg-body, .reply-header, .reply-body { padding: 20px; }
+      .msg-card-header, .thread-list, .reply-box { padding: 20px; }
       .msg-meta { gap: 10px; }
+      .bubble { max-width: 88%; }
     }
   </style>
 </head>
@@ -349,23 +385,30 @@
 
 <div class="page-wrap">
 
-  <!-- SIDEBAR -->
   <aside class="dash-sidebar">
     <%- include("../../views/partials/user/sider") %>
   </aside>
 
-  <!-- MAIN -->
   <main class="dash-main">
 
-    <!-- TOP NAV -->
+    <%
+      const statusLabels = {
+        open: 'Open', in_progress: 'In Progress', resolved: 'Resolved', closed: 'Closed'
+      };
+      const statusIcons = {
+        open: 'fa-circle-exclamation', in_progress: 'fa-comments',
+        resolved: 'fa-check-circle', closed: 'fa-lock'
+      };
+    %>
+
     <div class="top-nav">
       <a href="/my-messages" class="back-btn">
         <i class="fas fa-arrow-left"></i> Back to Messages
       </a>
-      <h1 class="page-title">Message Detail</h1>
+      <h1 class="page-title">Ticket Detail</h1>
+      <span class="ticket-tag">#<%= msg.ticketNumber %></span>
     </div>
 
-    <!-- MESSAGE CARD -->
     <div class="msg-card">
       <div class="msg-card-header">
         <div class="msg-subject"><%= msg.subject %></div>
@@ -380,64 +423,109 @@
           </div>
           <div class="msg-meta-item">
             <i class="fas fa-clock"></i>
-            <%= new Date(msg.createdAt).toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) %>
+            Opened <%= new Date(msg.createdAt).toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) %>
           </div>
-          <% if (msg.status === 'replied') { %>
-            <span class="status-badge badge-replied">
-              <i class="fas fa-check-circle"></i> Replied
-            </span>
-          <% } else { %>
-            <span class="status-badge badge-pending">
-              <i class="fas fa-clock"></i> Pending
-            </span>
-          <% } %>
+          <span class="status-badge badge-<%= msg.status %>">
+            <i class="fas <%= statusIcons[msg.status] %>"></i> <%= statusLabels[msg.status] %>
+          </span>
         </div>
       </div>
-      <div class="msg-body">
-        <div class="msg-body-label"><i class="fas fa-comment-dots"></i> Your Message</div>
-        <p><%= msg.message %></p>
+
+      <!-- THREAD -->
+      <div class="thread-card" style="border:none;border-radius:0;box-shadow:none;">
+        <div class="thread-list" id="threadList">
+          <% (msg.messages || []).forEach(m => { %>
+            <div class="bubble-row <%= m.sender === 'user' ? 'me' : 'them' %>">
+              <div class="bubble">
+                <div class="bubble-label"><%= m.sender === 'user' ? 'You' : "Cake O'Clock Support" %></div>
+                <%= m.text %>
+                <div class="bubble-time">
+                  <%= new Date(m.createdAt).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) %>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+
+        <% if (msg.status === 'closed') { %>
+          <div class="notice-card closed" style="margin:0 32px 28px;">
+            <div class="notice-icon"><i class="fas fa-lock"></i></div>
+            <h3>This ticket is closed</h3>
+            <p>Have a new question? Start a fresh ticket and we'll help right away.</p>
+          </div>
+        <% } else { %>
+          <div class="reply-box">
+            <% if (msg.status === 'resolved') { %>
+              <p style="font-size:.78rem;color:#b9840a;margin-bottom:10px;">
+                <i class="fas fa-info-circle"></i>
+                We marked this resolved. Reply below if you still need help, or it'll auto-close soon.
+              </p>
+            <% } %>
+            <textarea id="replyText" rows="3" placeholder="Type your message…"></textarea>
+            <div class="reply-box-footer">
+              <div id="replyFeedback" class="reply-feedback"></div>
+              <button id="sendBtn" class="send-btn" onclick="sendReply()">
+                <i class="fas fa-paper-plane"></i> Send
+              </button>
+            </div>
+          </div>
+        <% } %>
       </div>
     </div>
 
-    <!-- REPLY or PENDING -->
-    <% if (msg.adminReply && msg.adminReply.text) { %>
-    <div class="reply-card">
-      <div class="reply-header">
-        <div class="reply-icon">
-          <i class="fas fa-reply"></i>
-        </div>
-        <div class="reply-from">
-          Reply from Cake O'Clock
-          <span>Our team got back to you</span>
-        </div>
-        <div class="reply-time">
-          <i class="fas fa-clock" style="margin-right:4px;"></i>
-          <%= new Date(msg.adminReply.repliedAt).toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) %>
-        </div>
-      </div>
-      <div class="reply-body">
-        <p><%= msg.adminReply.text %></p>
-      </div>
-    </div>
-    <% } else { %>
-    <div class="pending-card">
-      <div class="pending-icon">
-        <i class="fas fa-hourglass-half"></i>
-      </div>
-      <h3>Reply on the way</h3>
-      <p>Our team hasn't replied yet. We typically respond within 24 hours.</p>
-    </div>
-    <% } %>
-
-    <!-- FOOTER NAV -->
     <div class="footer-nav">
       <a href="/my-messages" class="back-link">
-        <i class="fas fa-arrow-left"></i> Back to all messages
+        <i class="fas fa-arrow-left"></i> Back to all tickets
       </a>
     </div>
 
   </main>
 </div>
+
+<script>
+  // scroll thread to bottom on load
+  const threadList = document.getElementById('threadList');
+  if (threadList) threadList.scrollTop = threadList.scrollHeight;
+
+  async function sendReply() {
+    const textarea = document.getElementById('replyText');
+    const btn = document.getElementById('sendBtn');
+    const fb = document.getElementById('replyFeedback');
+    const text = textarea.value.trim();
+
+    if (!text) {
+      fb.className = 'reply-feedback show err';
+      fb.innerHTML = '<i class="fas fa-exclamation-circle"></i> Message cannot be empty.';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…';
+    fb.className = 'reply-feedback';
+
+    try {
+      const res = await fetch(window.location.pathname + '/reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ replyText: text })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        fb.className = 'reply-feedback show ok';
+        fb.innerHTML = '<i class="fas fa-check-circle"></i> Sent! Reloading…';
+        setTimeout(() => window.location.reload(), 900);
+      } else {
+        throw new Error(data.message || 'Something went wrong.');
+      }
+    } catch (err) {
+      fb.className = 'reply-feedback show err';
+      fb.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${err.message}`;
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+    }
+  }
+</script>
 
 </body>
 </html>
