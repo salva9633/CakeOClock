@@ -1,167 +1,816 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Not Found | 404</title>
-    <style>
-        /* Google Fonts Import */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-
-        :root {
-            --bg-color: #FFEDE8;
-            --card-right-bg: #DFA9A9;
-            /* Muted Rose - Requested Color */
-            --text-color-primary: #8B3A3A;
-            /* Dark Red/Brown */
-            --white: #FFFFFF;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-color);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 900px;
-        }
-
-        .error-card {
-            display: flex;
-            /* Side by side on desktop */
-            background: var(--white);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            overflow: hidden;
-            min-height: 500px;
-        }
-
-        /* Left Side - Illustration */
-        .card-left {
-            flex: 1;
-            background: var(--white);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
-            position: relative;
-        }
-
-        .illustration {
-            width: 100%;
-            max-width: 350px;
-            height: auto;
-        }
-
-        .error-code {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #DFA9A9;
-            /* Changed to Pink as requested */
-            margin-bottom: 20px;
-            text-align: center;
-            width: 100%;
-        }
-
-        .error-code span {
-            color: #DFA9A9;
-            /* Match with right side bg or specific request */
-            font-size: 1.2em;
-            display: block;
-        }
-
-        /* Right Side - Content */
-        .card-right {
-            flex: 1;
-            background-color: var(--card-right-bg);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
-            text-align: center;
-            color: var(--text-color-primary);
-        }
-
-        .card-right h2 {
-            font-size: 2rem;
-            font-weight: 500;
-            line-height: 1.4;
-            margin-bottom: 40px;
-        }
-
-        .home-btn {
-            display: inline-block;
-            padding: 12px 30px;
-            color: var(--text-color-primary);
-            text-decoration: none;
-            font-size: 1.1rem;
-            font-weight: 500;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .home-btn:hover {
-            opacity: 0.8;
-            transform: translateY(-2px);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .error-card {
-                flex-direction: column;
-                /* Stack vertically on mobile */
-                min-height: auto;
-            }
-
-            .card-left,
-            .card-right {
-                padding: 30px 20px;
-                flex: auto;
-                /* Allow auto sizing */
-            }
-
-            .illustration {
-                max-width: 250px;
-            }
-
-            .card-right h2 {
-                font-size: 1.5rem;
-                margin-bottom: 20px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<%#
+  404.ejs — server-rendered "not found" page for the Cake O'Clock storefront.
+  Render with: res.status(404).render('404', { homeUrl: '/', brandName: "Cake O'Clock" })
+  Both locals are optional; sensible defaults are used if omitted.
+  Note: this is for the real 404 route only. For a service-worker offline
+  fallback, use a static precached HTML file instead — EJS can't render
+  when there's no network to reach the server.
+%>
+<title><%= locals.pageTitle || "404 · Cake O'Clock" %></title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-1:#f8dce7;
+    --bg-2:#fbe8f0;
+    --bg-halo:#fdf2f7;
+    --ink:#3d2733;
+    --mauve:#a8677d;
+    --mauve-deep:#7c4258;
+    --plum:#5c2c3f;
+    --plum-dark:#4a2333;
+    --cream:#fff8f4;
+    --line:rgba(61,39,51,0.14);
+    --wood:#b98a68;
+    --wood-deep:#8f6650;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(120% 90% at 82% -8%, var(--bg-halo) 0%, var(--bg-halo) 34%, transparent 60%),
+      linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 55%, var(--bg-1) 100%);
+    font-family:'Manrope', sans-serif;
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:56px 20px;
+    overflow-x:hidden;
+  }
+  .wrap{
+    width:100%;
+    max-width:720px;
+    text-align:center;
+  }
+  .eyebrow-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    margin:0 0 22px;
+    opacity:0;
+    animation:riseIn .7s .05s ease forwards;
+  }
+  .eyebrow{
+    margin:0;
+    font-size:12.5px;
+    font-weight:800;
+    letter-spacing:.14em;
+    color:var(--mauve-deep);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .spark{ color:var(--plum); }
+  .status-pill{
+    display:none;
+    align-items:center;
+    gap:6px;
+    margin:0 0 18px;
+    font-size:11.5px;
+    font-weight:800;
+    letter-spacing:.1em;
+    color:var(--plum-dark);
+    justify-content:center;
+  }
+  .status-pill.show{ display:flex; }
+  .status-dot{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--plum);
+    animation:pulse 1.4s ease-in-out infinite;
+  }
+  h1.headline{
+    margin:0 0 20px;
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    line-height:1.04;
+    font-size:clamp(40px, 7.4vw, 74px);
+    letter-spacing:-0.01em;
+    opacity:0;
+    animation:riseIn .8s .15s ease forwards;
+  }
+  h1.headline .line{ display:block; }
+  h1.headline .accent{
+    font-style:italic;
+    font-weight:500;
+    background:linear-gradient(100deg, var(--plum) 10%, var(--mauve) 90%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .subtext{
+    max-width:520px;
+    margin:0 auto 40px;
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:.03em;
+    line-height:1.7;
+    color:var(--mauve-deep);
+    text-transform:uppercase;
+    opacity:0;
+    animation:riseIn .8s .25s ease forwards;
+  }
+  .game-card{
+    background:var(--cream);
+    border:1px solid var(--line);
+    border-radius:26px;
+    padding:18px 18px 20px;
+    box-shadow:0 24px 48px -28px rgba(92,44,63,0.35);
+    opacity:0;
+    animation:riseIn .8s .35s ease forwards;
+  }
+  .game-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+    margin:2px 6px 14px;
+    text-align:left;
+  }
+  .game-label{
+    margin:0;
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.12em;
+    color:var(--plum-dark);
+  }
+  .game-hint{
+    margin:0;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.06em;
+    color:var(--mauve-deep);
+    opacity:.85;
+  }
+  .score-box{
+    display:flex;
+    gap:18px;
+  }
+  .score-box > div{ display:flex; flex-direction:column; align-items:flex-end; line-height:1.15; }
+  .score-label{
+    font-size:9.5px;
+    font-weight:800;
+    letter-spacing:.14em;
+    color:var(--mauve-deep);
+    opacity:.7;
+  }
+  .score-val{
+    font-family:'Fraunces', serif;
+    font-size:20px;
+    font-weight:600;
+    color:var(--plum-dark);
+  }
+  .canvas-wrap{
+    position:relative;
+    width:100%;
+    height:260px;
+    border-radius:18px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    touch-action:none;
+    cursor:pointer;
+  }
+  canvas{ display:block; width:100%; height:100%; }
+  .overlay{
+    position:absolute; inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    background:linear-gradient(180deg, rgba(253,242,247,0.35), rgba(253,242,247,0.55));
+    backdrop-filter:blur(1.5px);
+    text-align:center;
+    padding:20px;
+  }
+  .overlay-title{
+    margin:0;
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-weight:600;
+    font-size:24px;
+    color:var(--plum-dark);
+  }
+  .overlay-sub{
+    margin:0;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.04em;
+    color:var(--mauve-deep);
+    text-transform:uppercase;
+  }
+  .mobile-controls{
+    display:flex;
+    justify-content:center;
+    margin-top:14px;
+  }
+  .duck-btn{
+    font-family:'Manrope', sans-serif;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.1em;
+    color:var(--plum-dark);
+    background:var(--bg-2);
+    border:1px solid var(--line);
+    padding:10px 20px;
+    border-radius:999px;
+    user-select:none;
+    touch-action:none;
+    cursor:pointer;
+  }
+  .duck-btn:active{ background:var(--mauve); color:var(--cream); }
+  .home-btn{
+    display:inline-block;
+    margin-top:30px;
+    font-size:12.5px;
+    font-weight:800;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    text-decoration:none;
+    color:var(--cream);
+    background:var(--plum);
+    padding:14px 28px;
+    border-radius:999px;
+    transition:transform .15s ease, background .15s ease;
+    opacity:0;
+    animation:riseIn .8s .45s ease forwards;
+  }
+  .home-btn:hover{ background:var(--plum-dark); transform:translateY(-1px); }
+  .home-btn:focus-visible, .duck-btn:focus-visible, .canvas-wrap:focus-visible{
+    outline:2.5px solid var(--plum);
+    outline-offset:3px;
+  }
+  .sr-only{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+  @keyframes riseIn{
+    from{ opacity:0; transform:translateY(10px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  @keyframes pulse{
+    0%,100%{ opacity:1; } 50%{ opacity:.35; }
+  }
+  @media (max-width:520px){
+    .canvas-wrap{ height:210px; }
+    .game-top{ justify-content:center; text-align:center; }
+    .score-box{ justify-content:center; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .eyebrow-row, h1.headline, .subtext, .game-card, .home-btn{
+      animation:none; opacity:1; transform:none;
+    }
+    .status-dot{ animation:none; }
+  }
+</style>
 </head>
-
 <body>
-    <div class="container">
-        <div class="error-card">
-            <div class="card-left">
-                <!-- Using a placeholder illustration -->
-                <div class="error-code">Page not found<br><span>ERROR 404</span></div>
-                <img src="https://cdni.iconscout.com/illustration/premium/thumb/404-error-3702359-3119148.png"
-                    alt="404 Illustration" class="illustration" style="color: #AF5454 !important">
-            </div>
-            <div class="card-right">
-                <h2>Looks like the page<br>doesn't exist</h2>
-                <a href="/" class="home-btn">Back to home</a>
-            </div>
-        </div>
-    </div>
-</body>
 
+  <main class="wrap">
+    <div class="eyebrow-row">
+      <p class="eyebrow"><span class="spark">✦</span><span id="eyebrowText">PAGE NOT FOUND · ERROR 404</span></p>
+    </div>
+    <p class="status-pill" id="statusPill"><span class="status-dot"></span><span id="statusText">OFFLINE — CHECK YOUR CONNECTION</span></p>
+
+    <h1 class="headline" id="headline">
+      <span class="line" id="hLine1">This Page</span>
+      <span class="line" id="hLine2">Went <span class="accent" id="hAccent">Missing</span></span>
+      <span class="line" id="hLine3">Mid-Bake</span>
+    </h1>
+
+    <p class="subtext" id="subtext">
+      The page you're looking for isn't on the menu — it may have been moved, renamed, or eaten before you arrived. While we look for it, how about a quick game?
+    </p>
+
+    <section class="game-card">
+      <div class="game-top">
+        <p class="game-label">✦ CAKE DASH</p>
+        <p class="game-hint">SPACE OR TAP TO JUMP · HOLD ↓ TO DUCK</p>
+        <div class="score-box">
+          <div><span class="score-label">SCORE</span><span class="score-val" id="scoreVal">0</span></div>
+          <div><span class="score-label">BEST</span><span class="score-val" id="bestVal">0</span></div>
+        </div>
+      </div>
+
+      <div class="canvas-wrap" id="canvasWrap" tabindex="0">
+        <canvas id="game"></canvas>
+        <div class="overlay" id="overlay">
+          <p class="overlay-title" id="overlayTitle">Tap or Press Space to Start</p>
+          <p class="overlay-sub" id="overlaySub">Jump the bakery mess · grab the sprinkles</p>
+        </div>
+        <p class="sr-only">Cake Dash: an optional keyboard-and-touch mini game. Press space to jump, hold the down arrow to duck. It has no effect on navigation — use the button below to return home.</p>
+      </div>
+
+      <div class="mobile-controls">
+        <button class="duck-btn" id="duckBtn" aria-label="Hold to duck">HOLD TO DUCK</button>
+      </div>
+    </section>
+
+    <a class="home-btn" id="ctaBtn" href="<%= locals.homeUrl || '/' %>">← Back to <%= locals.brandName || "Cake O'Clock" %></a>
+  </main>
+
+<script>
+(function(){
+  // brandName / homeUrl come from the EJS locals passed at render time
+  var BRAND = <%- JSON.stringify(locals.brandName || "Cake O'Clock") %>;
+  var HOME_URL = <%- JSON.stringify(locals.homeUrl || '/') %>;
+
+  // ---------- copy: 404 vs offline ----------
+  var COPY = {
+    notfound: {
+      eyebrow: "PAGE NOT FOUND · ERROR 404",
+      line1: "This Page", line2Pre: "Went ", accent: "Missing", line3: "Mid-Bake",
+      sub: "The page you're looking for isn't on the menu — it may have been moved, renamed, or eaten before you arrived. While we look for it, how about a quick game?",
+      cta: "← Back to " + BRAND, ctaMode: "link", showStatus: false
+    },
+    offline: {
+      eyebrow: "NO CONNECTION · WE'LL WAIT WITH YOU",
+      line1: "The Kitchen", line2Pre: "Has Gone ", accent: "Quiet", line3: "For A Moment",
+      sub: "Looks like your connection stepped out for a slice. Check your wifi and we'll be back shortly — or pass the time below.",
+      cta: "TRY AGAIN", ctaMode: "reload", showStatus: true
+    }
+  };
+
+  function applyMode(mode){
+    var c = COPY[mode];
+    document.getElementById('eyebrowText').textContent = c.eyebrow;
+    document.getElementById('hLine1').textContent = c.line1;
+    document.getElementById('hLine2').firstChild.textContent = c.line2Pre;
+    document.getElementById('hAccent').textContent = c.accent;
+    document.getElementById('hLine3').textContent = c.line3;
+    document.getElementById('subtext').textContent = c.sub;
+    var pill = document.getElementById('statusPill');
+    pill.classList.toggle('show', c.showStatus);
+    var cta = document.getElementById('ctaBtn');
+    cta.textContent = c.cta;
+    if(c.ctaMode === 'reload'){
+      cta.removeAttribute('href');
+      cta.onclick = function(e){ e.preventDefault(); location.reload(); };
+    } else {
+      cta.setAttribute('href', HOME_URL);
+      cta.onclick = null;
+    }
+  }
+
+  // Allow forcing a mode for testing via ?mode=offline / ?mode=404
+  var forced = new URLSearchParams(location.search).get('mode');
+  function currentMode(){
+    if(forced === 'offline') return 'offline';
+    if(forced === '404') return 'notfound';
+    return navigator.onLine ? 'notfound' : 'offline';
+  }
+  applyMode(currentMode());
+  window.addEventListener('online', function(){ if(!forced) applyMode('notfound'); });
+  window.addEventListener('offline', function(){ if(!forced) applyMode('offline'); });
+
+  // ---------- palette (mirrors CSS tokens) ----------
+  var COL = {
+    ink:'#3d2733', mauve:'#a8677d', mauveDeep:'#7c4258',
+    plum:'#5c2c3f', plumDark:'#4a2333', cream:'#fff8f4',
+    line:'rgba(61,39,51,0.14)', wood:'#b98a68', woodDeep:'#8f6650',
+    sky1:'#fce6ef', sky2:'#fff6f2'
+  };
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- canvas setup ----------
+  var wrap = document.getElementById('canvasWrap');
+  var canvas = document.getElementById('game');
+  var ctx = canvas.getContext('2d');
+  var overlay = document.getElementById('overlay');
+  var overlayTitle = document.getElementById('overlayTitle');
+  var overlaySub = document.getElementById('overlaySub');
+  var scoreVal = document.getElementById('scoreVal');
+  var bestVal = document.getElementById('bestVal');
+  var duckBtn = document.getElementById('duckBtn');
+
+  var W, H, DPR, groundY;
+  var groundH = 40;
+
+  function resize(){
+    var rect = wrap.getBoundingClientRect();
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = rect.width; H = rect.height;
+    canvas.width = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    groundY = H - groundH;
+    if(cat){
+      cat.y = groundY - catHeight();
+      cat.grounded = true; cat.vy = 0;
+    }
+  }
+
+  // ---------- game state ----------
+  var state = 'ready'; // ready | running | over
+  var runTime = 0, last = 0;
+  var score = 0, best = 0, speed = 5.4;
+  var spawnTimer = 60, collectTimer = 90, tickOffset = 0;
+  var obstacles = [], collectibles = [], particles = [];
+
+  var GRAVITY = 1.05, JUMP_VEL = -15.8; // snappier arc: same max height, ~10% less airtime
+
+  var cat = {
+    x: 66, w: 50, hStand: 56, hDuck: 32,
+    y: 0, vy: 0, grounded: true, ducking: false
+  };
+  function catHeight(){ return cat.ducking ? cat.hDuck : cat.hStand; }
+
+  resize();
+  window.addEventListener('resize', resize);
+
+  // ---------- obstacle / collectible types ----------
+  var GROUND_TYPES = ['rollingPin','donutStack','coffeeCup','whisk'];
+
+  function spawnGroundObstacle(){
+    var type = GROUND_TYPES[Math.floor(Math.random()*GROUND_TYPES.length)];
+    var w,h;
+    if(type==='rollingPin'){ w=48; h=18; }
+    else if(type==='donutStack'){ w=34; h=44; }
+    else if(type==='coffeeCup'){ w=30; h=34; }
+    else { w=20; h=40; } // whisk
+    obstacles.push({ type:type, kind:'ground', x:W+20, y:groundY-h, w:w, h:h });
+  }
+  function spawnAirObstacle(){
+    var w=42, h=24;
+    obstacles.push({ type:'macaron', kind:'air', x:W+20, y:groundY-74, w:w, h:h, born:runTime });
+  }
+  function spawnObstacle(){
+    if(score > 120 && Math.random() < 0.32){ spawnAirObstacle(); }
+    else { spawnGroundObstacle(); }
+  }
+  function spawnCollectible(){
+    var high = Math.random() < 0.5;
+    var y = high ? (groundY - 120 - Math.random()*40) : (groundY - 30 - Math.random()*20);
+    collectibles.push({ x:W+20, y:y, r:7 });
+  }
+
+  // ---------- controls ----------
+  function start(){
+    state = 'running';
+    obstacles = []; collectibles = []; particles = [];
+    score = 0; speed = 5.4; spawnTimer = 55; collectTimer = 70; runTime = 0;
+    cat.ducking = false; cat.grounded = true; cat.vy = 0;
+    cat.y = groundY - cat.hStand;
+    overlay.style.display = 'none';
+  }
+  function jump(){
+    if(state === 'ready' || state === 'over'){ start(); return; }
+    if(state === 'running' && cat.grounded && !cat.ducking){
+      cat.vy = JUMP_VEL; cat.grounded = false;
+    }
+  }
+  function duckStart(){
+    if(state === 'running' && cat.grounded && !cat.ducking){
+      cat.ducking = true;
+      cat.y = groundY - cat.hDuck;
+    }
+  }
+  function duckEnd(){
+    if(cat.ducking){
+      cat.ducking = false;
+      if(cat.grounded) cat.y = groundY - cat.hStand;
+    }
+  }
+  function gameOver(){
+    state = 'over';
+    best = Math.max(best, Math.floor(score));
+    bestVal.textContent = best;
+    overlayTitle.textContent = 'Game Over';
+    overlaySub.textContent = 'Score ' + Math.floor(score) + ' — tap or press space to try again';
+    overlay.style.display = 'flex';
+  }
+
+  window.addEventListener('keydown', function(e){
+    if(e.code === 'Space' || e.code === 'ArrowUp'){ e.preventDefault(); jump(); }
+    else if(e.code === 'ArrowDown' || e.code === 'KeyS'){ e.preventDefault(); duckStart(); }
+  });
+  window.addEventListener('keyup', function(e){
+    if(e.code === 'ArrowDown' || e.code === 'KeyS'){ duckEnd(); }
+  });
+  wrap.addEventListener('pointerdown', function(e){ e.preventDefault(); jump(); });
+  duckBtn.addEventListener('pointerdown', function(e){ e.preventDefault(); duckStart(); });
+  ['pointerup','pointerleave','pointercancel'].forEach(function(ev){
+    duckBtn.addEventListener(ev, duckEnd);
+  });
+
+  // ---------- collision ----------
+  function overlap(a,b){
+    return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y;
+  }
+
+  // ---------- update ----------
+  function update(dt){
+    // physics
+    if(!cat.grounded){
+      cat.vy += GRAVITY * dt;
+      cat.y += cat.vy * dt;
+      var floorY = groundY - catHeight();
+      if(cat.y >= floorY){ cat.y = floorY; cat.vy = 0; cat.grounded = true; }
+    }
+
+    speed = Math.min(speed + 0.0013 * dt, 11.5);
+    tickOffset -= speed * dt;
+    if(tickOffset < -40) tickOffset += 40;
+
+    // obstacles — floor is always comfortably above the ~30-frame jump
+    // airtime so a full jump never runs into the next obstacle's arrival
+    spawnTimer -= dt;
+    if(spawnTimer <= 0){
+      spawnObstacle();
+      var gap = Math.max(60 - speed*1.1, 42) + Math.random()*20;
+      spawnTimer = gap;
+    }
+    for(var i=obstacles.length-1;i>=0;i--){
+      var o = obstacles[i];
+      o.x -= speed*dt;
+      if(o.x + o.w < -10) { obstacles.splice(i,1); continue; }
+      var hb = { x:cat.x+6, y:cat.y+4, w:cat.w-12, h:catHeight()-8 };
+      var ob = { x:o.x+3, y:o.y+3, w:o.w-6, h:o.h-5 };
+      if(overlap(hb, ob)){ gameOver(); return; }
+    }
+
+    // collectibles
+    collectTimer -= dt;
+    if(collectTimer <= 0){
+      spawnCollectible();
+      collectTimer = 55 + Math.random()*50;
+    }
+    for(var j=collectibles.length-1;j>=0;j--){
+      var c = collectibles[j];
+      c.x -= speed*dt;
+      if(c.x < -20){ collectibles.splice(j,1); continue; }
+      var hb2 = { x:cat.x+4, y:cat.y+2, w:cat.w-8, h:catHeight()-4 };
+      var cb = { x:c.x-c.r, y:c.y-c.r, w:c.r*2, h:c.r*2 };
+      if(overlap(hb2, cb)){
+        score += 12;
+        particles.push({ x:c.x, y:c.y, life:1 });
+        collectibles.splice(j,1);
+      }
+    }
+
+    for(var k=particles.length-1;k>=0;k--){
+      particles[k].life -= 0.04*dt;
+      particles[k].y -= 0.4*dt;
+      if(particles[k].life <= 0) particles.splice(k,1);
+    }
+
+    score += speed*dt*0.05;
+    scoreVal.textContent = Math.floor(score);
+  }
+
+  // ---------- drawing ----------
+  function drawBackground(){
+    var g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0, COL.sky1);
+    g.addColorStop(1, COL.sky2);
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,W,H);
+
+    // soft halo, echoes brand motif
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(W*0.86, H*0.08, H*0.5, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    // drifting frosting-swirl clouds
+    var driftBase = reduceMotion ? 0 : runTime*0.15;
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    [[0.2,0.22,26],[0.55,0.14,20],[0.8,0.3,16]].forEach(function(p,idx){
+      var cx = ((p[0]*W + driftBase*(0.3+idx*0.15)) % (W+80)) - 20;
+      var cy = p[1]*H;
+      var r = p[2];
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, r, r*0.6, 0, 0, Math.PI*2);
+      ctx.ellipse(cx+r*0.7, cy+2, r*0.6, r*0.4, 0, 0, Math.PI*2);
+      ctx.fill();
+    });
+
+    // sparkles
+    if(!reduceMotion){
+      ctx.fillStyle = COL.mauve;
+      for(var s=0;s<3;s++){
+        var sx = (W*0.15 + s*W*0.32 + Math.sin(runTime*0.02+s)*10) % W;
+        var sy = H*0.18 + Math.cos(runTime*0.015+s*2)*8;
+        var alpha = 0.35 + 0.35*Math.sin(runTime*0.05+s*3);
+        ctx.globalAlpha = Math.max(alpha,0.1);
+        ctx.beginPath();
+        ctx.arc(sx, sy, 2.2, 0, Math.PI*2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function drawGround(){
+    ctx.fillStyle = COL.cream;
+    ctx.fillRect(0, groundY, W, groundH);
+    ctx.strokeStyle = COL.line;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, groundY); ctx.lineTo(W, groundY);
+    ctx.stroke();
+    ctx.strokeStyle = COL.line;
+    ctx.lineWidth = 2;
+    for(var x = tickOffset; x < W; x += 40){
+      ctx.beginPath();
+      ctx.moveTo(x, groundY+10);
+      ctx.lineTo(x+16, groundY+10);
+      ctx.stroke();
+    }
+  }
+
+  function drawObstacle(o){
+    ctx.save();
+    if(o.type === 'rollingPin'){
+      ctx.fillStyle = COL.wood;
+      roundRect(o.x, o.y+4, o.w, o.h-8, 6); ctx.fill();
+      ctx.fillStyle = COL.woodDeep;
+      ctx.beginPath(); ctx.arc(o.x, o.y+o.h/2, 5, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(o.x+o.w, o.y+o.h/2, 5, 0, Math.PI*2); ctx.fill();
+    } else if(o.type === 'donutStack'){
+      var ring = 3;
+      var rh = o.h/ring;
+      for(var i=0;i<ring;i++){
+        ctx.fillStyle = i%2===0 ? COL.mauve : COL.plum;
+        ctx.beginPath();
+        ctx.ellipse(o.x+o.w/2, o.y+rh*i+rh/2, o.w/2, rh/2*1.15, 0, 0, Math.PI*2);
+        ctx.fill();
+        ctx.fillStyle = COL.cream;
+        ctx.beginPath();
+        ctx.ellipse(o.x+o.w/2, o.y+rh*i+rh/2, o.w/6, rh/5, 0, 0, Math.PI*2);
+        ctx.fill();
+      }
+    } else if(o.type === 'coffeeCup'){
+      ctx.fillStyle = COL.plum;
+      roundRect(o.x, o.y+6, o.w, o.h-6, 5); ctx.fill();
+      ctx.strokeStyle = COL.plum;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(o.x+o.w+3, o.y+o.h/2+2, 6, -1.1, 1.1);
+      ctx.stroke();
+      ctx.strokeStyle = COL.mauveDeep;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(o.x+o.w*0.3, o.y); ctx.quadraticCurveTo(o.x+o.w*0.15, o.y-8, o.x+o.w*0.3, o.y-14);
+      ctx.stroke();
+    } else if(o.type === 'whisk'){
+      ctx.strokeStyle = COL.woodDeep;
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(o.x+o.w/2, o.y+o.h); ctx.lineTo(o.x+o.w/2, o.y+o.h*0.45); ctx.stroke();
+      ctx.strokeStyle = COL.mauveDeep;
+      ctx.lineWidth = 2;
+      for(var l=-1;l<=1;l+=2){
+        ctx.beginPath();
+        ctx.moveTo(o.x+o.w/2, o.y+o.h*0.45);
+        ctx.quadraticCurveTo(o.x+o.w/2+l*o.w*0.55, o.y+o.h*0.15, o.x+o.w/2, o.y);
+        ctx.stroke();
+      }
+    } else if(o.type === 'macaron'){
+      ctx.fillStyle = COL.mauve;
+      ctx.beginPath(); ctx.ellipse(o.x+o.w*0.3, o.y+o.h/2, o.w*0.28, o.h*0.42, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = COL.plum;
+      ctx.beginPath(); ctx.ellipse(o.x+o.w*0.7, o.y+o.h/2, o.w*0.28, o.h*0.42, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = COL.cream;
+      roundRect(o.x+o.w*0.18, o.y+o.h*0.42, o.w*0.64, o.h*0.16, 3); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function roundRect(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+  }
+
+  function drawCollectible(c){
+    ctx.save();
+    ctx.fillStyle = COL.plum;
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, c.r, 0, Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle = COL.mauveDeep;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(c.x+2, c.y-c.r);
+    ctx.quadraticCurveTo(c.x+8, c.y-c.r-6, c.x+4, c.y-c.r-10);
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.beginPath();
+    ctx.arc(c.x-2, c.y-2, 1.6, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawParticles(){
+    particles.forEach(function(p){
+      ctx.save();
+      ctx.globalAlpha = Math.max(p.life,0);
+      ctx.fillStyle = COL.mauve;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    });
+  }
+
+  function drawCat(){
+    var h = catHeight();
+    var x = cat.x, y = cat.y, w = cat.w;
+    var wrapTop = y + h*0.55;
+    ctx.save();
+
+    // wrapper
+    ctx.fillStyle = COL.plum;
+    ctx.beginPath();
+    ctx.moveTo(x+w*0.15, wrapTop);
+    ctx.lineTo(x+w*0.85, wrapTop);
+    ctx.lineTo(x+w*0.95, y+h);
+    ctx.lineTo(x+w*0.05, y+h);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+    ctx.lineWidth = 2;
+    for(var i=1;i<4;i++){
+      var px = x+w*0.15 + (w*0.7)*(i/4);
+      ctx.beginPath(); ctx.moveTo(px, wrapTop+3); ctx.lineTo(px, y+h-3); ctx.stroke();
+    }
+
+    // frosting
+    ctx.fillStyle = COL.mauve;
+    ctx.beginPath();
+    ctx.ellipse(x+w*0.5, wrapTop, w*0.44, h*0.26, 0, Math.PI, 0);
+    ctx.fill();
+    if(!cat.ducking){
+      ctx.beginPath();
+      ctx.ellipse(x+w*0.5, wrapTop-h*0.16, w*0.3, h*0.18, 0, Math.PI, 0);
+      ctx.fill();
+      ctx.fillStyle = COL.plumDark;
+      ctx.beginPath();
+      ctx.arc(x+w*0.5, wrapTop-h*0.3, 4.5, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    // eyes
+    ctx.fillStyle = COL.ink;
+    ctx.beginPath();
+    ctx.arc(x+w*0.37, wrapTop+h*0.16, 2, 0, Math.PI*2);
+    ctx.arc(x+w*0.63, wrapTop+h*0.16, 2, 0, Math.PI*2);
+    ctx.fill();
+
+    // legs
+    ctx.strokeStyle = COL.ink;
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    if(state === 'running' && cat.grounded && !cat.ducking){
+      var phase = Math.sin(runTime*0.35)*6;
+      ctx.beginPath(); ctx.moveTo(x+w*0.32,y+h); ctx.lineTo(x+w*0.32+phase*0.4, y+h+7); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x+w*0.68,y+h); ctx.lineTo(x+w*0.68-phase*0.4, y+h+7); ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.moveTo(x+w*0.32,y+h); ctx.lineTo(x+w*0.32, y+h+6); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x+w*0.68,y+h); ctx.lineTo(x+w*0.68, y+h+6); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    drawBackground();
+    drawGround();
+    obstacles.forEach(drawObstacle);
+    collectibles.forEach(drawCollectible);
+    drawParticles();
+    drawCat();
+  }
+
+  // ---------- loop ----------
+  function loop(ts){
+    if(!last) last = ts;
+    var dt = Math.min((ts-last)/16.6667, 2.2);
+    last = ts;
+    runTime += dt;
+    if(state === 'running') update(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
 </html>
