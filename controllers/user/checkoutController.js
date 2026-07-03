@@ -500,9 +500,17 @@ export const createRazorpayOrder = async (req, res) => {
       currency: order.currency,
     });
   } catch (err) {
-    console.error("createRazorpayOrder error:", err);
-    res.status(500).json({ success: false, message: "Failed to create Razorpay order" });
-  }
+  console.error("========== RAZORPAY ERROR ==========");
+  console.error(err);
+  console.error(err.error);
+  console.error(err.message);
+  console.error(err.stack);
+
+  return res.status(500).json({
+    success: false,
+    message: "Failed to create Razorpay order"
+  });
+}
 };
  
 
