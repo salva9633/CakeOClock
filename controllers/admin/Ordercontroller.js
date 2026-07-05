@@ -77,7 +77,7 @@ export const loadOrderDetail = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id).populate("items.productId");
     if (!order) return res.redirect("/admin/orders");
-return renderAdmin(req, res, "orderDetail", { order, title: "Order Detail" });  } catch (error) {
+return renderAdmin(req, res, "Orderdetail", { order, title: "Order Detail" });  } catch (error) {
     console.error("loadOrderDetail error:", error);
     return res.redirect("/admin/pagenotfound");
   }
