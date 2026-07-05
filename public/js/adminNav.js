@@ -31,32 +31,56 @@
   }
 
   async function navigate(url, { pushState = true } = {}) {
-    clearPageTimers();
-    contentEl.style.opacity = "0.6";
-    try {
-      const res = await fetch(url, {
-        headers: { "X-Requested-With": "XMLHttpRequest" }
-      });
+  clearPageTimers();
+  contentEl.style.opacity = "0.6";
+  try {
+    const res = await fetch(url, {
+      headers: { "X-Requested-With": "XMLHttpRequest" }
+    });
 
-      if (res.redirected || !res.ok) {
-        window.location.href = res.url || url;
-        return;
-      }
-
-      const html = await res.text();
-      contentEl.innerHTML = html;
-
-      if (pushState) history.pushState({ ajaxUrl: url }, "", url);
-
-      updateActiveSidebar(url);
-      runInlineScripts(contentEl);
-    } catch (err) {
-      console.error("Admin AJAX nav failed, falling back to full reload:", err);
-      window.location.href = url;
-    } finally {
-      contentEl.style.opacity = "1";
+    // Real redirect (e.g. auth redirected to /login) — follow it.
+    if (res.redirected) {
+      window.location.href = res.url;
+      return;
     }
+
+    // Server responded with an error status — don't silently reload
+    // the same URL, since that just reproduces the same error.
+    if (!res.ok) {
+      console.error(`Admin nav request failed: ${res.status} ${res.statusText} for ${url}`);
+      contentEl.innerHTML = renderInlineError(res.status, url);
+      if (pushState) history.pushState({ ajaxUrl: url }, "", url);
+      return;
+    }
+
+    const html = await res.text();
+    contentEl.innerHTML = html;
+
+    if (pushState) history.pushState({ ajaxUrl: url }, "", url);
+
+    updateActiveSidebar(url);
+    runInlineScripts(contentEl);
+  } catch (err) {
+    console.error("Admin AJAX nav failed, falling back to full reload:", err);
+    window.location.href = url;
+  } finally {
+    contentEl.style.opacity = "1";
   }
+}
+
+function renderInlineError(status, url) {
+  if (status >= 500) {
+    return `<div class="admin-error">
+      <h2>Something went wrong (${status})</h2>
+      <p>The server hit an error loading <code>${url}</code>. Try again, or check the server logs.</p>
+      <button onclick="window.adminNavigate(location.pathname)">Retry</button>
+    </div>`;
+  }
+  return `<div class="admin-error">
+    <h2>Not found (${status})</h2>
+    <p>The page you're looking for doesn't exist.</p>
+  </div>`;
+}
 
   function updateActiveSidebar(url) {
     const path = new URL(url, location.origin).pathname;
