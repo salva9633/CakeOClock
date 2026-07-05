@@ -2,6 +2,7 @@ import Order from "../../models/orderModel.js";
 import WalletTransaction from "../../models/walletModel.js";
 import User from "../../models/userModel.js";
 import Coupon from "../../models/couponModel.js"; 
+import { renderAdmin } from "../../utils/renderAdmin.js";
 
 // ─────────────────────────────────────────
 // GET /admin/orders
@@ -52,7 +53,7 @@ const counts = {
     });
     counts.All = grandTotal;
  
-    return res.render("orders", {
+    return renderAdmin(req, res, "orders", {
       orders,
       counts,
       total,
@@ -76,8 +77,7 @@ export const loadOrderDetail = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id).populate("items.productId");
     if (!order) return res.redirect("/admin/orders");
-    return res.render("orderDetail", { order, title: "Order Detail" });
-  } catch (error) {
+return renderAdmin(req, res, "orderDetail", { order, title: "Order Detail" });  } catch (error) {
     console.error("loadOrderDetail error:", error);
     return res.redirect("/admin/pagenotfound");
   }
@@ -211,7 +211,7 @@ export const loadReturnRequests = async (req, res) => {
       "items.status": "Return Requested"
     }).populate("userId");
 
-    res.render("returnRequests", {
+   renderAdmin(req, res, "returnRequests", {
       orders,
       title: "Return Requests",
     });

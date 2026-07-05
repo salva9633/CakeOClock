@@ -1,4 +1,5 @@
 import Order from "../../models/orderModel.js";
+import { renderAdmin } from "../../utils/renderAdmin.js";
 
 export const loadDashboard = async (req, res) => {
 
@@ -236,8 +237,7 @@ if (filter === "daily") {
     // RENDER
     // =========================
 
-    res.render("dashboard", {
-      totalOrders,
+renderAdmin(req, res, "dashboard", {      totalOrders,
       totalRevenue,
       deliveredOrders,
       cancelledOrders,

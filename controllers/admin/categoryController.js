@@ -1,5 +1,6 @@
 import Category from "../../models/categoryModel.js";
 import cloudinary from "../../config/cloudinary.js";
+import { renderAdmin } from "../../utils/renderAdmin.js";
 
 
 const streamUpload = (buffer, folder = "categories") => {
@@ -37,8 +38,7 @@ const categoryInfo = async (req, res) => {
 
     const totalPages = Math.ceil(totalCategories / limit);
 
-    res.render("category", { cat, currentPage: page, totalPages, search });
-  } catch (error) {
+renderAdmin(req, res, "category", { cat, currentPage: page, totalPages, search });  } catch (error) {
     console.log(error);
     res.redirect("/admin/pagenotfound");
   }

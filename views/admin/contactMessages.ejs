@@ -1,20 +1,18 @@
-<%- include('../partials/admin/header') %>
-
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
+@import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css');
 * { box-sizing: border-box; }
 
 :root {
   --bg:       #FDF1F3;
   --bg-2:     #FDF6F7;
   --white:    #FFFFFF;
-  --primary:  #C86A7A;
-  --primary-dk:#A8546A;
+  --primary:  #D89AA6;
+  --primary-dk:#B97C8C;
   --primary-lt:#FDF2F4;
-  --success:  #10B981;
-  --warning:  #F59E0B;
-  --info:     #3B82F6;
+  --success:  #93C9AE;
+  --warning:  #E3BE8E;
+  --info:     #9FB8DE;
   --text:     #1F2937;
   --text-2:   #374151;
   --text-muted:#6B7280;
@@ -23,10 +21,11 @@
   --border-lt:#F3F4F6;
 }
 
-@keyframes fadeUp  { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-@keyframes cardIn  { from{opacity:0;transform:translateY(20px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
-@keyframes rowIn   { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
-@keyframes pulseDot{ 0%{box-shadow:0 0 0 0 rgba(16,185,129,.5)} 70%{box-shadow:0 0 0 6px rgba(16,185,129,0)} 100%{box-shadow:0 0 0 0 rgba(16,185,129,0)} }
+@keyframes fadeUp   { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+@keyframes cardIn   { from{opacity:0;transform:translateY(20px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+@keyframes rowIn    { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
+@keyframes pulseDot { 0%{box-shadow:0 0 0 0 rgba(147,201,174,.5)} 70%{box-shadow:0 0 0 6px rgba(147,201,174,0)} 100%{box-shadow:0 0 0 0 rgba(147,201,174,0)} }
+@keyframes iconFloat{ 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
 
 /* PAGE SHELL */
 .cm-page {
@@ -48,16 +47,16 @@
   animation: fadeUp .4s ease both;
 }
 .cm-header-left { display: flex; align-items: center; gap: 14px; }
-.cm-hdr-icon {
-  width: 52px; height: 52px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #C86A7A, #e891a0);
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 8px 20px rgba(200,106,122,.28);
+.cm-hdr-title {
+  font-size: 26px; font-weight: 700; color: #111827;
+  letter-spacing: -.4px; line-height: 1.1;
+  display: flex; align-items: center; gap: 10px;
 }
-.cm-hdr-icon i { font-size: 24px; color: #fff; }
-.cm-hdr-title { font-size: 26px; font-weight: 700; color: #111827; letter-spacing: -.4px; line-height: 1.1; }
+.cm-hdr-icon {
+  font-size: 22px;
+  color: var(--primary-dk);
+  animation: iconFloat 3.2s ease-in-out infinite;
+}
 .cm-hdr-sub   { font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 400; }
 .cm-header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
@@ -68,7 +67,7 @@
   box-shadow: 0 2px 10px rgba(0,0,0,.03);
   transition: border-color .2s, box-shadow .2s;
 }
-.cm-search:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(200,106,122,.1); }
+.cm-search:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(216,154,166,.12); }
 .cm-search i   { font-size: 15px; color: var(--text-faint); flex-shrink: 0; }
 .cm-search input {
   border: none; outline: none; font-size: 13px; color: var(--text);
@@ -76,13 +75,21 @@
 }
 .cm-search input::placeholder { color: var(--text-faint); }
 
-.cm-sort {
-  height: 42px; border: 1px solid var(--border); border-radius: 12px;
-  padding: 0 12px; font-size: 13px; color: var(--text-2);
-  background: var(--white); font-family: 'Inter', sans-serif;
-  cursor: pointer; outline: none; transition: border-color .2s;
+.cm-sort-wrap {
+  display: flex; align-items: center; gap: 6px;
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 0 12px; height: 42px;
+  background: var(--white);
+  transition: border-color .2s;
 }
-.cm-sort:focus { border-color: var(--primary); }
+.cm-sort-wrap:focus-within { border-color: var(--primary); }
+.cm-sort-wrap i { font-size: 15px; color: var(--text-faint); flex-shrink: 0; }
+.cm-sort {
+  height: 100%; border: none;
+  font-size: 13px; color: var(--text-2);
+  background: transparent; font-family: 'Inter', sans-serif;
+  cursor: pointer; outline: none;
+}
 
 /* ── STATS ── */
 .cm-stats {
@@ -111,29 +118,31 @@
 .cm-stat:nth-child(2) { animation-delay: .12s; }
 .cm-stat:nth-child(3) { animation-delay: .18s; }
 .cm-stat:nth-child(4) { animation-delay: .24s; }
-.cm-stat:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.08); }
+.cm-stat:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.06); }
 
 .cm-stat-head { display: flex; justify-content: space-between; align-items: center; }
 .cm-stat-ico {
-  width: 40px; height: 40px; border-radius: 10px;
+  width: 44px; height: 44px;
+  border-radius: 12px;
   display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
 }
-.c-pink  .cm-stat-ico { background: #FDF2F4; }
-.c-pink  .cm-stat-ico i { color: var(--primary); }
-.c-amber .cm-stat-ico { background: #FFFBEB; }
+.c-pink  .cm-stat-ico { background: var(--primary-lt); }
+.c-amber .cm-stat-ico { background: #FBF1E0; }
+.c-blue  .cm-stat-ico { background: #E8F0FB; }
+.c-green .cm-stat-ico { background: #E7F5EE; }
+.c-pink  .cm-stat-ico i { color: var(--primary-dk); }
 .c-amber .cm-stat-ico i { color: var(--warning); }
-.c-blue  .cm-stat-ico { background: #EFF6FF; }
 .c-blue  .cm-stat-ico i { color: var(--info); }
-.c-green .cm-stat-ico { background: #ECFDF5; }
 .c-green .cm-stat-ico i { color: var(--success); }
-.cm-stat-ico i { font-size: 19px; }
+.cm-stat-ico i { font-size: 20px; }
 
 .cm-trend {
   font-size: 11px; font-weight: 600;
   padding: 3px 8px; border-radius: 20px;
   display: inline-flex; align-items: center; gap: 3px;
 }
-.trend-up  { background: #ECFDF5; color: #059669; }
+.trend-up  { background: #EAF6F0; color: #4E9974; }
 .trend-neu { background: #F3F4F6; color: var(--text-muted); }
 
 .cm-stat-num  { font-size: 36px; font-weight: 700; letter-spacing: -1px; line-height: 1; color: #111827; }
@@ -153,16 +162,17 @@
   background: var(--white); color: var(--text-muted);
   transition: all .2s; white-space: nowrap;
   font-family: 'Inter', sans-serif;
-  text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
 }
-.cm-pill:hover:not(.active) { border-color: var(--primary); color: var(--primary); background: var(--primary-lt); transform: translateY(-1px); }
-.cm-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 6px 16px rgba(200,106,122,.28); }
+.cm-pill i { font-size: 14px; }
+.cm-pill:hover:not(.active) { border-color: var(--primary); color: var(--primary-dk); background: var(--primary-lt); transform: translateY(-1px); }
+.cm-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 6px 16px rgba(216,154,166,.28); }
 .cm-pill-count {
   font-size: 10px; font-weight: 700; min-width: 18px; height: 18px;
   border-radius: 99px; display: inline-flex; align-items: center;
   justify-content: center; padding: 0 4px;
 }
-.cm-pill.active .cm-pill-count  { background: rgba(255,255,255,.25); color: #fff; }
+.cm-pill.active .cm-pill-count  { background: rgba(255,255,255,.3); color: #fff; }
 .cm-pill:not(.active) .cm-pill-count { background: var(--border-lt); color: var(--text-muted); }
 
 /* ── TABLE CARD ── */
@@ -174,14 +184,13 @@
   box-shadow: 0 4px 24px rgba(0,0,0,.03);
 }
 
-/* topbar echoing the "All customers · Live" strip */
 .cm-table-topbar {
   display: flex; align-items: center; justify-content: space-between;
   padding: 16px 22px; border-bottom: 1px solid var(--border-lt);
   flex-wrap: wrap; gap: 10px;
 }
 .cm-table-topbar-left { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #111827; }
-.cm-table-topbar-left i { color: var(--primary); font-size: 16px; }
+.cm-table-topbar-left i { color: var(--primary-dk); font-size: 16px; }
 .cm-table-count { font-weight: 400; color: var(--text-faint); font-size: 13px; }
 .cm-live-badge {
   display: inline-flex; align-items: center; gap: 6px;
@@ -226,11 +235,11 @@
   display: flex; align-items: center; justify-content: center;
   font-size: 12px; font-weight: 700; flex-shrink: 0; letter-spacing: .5px;
 }
-.av-0 { background: #FDE3EA; color: #A8546A; }
-.av-1 { background: #FCEBE0; color: #B45309; }
-.av-2 { background: #E4F5EC; color: #047857; }
-.av-3 { background: #EEE8FB; color: #6D28D9; }
-.av-4 { background: #E4EEFB; color: #1D4ED8; }
+.av-0 { background: #FBE4EA; color: #B97C8C; }
+.av-1 { background: #FBEFE3; color: #B5824A; }
+.av-2 { background: #E7F5EE; color: #4E9974; }
+.av-3 { background: #EFE9FA; color: #8362C9; }
+.av-4 { background: #E8F0FB; color: #5E86C9; }
 .cm-sname  { font-size: 14px; font-weight: 600; color: #111827; }
 .cm-semail { font-size: 12px; color: var(--text-faint); margin-top: 1px; }
 
@@ -251,13 +260,13 @@
   white-space: nowrap; border: 1px solid transparent;
 }
 .cm-badge i { font-size: 10px; }
-.b-unread  { background: #FFFBEB; color: #B45309; border-color: #FDE68A; }
-.b-read    { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
-.b-replied { background: #ECFDF5; color: #047857; border-color: #A7F3D0; }
+.b-unread  { background: #FBF1E0; color: #B5824A; border-color: #F0DDB0; }
+.b-read    { background: #E8F0FB; color: #5E86C9; border-color: #C9DAF3; }
+.b-replied { background: #E7F5EE; color: #4E9974; border-color: #BEE5D2; }
 
-.b-open        { background: #FDE8EC; color: #C0394F; border-color: #F5C6CB; }
-.b-in_progress { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
-.b-resolved    { background: #FFFBEB; color: #B45309; border-color: #FDE68A; }
+.b-open        { background: #FBE4EA; color: #C0798A; border-color: #F0C8D2; }
+.b-in_progress { background: #E8F0FB; color: #5E86C9; border-color: #C9DAF3; }
+.b-resolved    { background: #FBF1E0; color: #B5824A; border-color: #F0DDB0; }
 .b-closed      { background: #F3F4F6; color: #6B7280; border-color: #E5E7EB; }
 
 /* Date */
@@ -274,12 +283,12 @@
   cursor: pointer; text-decoration: none;
   transition: all .2s; font-family: 'Inter', sans-serif;
 }
-.cm-btn-view:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(200,106,122,.28); }
+.cm-btn-view:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(216,154,166,.28); }
 .cm-btn-view i { font-size: 13px; }
 
 /* Empty */
 .cm-empty { text-align: center; padding: 4rem 1rem; animation: fadeUp .4s ease both; }
-.cm-empty-ico { font-size: 52px; color: var(--border); margin-bottom: 16px; }
+.cm-empty-ico { font-size: 52px; color: var(--border); margin-bottom: 16px; animation: iconFloat 3.2s ease-in-out infinite; }
 .cm-empty h3  { font-size: 16px; font-weight: 600; color: var(--text-2); margin-bottom: 6px; }
 .cm-empty p   { font-size: 13px; color: var(--text-faint); }
 
@@ -300,8 +309,8 @@
   transition: all .2s; padding: 0 8px;
   font-family: 'Inter', sans-serif;
 }
-.cm-pb:hover:not(.dis):not(.on) { border-color: var(--primary); color: var(--primary); transform: translateY(-1px); }
-.cm-pb.on  { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 6px 14px rgba(200,106,122,.32); }
+.cm-pb:hover:not(.dis):not(.on) { border-color: var(--primary); color: var(--primary-dk); transform: translateY(-1px); }
+.cm-pb.on  { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 6px 14px rgba(216,154,166,.32); }
 .cm-pb.dis { opacity: .35; pointer-events: none; }
 
 /* Responsive */
@@ -317,31 +326,32 @@
 </style>
 
 <div class="page-wrapper">
-  <%- include('../partials/admin/sidebar') %>
-
   <div class="cm-page">
 
     <!-- ── HEADER ── -->
     <div class="cm-header">
-      <div class="cm-header-left">
-        <div class="cm-hdr-icon">
-          <i class="ti ti-message-2" aria-hidden="true"></i>
-        </div>
-        <div>
-          <div class="cm-hdr-title">Contact Messages</div>
-          <div class="cm-hdr-sub">Manage customer inquiries, review conversations, and respond efficiently.</div>
-        </div>
-      </div>
+    <div class="cm-header-left">
+  <div>
+    <div class="cm-hdr-title">
+      <i class="ti ti-message-2 cm-hdr-icon" aria-hidden="true"></i>
+      Contact Messages
+    </div>
+    <div class="cm-hdr-sub">Manage customer inquiries, review conversations, and respond efficiently.</div>
+  </div>
+</div>
       <div class="cm-header-right">
         <form method="GET" action="/admin/contact-messages" class="cm-search">
           <i class="ti ti-search" aria-hidden="true"></i>
           <input type="text" name="search" value="<%= search || '' %>"
                  placeholder="Search sender, email or subject…" autocomplete="off">
         </form>
-        <select class="cm-sort" onchange="window.location='?sort='+this.value+'&status=<%= activeFilter %>'">
-          <option value="newest" <%= (sort==='newest'||!sort)?'selected':'' %>>Newest first</option>
-          <option value="oldest" <%= sort==='oldest'?'selected':'' %>>Oldest first</option>
-        </select>
+        <div class="cm-sort-wrap">
+          <i class="ti ti-arrows-sort" aria-hidden="true"></i>
+          <select class="cm-sort" onchange="window.location='?sort='+this.value+'&status=<%= activeFilter %>'">
+            <option value="newest" <%= (sort==='newest'||!sort)?'selected':'' %>>Newest first</option>
+            <option value="oldest" <%= sort==='oldest'?'selected':'' %>>Oldest first</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -402,16 +412,17 @@
 <div class="cm-filters">
   <%
     const filters = [
-      { key: 'all',         label: 'All',         count: totalCount      },
-      { key: 'open',        label: 'Open',        count: openCount       },
-      { key: 'in_progress', label: 'In Progress', count: inProgressCount },
-      { key: 'resolved',    label: 'Resolved',    count: resolvedCount   },
-      { key: 'closed',      label: 'Closed',      count: closedCount     },
+      { key: 'all',         label: 'All',         count: totalCount,      icon: 'ti-layout-grid'   },
+      { key: 'open',        label: 'Open',        count: openCount,       icon: 'ti-alert-circle'  },
+      { key: 'in_progress', label: 'In Progress', count: inProgressCount, icon: 'ti-messages'      },
+      { key: 'resolved',    label: 'Resolved',    count: resolvedCount,   icon: 'ti-circle-check'  },
+      { key: 'closed',      label: 'Closed',      count: closedCount,     icon: 'ti-lock'          },
     ];
   %>
   <% filters.forEach(f => { %>
     <a href="/admin/contact-messages<%= f.key !== 'all' ? '?status='+f.key : '' %>"
        class="cm-pill <%= activeFilter === f.key ? 'active' : '' %>">
+      <i class="ti <%= f.icon %>" aria-hidden="true"></i>
       <%= f.label %>
       <span class="cm-pill-count"><%= f.count %></span>
     </a>
@@ -485,7 +496,7 @@
         </td>
         <td>
           <div class="cm-subj">
-            <span style="color:#C86A7A;font-weight:700;">#<%= msg.ticketNumber %></span>
+            <span style="color:var(--primary-dk);font-weight:700;">#<%= msg.ticketNumber %></span>
             &nbsp;<%= msg.subject.length > 40 ? msg.subject.substring(0,40)+'…' : msg.subject %>
           </div>
           <% if (firstMsg) { %>
@@ -541,7 +552,7 @@
         </div>
       </div>
       <% } %>
-    </div>
+    
 
   </div>
 </div>

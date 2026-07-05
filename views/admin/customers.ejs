@@ -1,4 +1,4 @@
-<%- include("../../views/partials/admin/sidebar") %>
+
 
 <style>
 :root {
@@ -199,8 +199,7 @@ tbody tr:hover { background: var(--blush); }
     <form method="GET" action="/admin/users" id="searchForm">
       <input type="hidden" name="page" value="1">
       <div class="cp-filters">
-        <select name="status" id="statusSelect" class="status-select" onchange="searchForm.submit()">
-          <option value="all"     <%= status === 'all'     ? 'selected' : '' %>>All Customers</option>
+<select name="status" id="statusSelect" class="status-select">          <option value="all"     <%= status === 'all'     ? 'selected' : '' %>>All Customers</option>
           <option value="active"  <%= status === 'active'  ? 'selected' : '' %>>Active only</option>
           <option value="blocked" <%= status === 'blocked' ? 'selected' : '' %>>Blocked only</option>
         </select>
@@ -348,18 +347,39 @@ tbody tr:hover { background: var(--blush); }
   }
 
   // SEARCH
-  const searchInput = document.getElementById("searchInput");
-  const clearIcon   = document.getElementById("clearIcon");
-  const searchForm  = document.getElementById("searchForm");
+  const searchInput  = document.getElementById("searchInput");
+  const clearIcon    = document.getElementById("clearIcon");
+  const searchForm   = document.getElementById("searchForm");
+  const statusSelect = document.getElementById("statusSelect");
   let   debounceTimer;
+
+  // Build the URL from current form state and go through AJAX nav
+  // (falls back to a normal navigation if adminNav.js isn't present)
+  function submitSearchForm() {
+    const params = new URLSearchParams({
+      page:   "1",
+      search: searchInput.value,
+      status: statusSelect.value
+    });
+    const url = `/admin/users?${params.toString()}`;
+    if (typeof window.adminNavigate === "function") {
+      window.adminNavigate(url);
+    } else {
+      window.location.href = url;
+    }
+  }
+
+  // block native full-page form submit
+  searchForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    submitSearchForm();
+  });
 
   // show/hide clear icon on input + debounce submit
   searchInput.addEventListener("input", function () {
     clearIcon.classList.toggle("d-none", !this.value.trim());
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(function () {
-      searchForm.submit();
-    }, 500);
+    debounceTimer = setTimeout(submitSearchForm, 500);
   });
 
   // enter key submit
@@ -367,7 +387,7 @@ tbody tr:hover { background: var(--blush); }
     if (e.key === "Enter") {
       e.preventDefault();
       clearTimeout(debounceTimer);
-      searchForm.submit();
+      submitSearchForm();
     }
   });
 
@@ -376,7 +396,9 @@ tbody tr:hover { background: var(--blush); }
     clearTimeout(debounceTimer);
     searchInput.value = "";
     clearIcon.classList.add("d-none");
-    const status = document.getElementById("statusSelect").value;
-    window.location.href = `/admin/users?status=${status}`;
+    submitSearchForm();
   });
+
+  // status dropdown
+  statusSelect.addEventListener("change", submitSearchForm);
 </script>

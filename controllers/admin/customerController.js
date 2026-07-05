@@ -1,5 +1,5 @@
 import User from "../../models/userModel.js";
-
+import { renderAdmin } from "../../utils/renderAdmin.js";
 const customerInfo = async (req, res) => {
   try {
     let search = req.query.search ? req.query.search.trim() : "";
@@ -32,7 +32,7 @@ const customerInfo = async (req, res) => {
     const totalUsers = await User.countDocuments(query);
     const totalPages = Math.max(1, Math.ceil(totalUsers / limit));
 
-    res.render("customers", { users, totalUsers, totalPages, currentPage: page, search, status });
+renderAdmin(req, res, "customers", { users, totalUsers, totalPages, currentPage: page, search, status });
   } catch (error) {
     console.log("Customer fetch error:", error);
     res.redirect("/admin/pagenotfound");

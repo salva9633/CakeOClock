@@ -1,4 +1,5 @@
 import Coupon from "../../models/couponModel.js";
+import { renderAdmin } from "../../utils/renderAdmin.js";
 
 const loadCoupons = async (req, res) => {
   try {
@@ -10,8 +11,7 @@ const loadCoupons = async (req, res) => {
     const coupons = await Coupon.find().sort({ createdAt: -1 }).skip(skip).limit(limit);
     const totalPages = Math.ceil(totalCoupons / limit);
 
-    res.render("coupons", { coupons, currentPage: page, totalPages, totalCoupons });
-  } catch (error) {
+renderAdmin(req, res, "coupons", { coupons, currentPage: page, totalPages, totalCoupons });  } catch (error) {
     console.log(error);
     res.redirect("/admin/error");
   }
@@ -232,7 +232,7 @@ const loadEditCoupon = async (req, res) => {
       return res.redirect("/admin/coupons");
     }
 
-    res.render("editCoupons", { coupon });
+renderAdmin(req, res, "editCoupons", { coupon });
   } catch (error) {
     console.log(error);
     res.redirect("/admin/error");

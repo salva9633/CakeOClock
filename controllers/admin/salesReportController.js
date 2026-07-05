@@ -2,6 +2,7 @@ import Order from "../../models/orderModel.js";
 import PDFDocument from "pdfkit";
 import ExcelJS from "exceljs";
 import moment from "moment";
+import { renderAdmin } from "../../utils/renderAdmin.js";
 
 // ===============================
 // SHARED DATE FILTER HELPER
@@ -171,7 +172,7 @@ export const loadSalesReport = async (req, res) => {
       statusCounts[o.status] = (statusCounts[o.status] || 0) + 1;
     });
 
-    return res.render("sales-report", {
+    return renderAdmin(req, res, "sales-report", {
       orders,
       overallSalesCount,
       overallOrderAmount,

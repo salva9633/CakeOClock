@@ -3,6 +3,7 @@ import Variant from "../../models/variantModel.js";
 import Category from "../../models/categoryModel.js";
 import cloudinary from "../../config/cloudinary.js";
 import Batch from "../../models/batchModel.js";
+import { renderAdmin } from "../../utils/renderAdmin.js";
 
 /* =========================
    GET PRODUCTS LIST
@@ -32,7 +33,7 @@ export const getProducts = async (req, res) => {
 
     const categories = await Category.find({ isActive: true }).lean();
 
-    res.render("products/products", {
+    renderAdmin(req, res, "products/products", {
       products,
       categories,
       currentPage: page,
@@ -186,8 +187,7 @@ export const getProductDetail = async (req, res) => {
       variant.totalStock = batches.reduce((sum, b) => sum + b.availableStock, 0);
     }
 
-    res.render("products/productDetails", { product, variants });
-  } catch (error) {
+renderAdmin(req, res, "products/productDetails", { product, variants });  } catch (error) {
     console.error("PRODUCT DETAIL ERROR:", error);
     res.status(500).send("Product detail error");
   }

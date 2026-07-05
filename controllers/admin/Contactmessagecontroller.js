@@ -1,5 +1,6 @@
 import ContactMessage from "../../models/Contactmessagemodel.js";
 import nodemailer from "nodemailer";
+import { renderAdmin } from "../../utils/renderAdmin.js";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -50,7 +51,7 @@ export const loadContactMessages = async (req, res) => {
 
     const totalPages = Math.ceil(totalCount / perPage) || 1;
 
-    res.render("contactMessages", {
+    renderAdmin(req, res, "contactMessages", {
       title:        "Contact Messages",
       messages,
       activeFilter: status,
@@ -79,8 +80,7 @@ export const viewContactMessage = async (req, res) => {
 
     if (msg.applyAutoClose()) await msg.save();
 
-    res.render("contactMessageDetail", { title: "Message Detail", msg });
-  } catch (err) {
+renderAdmin(req, res, "contactMessageDetail", { title: "Message Detail", msg });  } catch (err) {
     console.error("viewContactMessage error:", err);
     res.redirect("/admin/contact-messages");
   }
