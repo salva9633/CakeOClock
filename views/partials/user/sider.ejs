@@ -16,8 +16,6 @@
     padding: 20px 14px 28px;
     border: 1px solid #f0c4d4;
     box-shadow: 0 4px 24px rgba(139,74,90,.08);
-    position: sticky;
-    top: 100px;
   }
 
   /* ── BRAND ── */
@@ -194,27 +192,27 @@
   <!-- Section -->
   <div class="sidebar-section-label">Account</div>
 
-  <a href="/profile" class="menu-item">
+  <a href="/profile" class="menu-item spa-link">
     <div class="menu-icon"><i class="fas fa-user"></i></div>
     Profile Information
   </a>
 
-  <a href="/profile/address" class="menu-item">
+  <a href="/profile/address" class="menu-item spa-link">
     <div class="menu-icon"><i class="fas fa-location-dot"></i></div>
     Manage Address
   </a>
 
-  <a href="/orders" class="menu-item">
+  <a href="/orders" class="menu-item spa-link">
     <div class="menu-icon"><i class="fas fa-bag-shopping"></i></div>
     My Orders
   </a>
 
-  <a href="/wallet" class="menu-item">
+  <a href="/wallet" class="menu-item spa-link">
     <div class="menu-icon"><i class="fas fa-wallet"></i></div>
     Wallet
   </a>
 
-  <a href="/my-messages" class="menu-item">
+  <a href="/my-messages" class="menu-item spa-link">
   <div class="menu-icon"><i class="fas fa-envelope-open-text"></i></div>
   My Messages
 </a>
@@ -223,7 +221,7 @@
 
   <div class="sidebar-section-label">Settings</div>
 
-  <a href="/changePassword" class="menu-item">
+  <a href="/changePassword" class="menu-item spa-link">
     <div class="menu-icon"><i class="fas fa-shield-halved"></i></div>
     Privacy Settings
   </a>
@@ -242,31 +240,94 @@ document.addEventListener('DOMContentLoaded', function () {
   const currentPath = window.location.pathname;
   const menuItems   = document.querySelectorAll('.menu-item');
 
-  let bestMatch = null;
-  let maxLen    = 0;
-
-  menuItems.forEach(item => {
-    const href = item.getAttribute('href');
-    if (!href || href === '#') return;
-    if (currentPath === href ||
-       (currentPath.startsWith(href) && href !== '/')) {
-      if (href.length > maxLen) {
-        maxLen    = href.length;
-        bestMatch = item;
+  function highlightActive(path) {
+    let bestMatch = null;
+    let maxLen    = 0;
+    menuItems.forEach(item => {
+      const href = item.getAttribute('href');
+      if (!href || href === '#') return;
+      if (path === href || (path.startsWith(href) && href !== '/')) {
+        if (href.length > maxLen) {
+          maxLen    = href.length;
+          bestMatch = item;
+        }
       }
-    }
-  });
-
-  if (bestMatch) {
+    });
     menuItems.forEach(i => i.classList.remove('active'));
-    bestMatch.classList.add('active');
+    if (bestMatch) bestMatch.classList.add('active');
   }
+
+  highlightActive(currentPath);
 
   menuItems.forEach(item => {
     item.addEventListener('click', function () {
-      menuItems.forEach(i => i.classList.remove('active'));
-      this.classList.add('active');
+      // Only pre-highlight instantly for spa-link items; full-reload links
+      // (My Orders, Wallet, My Messages, Logout) get highlighted on next load anyway.
+      if (this.classList.contains('spa-link')) {
+        menuItems.forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+      }
     });
   });
+
+  // Re-run highlighting whenever the SPA script swaps content / changes URL.
+  window.addEventListener('popstate', () => highlightActive(window.location.pathname));
+  document.addEventListener('spa:navigated', (e) => highlightActive(e.detail.url));
 });
+</script>
+<script>
+(function () {
+  const TARGET = '#dashMain';
+
+  async function loadPage(url, push = true) {
+    const current = document.querySelector(TARGET);
+    if (!current) { window.location.href = url; return; }
+
+    current.style.opacity = '0.4';
+    current.style.pointerEvents = 'none';
+
+    try {
+      const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+      if (!res.ok) throw new Error('Bad response');
+      const html = await res.text();
+      const doc  = new DOMParser().parseFromString(html, 'text/html');
+      const newMain  = doc.querySelector(TARGET);
+      const newTitle = doc.querySelector('title');
+
+      if (!newMain) { window.location.href = url; return; }
+
+      current.replaceWith(newMain);
+
+      if (newTitle) document.title = newTitle.textContent;
+
+      // re-run inline/external scripts inside the swapped-in content
+      newMain.querySelectorAll('script').forEach(old => {
+        const s = document.createElement('script');
+        if (old.src) s.src = old.src; else s.textContent = old.textContent;
+        old.replaceWith(s);
+      });
+
+      if (push) history.pushState({ url }, '', url);
+      document.dispatchEvent(new CustomEvent('spa:navigated', { detail: { url } }));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      console.error('SPA nav failed, falling back to full reload', err);
+      window.location.href = url;
+    }
+  }
+
+  document.addEventListener('click', function (e) {
+    const link = e.target.closest('.spa-link');
+    if (!link) return;
+    const url = link.getAttribute('href');
+    if (!url || url.startsWith('#') || link.target === '_blank') return;
+    if (url === window.location.pathname + window.location.search) return;
+    e.preventDefault();
+    loadPage(url);
+  });
+
+  window.addEventListener('popstate', () => {
+    loadPage(window.location.pathname + window.location.search, false);
+  });
+})();
 </script>

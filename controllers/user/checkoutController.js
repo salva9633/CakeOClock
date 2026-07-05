@@ -83,7 +83,8 @@ const coupons = allCoupons.filter(c => {
   if (c.assignedTo && String(c.assignedTo) !== String(userId)) return false;
   return true;
 });
- console.log("Coupons after filter:", coupons.length, coupons.map(c => c.code));
+
+console.log("Coupons after filter:", coupons.length, coupons.map(c => c.code));
 
     res.render("checkout", {
       user,
@@ -154,9 +155,7 @@ if (!coupon) {
       return res.json({ success: false, message: "This coupon is not valid for your account." });
     }
 
-if (coupon.usedBy && coupon.usedBy.map(String).includes(String(userId))) {
-      return res.json({ success: false, message: "You have already used this coupon." });
-    }
+
  
     
     if (coupon.minPurchase && itemTotal < coupon.minPurchase) {
@@ -384,9 +383,7 @@ if (couponCode) {
         if (couponDoc.assignedTo && String(couponDoc.assignedTo) !== String(userId)) {
           return res.redirect(`/checkout?couponError=This+coupon+is+not+valid+for+your+account`);
         }
-        if (couponDoc.usedBy?.map(String).includes(String(userId))) {
-          return res.redirect(`/checkout?couponError=You+have+already+used+this+coupon`);
-        }
+       
         if (couponDoc.isFirstOrderOnly) {
           const previousOrders = await Order.findOne({ userId, status: { $ne: "Cancelled" } });
           if (previousOrders) return res.redirect(`/checkout?couponError=This+coupon+is+only+valid+for+your+first+order`);
@@ -606,8 +603,7 @@ export const verifyRazorpayPayment = async (req, res) => {
    if (couponDoc) {
         if (couponDoc.assignedTo && String(couponDoc.assignedTo) !== String(userId)) {
           couponDoc = null;
-        } else if (couponDoc.usedBy?.map(String).includes(String(userId))) {
-          couponDoc = null;
+       
         } else {
           if (couponDoc.discountType === "percentage") {
             discount = (itemTotal * couponDoc.discountValue) / 100;

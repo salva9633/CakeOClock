@@ -115,6 +115,22 @@
         <!-- Icons -->
         <div class="d-flex align-items-center gap-4">
 
+
+                  
+<!-- ❤ Wishlist Icon -->
+<a href="/wishlist" class="text-reset header-icon" title="My Wishlist"
+   style="position:relative; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; text-decoration:none;">
+  <i class="fas fa-heart fa-lg" style="color:#8B3A52;"></i>
+  <% const _wc2 = locals.wishlistCount || 0; %>
+<span id="wishlist-count" style="
+    position:absolute; top:-8px; right:-8px;
+    background:#8B3A52; color:#fff;
+    border-radius:50%; width:18px; height:18px;
+    font-size:.62rem; font-weight:700;
+    display:<%= _wc2 > 0 ? 'flex' : 'none' %>; align-items:center; justify-content:center;
+    line-height:1;"><%= _wc2 > 0 ? _wc2 : '' %></span>
+</a>
+
            <!-- 🛒 Cart Icon -->
 <a href="/cart" class="text-reset header-icon" title="My Cart" 
    style="position:relative; display:inline-flex;">
@@ -129,20 +145,7 @@
     line-height:1;"><%= _cc2 > 0 ? _cc2 : '' %></span>
 </a>
 
-            <!-- ❤ Wishlist Icon -->
-<!-- ❤ Wishlist Icon -->
-<a href="/wishlist" class="text-reset header-icon" title="My Wishlist"
-   style="position:relative; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; text-decoration:none;">
-  <i class="fas fa-heart fa-lg" style="color:#8B3A52;"></i>
-  <% const _wc2 = locals.wishlistCount || 0; %>
-<span id="wishlist-count" style="
-    position:absolute; top:-8px; right:-8px;
-    background:#8B3A52; color:#fff;
-    border-radius:50%; width:18px; height:18px;
-    font-size:.62rem; font-weight:700;
-    display:<%= _wc2 > 0 ? 'flex' : 'none' %>; align-items:center; justify-content:center;
-    line-height:1;"><%= _wc2 > 0 ? _wc2 : '' %></span>
-</a>
+
             <!-- User Dropdown / Auth Links -->
             <% if (locals.user) { %>
                 <div class="dropdown">

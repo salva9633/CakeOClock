@@ -2,386 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <title>Ticket #<%= msg.ticketNumber %> – Cake O'Clock</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ticket Detail – Cake O'Clock</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="/css/cake.css">
-  <style>
-    :root {
-      --rose:    #8B4A5A;
-      --rose-dk: #6e3547;
-      --rose-lt: #fdf0f5;
-      --blush:   #f3d7d3;
-      --cream:   #fff8f9;
-      --muted:   #a07085;
-      --border:  #f0c4d4;
-      --text:    #2d1520;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: linear-gradient(135deg, #f9e8ef 0%, #fdf5f8 50%, #f3e8f5 100%);
-      font-family: 'Lato', sans-serif;
-      min-height: 100vh;
-    }
-
-    .page-wrap {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 32px 24px 60px;
-      display: flex;
-      gap: 28px;
-      align-items: flex-start;
-    }
-
-    .dash-sidebar {
-      width: 250px;
-      min-width: 250px;
-      flex-shrink: 0;
-      animation: slideLeft .5s ease both;
-    }
-
-    @keyframes slideLeft {
-      from { opacity: 0; transform: translateX(-24px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
-
-    .dash-main {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      animation: slideUp .55s ease .1s both;
-    }
-
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .top-nav {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-
-    .back-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 9px 16px;
-      background: #fff;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      color: var(--muted);
-      font-size: .82rem;
-      font-weight: 700;
-      text-decoration: none;
-      font-family: 'Lato', sans-serif;
-      transition: all .2s;
-    }
-
-    .back-btn:hover {
-      border-color: var(--rose);
-      color: var(--rose);
-      background: var(--rose-lt);
-    }
-
-    .page-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .ticket-tag {
-      font-size: .72rem;
-      font-weight: 800;
-      color: var(--rose);
-      background: var(--rose-lt);
-      border: 1px solid var(--border);
-      padding: 4px 10px;
-      border-radius: 20px;
-      letter-spacing: .04em;
-    }
-
-    .msg-card {
-      background: #fff;
-      border-radius: 22px;
-      overflow: hidden;
-      box-shadow: 0 4px 20px rgba(139,74,90,.08);
-      border: 1px solid var(--border);
-      animation: fadeCard .5s ease .1s both;
-    }
-
-    @keyframes fadeCard {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .msg-card-header {
-      background: linear-gradient(135deg, var(--rose) 0%, #c27090 100%);
-      padding: 28px 32px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .msg-card-header::before {
-      content: '';
-      position: absolute;
-      top: -40px; right: -40px;
-      width: 160px; height: 160px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.08);
-    }
-
-    .msg-subject {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 10px;
-      position: relative; z-index: 2;
-    }
-
-    .msg-meta {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      flex-wrap: wrap;
-      position: relative; z-index: 2;
-    }
-
-    .msg-meta-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: .78rem;
-      color: rgba(255,255,255,.75);
-    }
-
-    .msg-meta-item i { color: rgba(255,255,255,.5); }
-
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-size: .7rem;
-      font-weight: 700;
-      padding: 5px 14px;
-      border-radius: 20px;
-      letter-spacing: .04em;
-      margin-left: auto;
-      position: relative; z-index: 2;
-    }
-
-    .badge-open        { background: rgba(252,232,237,.9); color: #c0394f; }
-    .badge-in_progress { background: rgba(232,240,254,.9); color: #3367d6; }
-    .badge-resolved    { background: rgba(255,248,225,.9); color: #b9840a; }
-    .badge-closed      { background: rgba(238,238,238,.9); color: #777; }
-
-    /* ── THREAD ── */
-    .thread-card {
-      background: #fff;
-      border-radius: 22px;
-      overflow: hidden;
-      box-shadow: 0 4px 20px rgba(139,74,90,.08);
-      border: 1px solid var(--border);
-      animation: fadeCard .5s ease .15s both;
-    }
-
-    .thread-list {
-      padding: 28px 32px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      max-height: 560px;
-      overflow-y: auto;
-    }
-
-    .bubble-row { display: flex; }
-    .bubble-row.me   { justify-content: flex-end; }
-    .bubble-row.them { justify-content: flex-start; }
-
-    .bubble {
-      max-width: 70%;
-      padding: 14px 18px;
-      border-radius: 16px;
-      font-size: .9rem;
-      line-height: 1.7;
-      white-space: pre-wrap;
-    }
-
-    .bubble-row.me .bubble {
-      background: var(--rose);
-      color: #fff;
-      border-bottom-right-radius: 4px;
-    }
-
-    .bubble-row.them .bubble {
-      background: #f3f0f1;
-      color: #333;
-      border-bottom-left-radius: 4px;
-    }
-
-    .bubble-label {
-      font-size: .65rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      margin-bottom: 4px;
-      opacity: .8;
-    }
-
-    .bubble-time {
-      font-size: .65rem;
-      margin-top: 6px;
-      opacity: .65;
-    }
-
-    /* ── REPLY BOX ── */
-    .reply-box {
-      border-top: 1px solid var(--border);
-      padding: 20px 32px;
-      background: #fdf6f8;
-    }
-
-    .reply-box textarea {
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 14px;
-      font-size: .88rem;
-      font-family: 'Lato', sans-serif;
-      color: var(--text);
-      background: #fff;
-      resize: vertical;
-      outline: none;
-      line-height: 1.7;
-      transition: border-color .15s;
-    }
-
-    .reply-box textarea:focus { border-color: var(--rose); }
-
-    .reply-box-footer {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 12px;
-      margin-top: 10px;
-    }
-
-    .reply-feedback {
-      font-size: .78rem;
-      display: none;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .reply-feedback.show { display: flex; }
-    .reply-feedback.err  { color: #c0394f; }
-    .reply-feedback.ok   { color: #2e7d32; }
-
-    .send-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 10px 22px;
-      background: linear-gradient(135deg, var(--rose), var(--rose-dk));
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-size: .85rem;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: 'Lato', sans-serif;
-      transition: transform .18s, box-shadow .18s;
-    }
-
-    .send-btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(139,74,90,.28);
-    }
-
-    .send-btn:disabled { opacity: .6; cursor: not-allowed; }
-
-    /* ── RESOLVED / CLOSED NOTICE ── */
-    .notice-card {
-      background: #fff;
-      border-radius: 22px;
-      border: 2px dashed var(--border);
-      padding: 28px;
-      text-align: center;
-      box-shadow: 0 4px 20px rgba(139,74,90,.04);
-      animation: fadeCard .5s ease .2s both;
-    }
-
-    .notice-card.resolved { border-color: #f0dca0; }
-    .notice-card.closed   { border-color: #ddd; }
-
-    .notice-icon {
-      width: 56px; height: 56px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.3rem;
-      margin: 0 auto 14px;
-    }
-
-    .notice-card.resolved .notice-icon { background: #fff8e1; color: #b9840a; }
-    .notice-card.closed   .notice-icon { background: #eee; color: #888; }
-
-    .notice-card h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1rem;
-      color: var(--text);
-      margin-bottom: 6px;
-    }
-
-    .notice-card p {
-      font-size: .82rem;
-      color: #aaa;
-    }
-
-    .footer-nav { animation: fadeCard .5s ease .3s both; }
-
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 22px;
-      background: #fff;
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      color: var(--muted);
-      font-size: .84rem;
-      font-weight: 700;
-      text-decoration: none;
-      transition: all .2s;
-    }
-
-    .back-link:hover {
-      border-color: var(--rose);
-      color: var(--rose);
-      background: var(--rose-lt);
-      transform: translateX(-3px);
-    }
-
-    @media (max-width: 900px) {
-      .page-wrap { flex-direction: column; padding: 16px; }
-      .dash-sidebar { width: 100%; min-width: unset; }
-      .msg-card-header, .thread-list, .reply-box { padding: 20px; }
-      .msg-meta { gap: 10px; }
-      .bubble { max-width: 88%; }
-    }
-  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
 <%- include("../../views/partials/user/h2") %>
+<%- include("../../views/partials/user/dashboardStyles") %>
 
 <div class="page-wrap">
 
@@ -389,143 +19,260 @@
     <%- include("../../views/partials/user/sider") %>
   </aside>
 
-  <main class="dash-main">
+  <!-- Page CSS, markup and page JS all live inside #dashMain so a normal
+       SPA swap brings everything this page needs along with it. -->
+  <main class="dash-main" id="dashMain">
+    <style>
+      /* extra tokens on top of dashboardStyle's shared :root */
+      :root {
+        --r-sm: 10px; --r-md: 14px; --r-lg: 18px; --r-xl: 24px;
+        --gap-sm: 12px; --gap-md: 20px; --gap-lg: 28px;
+      }
+
+      .page-topbar { margin-bottom: var(--gap-md); display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+      .page-topbar h2 { display: flex; align-items: center; gap: 10px; }
+      .back-btn {
+        display: inline-flex; align-items: center; gap: 7px; padding: 8px 15px;
+        background: #fff; border: 1.5px solid var(--border); border-radius: var(--r-sm);
+        color: var(--muted); font-size: .8rem; font-weight: 700; text-decoration: none;
+        font-family: var(--font-body); transition: all .18s;
+      }
+      .back-btn:hover { border-color: var(--rose); color: var(--rose); background: var(--rose-lt); }
+      .ticket-tag {
+        font-size: .72rem; font-weight: 800; color: var(--rose); background: var(--rose-lt);
+        border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px; letter-spacing: .04em;
+      }
+
+      .msg-card {
+        background: var(--cream); border-radius: var(--r-xl); overflow: hidden;
+        box-shadow: var(--shadow-md, 0 6px 20px rgba(139,74,90,.1)); border: 1.5px solid var(--border);
+      }
+
+      .msg-card-header {
+        background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dk) 100%);
+        padding: 22px 26px;
+      }
+      .msg-subject { font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+      .msg-meta { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+      .msg-meta-item { display: flex; align-items: center; gap: 6px; font-size: .78rem; color: rgba(255,255,255,.8); }
+      .msg-meta-item i { color: rgba(255,255,255,.55); }
+      .status-badge {
+        display: inline-flex; align-items: center; gap: 5px; font-size: .7rem; font-weight: 700;
+        padding: 5px 14px; border-radius: 20px; letter-spacing: .04em; margin-left: auto;
+      }
+      .badge-open        { background: rgba(252,232,237,.95); color: #c0394f; }
+      .badge-in_progress { background: rgba(232,240,254,.95); color: #3367d6; }
+      .badge-resolved    { background: rgba(255,248,225,.95); color: #b9840a; }
+      .badge-closed      { background: rgba(238,238,238,.95); color: #777; }
+
+      /* ── Thread: compact, chat-app style bubbles that hug their text ── */
+      .thread-list {
+        padding: 22px 24px; display: flex; flex-direction: column; gap: 6px;
+        max-height: 480px; overflow-y: auto;
+        background-color: #f7ecef;
+        background-image: radial-gradient(rgba(139,74,90,.07) 1px, transparent 1px);
+        background-size: 16px 16px;
+      }
+
+      /* `flex: 0 0 auto` stops rows/bubbles from being stretched to share
+         out the container's height — that's what was blowing each bubble
+         up into a giant empty box. `align-items: flex-end` (not the flex
+         default of `stretch`) keeps the bubble sized to its own content. */
+      .bubble-row { display: flex; flex: 0 0 auto; align-items: flex-end; margin-top: 6px; }
+      .bubble-row.me   { justify-content: flex-end; }
+      .bubble-row.them { justify-content: flex-start; }
+
+      .bubble {
+        flex: 0 0 auto;
+        width: fit-content;
+        max-width: 60%;
+        padding: 8px 12px 6px;
+        border-radius: 14px;
+        font-size: .87rem; line-height: 1.5;
+        box-shadow: 0 1px 1px rgba(0,0,0,.05);
+        animation: bubbleIn .28s ease both;
+      }
+      @keyframes bubbleIn {
+        from { opacity: 0; transform: translateY(8px) scale(.97); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
+      }
+
+      .bubble-row.me .bubble   { background: var(--rose); color: #fff; border-bottom-right-radius: 3px; }
+      .bubble-row.them .bubble { background: #fff; color: var(--text); border: 1px solid var(--border); border-bottom-left-radius: 3px; }
+
+      .bubble-label {
+        display: none; /* alignment already tells you it's your own message */
+        font-size: .62rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; opacity: .8;
+      }
+      .bubble-row.them .bubble-label { display: block; color: var(--rose); }
+
+      .bubble-text { white-space: pre-wrap; word-break: break-word; }
+
+      .bubble-meta {
+        display: flex; align-items: center; gap: 4px; justify-content: flex-end;
+        font-size: .62rem; margin-top: 3px; opacity: .7; white-space: nowrap;
+      }
+      .bubble-row.me .bubble-meta   { color: rgba(255,255,255,.9); }
+      .bubble-row.them .bubble-meta { color: var(--muted); justify-content: flex-start; }
+
+      .reply-box { border-top: 1.5px solid var(--border); padding: 18px 26px; }
+      .reply-box textarea {
+        width: 100%; border: 1.5px solid var(--border); border-radius: var(--r-sm);
+        padding: 12px 14px; font-size: .87rem; font-family: var(--font-body); color: var(--text);
+        background: #fff; resize: vertical; outline: none; line-height: 1.6; transition: border-color .15s;
+      }
+      .reply-box textarea:focus { border-color: var(--rose); box-shadow: 0 0 0 4px rgba(139,74,90,.09); }
+      .reply-box-footer { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 10px; }
+      .reply-feedback { font-size: .78rem; display: none; align-items: center; gap: 5px; }
+      .reply-feedback.show { display: flex; }
+      .reply-feedback.err  { color: #c0394f; }
+      .reply-feedback.ok   { color: #2e7d32; }
+
+      .send-btn {
+        display: inline-flex; align-items: center; gap: 7px; padding: 10px 20px;
+        background: linear-gradient(135deg, var(--rose), var(--rose-dk)); color: #fff; border: none;
+        border-radius: var(--r-sm); font-size: .84rem; font-weight: 700; cursor: pointer;
+        font-family: var(--font-body); transition: box-shadow .18s;
+      }
+      .send-btn:hover:not(:disabled) { box-shadow: 0 8px 18px rgba(139,74,90,.26); }
+      .send-btn:disabled { opacity: .6; cursor: not-allowed; }
+
+      .notice-card {
+        margin: 0 26px 24px; border-radius: var(--r-lg); border: 2px dashed var(--border);
+        padding: 24px; text-align: center;
+      }
+      .notice-icon {
+        width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 1.2rem; margin: 0 auto 12px; background: #eee; color: #888;
+      }
+      .notice-card h3 { font-family: var(--font-display); font-size: 1rem; color: var(--text); margin-bottom: 6px; }
+      .notice-card p { font-size: .82rem; color: var(--muted); }
+
+      .footer-nav { margin-top: var(--gap-md); }
+      .back-link {
+        display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px;
+        background: #fff; border: 1.5px solid var(--border); border-radius: var(--r-md);
+        color: var(--muted); font-size: .84rem; font-weight: 700; text-decoration: none; transition: all .2s;
+      }
+      .back-link:hover { border-color: var(--rose); color: var(--rose); background: var(--rose-lt); }
+
+      @media (max-width: 900px) {
+        .msg-card-header, .thread-list, .reply-box { padding: 18px; }
+        .bubble { max-width: 84%; }
+      }
+    </style>
 
     <%
-      const statusLabels = {
-        open: 'Open', in_progress: 'In Progress', resolved: 'Resolved', closed: 'Closed'
-      };
-      const statusIcons = {
-        open: 'fa-circle-exclamation', in_progress: 'fa-comments',
-        resolved: 'fa-check-circle', closed: 'fa-lock'
-      };
+      const statusLabels = { open: 'Open', in_progress: 'In Progress', resolved: 'Resolved', closed: 'Closed' };
+      const statusIcons  = { open: 'fa-circle-exclamation', in_progress: 'fa-comments', resolved: 'fa-check-circle', closed: 'fa-lock' };
     %>
 
-    <div class="top-nav">
-      <a href="/my-messages" class="back-btn">
-        <i class="fas fa-arrow-left"></i> Back to Messages
-      </a>
-      <h1 class="page-title">Ticket Detail</h1>
-      <span class="ticket-tag">#<%= msg.ticketNumber %></span>
+    <div class="page-topbar">
+      <a href="/my-messages" class="back-btn spa-link"><i class="fas fa-arrow-left"></i> Back</a>
+      <h2>Ticket Detail <span class="ticket-tag">#<%= msg.ticketNumber %></span></h2>
     </div>
 
     <div class="msg-card">
       <div class="msg-card-header">
         <div class="msg-subject"><%= msg.subject %></div>
         <div class="msg-meta">
-          <div class="msg-meta-item">
-            <i class="fas fa-user"></i>
-            <strong style="color:#fff;"><%= msg.name %></strong>
-          </div>
-          <div class="msg-meta-item">
-            <i class="fas fa-envelope"></i>
-            <%= msg.email %>
-          </div>
-          <div class="msg-meta-item">
-            <i class="fas fa-clock"></i>
-            Opened <%= new Date(msg.createdAt).toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) %>
-          </div>
-          <span class="status-badge badge-<%= msg.status %>">
-            <i class="fas <%= statusIcons[msg.status] %>"></i> <%= statusLabels[msg.status] %>
-          </span>
+          <div class="msg-meta-item"><i class="fas fa-user"></i> <strong style="color:#fff;"><%= msg.name %></strong></div>
+          <div class="msg-meta-item"><i class="fas fa-envelope"></i> <%= msg.email %></div>
+          <div class="msg-meta-item"><i class="fas fa-clock"></i> Opened <%= new Date(msg.createdAt).toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) %></div>
+          <span class="status-badge badge-<%= msg.status %>"><i class="fas <%= statusIcons[msg.status] %>"></i> <%= statusLabels[msg.status] %></span>
         </div>
       </div>
 
-      <!-- THREAD -->
-      <div class="thread-card" style="border:none;border-radius:0;box-shadow:none;">
-        <div class="thread-list" id="threadList">
-          <% (msg.messages || []).forEach(m => { %>
-            <div class="bubble-row <%= m.sender === 'user' ? 'me' : 'them' %>">
-              <div class="bubble">
-                <div class="bubble-label"><%= m.sender === 'user' ? 'You' : "Cake O'Clock Support" %></div>
-                <%= m.text %>
-                <div class="bubble-time">
-                  <%= new Date(m.createdAt).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) %>
-                </div>
+      <div class="thread-list" id="threadList">
+        <% (msg.messages || []).forEach(m => { %>
+          <div class="bubble-row <%= m.sender === 'user' ? 'me' : 'them' %>">
+            <div class="bubble">
+              <% if (m.sender !== 'user') { %><div class="bubble-label">Cake O'Clock Support</div><% } %>
+              <div class="bubble-text"><%= m.text %></div>
+              <div class="bubble-meta">
+                <span><%= new Date(m.createdAt).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) %></span>
+                <% if (m.sender === 'user') { %><i class="fas fa-check-double" style="font-size:.66rem"></i><% } %>
               </div>
             </div>
-          <% }) %>
-        </div>
-
-        <% if (msg.status === 'closed') { %>
-          <div class="notice-card closed" style="margin:0 32px 28px;">
-            <div class="notice-icon"><i class="fas fa-lock"></i></div>
-            <h3>This ticket is closed</h3>
-            <p>Have a new question? Start a fresh ticket and we'll help right away.</p>
           </div>
-        <% } else { %>
-          <div class="reply-box">
-            <% if (msg.status === 'resolved') { %>
-              <p style="font-size:.78rem;color:#b9840a;margin-bottom:10px;">
-                <i class="fas fa-info-circle"></i>
-                We marked this resolved. Reply below if you still need help, or it'll auto-close soon.
-              </p>
-            <% } %>
-            <textarea id="replyText" rows="3" placeholder="Type your message…"></textarea>
-            <div class="reply-box-footer">
-              <div id="replyFeedback" class="reply-feedback"></div>
-              <button id="sendBtn" class="send-btn" onclick="sendReply()">
-                <i class="fas fa-paper-plane"></i> Send
-              </button>
-            </div>
-          </div>
-        <% } %>
+        <% }) %>
       </div>
+
+      <% if (msg.status === 'closed') { %>
+        <div class="notice-card">
+          <div class="notice-icon"><i class="fas fa-lock"></i></div>
+          <h3>This ticket is closed</h3>
+          <p>Have a new question? Start a fresh ticket and we'll help right away.</p>
+        </div>
+      <% } else { %>
+        <div class="reply-box">
+          <% if (msg.status === 'resolved') { %>
+            <p style="font-size:.78rem;color:#b9840a;margin-bottom:10px;">
+              <i class="fas fa-info-circle"></i> We marked this resolved. Reply below if you still need help, or it'll auto-close soon.
+            </p>
+          <% } %>
+          <textarea id="replyText" rows="3" placeholder="Type your message…"></textarea>
+          <div class="reply-box-footer">
+            <div id="replyFeedback" class="reply-feedback"></div>
+            <button id="sendBtn" class="send-btn" onclick="sendReply()">
+              <i class="fas fa-paper-plane"></i> Send
+            </button>
+          </div>
+        </div>
+      <% } %>
     </div>
 
     <div class="footer-nav">
-      <a href="/my-messages" class="back-link">
-        <i class="fas fa-arrow-left"></i> Back to all tickets
-      </a>
+      <a href="/my-messages" class="back-link spa-link"><i class="fas fa-arrow-left"></i> Back to all tickets</a>
     </div>
 
+    <script>
+      // scroll thread to bottom on load
+      const threadList = document.getElementById('threadList');
+      if (threadList) threadList.scrollTop = threadList.scrollHeight;
+
+      async function sendReply() {
+        const textarea = document.getElementById('replyText');
+        const btn = document.getElementById('sendBtn');
+        const fb = document.getElementById('replyFeedback');
+        const text = textarea.value.trim();
+
+        if (!text) {
+          fb.className = 'reply-feedback show err';
+          fb.innerHTML = '<i class="fas fa-exclamation-circle"></i> Message cannot be empty.';
+          return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…';
+        fb.className = 'reply-feedback';
+
+        try {
+          const res = await fetch(window.location.pathname + '/reply', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ replyText: text })
+          });
+          const data = await res.json();
+
+          if (data.success) {
+            fb.className = 'reply-feedback show ok';
+            fb.innerHTML = '<i class="fas fa-check-circle"></i> Sent! Reloading…';
+            setTimeout(() => window.location.reload(), 900);
+          } else {
+            throw new Error(data.message || 'Something went wrong.');
+          }
+        } catch (err) {
+          fb.className = 'reply-feedback show err';
+          fb.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${err.message}`;
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+        }
+      }
+    </script>
   </main>
 </div>
 
-<script>
-  // scroll thread to bottom on load
-  const threadList = document.getElementById('threadList');
-  if (threadList) threadList.scrollTop = threadList.scrollHeight;
-
-  async function sendReply() {
-    const textarea = document.getElementById('replyText');
-    const btn = document.getElementById('sendBtn');
-    const fb = document.getElementById('replyFeedback');
-    const text = textarea.value.trim();
-
-    if (!text) {
-      fb.className = 'reply-feedback show err';
-      fb.innerHTML = '<i class="fas fa-exclamation-circle"></i> Message cannot be empty.';
-      return;
-    }
-
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…';
-    fb.className = 'reply-feedback';
-
-    try {
-      const res = await fetch(window.location.pathname + '/reply', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ replyText: text })
-      });
-      const data = await res.json();
-
-      if (data.success) {
-        fb.className = 'reply-feedback show ok';
-        fb.innerHTML = '<i class="fas fa-check-circle"></i> Sent! Reloading…';
-        setTimeout(() => window.location.reload(), 900);
-      } else {
-        throw new Error(data.message || 'Something went wrong.');
-      }
-    } catch (err) {
-      fb.className = 'reply-feedback show err';
-      fb.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${err.message}`;
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
-    }
-  }
-</script>
-
+<%- include("../../views/partials/user/footer") %>
 </body>
 </html>

@@ -91,15 +91,21 @@
     stroke-linejoin: round;
   }
 
+  /* Wishlist heart — solid fill look */
+  .nav-icon-btn.wishlist-btn svg {
+    fill: currentColor;
+    stroke: none;
+  }
+
   /* ── BADGE ── */
   .nav-badge {
     position: absolute;
     top: 1px; right: 1px;
-    min-width: 18px; height: 18px;
-    background: var(--rose);
+    min-width: 17px; height: 17px;
+    background: var(--rose-dk);
     color: #fff;
     font-family: 'Lato', sans-serif;
-    font-size: .60rem;
+    font-size: .58rem;
     font-weight: 700;
     border-radius: 50px;
     display: flex;
@@ -181,7 +187,7 @@
   .u-menu .item-logout:hover { background: #fff0f0 !important; color: #c0392b !important; }
 
   /* ── AUTH LINKS (guest) ── */
-.auth-link {
+  .auth-link {
     font-family: 'Lato', sans-serif;
     font-size: .78rem;
     font-weight: 700;
@@ -217,8 +223,7 @@
     </a>
 
     <!-- ── NAV LINKS ── -->
-<!-- ── NAV LINKS ── -->
-<ul class="nav gap-1 d-none d-lg-flex position-absolute start-50 translate-middle-x">
+    <ul class="nav gap-1 d-none d-lg-flex position-absolute start-50 translate-middle-x">
         <li><a class="nav-link" href="/">Home</a></li>
       <li><a class="nav-link" href="/products">Shop</a></li>
       <li><a class="nav-link" href="/about">About Us</a></li>
@@ -229,8 +234,8 @@
     <!-- ── ICONS + USER ── -->
     <div class="d-flex align-items-center gap-2" style="flex-shrink:0;">
 
-      <!-- ❤ WISHLIST -->
-      <a href="/wishlist" class="nav-icon-btn" title="My Wishlist" aria-label="Wishlist">
+      <!-- WISHLIST -->
+      <a href="/wishlist" class="nav-icon-btn wishlist-btn" title="My Wishlist" aria-label="Wishlist">
         <svg viewBox="0 0 24 24">
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
         </svg>
@@ -242,7 +247,7 @@
         </span>
       </a>
 
-      <!-- 🛒 CART -->
+      <!-- CART -->
       <a href="/cart" class="nav-icon-btn" title="My Cart" aria-label="Cart">
         <svg viewBox="0 0 24 24">
           <circle cx="9" cy="21" r="1"/>
@@ -269,7 +274,7 @@
             <%= locals.user.name.split(' ')[0] %>
             <i class="fas fa-chevron-down u-caret"></i>
           </a>
-<ul class="dropdown-menu dropdown-menu-end u-menu">
+          <ul class="dropdown-menu dropdown-menu-end u-menu">
             <li>
               <a class="dropdown-item" href="/profile">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -290,7 +295,8 @@
                 Logout
               </a>
             </li>
-          </ul>        </div>
+          </ul>
+        </div>
 
       <% } else { %>
         <a href="/login"  class="auth-link">Log In</a>

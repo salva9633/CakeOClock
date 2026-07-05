@@ -7,261 +7,176 @@
   <link rel="stylesheet" href="/css/cake.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --rose: #AF5454; --rose-dk: #8c3a3a; --rose-mid: #c97070;
-      --rose-lt: #fdf0f0; --rose-pale: #fff5f2;
-      --brown: #3d1f1f; --brown-lt: #7a5050;
-      --cream: #fdf8f6; --muted: #8a7070; --border: #ecdada;
-      --font-display: 'Playfair Display', serif;
-      --font-body: 'DM Sans', sans-serif;
-      --r-sm: 10px; --r-md: 14px; --r-lg: 18px; --r-xl: 24px;
-      --shadow-md: 0 6px 24px rgba(175,84,84,.12);
-      --shadow-lg: 0 14px 44px rgba(175,84,84,.18);
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: var(--font-body); background: linear-gradient(135deg, #f5e0dd 0%, #fdf3ef 100%); color: var(--brown); }
-
-    .dash-wrap {
-      display: flex; width: 97%; min-height: 85vh;
-      margin: 20px auto; background: #fff;
-      border-radius: var(--r-xl); box-shadow: var(--shadow-md); overflow: hidden;
-      animation: wrapIn .5s cubic-bezier(.22,.9,.36,1) both;
-    }
-    @keyframes wrapIn {
-      from { opacity: 0; transform: translateY(30px) scale(.98); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    .dash-sidebar {
-      width: 260px; min-width: 260px;
-      background: linear-gradient(180deg, var(--rose-pale) 0%, #fff0ec 100%);
-      border-right: 1px solid var(--border); padding: 28px 22px;
-    }
-    .dash-main { flex: 1; padding: 36px 40px; overflow-y: auto; }
-
-    /* ── Page heading ── */
-    .page-topbar { display: flex; align-items: center; margin-bottom: 28px; animation: slideDown .45s .1s ease both; }
-    @keyframes slideDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
-    .page-topbar h2 {
-      font-family: var(--font-display); font-size: 1.9rem; font-weight: 700;
-      color: var(--brown); position: relative;
-    }
-    .page-topbar h2::after {
-      content: ''; position: absolute; bottom: -4px; left: 0;
-      height: 3px; width: 0;
-      background: linear-gradient(90deg, var(--rose), var(--rose-dk));
-      border-radius: 2px; animation: drawLine .55s .55s ease forwards;
-    }
-    @keyframes drawLine { to { width: 100%; } }
-
-    .wallet-grid { display: grid; grid-template-columns: 320px 1fr; gap: 24px; }
-
-    /* ── Balance card ── */
-    .wallet-balance-card {
-      background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dk) 100%);
-      border-radius: var(--r-xl); padding: 28px 32px; color: #fff;
-      margin-bottom: 16px; position: relative; overflow: hidden;
-      box-shadow: 0 12px 36px rgba(175,84,84,.32);
-      animation: cardIn .5s .1s cubic-bezier(.22,.9,.36,1) both;
-    }
-    @keyframes cardIn { from { opacity: 0; transform: translateY(28px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
-    .wallet-balance-card::after {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.18) 50%, transparent 65%);
-      transform: translateX(-100%); animation: shimmer 3.5s 1.2s infinite;
-    }
-    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
-    .wbc-bubble {
-      position: absolute; border-radius: 50%; background: rgba(255,255,255,.08);
-      animation: bubbleDrift var(--p,5s) ease-in-out infinite alternate;
-    }
-    .wbc-bubble:nth-child(1){ width:130px; height:130px; top:-40px; right:20px; --p:4.5s; }
-    .wbc-bubble:nth-child(2){ width:70px; height:70px; bottom:-20px; right:120px; --p:3.5s; }
-    .wbc-bubble:nth-child(3){ width:40px; height:40px; top:10px; right:160px; --p:5.5s; }
-    @keyframes bubbleDrift { from { transform: translateY(0) scale(1); } to { transform: translateY(-10px) scale(1.08); } }
-    .wallet-balance-card .label { font-size:.78rem; opacity:.8; letter-spacing:.07em; text-transform:uppercase; margin-bottom:6px; position:relative; z-index:1; }
-    .wallet-icon-wrap {
-      width: 48px; height: 48px; background: rgba(255,255,255,.18); border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.4rem; margin-bottom: 12px; position: relative; z-index: 1;
-      animation: iconFloat 2.8s ease-in-out infinite;
-    }
-    @keyframes iconFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-    .wallet-balance-card .amount {
-      font-family: var(--font-display); font-size: 2.4rem; font-weight: 700;
-      line-height: 1; position: relative; z-index: 1; margin-bottom: 6px;
-    }
-    .wallet-balance-card .sub { font-size:.76rem; opacity:.7; position:relative; z-index:1; }
-
-    /* ── Stats ── */
-    .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 16px; }
-    .stat-card {
-      background: var(--cream); border: 1.5px solid var(--border); border-radius: var(--r-lg);
-      padding: 16px; text-align: center;
-      transition: border-color .2s, box-shadow .2s, transform .2s;
-      animation: cardIn .5s ease both;
-    }
-    .stats-row .stat-card:nth-child(1){ animation-delay:.20s; }
-    .stats-row .stat-card:nth-child(2){ animation-delay:.28s; }
-    .stats-row .stat-card:nth-child(3){ animation-delay:.36s; }
-    .stat-card:hover { border-color: var(--rose-mid); box-shadow: var(--shadow-md); transform: translateY(-3px); }
-    .stat-card .stat-val { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--rose); }
-    .stat-card .stat-label { font-size: .72rem; color: var(--muted); margin-top: 4px; }
-
-    /* ── Side panel cards ── */
-    .side-card {
-      background: var(--cream); border: 1.5px solid var(--border); border-radius: var(--r-lg);
-      padding: 20px; margin-bottom: 16px; animation: cardIn .5s ease both;
-      transition: border-color .2s, box-shadow .2s;
-    }
-    .side-card:hover { border-color: var(--rose-mid); box-shadow: var(--shadow-md); }
-    .side-card-title {
-      font-size: .92rem; font-weight: 700; color: var(--brown); margin-bottom: 14px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .info-list { font-size: .78rem; color: var(--muted); padding-left: 16px; margin: 0; line-height: 1.9; }
-
-    #topupAmount {
-      width: 100%; border: 1.5px solid var(--border); border-radius: var(--r-sm);
-      padding: 12px 14px; font-size: .9rem; font-family: var(--font-body);
-      color: var(--brown); background: #fff; outline: none; margin-bottom: 10px;
-      transition: border-color .2s, box-shadow .2s;
-    }
-    #topupAmount:focus { border-color: var(--rose); box-shadow: 0 0 0 4px rgba(175,84,84,.09); }
-
-    .quick-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-    .quick-btn {
-      flex: 1; min-width: 68px; padding: 8px 10px;
-      border: 1.5px solid var(--border); border-radius: var(--r-sm);
-      background: #fff; color: var(--rose); font-size: .8rem; font-weight: 700;
-      cursor: pointer; transition: all .18s; font-family: var(--font-body);
-    }
-    .quick-btn:hover { background: var(--rose); color: #fff; border-color: var(--rose); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(175,84,84,.22); }
-
-    #addMoneyBtn {
-      width: 100%; background: linear-gradient(135deg, var(--rose), var(--rose-dk));
-      color: #fff; border: none; border-radius: var(--r-sm); padding: 13px;
-      font-size: .92rem; font-weight: 700; cursor: pointer; letter-spacing: .02em;
-      font-family: var(--font-body);
-      transition: transform .18s, box-shadow .18s;
-      box-shadow: 0 6px 20px rgba(175,84,84,.28);
-      position: relative; overflow: hidden;
-    }
-    #addMoneyBtn::after {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,.22) 50%, transparent 60%);
-      transform: translateX(-100%); transition: transform .4s;
-    }
-    #addMoneyBtn:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(175,84,84,.36); }
-    #addMoneyBtn:hover::after { transform: translateX(160%); }
-    #addMoneyBtn:disabled { opacity: .7; cursor: not-allowed; }
-    #topupMsg { font-size: .8rem; margin-top: 8px; display: none; padding: 8px 13px; border-radius: var(--r-sm); }
-
-    /* ── Transactions ── */
-    .transactions-card {
-      background: var(--cream); border-radius: var(--r-xl); padding: 28px;
-      box-shadow: var(--shadow-md); border: 1.5px solid var(--border);
-      animation: cardIn .5s .15s ease both;
-    }
-    .transactions-title {
-      font-family: var(--font-display); font-size: 1.1rem; color: var(--brown);
-      margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid var(--border);
-      display: flex; align-items: center; gap: 8px;
-    }
-    .txn-count { font-size: .75rem; color: var(--muted); font-family: var(--font-body); font-weight: 400; margin-left: auto; }
-
-    .txn-item {
-      display: flex; align-items: center; gap: 14px; padding: 14px 10px;
-      border-bottom: 1px solid var(--border); border-radius: var(--r-sm); opacity: 0;
-      animation: txnReveal .38s ease both;
-      transition: background .15s, transform .15s;
-    }
-    .txn-item:last-child { border-bottom: none; }
-    .txn-item:hover { background: var(--rose-lt); transform: translateX(4px); }
-    .txn-item:nth-child(1){ animation-delay:.25s; } .txn-item:nth-child(2){ animation-delay:.32s; }
-    .txn-item:nth-child(3){ animation-delay:.39s; } .txn-item:nth-child(4){ animation-delay:.46s; }
-    .txn-item:nth-child(5){ animation-delay:.53s; } .txn-item:nth-child(6){ animation-delay:.60s; }
-    .txn-item:nth-child(n+7){ animation-delay:.65s; }
-    @keyframes txnReveal { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-
-    .txn-icon {
-      width: 44px; height: 44px; border-radius: var(--r-md);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem; flex-shrink: 0;
-      transition: transform .22s cubic-bezier(.34,1.56,.64,1);
-    }
-    .txn-item:hover .txn-icon { transform: scale(1.12) rotate(-5deg); }
-    .txn-icon.credit { background: #e6f4ea; }
-    .txn-icon.debit  { background: #fdecea; }
-    .txn-info { flex: 1; min-width: 0; }
-    .txn-desc { font-size: .88rem; font-weight: 600; color: var(--brown); }
-    .txn-meta { font-size: .74rem; color: var(--muted); margin-top: 2px; }
-    .txn-order { font-size: .71rem; color: var(--rose); margin-top: 2px; }
-    .txn-amount { text-align: right; flex-shrink: 0; }
-    .txn-amount .val { font-size: 1rem; font-weight: 700; }
-    .txn-amount .val.credit { color: #2a8c4a; }
-    .txn-amount .val.debit  { color: #c0392b; }
-    .txn-amount .balance { font-size: .71rem; color: var(--muted); margin-top: 2px; }
-    .txn-badge {
-      display: inline-block; font-size: .6rem; font-weight: 800;
-      letter-spacing: .06em; text-transform: uppercase;
-      padding: 2px 7px; border-radius: 5px; margin-top: 4px;
-    }
-    .txn-badge.credit { background: #e6f4ea; color: #2a8c4a; }
-    .txn-badge.debit  { background: #fdecea; color: #c0392b; }
-
-    /* ── Empty state ── */
-    .empty-state {
-      text-align: center; padding: 52px 24px; color: var(--muted);
-      animation: emptyFloat 3s ease-in-out infinite alternate;
-    }
-    @keyframes emptyFloat { from { transform: translateY(0); } to { transform: translateY(-8px); } }
-    .empty-state .icon { font-size: 3.2rem; margin-bottom: 14px; display: block; }
-    .empty-state h3 { font-family: var(--font-display); font-size: 1.3rem; color: var(--rose); margin-bottom: 8px; }
-    .empty-state p { font-size: .88rem; margin-bottom: 16px; }
-    .empty-state a { color: var(--rose); font-weight: 600; text-decoration: none; }
-    .empty-state a:hover { text-decoration: underline; }
-
-    /* ── Pagination ── */
-    .pagination-wrap { display: flex; justify-content: center; gap: 6px; margin-top: 24px; flex-wrap: wrap; }
-    .pg-btn {
-      min-width: 34px; height: 34px; border-radius: 50%;
-      border: 1.5px solid var(--border); background: #fff; color: var(--rose);
-      font-size: .83rem; font-weight: 700; font-family: var(--font-body);
-      display: flex; align-items: center; justify-content: center; text-decoration: none;
-      transition: background .18s, border-color .18s, transform .15s;
-    }
-    .pg-btn:hover:not(.disabled):not(.active) { background: var(--rose-lt); border-color: var(--rose-mid); transform: translateY(-1px); }
-    .pg-btn.active { background: linear-gradient(135deg, var(--rose), var(--rose-dk)); border-color: var(--rose); color: #fff; box-shadow: 0 3px 10px rgba(175,84,84,.3); }
-    .pg-btn.disabled { opacity: .35; pointer-events: none; }
-
-    @media (max-width: 860px) {
-      .dash-wrap { flex-direction: column; width: 100%; border-radius: 0; margin: 0; }
-      .dash-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
-      .dash-main { padding: 20px 16px; }
-      .wallet-grid { grid-template-columns: 1fr; }
-    }
-  </style>
 </head>
 <body>
 
 <%- include("../partials/user/h2") %>
+<%- include("../../views/partials/user/dashboardStyles") %>
 
-<div class="dash-wrap">
+<div class="page-wrap">
+
   <aside class="dash-sidebar">
     <%- include("../../views/partials/user/sider") %>
   </aside>
 
-  <main class="dash-main">
+  <!-- Page CSS, markup and page JS all live inside #dashMain so a normal
+       SPA swap brings everything this page needs along with it. -->
+  <main class="dash-main" id="dashMain">
+    <style>
+      /* extra tokens on top of dashboardStyle's shared :root (safe to add,
+         multiple :root blocks merge — these just aren't defined yet) */
+      :root {
+        --rose-mid: #c97070;
+        --r-sm: 10px; --r-md: 14px; --r-lg: 18px; --r-xl: 24px;
+        --gap-sm: 12px; --gap-md: 20px; --gap-lg: 28px;
+        --shadow-md: 0 6px 20px rgba(139,74,90,.10);
+        --shadow-lg: 0 12px 36px rgba(139,74,90,.16);
+      }
+
+      .page-topbar { margin-bottom: var(--gap-lg); }
+
+      .wallet-grid { display: grid; grid-template-columns: 320px 1fr; gap: var(--gap-lg); align-items: start; }
+      .wallet-col { display: flex; flex-direction: column; gap: var(--gap-md); }
+
+      /* ── Balance card: calmer, one focal point instead of competing motion ── */
+      .wallet-balance-card {
+        background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dk) 100%);
+        border-radius: var(--r-xl); padding: 26px 28px; color: #fff;
+        position: relative; overflow: hidden;
+        box-shadow: 0 10px 30px rgba(139,74,90,.26);
+      }
+      .wallet-icon-wrap {
+        width: 44px; height: 44px; background: rgba(255,255,255,.16); border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.25rem; margin-bottom: 14px; position: relative; z-index: 1;
+      }
+      .wallet-balance-card .label { font-size:.74rem; opacity:.75; letter-spacing:.07em; text-transform:uppercase; margin-bottom:6px; position:relative; z-index:1; }
+      .wallet-balance-card .amount { font-family: var(--font-display); font-size: 2.2rem; font-weight: 700; line-height: 1; position: relative; z-index: 1; margin-bottom: 4px; }
+      .wallet-balance-card .sub { font-size:.74rem; opacity:.65; position:relative; z-index:1; }
+
+      /* ── Stats: one quiet strip instead of three separate bordered cards ── */
+      .stats-row {
+        display: grid; grid-template-columns: repeat(3,1fr);
+        /* background: var(--cream); border: 1.5px solid var(--border); border-radius: var(--r-lg); */
+      }
+      .stat-card { padding: 16px 8px; text-align: center; }
+      .stat-card + .stat-card { border-left: 1.5px solid var(--border); }
+      .stat-card .stat-val { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; color: var(--rose); }
+      .stat-card .stat-label { font-size: .7rem; color: var(--muted); margin-top: 3px; }
+
+      .side-card {
+        background: var(--cream); border: 1.5px solid var(--border); border-radius: var(--r-lg);
+        padding: 20px;
+      }
+      .side-card-title { font-size: .88rem; font-weight: 700; color: var(--text); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+      .info-list { font-size: .78rem; color: var(--muted); padding-left: 16px; margin: 0; line-height: 1.9; }
+
+      #topupAmount {
+        width: 100%; border: 1.5px solid var(--border); border-radius: var(--r-sm);
+        padding: 12px 14px; font-size: .9rem; font-family: var(--font-body);
+        color: var(--text); background: #fff; outline: none; margin-bottom: 12px;
+        transition: border-color .2s, box-shadow .2s;
+      }
+      #topupAmount:focus { border-color: var(--rose); box-shadow: 0 0 0 4px rgba(139,74,90,.09); }
+
+      .quick-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+      .quick-btn {
+        flex: 1; min-width: 68px; padding: 8px 10px;
+        border: 1.5px solid var(--border); border-radius: var(--r-sm);
+        background: #fff; color: var(--rose); font-size: .8rem; font-weight: 700;
+        cursor: pointer; transition: background .18s, color .18s, border-color .18s; font-family: var(--font-body);
+      }
+      .quick-btn:hover { background: var(--rose); color: #fff; border-color: var(--rose); }
+
+      #addMoneyBtn {
+        width: 100%; background: linear-gradient(135deg, var(--rose), var(--rose-dk));
+        color: #fff; border: none; border-radius: var(--r-sm); padding: 13px;
+        font-size: .9rem; font-weight: 700; cursor: pointer; letter-spacing: .02em;
+        font-family: var(--font-body); transition: box-shadow .18s;
+        box-shadow: 0 6px 18px rgba(139,74,90,.26);
+      }
+      #addMoneyBtn:hover { box-shadow: 0 8px 22px rgba(139,74,90,.32); }
+      #addMoneyBtn:disabled { opacity: .7; cursor: not-allowed; }
+      #topupMsg { font-size: .8rem; margin-top: 10px; display: none; padding: 9px 13px; border-radius: var(--r-sm); }
+
+      .transactions-card {
+        background: var(--cream); border-radius: var(--r-xl); padding: 28px;
+        box-shadow: var(--shadow-md); border: 1.5px solid var(--border);
+      }
+      .transactions-title {
+        font-family: var(--font-display); font-size: 1.1rem; color: var(--text);
+        margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid var(--border);
+        display: flex; align-items: center; gap: 8px;
+      }
+      .txn-count { font-size: .75rem; color: var(--muted); font-family: var(--font-body); font-weight: 400; margin-left: auto; }
+
+      .txn-item {
+        display: flex; align-items: center; gap: 16px; padding: 18px 8px;
+        border-bottom: 1px solid var(--border);
+      }
+      .txn-item:last-child { border-bottom: none; padding-bottom: 6px; }
+      .txn-item:first-child { padding-top: 6px; }
+
+      .txn-icon {
+        width: 42px; height: 42px; border-radius: var(--r-md);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.05rem; flex-shrink: 0;
+      }
+      .txn-icon.credit { background: #e6f4ea; }
+      .txn-icon.debit  { background: #fdecea; }
+      .txn-info { flex: 1; min-width: 0; }
+      .txn-desc { font-size: .88rem; font-weight: 600; color: var(--text); }
+      .txn-meta { font-size: .74rem; color: var(--muted); margin-top: 3px; }
+      .txn-order { font-size: .71rem; color: var(--rose); margin-top: 3px; }
+      .txn-amount { text-align: right; flex-shrink: 0; }
+      .txn-amount .val { font-size: 1rem; font-weight: 700; }
+      .txn-amount .val.credit { color: #2a8c4a; }
+      .txn-amount .val.debit  { color: #c0392b; }
+      .txn-amount .balance { font-size: .71rem; color: var(--muted); margin-top: 3px; }
+      .txn-badge { display: inline-block; font-size: .6rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 2px 7px; border-radius: 5px; margin-top: 5px; }
+      .txn-badge.credit { background: #e6f4ea; color: #2a8c4a; }
+      .txn-badge.debit  { background: #fdecea; color: #c0392b; }
+
+      .empty-state { text-align: center; padding: 52px 24px; color: var(--muted); }
+      .empty-state .icon { font-size: 3.2rem; margin-bottom: 14px; display: block; }
+      .empty-state h3 { font-family: var(--font-display); font-size: 1.3rem; color: var(--rose); margin-bottom: 8px; }
+      .empty-state p { font-size: .88rem; margin-bottom: 16px; }
+      .empty-state a { color: var(--rose); font-weight: 600; text-decoration: none; }
+      .empty-state a:hover { text-decoration: underline; }
+
+      .pagination-wrap { display: flex; justify-content: center; gap: 6px; margin-top: 26px; flex-wrap: wrap; }
+      .pg-btn {
+        min-width: 34px; height: 34px; border-radius: 50%;
+        border: 1.5px solid var(--border); background: #fff; color: var(--rose);
+        font-size: .83rem; font-weight: 700; font-family: var(--font-body);
+        display: flex; align-items: center; justify-content: center; text-decoration: none;
+        transition: background .18s, border-color .18s;
+      }
+      .pg-btn:hover:not(.disabled):not(.active) { background: var(--rose-lt); border-color: var(--rose-mid); }
+      .pg-btn.active { background: linear-gradient(135deg, var(--rose), var(--rose-dk)); border-color: var(--rose); color: #fff; }
+      .pg-btn.disabled { opacity: .35; pointer-events: none; }
+
+      @media (max-width: 700px) {
+        .wallet-grid { grid-template-columns: 1fr; }
+      }
+    </style>
+
     <div class="page-topbar">
       <h2>My Wallet</h2>
     </div>
 
+    <%
+      // Show only the 6 most recent transactions on this view.
+      // If your controller paginates with a larger page size, set the
+      // wallet route's query limit to 6 so `totalPages` lines up with
+      // what's rendered here.
+      const visibleTransactions = (transactions || []).slice(0, 6);
+    %>
+
     <div class="wallet-grid">
       <!-- Left column -->
-      <div>
+      <div class="wallet-col">
         <div class="wallet-balance-card">
-          <div class="wbc-bubble"></div><div class="wbc-bubble"></div><div class="wbc-bubble"></div>
           <div class="wallet-icon-wrap"><i class="fas fa-wallet"></i></div>
           <div class="label">Available Balance</div>
           <div class="amount">₹<%= (walletBalance || 0).toLocaleString('en-IN') %></div>
@@ -322,8 +237,8 @@
             <span class="txn-count"><%= totalTransactions %> transaction<%= totalTransactions !== 1 ? 's' : '' %></span>
           </div>
 
-          <% if (transactions && transactions.length > 0) { %>
-            <% transactions.forEach(txn => { %>
+          <% if (visibleTransactions.length > 0) { %>
+            <% visibleTransactions.forEach(txn => { %>
               <div class="txn-item">
                 <div class="txn-icon <%= txn.type %>">
                   <i class="fas fa-<%= txn.type === 'credit' ? 'arrow-down' : 'arrow-up' %>"></i>
@@ -349,11 +264,11 @@
 
             <% if (totalPages > 1) { %>
               <div class="pagination-wrap">
-                <a class="pg-btn <%= currentPage === 1 ? 'disabled' : '' %>" href="/wallet?page=<%= currentPage - 1 %>">‹</a>
+                <a class="pg-btn spa-link <%= currentPage === 1 ? 'disabled' : '' %>" href="/wallet?page=<%= currentPage - 1 %>">‹</a>
                 <% for (let i = 1; i <= totalPages; i++) { %>
-                  <a class="pg-btn <%= currentPage === i ? 'active' : '' %>" href="/wallet?page=<%= i %>"><%= i %></a>
+                  <a class="pg-btn spa-link <%= currentPage === i ? 'active' : '' %>" href="/wallet?page=<%= i %>"><%= i %></a>
                 <% } %>
-                <a class="pg-btn <%= currentPage === totalPages ? 'disabled' : '' %>" href="/wallet?page=<%= currentPage + 1 %>">›</a>
+                <a class="pg-btn spa-link <%= currentPage === totalPages ? 'disabled' : '' %>" href="/wallet?page=<%= currentPage + 1 %>">›</a>
               </div>
             <% } %>
 
@@ -368,66 +283,75 @@
         </div>
       </div>
     </div>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+      const RAZORPAY_KEY = "<%= razorpayKeyId %>";
+
+      function refreshWallet() {
+        (window.spaRefresh || (() => location.reload()))();
+      }
+
+      function setAmount(val) {
+        const input = document.getElementById('topupAmount');
+        input.value = val;
+        input.style.borderColor = 'var(--rose)';
+        input.style.boxShadow   = '0 0 0 4px rgba(139,74,90,.12)';
+        setTimeout(() => { input.style.borderColor = ''; input.style.boxShadow = ''; }, 600);
+      }
+
+      async function addMoneyToWallet() {
+        const amount = parseFloat(document.getElementById('topupAmount').value);
+        const btn    = document.getElementById('addMoneyBtn');
+        if (!amount || amount < 1) { showMsg('Please enter a valid amount (min ₹1)', 'error'); return; }
+        btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing…';
+        try {
+          const res  = await fetch('/wallet/create-order', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount })
+          });
+          const data = await res.json();
+          if (!data.success) {
+            showMsg(data.message || 'Failed to initiate payment', 'error');
+            btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Money via Razorpay'; return;
+          }
+          const options = {
+            key: RAZORPAY_KEY, amount: data.amount, currency: data.currency,
+            order_id: data.orderId, name: "Cake O'Clock", description: "Wallet Top-up",
+            theme: { color: "#8B4A5A" },
+            handler: async function(response) {
+              const verifyRes = await fetch('/wallet/verify-payment', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ razorpay_order_id: response.razorpay_order_id, razorpay_payment_id: response.razorpay_payment_id, razorpay_signature: response.razorpay_signature, amount })
+              });
+              const result = await verifyRes.json();
+              if (result.success) {
+                showMsg('✅ ₹' + amount.toLocaleString('en-IN') + ' added to your wallet!', 'success');
+                document.querySelector('.wallet-balance-card .amount').textContent = '₹' + result.newBalance.toLocaleString('en-IN');
+                document.getElementById('topupAmount').value = '';
+                setTimeout(refreshWallet, 1500);
+              } else { showMsg(result.message || 'Verification failed', 'error'); }
+              btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Money via Razorpay';
+            },
+            modal: { ondismiss: function() { btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Money via Razorpay'; } }
+          };
+          const rzp = new Razorpay(options);
+          rzp.on('payment.failed', function(r) { showMsg('Payment failed: ' + r.error.description, 'error'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Money via Razorpay'; });
+          rzp.open();
+        } catch (err) { showMsg('Something went wrong. Please try again.', 'error'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Money via Razorpay'; }
+      }
+
+      function showMsg(text, type) {
+        const el = document.getElementById('topupMsg');
+        el.textContent      = text;
+        el.style.display    = 'block';
+        el.style.background = type === 'success' ? '#e6f4ea' : '#fdecea';
+        el.style.color      = type === 'success' ? '#1e7e34' : '#c0392b';
+      }
+    </script>
   </main>
 </div>
 
 <%- include("../partials/user/footer") %>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script>
-  const RAZORPAY_KEY = "<%= razorpayKeyId %>";
-  function setAmount(val) {
-    const input = document.getElementById('topupAmount');
-    input.value = val;
-    input.style.borderColor = 'var(--rose)';
-    input.style.boxShadow   = '0 0 0 4px rgba(175,84,84,.12)';
-    setTimeout(() => { input.style.borderColor = ''; input.style.boxShadow = ''; }, 600);
-  }
-  async function addMoneyToWallet() {
-    const amount = parseFloat(document.getElementById('topupAmount').value);
-    const btn    = document.getElementById('addMoneyBtn');
-    if (!amount || amount < 1) { showMsg('Please enter a valid amount (min ₹1)', 'error'); return; }
-    btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing…';
-    try {
-      const res  = await fetch('/wallet/create-order', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount })
-      });
-      const data = await res.json();
-      if (!data.success) {
-        showMsg(data.message || 'Failed to initiate payment', 'error');
-        btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Money via Razorpay'; return;
-      }
-      const options = {
-        key: RAZORPAY_KEY, amount: data.amount, currency: data.currency,
-        order_id: data.orderId, name: "Cake O'Clock", description: "Wallet Top-up",
-        theme: { color: "#AF5454" },
-        handler: async function(response) {
-          const verifyRes = await fetch('/wallet/verify-payment', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ razorpay_order_id: response.razorpay_order_id, razorpay_payment_id: response.razorpay_payment_id, razorpay_signature: response.razorpay_signature, amount })
-          });
-          const result = await verifyRes.json();
-          if (result.success) {
-            showMsg('✅ ₹' + amount.toLocaleString('en-IN') + ' added to your wallet!', 'success');
-            document.querySelector('.wallet-balance-card .amount').textContent = '₹' + result.newBalance.toLocaleString('en-IN');
-            document.getElementById('topupAmount').value = '';
-            setTimeout(() => location.reload(), 1500);
-          } else { showMsg(result.message || 'Verification failed', 'error'); }
-          btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Money via Razorpay';
-        },
-        modal: { ondismiss: function() { btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Money via Razorpay'; } }
-      };
-      const rzp = new Razorpay(options);
-rzp.on('payment.failed', function(r) { showMsg('Payment failed: ' + r.error.description, 'error'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Money via Razorpay'; });     rzp.open();
-    } catch (err) { showMsg('Something went wrong. Please try again.', 'error'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Money via Razorpay'; }
-  }
-  function showMsg(text, type) {
-    const el = document.getElementById('topupMsg');
-    el.textContent      = text;
-    el.style.display    = 'block';
-    el.style.background = type === 'success' ? '#e6f4ea' : '#fdecea';
-    el.style.color      = type === 'success' ? '#1e7e34' : '#c0392b';
-  }
-</script>
 </body>
 </html>

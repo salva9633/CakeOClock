@@ -113,6 +113,16 @@
           </tr>
         </thead>
         <tbody>
+          <%
+            const DESC_PREVIEW_LEN = 28;
+            function previewText(text) {
+              if (!text) return '—';
+              const trimmed = text.trim();
+              return trimmed.length > DESC_PREVIEW_LEN
+                ? trimmed.substring(0, DESC_PREVIEW_LEN).trim() + '…'
+                : trimmed;
+            }
+          %>
           <% coupons.forEach(coupon => { %>
           <tr>
             <td class="code-cell"><%= coupon.code %></td>
@@ -135,7 +145,9 @@
                 <span class="badge badge-inactive">Inactive</span>
               <% } %>
             </td>
-            <td><%= coupon.description || '—' %></td>
+            <td class="desc-cell" title="<%= coupon.description || '' %>">
+              <%= previewText(coupon.description) %>
+            </td>
             <td>
               <div class="action-cell">
               <button
@@ -387,6 +399,18 @@ tbody td {
   font-weight: 700 !important;
   color: var(--brown) !important;
   letter-spacing: .04em;
+}
+
+/* Description column: fixed width, single line, ellipsis — full text
+   available on hover via the title attribute. Keeps every row the same
+   height regardless of how long a coupon's description is. */
+.desc-cell {
+  max-width: 160px;
+  color: var(--muted) !important;
+  cursor: help;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .badge {
@@ -704,4 +728,3 @@ async function toggleStatus(id, isActive) {
   }
 }
 </script>
-

@@ -6,282 +6,165 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/css/cake.css">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --burgundy:    #8B4A5A;
-      --burgundy-dk: #6e3547;
-      --blush:       #f7e0e8;
-      --blush-mid:   #f0c4d4;
-      --blush-pale:  #fdf5f8;
-      --blush-card:  #fff8fb;
-    }
-
-    body { background: linear-gradient(135deg, #f9e8ef 0%, #fdf5f8 100%); }
-
-    .dash-wrap {
-      display: flex;
-      width: 97%;
-      min-height: 85vh;
-      margin: 20px auto;
-      background: #fff;
-      border-radius: var(--r-xl);
-      box-shadow: var(--shadow-md);
-      overflow: hidden;
-    }
-    .dash-sidebar {
-      width: 260px;
-      min-width: 260px;
-      background: linear-gradient(180deg, #fff5f7 0%, #ffeef3 100%);
-      border-right: 1px solid var(--blush-mid);
-      padding: 28px 22px;
-    }
-    .dash-main {
-      flex: 1;
-      padding: 36px 40px;
-      overflow-y: auto;
-    }
-
-    /* ── Page header ── */
-    .page-topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 28px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .page-topbar h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.9rem;
-      font-weight: 700;
-      color: var(--burgundy);
-    }
-
-    /* ── Search ── */
-    .search-form { display: flex; gap: 8px; align-items: center; }
-    .search-input {
-      border: 1.5px solid var(--blush-mid);
-      border-radius: 50px;
-      padding: 9px 18px;
-      font-size: .84rem;
-      font-family: 'Nunito', sans-serif;
-      background: var(--blush-pale);
-      color: #3a2030;
-      width: 200px;
-      transition: border-color .2s, box-shadow .2s;
-    }
-    .search-input::placeholder { color: #c9a0b0; }
-    .search-input:focus {
-      outline: none;
-      border-color: var(--burgundy);
-      box-shadow: 0 0 0 3px rgba(139,74,90,.10);
-    }
-    .btn-search {
-      background: linear-gradient(135deg, var(--burgundy), var(--burgundy-dk));
-      color: #fff; border: none; border-radius: 50px;
-      width: 38px; height: 38px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; flex-shrink: 0;
-      box-shadow: 0 4px 12px rgba(139,74,90,.25);
-      transition: transform .18s, box-shadow .18s;
-    }
-    .btn-search:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(139,74,90,.32); }
-    .btn-clear { font-size: .8rem; color: #b08090; text-decoration: none; transition: color .2s; }
-    .btn-clear:hover { color: var(--burgundy); }
-
-    /* ── Order cards ── */
-    .orders-list { display: flex; flex-direction: column; gap: 16px; }
-
-    .order-card {
-      background: var(--blush-card);
-      border: 1.5px solid var(--blush-mid);
-      border-radius: 16px;
-      overflow: hidden;
-      transition: box-shadow .22s, transform .22s, border-color .22s;
-      animation: fadeUp .38s ease both;
-    }
-    .order-card:nth-child(1){ animation-delay:.04s }
-    .order-card:nth-child(2){ animation-delay:.09s }
-    .order-card:nth-child(3){ animation-delay:.14s }
-    .order-card:nth-child(4){ animation-delay:.19s }
-    .order-card:hover {
-      border-color: var(--blush-mid);
-      box-shadow: 0 6px 24px rgba(139,74,90,.12);
-      transform: translateY(-2px);
-    }
-    @keyframes fadeUp {
-      from { opacity:0; transform:translateY(12px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
-
-    .card-head {
-      padding: 14px 20px;
-      background: linear-gradient(90deg, var(--blush) 0%, #fff8fb 100%);
-      border-bottom: 1px solid var(--blush-mid);
-    }
-    .order-id { font-size: .82rem; font-weight: 700; color: var(--burgundy); letter-spacing: .3px; }
-    .order-meta { font-size: .76rem; color: #b08090; margin-top: 2px; }
-
-    .items-list { padding: 0 20px; }
-    .item-row {
-      display: flex; align-items: center; gap: 14px;
-      padding: 13px 0; border-bottom: 1px solid #faeef3;
-    }
-    .item-row:last-child { border-bottom: none; }
-    .item-img {
-      width: 56px; height: 56px; object-fit: cover;
-      border-radius: 10px; flex-shrink: 0;
-      border: 1.5px solid var(--blush-mid); background: var(--blush);
-    }
-    .item-info { flex: 1; min-width: 0; }
-    .item-name {
-      font-size: .9rem; font-weight: 700; color: #2d1520;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .item-price { font-size: .86rem; font-weight: 700; color: var(--burgundy); margin-top: 2px; }
-    .item-qty { font-size: .76rem; color: #b08090; margin-top: 1px; }
-
-    .card-foot {
-      padding: 12px 20px;
-      background: var(--blush);
-      border-top: 1px solid var(--blush-mid);
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
-    }
-    .order-total { font-size: .92rem; font-weight: 700; color: #2d1520; }
-    .order-total span { font-size: .76rem; font-weight: 500; color: #b08090; margin-right: 4px; }
-    .card-actions { display: flex; gap: 8px; align-items: center; }
-
-    .btn-details {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: linear-gradient(135deg, var(--burgundy) 0%, var(--burgundy-dk) 100%);
-      color: #fff; border: none; border-radius: 50px; padding: 8px 22px;
-      font-size: .83rem; font-weight: 700; font-family: 'Nunito', sans-serif;
-      cursor: pointer; text-decoration: none; letter-spacing: .3px;
-      box-shadow: 0 4px 14px rgba(139,74,90,.25);
-      transition: transform .18s, box-shadow .18s;
-    }
-    .btn-details:hover { transform: translateY(-2px); box-shadow: 0 7px 20px rgba(139,74,90,.35); color: #fff; }
-
-    .btn-return {
-      background: #fff; color: var(--burgundy);
-      border: 1.5px solid var(--blush-mid); border-radius: 50px;
-      padding: 7px 18px; font-size: .83rem; font-weight: 700;
-      font-family: 'Nunito', sans-serif; cursor: pointer;
-      transition: background .2s, border-color .2s;
-    }
-    .btn-return:hover { background: var(--blush); border-color: var(--burgundy); }
-    .btn-retry {
-  background: linear-gradient(135deg, #e05c6e, #b71c1c);
-  color: #fff;
-  border: none;
-  border-radius: 50px;
-  padding: 8px 20px;
-  font-size: .83rem;
-  font-weight: 700;
-  font-family: 'Nunito', sans-serif;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(183,28,28,.25);
-  transition: transform .18s, box-shadow .18s;
-}
-.btn-retry:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 7px 20px rgba(183,28,28,.35);
-}
-.foot-failed {
-  background: linear-gradient(90deg, #fce4ec 0%, #fff8fb 100%);
-  border-top-color: #f8bbd0;
-}
-
-    /* ── Empty state ── */
-    .empty-state { text-align: center; padding: 70px 20px; }
-    .empty-icon { font-size: 3.5rem; margin-bottom: 14px; }
-    .empty-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--burgundy); margin-bottom: 8px; }
-    .empty-sub { font-size: .88rem; color: #b08090; margin-bottom: 20px; }
-
-    /* ── Pagination ── */
-    .pagination-wrap {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 6px;
-      margin-top: 32px;
-      flex-wrap: wrap;
-    }
-    .pg-btn {
-      min-width: 36px; height: 36px;
-      border-radius: 50%;
-      border: 1.5px solid var(--blush-mid);
-      background: #fff;
-      color: var(--burgundy);
-      font-size: .85rem;
-      font-weight: 700;
-      font-family: 'Nunito', sans-serif;
-      display: flex; align-items: center; justify-content: center;
-      text-decoration: none;
-      transition: background .18s, border-color .18s, color .18s, box-shadow .18s;
-      cursor: pointer;
-      padding: 0 4px;
-    }
-    .pg-btn:hover:not(.disabled) {
-      background: var(--blush);
-      border-color: var(--burgundy);
-      color: var(--burgundy);
-    }
-    .pg-btn.active {
-      background: linear-gradient(135deg, var(--burgundy), var(--burgundy-dk));
-      border-color: var(--burgundy);
-      color: #fff;
-      box-shadow: 0 3px 10px rgba(139,74,90,.30);
-    }
-    .pg-btn.disabled {
-      opacity: .35;
-      pointer-events: none;
-      cursor: default;
-    }
-    .pg-info {
-      font-size: .8rem;
-      color: #b08090;
-      font-family: 'Nunito', sans-serif;
-      white-space: nowrap;
-    }
-    /* ── Status badge ── */
-    .status-badge {
-      display: inline-block;
-      padding: 3px 12px;
-      border-radius: 50px;
-      font-size: .72rem;
-      font-weight: 700;
-      letter-spacing: .04em;
-      vertical-align: middle;
-    }
-    .status-pending          { background: #fff8e1; color: #b8860b; }
-    .status-processing       { background: #e3f2fd; color: #1565c0; }
-    .status-shipped          { background: #e8f5e9; color: #2e7d32; }
-    .status-delivered        { background: #e8f5e9; color: #1b5e20; }
-    .status-cancelled        { background: #fce4ec; color: #b71c1c; }
-    .status-return-requested { background: #f3e5f5; color: #6a1b9a; }
-    .status-returned         { background: #ede7f6; color: #4527a0; }
-
-    @media (max-width: 860px) {
-      .dash-wrap { flex-direction: column; width: 100%; border-radius: 0; margin: 0; }
-      .dash-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--blush-mid); }
-      .dash-main { padding: 20px 16px; }
-    }
-  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
 <%- include("../../views/partials/user/h2") %>
+<%- include("../../views/partials/user/dashboardStyles") %>
 
-<div class="dash-wrap">
+<div class="page-wrap">
+
   <aside class="dash-sidebar">
     <%- include("../../views/partials/user/sider") %>
   </aside>
 
-  <main class="dash-main">
+  <!-- Everything below travels together on every SPA swap: page CSS,
+       markup and page JS all live inside #dashMain. -->
+  <main class="dash-main" id="dashMain">
+    <style>
+      /* ── page-local additions on top of dashboardStyle tokens ── */
+      .orders-list { display: flex; flex-direction: column; gap: 16px; }
+
+      .order-card {
+        background: var(--cream);
+        border: 1.5px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        transition: box-shadow .22s, transform .22s, border-color .22s;
+        animation: fadeUpOrder .38s ease both;
+      }
+      .order-card:nth-child(1){ animation-delay:.04s }
+      .order-card:nth-child(2){ animation-delay:.09s }
+      .order-card:nth-child(3){ animation-delay:.14s }
+      .order-card:nth-child(4){ animation-delay:.19s }
+      .order-card:hover {
+        border-color: var(--rose);
+        box-shadow: 0 6px 24px rgba(139,74,90,.12);
+        transform: translateY(-2px);
+      }
+      @keyframes fadeUpOrder {
+        from { opacity:0; transform:translateY(12px); }
+        to   { opacity:1; transform:translateY(0); }
+      }
+
+      .card-head {
+        padding: 14px 20px;
+        background: linear-gradient(90deg, var(--blush) 0%, var(--cream) 100%);
+        border-bottom: 1px solid var(--border);
+      }
+      .order-id { font-size: .82rem; font-weight: 700; color: var(--rose); letter-spacing: .3px; }
+      .order-meta { font-size: .76rem; color: var(--muted); margin-top: 2px; }
+
+      .items-list { padding: 0 20px; }
+      .item-row {
+        display: flex; align-items: center; gap: 14px;
+        padding: 13px 0; border-bottom: 1px solid var(--rose-lt);
+      }
+      .item-row:last-child { border-bottom: none; }
+      .item-img {
+        width: 56px; height: 56px; object-fit: cover;
+        border-radius: 10px; flex-shrink: 0;
+        border: 1.5px solid var(--border); background: var(--blush);
+      }
+      .item-info { flex: 1; min-width: 0; }
+      .item-name {
+        font-size: .9rem; font-weight: 700; color: var(--text);
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      .item-price { font-size: .86rem; font-weight: 700; color: var(--rose); margin-top: 2px; }
+      .item-qty { font-size: .76rem; color: var(--muted); margin-top: 1px; }
+
+      .card-foot {
+        padding: 12px 20px;
+        background: var(--blush);
+        border-top: 1px solid var(--border);
+        display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+      }
+      .order-total { font-size: .92rem; font-weight: 700; color: var(--text); }
+      .order-total span { font-size: .76rem; font-weight: 500; color: var(--muted); margin-right: 4px; }
+      .card-actions { display: flex; gap: 8px; align-items: center; }
+
+      .btn-details {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dk) 100%);
+        color: #fff; border: none; border-radius: 50px; padding: 8px 22px;
+        font-size: .83rem; font-weight: 700; font-family: 'Nunito', sans-serif;
+        cursor: pointer; text-decoration: none; letter-spacing: .3px;
+        box-shadow: 0 4px 14px rgba(139,74,90,.25);
+        transition: transform .18s, box-shadow .18s;
+      }
+      .btn-details:hover { transform: translateY(-2px); box-shadow: 0 7px 20px rgba(139,74,90,.35); color: #fff; }
+
+      .btn-retry {
+        background: linear-gradient(135deg, #e05c6e, #b71c1c);
+        color: #fff; border: none; border-radius: 50px; padding: 8px 20px;
+        font-size: .83rem; font-weight: 700; font-family: 'Nunito', sans-serif;
+        cursor: pointer; box-shadow: 0 4px 12px rgba(183,28,28,.25);
+        transition: transform .18s, box-shadow .18s;
+      }
+      .btn-retry:hover { transform: translateY(-2px); box-shadow: 0 7px 20px rgba(183,28,28,.35); }
+      .foot-failed { background: linear-gradient(90deg, #fce4ec 0%, var(--cream) 100%); border-top-color: #f8bbd0; }
+
+      .empty-state { text-align: center; padding: 70px 20px; }
+      .empty-icon { font-size: 3.5rem; margin-bottom: 14px; }
+      .empty-title { font-family: var(--font-display); font-size: 1.4rem; color: var(--rose); margin-bottom: 8px; }
+      .empty-sub { font-size: .88rem; color: var(--muted); margin-bottom: 20px; }
+
+      .pagination-wrap {
+        display: flex; justify-content: center; align-items: center; gap: 6px;
+        margin-top: 32px; flex-wrap: wrap;
+      }
+      .pg-btn {
+        min-width: 36px; height: 36px; border-radius: 50%;
+        border: 1.5px solid var(--border); background: #fff; color: var(--rose);
+        font-size: .85rem; font-weight: 700; font-family: 'Nunito', sans-serif;
+        display: flex; align-items: center; justify-content: center; text-decoration: none;
+        transition: background .18s, border-color .18s, color .18s, box-shadow .18s;
+        cursor: pointer; padding: 0 4px;
+      }
+      .pg-btn:hover:not(.disabled) { background: var(--blush); border-color: var(--rose); color: var(--rose); }
+      .pg-btn.active {
+        background: linear-gradient(135deg, var(--rose), var(--rose-dk));
+        border-color: var(--rose); color: #fff; box-shadow: 0 3px 10px rgba(139,74,90,.30);
+      }
+      .pg-btn.disabled { opacity: .35; pointer-events: none; cursor: default; }
+      .pg-info { font-size: .8rem; color: var(--muted); font-family: 'Nunito', sans-serif; white-space: nowrap; }
+
+      .status-badge {
+        display: inline-block; padding: 3px 12px; border-radius: 50px;
+        font-size: .72rem; font-weight: 700; letter-spacing: .04em; vertical-align: middle;
+      }
+      .status-pending          { background: #fff8e1; color: #b8860b; }
+      .status-processing       { background: #e3f2fd; color: #1565c0; }
+      .status-shipped          { background: #e8f5e9; color: #2e7d32; }
+      .status-delivered        { background: #e8f5e9; color: #1b5e20; }
+      .status-cancelled        { background: #fce4ec; color: #b71c1c; }
+      .status-return-requested { background: #f3e5f5; color: #6a1b9a; }
+      .status-returned         { background: #ede7f6; color: #4527a0; }
+
+      .search-form { display: flex; gap: 8px; align-items: center; }
+      .search-input {
+        border: 1.5px solid var(--border); border-radius: 50px; padding: 9px 18px;
+        font-size: .84rem; font-family: 'Nunito', sans-serif; background: var(--rose-lt);
+        color: var(--text); width: 200px; transition: border-color .2s, box-shadow .2s;
+      }
+      .search-input::placeholder { color: var(--muted); }
+      .search-input:focus { outline: none; border-color: var(--rose); box-shadow: 0 0 0 3px rgba(139,74,90,.10); }
+      .btn-search {
+        background: linear-gradient(135deg, var(--rose), var(--rose-dk));
+        color: #fff; border: none; border-radius: 50px; width: 38px; height: 38px;
+        display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(139,74,90,.25); transition: transform .18s, box-shadow .18s;
+      }
+      .btn-search:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(139,74,90,.32); }
+      .btn-clear { font-size: .8rem; color: var(--muted); text-decoration: none; transition: color .2s; }
+      .btn-clear:hover { color: var(--rose); }
+    </style>
+
     <div class="page-topbar">
       <h2>My Orders</h2>
-      <form method="GET" action="/orders" class="search-form">
+      <form method="GET" action="/orders" class="search-form" id="orderSearchForm">
         <input type="text" name="search" class="search-input" placeholder="Search by Order ID…" value="<%= search %>">
         <button type="submit" class="btn-search" aria-label="Search">
           <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
@@ -289,7 +172,7 @@
           </svg>
         </button>
         <% if (search) { %>
-          <a href="/orders" class="btn-clear">✕ Clear</a>
+          <a href="/orders" class="btn-clear spa-link">✕ Clear</a>
         <% } %>
       </form>
     </div>
@@ -328,26 +211,26 @@
               <% }) %>
             </div>
 
-          <div class="card-foot <%= order.paymentStatus === 'Failed' ? 'foot-failed' : '' %>">
-  <div class="order-total">
-    <span>Total</span>₹<%= order.finalTotal.toLocaleString('en-IN') %>
-    &nbsp;
-    <span class="status-badge status-<%= order.status.toLowerCase().replace(/ /g,'-') %>">
-      <%= order.status %>
-    </span>
-    <% if (order.paymentStatus === 'Failed') { %>
-      <span class="status-badge" style="background:#fce4ec;color:#b71c1c;margin-left:6px;">⚠ Payment Failed</span>
-    <% } %>
-  </div>
-  <div class="card-actions">
-    <% if (order.paymentStatus === 'Failed' && order.status === 'Pending') { %>
-      <button class="btn-retry" onclick="retryPayment('<%= order._id %>', <%= order.finalTotal %>)">
-        Retry Payment
-      </button>
-    <% } %>
-    <a href="/orders/<%= order._id %>" class="btn-details">Details</a>
-  </div>
-</div>
+            <div class="card-foot <%= order.paymentStatus === 'Failed' ? 'foot-failed' : '' %>">
+              <div class="order-total">
+                <span>Total</span>₹<%= order.finalTotal.toLocaleString('en-IN') %>
+                &nbsp;
+                <span class="status-badge status-<%= order.status.toLowerCase().replace(/ /g,'-') %>">
+                  <%= order.status %>
+                </span>
+                <% if (order.paymentStatus === 'Failed') { %>
+                  <span class="status-badge" style="background:#fce4ec;color:#b71c1c;margin-left:6px;">⚠ Payment Failed</span>
+                <% } %>
+              </div>
+              <div class="card-actions">
+                <% if (order.paymentStatus === 'Failed' && order.status === 'Pending') { %>
+                  <button class="btn-retry" onclick="retryPayment('<%= order._id %>', <%= order.finalTotal %>)">
+                    Retry Payment
+                  </button>
+                <% } %>
+                <a href="/orders/<%= order._id %>" class="btn-details spa-link">Details</a>
+              </div>
+            </div>
 
           </div>
         <% }) %>
@@ -358,22 +241,19 @@
     <% if (orders && orders.length > 0) { %>
       <div class="pagination-wrap">
 
-        <!-- Prev -->
-        <a class="pg-btn <%= currentPage <= 1 ? 'disabled' : '' %>"
+        <a class="pg-btn spa-link <%= currentPage <= 1 ? 'disabled' : '' %>"
            href="/orders?page=<%= currentPage - 1 %><%= search ? '&search=' + search : '' %>">
           ‹
         </a>
 
-        <!-- Page numbers -->
         <% for (let p = 1; p <= totalPages; p++) { %>
-          <a class="pg-btn <%= currentPage === p ? 'active' : '' %>"
+          <a class="pg-btn spa-link <%= currentPage === p ? 'active' : '' %>"
              href="/orders?page=<%= p %><%= search ? '&search=' + search : '' %>">
             <%= p %>
           </a>
         <% } %>
 
-        <!-- Next -->
-        <a class="pg-btn <%= currentPage >= totalPages ? 'disabled' : '' %>"
+        <a class="pg-btn spa-link <%= currentPage >= totalPages ? 'disabled' : '' %>"
            href="/orders?page=<%= currentPage + 1 %><%= search ? '&search=' + search : '' %>">
           ›
         </a>
@@ -382,113 +262,148 @@
       </div>
     <% } %>
 
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      // Search form: hand off to SPA nav instead of a full GET reload.
+   // Search form: hand off to SPA nav instead of a full GET reload.
+      (function () {
+        const form = document.getElementById('orderSearchForm');
+        if (!form) return;
+
+        function debounce(fn, delay = 400) {
+          let timer;
+          return function (...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => fn.apply(this, args), delay);
+          };
+        }
+
+        function runSearch() {
+          const val = form.search.value.trim();
+          const url = '/orders' + (val ? '?search=' + encodeURIComponent(val) : '');
+          (window.spaNavigate || (u => window.location.href = u))(url);
+        }
+
+        const debouncedSearch = debounce(runSearch, 400);
+
+        // Auto-search as the user types (debounced)
+        form.search.addEventListener('input', debouncedSearch);
+
+        // Keep manual submit (Enter / button click) instant, no debounce delay
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          runSearch();
+        });
+      })();
+
+      function refreshOrders() {
+        (window.spaRefresh || (() => location.reload()))();
+      }
+
+      async function returnOrder(id) {
+        const { value: reason, isConfirmed } = await Swal.fire({
+          title: 'Return Order',
+          text:  'Please select a reason for your return.',
+          icon:  'question',
+          input: 'select',
+          inputOptions: {
+            'Damaged or defective':     'Damaged or defective',
+            'Wrong item delivered':     'Wrong item delivered',
+            'Not as described':         'Not as described',
+            'Quality not satisfactory': 'Quality not satisfactory',
+            'Other':                    'Other'
+          },
+          inputPlaceholder:   'Select a reason',
+          showCancelButton:   true,
+          confirmButtonColor: '#8B4A5A',
+          cancelButtonColor:  '#a07085',
+          confirmButtonText:  'Submit Return',
+          preConfirm: (val) => {
+            if (!val) { Swal.showValidationMessage('Please select a reason'); return false; }
+          }
+        });
+        if (!isConfirmed) return;
+        const res  = await fetch(`/orders/${id}/return`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason })
+        });
+        const data = await res.json();
+        if (data.success) {
+          Swal.fire({ icon:'success', title:'Return Requested', text:data.message, confirmButtonColor:'#8B4A5A' })
+            .then(refreshOrders);
+        } else {
+          Swal.fire({ icon:'error', title:'Failed', text:data.message, confirmButtonColor:'#8B4A5A' });
+        }
+      }
+
+      async function retryPayment(orderId, amount) {
+        const confirmed = await Swal.fire({
+          title: 'Retry Payment',
+          text:  `Retry payment of ₹${amount.toLocaleString('en-IN')}?`,
+          icon:  'question',
+          showCancelButton:   true,
+          confirmButtonColor: '#8B4A5A',
+          cancelButtonColor:  '#a07085',
+          confirmButtonText:  'Yes, Pay Now'
+        });
+        if (!confirmed.isConfirmed) return;
+
+        try {
+          const res  = await fetch('/checkout/retry-razorpay-order', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ orderId })
+          });
+          const data = await res.json();
+          if (!data.success) {
+            Swal.fire({ icon: 'error', title: 'Error', text: data.message, confirmButtonColor: '#8B4A5A' });
+            return;
+          }
+
+          const options = {
+            key:      data.razorpayKeyId,
+            amount:   data.razorpayOrder.amount,
+            currency: 'INR',
+            name:     "Cake O'Clock",
+            order_id: data.razorpayOrder.id,
+            handler: async function (response) {
+              const verifyRes = await fetch('/checkout/verify-retry-payment', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({
+                  razorpay_order_id:   response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature:  response.razorpay_signature,
+                  orderId
+                })
+              });
+              const verifyData = await verifyRes.json();
+              if (verifyData.success) {
+                (window.spaNavigate || (u => window.location.href = u))(`/order-success/${orderId}`);
+              } else {
+                Swal.fire({ icon: 'error', title: 'Verification Failed', text: verifyData.message, confirmButtonColor: '#8B4A5A' });
+              }
+            },
+            modal: {
+              ondismiss: function () {
+                Swal.fire({ icon: 'info', title: 'Payment Cancelled', confirmButtonColor: '#8B4A5A' });
+              }
+            },
+            theme: { color: '#8B4A5A' }
+          };
+
+          const rzp = new Razorpay(options);
+          rzp.open();
+        } catch (err) {
+          Swal.fire({ icon: 'error', title: 'Something went wrong', confirmButtonColor: '#8B4A5A' });
+        }
+      }
+    </script>
   </main>
 </div>
 
 <%- include("../../views/partials/user/footer") %>
-
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-async function returnOrder(id) {
-  const { value: reason, isConfirmed } = await Swal.fire({
-    title: 'Return Order',
-    text:  'Please select a reason for your return.',
-    icon:  'question',
-    input: 'select',
-    inputOptions: {
-      'Damaged or defective':     'Damaged or defective',
-      'Wrong item delivered':     'Wrong item delivered',
-      'Not as described':         'Not as described',
-      'Quality not satisfactory': 'Quality not satisfactory',
-      'Other':                    'Other'
-    },
-    inputPlaceholder:   'Select a reason',
-    showCancelButton:   true,
-    confirmButtonColor: '#8B4A5A',
-    cancelButtonColor:  '#b08090',
-    confirmButtonText:  'Submit Return',
-    preConfirm: (val) => {
-      if (!val) { Swal.showValidationMessage('Please select a reason'); return false; }
-    }
-  });
-  if (!isConfirmed) return;
-  const res  = await fetch(`/orders/${id}/return`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ reason })
-  });
-  const data = await res.json();
-  if (data.success) {
-    Swal.fire({ icon:'success', title:'Return Requested', text:data.message, confirmButtonColor:'#8B4A5A' })
-      .then(() => location.reload());
-  } else {
-    Swal.fire({ icon:'error', title:'Failed', text:data.message, confirmButtonColor:'#8B4A5A' });
-  }
-}
-
-async function retryPayment(orderId, amount) {
-  const confirmed = await Swal.fire({
-    title: 'Retry Payment',
-    text:  `Retry payment of ₹${amount.toLocaleString('en-IN')}?`,
-    icon:  'question',
-    showCancelButton:   true,
-    confirmButtonColor: '#8B4A5A',
-    cancelButtonColor:  '#b08090',
-    confirmButtonText:  'Yes, Pay Now'
-  });
-  if (!confirmed.isConfirmed) return;
-
-  try {
-    const res  = await fetch('/checkout/retry-razorpay-order', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ orderId })
-    });
-    const data = await res.json();
-    if (!data.success) {
-      Swal.fire({ icon: 'error', title: 'Error', text: data.message, confirmButtonColor: '#8B4A5A' });
-      return;
-    }
-
-    const options = {
-      key:      data.razorpayKeyId,
-      amount:   data.razorpayOrder.amount,
-      currency: 'INR',
-      name:     "Cake O'Clock",
-      order_id: data.razorpayOrder.id,
-      handler: async function (response) {
-const verifyRes = await fetch('/checkout/verify-retry-payment', {
-  method:  'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body:    JSON.stringify({
-    razorpay_order_id:   response.razorpay_order_id,
-    razorpay_payment_id: response.razorpay_payment_id,
-    razorpay_signature:  response.razorpay_signature,
-    orderId
-  })
-});
-        const verifyData = await verifyRes.json();
-        if (verifyData.success) {
-          window.location.href = `/order-success/${orderId}`;
-        } else {
-          Swal.fire({ icon: 'error', title: 'Verification Failed', text: verifyData.message, confirmButtonColor: '#8B4A5A' });
-        }
-      },
-      modal: {
-        ondismiss: function () {
-          Swal.fire({ icon: 'info', title: 'Payment Cancelled', confirmButtonColor: '#8B4A5A' });
-        }
-      },
-      theme: { color: '#8B4A5A' }
-    };
-
-    const rzp = new Razorpay(options);
-    rzp.open();
-  } catch (err) {
-    Swal.fire({ icon: 'error', title: 'Something went wrong', confirmButtonColor: '#8B4A5A' });
-  }
-}
-</script>
 </body>
 </html>

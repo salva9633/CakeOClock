@@ -6,7 +6,8 @@
 * { box-sizing: border-box; }
 
 :root {
-  --bg:       #F8F9FC;
+  --bg:       #FDF1F3;
+  --bg-2:     #FDF6F7;
   --white:    #FFFFFF;
   --primary:  #C86A7A;
   --primary-dk:#A8546A;
@@ -24,12 +25,13 @@
 
 @keyframes fadeUp  { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
 @keyframes cardIn  { from{opacity:0;transform:translateY(20px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
-@keyframes rowIn   { from{opacity:0;transform:translateX(-6px)} to{opacity:1;transform:translateX(0)} }
+@keyframes rowIn   { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
+@keyframes pulseDot{ 0%{box-shadow:0 0 0 0 rgba(16,185,129,.5)} 70%{box-shadow:0 0 0 6px rgba(16,185,129,0)} 100%{box-shadow:0 0 0 0 rgba(16,185,129,0)} }
 
 /* PAGE SHELL */
 .cm-page {
   font-family: 'Inter', system-ui, sans-serif;
-  background: var(--bg);
+  background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
   min-height: 100vh;
   padding: 2rem 2rem 3rem;
   color: var(--text);
@@ -52,6 +54,7 @@
   background: linear-gradient(135deg, #C86A7A, #e891a0);
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 8px 20px rgba(200,106,122,.28);
 }
 .cm-hdr-icon i { font-size: 24px; color: #fff; }
 .cm-hdr-title { font-size: 26px; font-weight: 700; color: #111827; letter-spacing: -.4px; line-height: 1.1; }
@@ -61,7 +64,8 @@
 .cm-search {
   display: flex; align-items: center; gap: 8px;
   background: var(--white); border: 1px solid var(--border);
-  border-radius: 10px; padding: 0 14px; height: 40px; min-width: 240px;
+  border-radius: 12px; padding: 0 16px; height: 42px; min-width: 260px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.03);
   transition: border-color .2s, box-shadow .2s;
 }
 .cm-search:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(200,106,122,.1); }
@@ -73,7 +77,7 @@
 .cm-search input::placeholder { color: var(--text-faint); }
 
 .cm-sort {
-  height: 40px; border: 1px solid var(--border); border-radius: 10px;
+  height: 42px; border: 1px solid var(--border); border-radius: 12px;
   padding: 0 12px; font-size: 13px; color: var(--text-2);
   background: var(--white); font-family: 'Inter', sans-serif;
   cursor: pointer; outline: none; transition: border-color .2s;
@@ -151,8 +155,8 @@
   font-family: 'Inter', sans-serif;
   text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
 }
-.cm-pill:hover:not(.active) { border-color: var(--primary); color: var(--primary); background: var(--primary-lt); }
-.cm-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.cm-pill:hover:not(.active) { border-color: var(--primary); color: var(--primary); background: var(--primary-lt); transform: translateY(-1px); }
+.cm-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 6px 16px rgba(200,106,122,.28); }
 .cm-pill-count {
   font-size: 10px; font-weight: 700; min-width: 18px; height: 18px;
   border-radius: 99px; display: inline-flex; align-items: center;
@@ -161,31 +165,55 @@
 .cm-pill.active .cm-pill-count  { background: rgba(255,255,255,.25); color: #fff; }
 .cm-pill:not(.active) .cm-pill-count { background: var(--border-lt); color: var(--text-muted); }
 
-/* ── TABLE ── */
+/* ── TABLE CARD ── */
 .cm-table-card {
   background: var(--white); border: 1px solid var(--border);
   border-radius: 16px; overflow: hidden;
   opacity: 0; animation: cardIn .5s ease .36s forwards;
   margin-bottom: 1.5rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,.03);
 }
+
+/* topbar echoing the "All customers · Live" strip */
+.cm-table-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 22px; border-bottom: 1px solid var(--border-lt);
+  flex-wrap: wrap; gap: 10px;
+}
+.cm-table-topbar-left { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #111827; }
+.cm-table-topbar-left i { color: var(--primary); font-size: 16px; }
+.cm-table-count { font-weight: 400; color: var(--text-faint); font-size: 13px; }
+.cm-live-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; color: var(--primary-dk);
+  background: var(--primary-lt); padding: 5px 12px; border-radius: 99px;
+}
+.cm-live-badge .live-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--success);
+  animation: pulseDot 1.8s infinite;
+}
+
 .cm-table-scroll { overflow-x: auto; }
 .cm-table {
   width: 100%; border-collapse: collapse; min-width: 680px;
 }
 .cm-table thead tr {
-  background: #F9FAFB; border-bottom: 1px solid var(--border);
+  background: linear-gradient(90deg, var(--primary-dk), var(--primary));
 }
 .cm-table thead th {
-  padding: 12px 18px; font-size: 12px; font-weight: 600;
-  color: var(--text-muted); text-transform: uppercase;
+  padding: 14px 18px; font-size: 12px; font-weight: 600;
+  color: #fff; text-transform: uppercase;
   letter-spacing: .06em; white-space: nowrap; text-align: left;
 }
 .cm-table tbody tr {
   border-bottom: 1px solid var(--border-lt);
-  transition: background .15s; cursor: pointer;
+  transition: background .15s, transform .15s;
+  cursor: pointer;
+  opacity: 0;
+  animation: rowIn .35s ease forwards;
 }
 .cm-table tbody tr:last-child { border-bottom: none; }
-.cm-table tbody tr:hover { background: #FAFAFA; }
+.cm-table tbody tr:hover { background: #FAFAFA; transform: translateX(2px); }
 .cm-table tbody td {
   padding: 14px 18px; font-size: 14px;
   color: var(--text); vertical-align: middle;
@@ -198,11 +226,11 @@
   display: flex; align-items: center; justify-content: center;
   font-size: 12px; font-weight: 700; flex-shrink: 0; letter-spacing: .5px;
 }
-.av-0 { background: #FDE8EC; color: #9D2235; }
-.av-1 { background: #FEF3C7; color: #92400E; }
-.av-2 { background: #D1FAE5; color: #065F46; }
-.av-3 { background: #EDE9FE; color: #4C1D95; }
-.av-4 { background: #DBEAFE; color: #1E3A5F; }
+.av-0 { background: #FDE3EA; color: #A8546A; }
+.av-1 { background: #FCEBE0; color: #B45309; }
+.av-2 { background: #E4F5EC; color: #047857; }
+.av-3 { background: #EEE8FB; color: #6D28D9; }
+.av-4 { background: #E4EEFB; color: #1D4ED8; }
 .cm-sname  { font-size: 14px; font-weight: 600; color: #111827; }
 .cm-semail { font-size: 12px; color: var(--text-faint); margin-top: 1px; }
 
@@ -227,7 +255,6 @@
 .b-read    { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
 .b-replied { background: #ECFDF5; color: #047857; border-color: #A7F3D0; }
 
-
 .b-open        { background: #FDE8EC; color: #C0394F; border-color: #F5C6CB; }
 .b-in_progress { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
 .b-resolved    { background: #FFFBEB; color: #B45309; border-color: #FDE68A; }
@@ -247,11 +274,11 @@
   cursor: pointer; text-decoration: none;
   transition: all .2s; font-family: 'Inter', sans-serif;
 }
-.cm-btn-view:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+.cm-btn-view:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(200,106,122,.28); }
 .cm-btn-view i { font-size: 13px; }
 
 /* Empty */
-.cm-empty { text-align: center; padding: 4rem 1rem; }
+.cm-empty { text-align: center; padding: 4rem 1rem; animation: fadeUp .4s ease both; }
 .cm-empty-ico { font-size: 52px; color: var(--border); margin-bottom: 16px; }
 .cm-empty h3  { font-size: 16px; font-weight: 600; color: var(--text-2); margin-bottom: 6px; }
 .cm-empty p   { font-size: 13px; color: var(--text-faint); }
@@ -265,7 +292,7 @@
 .cm-pg-info { font-size: 13px; color: var(--text-muted); }
 .cm-pager   { display: flex; gap: 4px; }
 .cm-pb {
-  min-width: 34px; height: 34px; border-radius: 8px;
+  min-width: 34px; height: 34px; border-radius: 9px;
   border: 1px solid var(--border); background: var(--white);
   color: var(--text-2); font-size: 13px; font-weight: 500;
   display: flex; align-items: center; justify-content: center;
@@ -273,8 +300,8 @@
   transition: all .2s; padding: 0 8px;
   font-family: 'Inter', sans-serif;
 }
-.cm-pb:hover:not(.dis):not(.on) { border-color: var(--primary); color: var(--primary); }
-.cm-pb.on  { background: var(--primary); color: #fff; border-color: var(--primary); }
+.cm-pb:hover:not(.dis):not(.on) { border-color: var(--primary); color: var(--primary); transform: translateY(-1px); }
+.cm-pb.on  { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 6px 14px rgba(200,106,122,.32); }
 .cm-pb.dis { opacity: .35; pointer-events: none; }
 
 /* Responsive */
@@ -292,6 +319,7 @@
 <div class="page-wrapper">
   <%- include('../partials/admin/sidebar') %>
 
+  <div class="cm-page">
 
     <!-- ── HEADER ── -->
     <div class="cm-header">
@@ -325,7 +353,6 @@
   const resolvedPct    = totalCount > 0 ? Math.round(resolvedCount   / totalCount * 100) : 0;
   const closedPct      = totalCount > 0 ? Math.round(closedCount     / totalCount * 100) : 0;
 %>
-    <!-- ── STATS ── (replace the existing .cm-stats block) -->
 <div class="cm-stats">
   <div class="cm-stat c-pink">
     <div class="cm-stat-head">
@@ -371,7 +398,7 @@
   </div>
 </div>
 
-<!-- ── FILTER PILLS ── (replace filters array) -->
+<!-- ── FILTER PILLS ── -->
 <div class="cm-filters">
   <%
     const filters = [
@@ -393,6 +420,16 @@
 
     <!-- ── TABLE ── -->
     <div class="cm-table-card">
+
+      <div class="cm-table-topbar">
+        <div class="cm-table-topbar-left">
+          <i class="ti ti-layout-list" aria-hidden="true"></i>
+          <span>All Messages</span>
+          <span class="cm-table-count">(<%= messages.length %> shown)</span>
+        </div>
+        <span class="cm-live-badge"><span class="live-dot"></span> Live</span>
+      </div>
+
       <% if (messages.length === 0) { %>
         <div class="cm-empty">
           <div class="cm-empty-ico"><i class="ti ti-mail-off" aria-hidden="true"></i></div>
@@ -436,7 +473,7 @@
         const relTime  = timeAgo(msg.lastActivityAt || msg.createdAt);
         const firstMsg = msg.messages && msg.messages.length ? msg.messages[0].text : '';
       %>
-      <tr onclick="window.location='/admin/contact-messages/<%= msg._id %>'">
+      <tr onclick="window.location='/admin/contact-messages/<%= msg._id %>'" style="animation-delay: <%= (i * 0.045).toFixed(2) %>s">
         <td>
           <div class="cm-sender">
             <div class="cm-av <%= avCls %>"><%= initials %></div>
@@ -506,7 +543,7 @@
       <% } %>
     </div>
 
-  
+  </div>
 </div>
 
 <script>

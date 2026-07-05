@@ -102,20 +102,19 @@
   }
   .coc-field textarea{ resize:vertical; min-height:130px; }
 
-  .coc-submit{
-    position:relative; width:100%; padding:16px; background:var(--choco); color:#fff; border:none;
+.coc-submit{
+    position:relative; width:100%; padding:16px; background:var(--rosegold); color:#fff; border:none;
     border-radius:50px; font-size:.96rem; font-weight:500; letter-spacing:.03em; cursor:pointer;
     display:flex; align-items:center; justify-content:center; gap:10px; overflow:hidden; isolation:isolate;
     box-shadow:0 14px 30px rgba(59,31,41,.22); transition:transform .35s ease, box-shadow .35s ease;
   }
   .coc-submit::before{
     content:""; position:absolute; inset:0; z-index:-1; transform:scaleX(0); transform-origin:left;
-    background:var(--rosegold); transition:transform .45s cubic-bezier(.2,.7,.2,1);
+    background:var(--choco); transition:transform .45s cubic-bezier(.2,.7,.2,1);
   }
   .coc-submit:hover::before{ transform:scaleX(1); }
   .coc-submit:hover{ transform:translateY(-3px); box-shadow:0 18px 36px rgba(201,123,132,.32); }
   .coc-submit svg{ width:18px; height:18px; }
-
   @media (max-width: 860px){
     .coc-c-grid{ grid-template-columns:1fr; }
     .coc-form-card{ padding:30px 24px; }

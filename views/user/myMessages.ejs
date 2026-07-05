@@ -2,358 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Messages – Cake O'Clock</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/css/cake.css">
-  <style>
-    :root {
-      --rose:    #8B4A5A;
-      --rose-dk: #6e3547;
-      --rose-lt: #fdf0f5;
-      --blush:   #f3d7d3;
-      --cream:   #fff8f9;
-      --muted:   #a07085;
-      --border:  #f0c4d4;
-      --text:    #2d1520;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: linear-gradient(135deg, #f9e8ef 0%, #fdf5f8 50%, #f3e8f5 100%);
-      font-family: 'Lato', sans-serif;
-      min-height: 100vh;
-    }
-
-    .page-wrap {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 32px 24px 60px;
-      display: flex;
-      gap: 28px;
-      align-items: flex-start;
-    }
-
-    .dash-sidebar {
-      width: 250px;
-      min-width: 250px;
-      flex-shrink: 0;
-      animation: slideLeft .5s ease both;
-    }
-
-    @keyframes slideLeft {
-      from { opacity: 0; transform: translateX(-24px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
-
-    .dash-main {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      animation: slideUp .55s ease .1s both;
-    }
-
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .msg-hero {
-      background: linear-gradient(135deg, var(--rose) 0%, #c27090 50%, #d4889a 100%);
-      border-radius: 24px;
-      padding: 36px 48px;
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      box-shadow: 0 16px 48px rgba(139,74,90,.22);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .msg-hero::before {
-      content: '';
-      position: absolute;
-      top: -60px; right: -60px;
-      width: 220px; height: 220px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.08);
-    }
-
-    .msg-hero::after {
-      content: '';
-      position: absolute;
-      bottom: -40px; left: 30%;
-      width: 160px; height: 160px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.06);
-    }
-
-    .hero-icon-wrap {
-      width: 72px; height: 72px;
-      border-radius: 20px;
-      background: rgba(255,255,255,.2);
-      border: 2px solid rgba(255,255,255,.3);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.8rem;
-      color: #fff;
-      flex-shrink: 0;
-      position: relative; z-index: 2;
-      backdrop-filter: blur(8px);
-    }
-
-    .hero-text { position: relative; z-index: 2; }
-
-    .hero-text h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 6px;
-    }
-
-    .hero-text p {
-      font-size: .88rem;
-      color: rgba(255,255,255,.75);
-      margin-bottom: 14px;
-    }
-
-    .hero-stats {
-      display: flex;
-      gap: 16px;
-      position: relative; z-index: 2;
-      margin-left: auto;
-      flex-wrap: wrap;
-    }
-
-    .hero-stat {
-      background: rgba(255,255,255,.15);
-      border: 1px solid rgba(255,255,255,.25);
-      border-radius: 14px;
-      padding: 12px 20px;
-      text-align: center;
-      backdrop-filter: blur(6px);
-      min-width: 80px;
-    }
-
-    .hero-stat-num {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1;
-    }
-
-    .hero-stat-label {
-      font-size: .65rem;
-      color: rgba(255,255,255,.7);
-      font-weight: 700;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      margin-top: 4px;
-    }
-
-    .messages-card {
-      background: #fff;
-      border-radius: 22px;
-      overflow: hidden;
-      box-shadow: 0 4px 20px rgba(139,74,90,.08);
-      border: 1px solid var(--border);
-      animation: fadeCard .5s ease .2s both;
-    }
-
-    @keyframes fadeCard {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .card-header {
-      padding: 20px 28px;
-      border-bottom: 1px solid var(--border);
-      background: linear-gradient(135deg, #fdf6f8, #fff);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .card-header-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--rose);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .card-header-title i { font-size: .95rem; }
-
-    .new-msg-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 9px 18px;
-      background: linear-gradient(135deg, var(--rose), var(--rose-dk));
-      color: #fff;
-      border-radius: 10px;
-      font-size: .8rem;
-      font-weight: 700;
-      text-decoration: none;
-      font-family: 'Lato', sans-serif;
-      box-shadow: 0 4px 14px rgba(139,74,90,.28);
-      transition: transform .18s, box-shadow .18s;
-    }
-
-    .new-msg-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(139,74,90,.36);
-      color: #fff;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 72px 24px;
-    }
-
-    .empty-icon {
-      width: 80px; height: 80px;
-      border-radius: 50%;
-      background: var(--rose-lt);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2rem;
-      color: var(--muted);
-      margin: 0 auto 20px;
-    }
-
-    .empty-state h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.1rem;
-      color: var(--text);
-      margin-bottom: 8px;
-    }
-
-    .empty-state p {
-      font-size: .85rem;
-      color: #bbb;
-      margin-bottom: 20px;
-    }
-
-    .msg-table { width: 100%; border-collapse: collapse; }
-
-    .msg-table thead tr {
-      background: #fdf6f8;
-      border-bottom: 2px solid var(--border);
-    }
-
-    .msg-table th {
-      padding: 13px 20px;
-      text-align: left;
-      font-size: .68rem;
-      font-weight: 800;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .msg-table tbody tr {
-      border-bottom: 1px solid #fdf0f2;
-      transition: background .15s, transform .15s;
-      cursor: pointer;
-    }
-
-    .msg-table tbody tr:last-child { border-bottom: none; }
-
-    .msg-table tbody tr:hover { background: #fdf6f8; }
-
-    .msg-table td { padding: 16px 20px; vertical-align: middle; }
-
-    .subject-cell strong {
-      display: block;
-      font-size: .88rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 3px;
-    }
-
-    .subject-cell .ticket-no {
-      font-size: .68rem;
-      font-weight: 700;
-      color: var(--rose);
-      letter-spacing: .04em;
-      margin-right: 6px;
-    }
-
-    .subject-cell span.preview {
-      font-size: .75rem;
-      color: #bbb;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-size: .7rem;
-      font-weight: 700;
-      padding: 5px 12px;
-      border-radius: 20px;
-      letter-spacing: .04em;
-    }
-
-    .badge-open        { background: #fce8ed; color: #c0394f; }
-    .badge-in_progress { background: #e8f0fe; color: #3367d6; }
-    .badge-resolved    { background: #fff8e1; color: #b9840a; }
-    .badge-closed      { background: #eee; color: #888; }
-
-    .date-cell {
-      font-size: .8rem;
-      color: #bbb;
-      font-weight: 600;
-    }
-
-    .view-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 16px;
-      background: var(--rose-lt);
-      color: var(--rose);
-      border-radius: 8px;
-      font-size: .78rem;
-      font-weight: 700;
-      text-decoration: none;
-      border: 1px solid var(--border);
-      transition: all .2s;
-      font-family: 'Lato', sans-serif;
-    }
-
-    .view-btn:hover {
-      background: var(--rose);
-      color: #fff;
-      border-color: var(--rose);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(139,74,90,.2);
-    }
-
-    @media (max-width: 900px) {
-      .page-wrap { flex-direction: column; padding: 16px; }
-      .dash-sidebar { width: 100%; min-width: unset; }
-      .msg-hero { flex-direction: column; padding: 28px 24px; gap: 16px; }
-      .hero-stats { margin-left: 0; }
-    }
-
-    @media (max-width: 600px) {
-      .hero-stats { flex-wrap: wrap; }
-      .msg-table th:nth-child(3),
-      .msg-table td:nth-child(3) { display: none; }
-    }
-  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
 <%- include("../../views/partials/user/h2") %>
+<%- include("../../views/partials/user/dashboardStyles") %>
 
 <div class="page-wrap">
 
@@ -361,7 +19,114 @@
     <%- include("../../views/partials/user/sider") %>
   </aside>
 
-  <main class="dash-main">
+  <!-- Page CSS, markup and page JS all live inside #dashMain so a normal
+       SPA swap brings everything this page needs along with it. -->
+  <main class="dash-main" id="dashMain">
+    <style>
+      /* extra tokens on top of dashboardStyle's shared :root */
+      :root {
+        --r-sm: 10px; --r-md: 14px; --r-lg: 18px; --r-xl: 24px;
+        --gap-sm: 12px; --gap-md: 20px; --gap-lg: 28px;
+      }
+
+      .page-topbar {
+        margin-bottom: var(--gap-lg);
+        display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+      }
+      .page-topbar-stats { display: flex; gap: 10px; }
+    .pt-stat {
+  background: linear-gradient(135deg, var(--rose-lt), #fdf2f5);
+  border: 1.5px solid var(--border); border-radius: var(--r-md);
+  padding: 8px 16px; text-align: center; min-width: 68px;
+}
+      .pt-stat .pt-num { font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; color: var(--rose); line-height: 1; }
+      .pt-stat .pt-label { font-size: .64rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-top: 3px; }
+
+      .new-msg-btn {
+        display: inline-flex; align-items: center; gap: 7px; padding: 10px 18px;
+        background: linear-gradient(135deg, var(--rose), var(--rose-dk));
+        color: #fff; border-radius: var(--r-sm); font-size: .82rem; font-weight: 700;
+        text-decoration: none; font-family: var(--font-body);
+        box-shadow: 0 6px 18px rgba(139,74,90,.24); transition: box-shadow .18s;
+      }
+      .new-msg-btn:hover { box-shadow: 0 8px 22px rgba(139,74,90,.3); color: #fff; }
+
+      .messages-card {
+        background: var(--cream); border-radius: var(--r-xl);
+        box-shadow: var(--shadow-md, 0 6px 20px rgba(139,74,90,.1)); border: 1.5px solid var(--border);
+        overflow: hidden;
+      }
+    .card-header {
+  padding: 18px 24px; border-bottom: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: linear-gradient(135deg, var(--rose-lt), #fdf2f5);
+}
+      .card-header-title {
+        font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; color: var(--rose);
+        display: flex; align-items: center; gap: 9px;
+      }
+
+      .empty-state { text-align: center; padding: 60px 24px; }
+      .empty-icon {
+        width: 72px; height: 72px; border-radius: 50%;
+        background: var(--rose-lt); display: flex; align-items: center; justify-content: center;
+        font-size: 1.8rem; color: var(--muted); margin: 0 auto 18px;
+      }
+      .empty-state h3 { font-family: var(--font-display); font-size: 1.1rem; color: var(--text); margin-bottom: 8px; }
+      .empty-state p { font-size: .85rem; color: var(--muted); margin-bottom: 20px; }
+
+      .msg-table { width: 100%; border-collapse: collapse; }
+.msg-table thead tr { background: linear-gradient(135deg, var(--rose-lt), #fdf2f5); }
+      .msg-table th {
+        padding: 13px 20px; text-align: left; font-size: .68rem; font-weight: 800;
+        letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
+      }
+      .msg-table tbody tr { border-top: 1px solid var(--border); cursor: pointer; transition: background .15s; }
+      .msg-table tbody tr:hover { background: var(--rose-lt); }
+      .msg-table td { padding: 16px 20px; vertical-align: middle; }
+
+      .subject-cell strong { display: block; font-size: .88rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+      .subject-cell .ticket-no { font-size: .68rem; font-weight: 700; color: var(--rose); letter-spacing: .04em; margin-right: 6px; }
+      .subject-cell span.preview { font-size: .75rem; color: var(--muted); }
+
+      .badge { display: inline-flex; align-items: center; gap: 5px; font-size: .7rem; font-weight: 700; padding: 5px 12px; border-radius: 20px; letter-spacing: .04em; }
+      .badge-open        { background: #fce8ed; color: #c0394f; }
+      .badge-in_progress { background: #e8f0fe; color: #3367d6; }
+      .badge-resolved    { background: #fff8e1; color: #b9840a; }
+      .badge-closed      { background: #eee; color: #888; }
+
+      .date-cell { font-size: .8rem; color: var(--muted); font-weight: 600; }
+
+      .view-btn {
+        display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px;
+        background: #fff; color: var(--rose); border-radius: var(--r-sm); font-size: .78rem; font-weight: 700;
+        text-decoration: none; border: 1.5px solid var(--border); transition: all .2s; font-family: var(--font-body);
+      }
+      .view-btn:hover { background: var(--rose); color: #fff; border-color: var(--rose); }
+@media (max-width: 600px) {
+        .msg-table th:nth-child(3), .msg-table td:nth-child(3) { display: none; }
+      }
+
+      .pagination-wrap {
+        display: flex; justify-content: center; align-items: center; gap: 6px;
+        margin-top: 24px; flex-wrap: wrap;
+      }
+      .pg-btn {
+        min-width: 36px; height: 36px; border-radius: 50%;
+        border: 1.5px solid var(--border); background: #fff; color: var(--rose);
+        font-size: .85rem; font-weight: 700; font-family: var(--font-body);
+        display: flex; align-items: center; justify-content: center;
+        transition: background .18s, border-color .18s, color .18s, box-shadow .18s;
+        cursor: pointer; padding: 0 4px;
+      }
+      .pg-btn:hover:not(.disabled) { background: var(--rose-lt); border-color: var(--rose); }
+      .pg-btn.active {
+        background: linear-gradient(135deg, var(--rose), var(--rose-dk));
+        border-color: var(--rose); color: #fff; box-shadow: 0 3px 10px rgba(139,74,90,.30);
+      }
+      .pg-btn.disabled { opacity: .35; pointer-events: none; cursor: default; }
+      .pg-info { font-size: .8rem; color: var(--muted); font-family: var(--font-body); white-space: nowrap; margin-left: 6px; }
+    </style>
 
     <%
       const badgeMap = {
@@ -374,94 +139,87 @@
       const resolvedCount = messages.filter(m => m.status === 'resolved').length;
     %>
 
-    <div class="msg-hero">
-      <div class="hero-icon-wrap">
-        <i class="fas fa-envelope-open-text"></i>
-      </div>
-      <div class="hero-text">
-        <h1>My Messages</h1>
-        <p>Track your support tickets and chat with our team until it's sorted</p>
-      </div>
-      <div class="hero-stats">
-        <div class="hero-stat">
-          <div class="hero-stat-num"><%= messages.length %></div>
-          <div class="hero-stat-label">Total</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-num"><%= activeCount %></div>
-          <div class="hero-stat-label">Active</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-num"><%= resolvedCount %></div>
-          <div class="hero-stat-label">Resolved</div>
-        </div>
+    <div class="page-topbar">
+      <h2>My Messages</h2>
+      <div class="page-topbar-stats">
+        <div class="pt-stat"><div class="pt-num"><%= messages.length %></div><div class="pt-label">Total</div></div>
+        <div class="pt-stat"><div class="pt-num"><%= activeCount %></div><div class="pt-label">Active</div></div>
+        <div class="pt-stat"><div class="pt-num"><%= resolvedCount %></div><div class="pt-label">Resolved</div></div>
       </div>
     </div>
 
     <div class="messages-card">
       <div class="card-header">
-        <div class="card-header-title">
-          <i class="fas fa-inbox"></i>
-          Your Tickets
-        </div>
-        <a href="/contact-us" class="new-msg-btn">
-          <i class="fas fa-plus"></i> New Ticket
-        </a>
+        <div class="card-header-title"><i class="fas fa-inbox"></i> Your Tickets</div>
+        <a href="/contact-us" class="new-msg-btn spa-link"><i class="fas fa-plus"></i> New Ticket</a>
       </div>
-
       <% if (messages.length === 0) { %>
-      <div class="empty-state">
-        <div class="empty-icon">
-          <i class="fas fa-inbox"></i>
+        <div class="empty-state">
+          <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+          <h3>No tickets yet</h3>
+          <p>Have a question or a custom cake order in mind?</p>
+          <a href="/contact-us" class="new-msg-btn spa-link">
+            <i class="fas fa-paper-plane"></i> Send your first message
+          </a>
         </div>
-        <h3>No tickets yet</h3>
-        <p>Have a question or a custom cake order in mind?</p>
-        <a href="/contact-us" class="new-msg-btn">
-          <i class="fas fa-paper-plane"></i> Send your first message
-        </a>
-      </div>
       <% } else { %>
-      <table class="msg-table">
-        <thead>
-          <tr>
-            <th>Subject</th>
-            <th>Status</th>
-            <th>Last Activity</th>
-            <th style="text-align:center;">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% messages.forEach(msg => {
-            const firstMsg = msg.messages && msg.messages.length ? msg.messages[0].text : '';
-            const b = badgeMap[msg.status] || badgeMap.open;
-          %>
-          <tr onclick="window.location='/my-messages/<%= msg._id %>'">
-            <td class="subject-cell">
-              <strong><span class="ticket-no">#<%= msg.ticketNumber %></span><%= msg.subject %></strong>
-              <span class="preview"><%= firstMsg.length > 60 ? firstMsg.substring(0,60)+'…' : firstMsg %></span>
-            </td>
-            <td>
-              <span class="badge <%= b.cls %>">
-                <i class="fas <%= b.icon %>"></i> <%= b.label %>
-              </span>
-            </td>
-            <td class="date-cell">
-              <%= new Date(msg.lastActivityAt || msg.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) %>
-            </td>
-            <td style="text-align:center;" onclick="event.stopPropagation()">
-              <a href="/my-messages/<%= msg._id %>" class="view-btn">
-                <i class="fas fa-eye"></i> View
-              </a>
-            </td>
-          </tr>
-          <% }) %>
-        </tbody>
-      </table>
+        <table class="msg-table">
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Status</th>
+              <th>Last Activity</th>
+              <th style="text-align:center;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% messages.forEach(msg => {
+              const firstMsg = msg.messages && msg.messages.length ? msg.messages[0].text : '';
+              const b = badgeMap[msg.status] || badgeMap.open;
+            %>
+<tr class="spa-link msg-row" data-href="/my-messages/<%= msg._id %>" onclick="window.location='/my-messages/<%= msg._id %>'">              <td class="subject-cell">
+                <strong><span class="ticket-no">#<%= msg.ticketNumber %></span><%= msg.subject %></strong>
+                <span class="preview"><%= firstMsg.length > 60 ? firstMsg.substring(0,60)+'…' : firstMsg %></span>
+              </td>
+              <td>
+                <span class="badge <%= b.cls %>">
+                  <i class="fas <%= b.icon %>"></i> <%= b.label %>
+                </span>
+              </td>
+              <td class="date-cell">
+                <%= new Date(msg.lastActivityAt || msg.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) %>
+              </td>
+              <td style="text-align:center;" onclick="event.stopPropagation()">
+                <a href="/my-messages/<%= msg._id %>" class="view-btn spa-link">
+                  <i class="fas fa-eye"></i> View
+                </a>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+</table>
       <% } %>
     </div>
 
+    <% if (totalPages > 1) { %>
+      <div class="pagination-wrap">
+        <a class="pg-btn <%= currentPage === 1 ? 'disabled' : '' %>"
+           href="/my-messages?page=<%= currentPage - 1 %>">‹</a>
+
+        <% for (let p = 1; p <= totalPages; p++) { %>
+          <a class="pg-btn <%= currentPage === p ? 'active' : '' %>"
+             href="/my-messages?page=<%= p %>"><%= p %></a>
+        <% } %>
+
+        <a class="pg-btn <%= currentPage === totalPages ? 'disabled' : '' %>"
+           href="/my-messages?page=<%= currentPage + 1 %>">›</a>
+
+        <span class="pg-info">Page <%= currentPage %> of <%= totalPages %></span>
+      </div>
+    <% } %>
   </main>
 </div>
 
+<%- include("../../views/partials/user/footer") %>
 </body>
 </html>

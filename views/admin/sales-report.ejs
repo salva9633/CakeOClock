@@ -363,7 +363,12 @@
       <div class="metric-value" id="v-revenue" data-target="<%= Math.round(overallOrderAmount) %>" data-prefix="₹">₹0</div>
       <div class="metric-sub">gross revenue</div>
     </div>
-   
+    <div class="metric m3">
+      <div class="metric-icon"><i class="ti ti-discount-2" aria-hidden="true"></i></div>
+      <div class="metric-label">Offer Discount</div>
+      <div class="metric-value" id="v-discount" data-target="<%= Math.round(overallDiscount) %>" data-prefix="₹">₹0</div>
+      <div class="metric-sub">product offer savings</div>
+    </div>
     <div class="metric m4">
       <div class="metric-icon"><i class="ti ti-ticket" aria-hidden="true"></i></div>
       <div class="metric-label">Coupon Savings</div>
@@ -384,7 +389,7 @@
         </div>
       </div>
       <div style="position:relative; width:100%; height:220px;">
-        <canvas id="salesChart" role="img" aria-label="Bar chart showing revenue over time"></canvas>
+        <canvas id="salesChart" role="img" aria-label="Line chart showing revenue over time"></canvas>
       </div>
     </div>
 
@@ -447,9 +452,9 @@
                 <span class="badge badge-cancelled">
                   <i class="ti ti-circle-x" aria-hidden="true" style="font-size:11px;"></i> Cancelled
                 </span>
-              <% } else if (order.status === 'Returned') { %>
+              <% } else if (order.status === 'Returned' || order.status === 'Return Requested') { %>
                 <span class="badge badge-returned">
-                  <i class="ti ti-arrow-back-up" aria-hidden="true" style="font-size:11px;"></i> Returned
+                  <i class="ti ti-arrow-back-up" aria-hidden="true" style="font-size:11px;"></i> <%= order.status %>
                 </span>
               <% } else { %>
                 <span class="badge badge-pending">
@@ -531,23 +536,23 @@
     el.classList.toggle('visible', val === 'custom');
   }
 
-  /* ── Bar chart ── */
+  /* ── Line chart (revenue) ── */
   new Chart(document.getElementById('salesChart'), {
-type: 'line',
+    type: 'line',
     data: {
       labels:   <%- JSON.stringify(chartLabels) %>,
-    datasets: [{
-  label: 'Revenue (₹)',
-  data:  <%- JSON.stringify(chartData) %>,
-  backgroundColor: 'rgba(201,123,138,0.2)',
-  borderColor: '#C97B8A',
-  fill: true,           // ← add this
-  tension: 0.4,
-  borderWidth: 2,
-  pointRadius: 3,
-  pointHoverRadius: 5,
-  pointBackgroundColor: '#C97B8A',
-}]
+      datasets: [{
+        label: 'Revenue (₹)',
+        data:  <%- JSON.stringify(chartData) %>,
+        backgroundColor: 'rgba(201,123,138,0.2)',
+        borderColor: '#C97B8A',
+        fill: true,
+        tension: 0.4,
+        borderWidth: 2,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        pointBackgroundColor: '#C97B8A',
+      }]
     },
     options: {
       responsive: true,
@@ -582,28 +587,29 @@ type: 'line',
     }
   });
 
-  /* ── Doughnut chart ── */
+  /* ── Doughnut chart (order status, ALL statuses in range) ── */
+  const statusLabels = <%- JSON.stringify(Object.keys(statusCounts)) %>;
+  const statusData   = <%- JSON.stringify(Object.values(statusCounts)) %>;
+
+  const statusColorMap = {
+    'Pending':          { bg: 'rgba(241,241,241,0.9)', border: '#7A7A7A' },
+    'Processing':       { bg: 'rgba(253,236,239,0.9)', border: '#C97B8A' },
+    'Shipped':          { bg: 'rgba(234,244,255,0.9)', border: '#4A90E2' },
+    'Delivered':        { bg: 'rgba(232,246,240,0.9)', border: '#5A9A6A' },
+    'Cancelled':        { bg: 'rgba(255,234,234,0.9)', border: '#D95C5C' },
+    'Returned':         { bg: 'rgba(240,235,252,0.9)', border: '#6A2FC2' },
+    'Return Requested': { bg: 'rgba(240,235,252,0.9)', border: '#6A2FC2' },
+  };
+  const fallbackColors = ['rgba(220,220,220,0.9)'];
+
   new Chart(document.getElementById('statusChart'), {
     type: 'doughnut',
     data: {
-      labels:   <%- JSON.stringify(Object.keys(statusCounts)) %>,
+      labels: statusLabels,
       datasets: [{
-        data: <%- JSON.stringify(Object.values(statusCounts)) %>,
- backgroundColor: [
-  'rgba(241,241,241,0.9)', // Pending → Grey
-  'rgba(253,236,239,0.9)', // Processing → Pastel Pink
-  'rgba(234,244,255,0.9)', // Shipped → Pastel Blue
-  'rgba(232,246,240,0.9)', // Delivered → Green
-  'rgba(255,234,234,0.9)'  // Returned → Pastel Red
-],
-
-borderColor: [
-  '#7A7A7A', // Pending
-  '#C97B8A', // Processing
-  '#4A90E2', // Shipped
-  '#5A9A6A', // Delivered
-  '#D95C5C'  // Returned
-],
+        data: statusData,
+        backgroundColor: statusLabels.map(s => (statusColorMap[s] || { bg: fallbackColors[0] }).bg),
+        borderColor:     statusLabels.map(s => (statusColorMap[s] || { border: '#999' }).border),
         borderWidth: 1.5
       }]
     },

@@ -10,17 +10,36 @@ const transporter = nodemailer.createTransport({
 });
 
 // ── GET /my-messages ───────────────────────────────────
+// ── GET /my-messages ───────────────────────────────────
 export const myMessages = async (req, res) => {
   try {
-    const email = req.session.user.email;
-    const tickets = await ContactMessage.find({ email }).sort({ lastActivityAt: -1 });
+    const email   = req.session.user.email;
+    const page    = parseInt(req.query.page) || 1;
+    const perPage = 5;
+    const skip    = (page - 1) * perPage;
+
+    const filter = { email };
+
+    const [tickets, totalCount] = await Promise.all([
+      ContactMessage.find(filter).sort({ lastActivityAt: -1 }).skip(skip).limit(perPage),
+      ContactMessage.countDocuments(filter)
+    ]);
 
     // lazy auto-close pass
     for (const t of tickets) {
       if (t.applyAutoClose()) await t.save();
     }
 
-    res.render("myMessages", { messages: tickets, user: req.session.user });
+    const totalPages = Math.ceil(totalCount / perPage) || 1;
+
+    res.render("myMessages", {
+      messages: tickets,
+      user: req.session.user,
+      currentPage: page,
+      totalPages,
+      perPage,
+      totalCount
+    });
   } catch (err) {
     console.error(err);
     res.redirect("/");

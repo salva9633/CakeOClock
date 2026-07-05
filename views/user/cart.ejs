@@ -223,12 +223,13 @@
       font-size: 1.5rem; color: var(--rose); margin-bottom: 8px;
     }
     .empty-cart a {
-      display: inline-block; margin-top: 18px;
-      padding: 11px 28px; border-radius: 12px;
-      background: var(--rose-dk); color: #fff;
-      font-weight: 700; font-size: .88rem;
-      transition: background .2s;
-    }
+  display: inline-block; margin-top: 18px;
+  padding: 11px 28px; border-radius: 12px;
+  background: var(--rose-dk); color: #fff;
+  font-weight: 700; font-size: .88rem;
+  transition: background .2s;
+  text-decoration: none !important;
+}
     .empty-cart a:hover { background: var(--rose); }
 
     /* ── ORDER SUMMARY ── */
@@ -349,7 +350,7 @@
   <div>
     <div class="section-card">
       <div class="section-head">
-        <h2>🛒 My Cart</h2>
+<h2><i class="fas fa-cart-shopping" style="color:var(--rose-dk);margin-right:6px;"></i> My Cart</h2>
         <span class="item-count" id="item-count-label"><%= items.length %> item<%= items.length !== 1 ? 's' : '' %></span>
       </div>
 
@@ -368,8 +369,7 @@
 
       <% if (!items || items.length === 0) { %>
         <div class="empty-cart">
-          <div class="ec-icon">🎂</div>
-          <h3>Your cart is empty</h3>
+<div class="ec-icon"><i class="fas fa-cake-candles" style="color:var(--rose);"></i></div>          <h3>Your cart is empty</h3>
           <p>Looks like you haven't added anything yet.</p>
           <a href="/products">Browse Cakes</a>
         </div>
@@ -492,10 +492,9 @@
           <span class="total-price" id="total-price-val">₹<%= total.toLocaleString('en-IN') %></span>
         </div>
 
-        <!-- FIX 1: savings pill always in DOM, shown/hidden dynamically -->
-        <div id="savings-pill" style="<%= savings > 0 ? '' : 'display:none;' %>">
-          🎉 You save <span id="savings-pill-val">₹<%= savings.toLocaleString('en-IN') %></span> on this order!
-        </div>
+      <div id="savings-pill" style="<%= savings > 0 ? '' : 'display:none;' %>">
+  <i class="fas fa-party-horn" style="margin-right:5px;"></i> You save <span id="savings-pill-val">₹<%= savings.toLocaleString('en-IN') %></span> on this order!
+</div>
 
         <!-- Checkout button: always a button, JS validates cart on click before navigating -->
         <button
@@ -504,8 +503,7 @@
           onclick="handleCheckout()"
           <%= items.length === 0 ? 'disabled' : '' %>
         >
-          🔒 Proceed to Checkout
-        </button>
+<i class="fas fa-lock" style="margin-right:6px;"></i> Proceed to Checkout        </button>
 
         <!-- Shown when server-side render already knows items are blocked -->
         <div class="checkout-blocked" id="checkout-blocked-msg"
@@ -535,14 +533,14 @@
     return `<span style="font-family:'Dancing Script',cursive;font-size:1.75rem;color:#3a1a1a;">${text}</span>`;
   }
 
-  function toast(msg) {
-    const rack = document.getElementById('toast-rack');
-    const el   = document.createElement('div');
-    el.className   = 'toast-pill';
-    el.textContent = msg;
-    rack.appendChild(el);
-    setTimeout(() => el.remove(), 2800);
-  }
+ function toast(msg) {
+  const rack = document.getElementById('toast-rack');
+  const el   = document.createElement('div');
+  el.className  = 'toast-pill';
+  el.innerHTML  = msg;
+  rack.appendChild(el);
+  setTimeout(() => el.remove(), 2800);
+}
 
   function formatINR(amount) {
     return '₹' + Number(amount).toLocaleString('en-IN');
@@ -701,8 +699,7 @@
       // FIX 1 + FIX 2: update all summary figures and checkout state
       updateSummaryUI(data);
 
-      toast('✅ Quantity updated');
-
+toast('<i class="fas fa-check-circle"></i> Quantity updated');
     } catch {
       toast('⚠️ Network error. Please try again.');
     }
@@ -733,7 +730,7 @@
       });
       const data = await res.json();
 
-      if (!data.success) { toast('⚠️ Could not remove item.'); return; }
+      if (!data.success) {toast('<i class="fas fa-triangle-exclamation"></i> Could not remove item.'); return; }
 
       // Remove row from DOM
       const row = document.getElementById('cart-item-' + itemId);
@@ -750,11 +747,9 @@
         updateSummaryUI(data);
       }
 
-      toast('🗑️ Item removed from cart');
-
+toast('<i class="fas fa-trash-alt"></i> Item removed from cart');
     } catch {
-      toast('⚠️ Network error. Please try again.');
-    }
+toast('<i class="fas fa-triangle-exclamation"></i> Network error. Please try again.');    }
   }
 </script>
 

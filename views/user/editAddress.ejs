@@ -4,408 +4,161 @@
   <meta charset="UTF-8">
   <title>Edit Address – Cake O'Clock</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/cake.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --rose: #AF5454; --rose-dk: #8c3a3a; --rose-mid: #c97070;
-      --rose-lt: #fdf0f0; --rose-pale: #fff5f2;
-      --brown: #3d1f1f; --brown-lt: #7a5050;
-      --cream: #fdf8f6; --muted: #8a7070; --border: #ecdada;
-      --caramel: #b8864e;
-      --font-display: 'Playfair Display', serif;
-      --font-body: 'DM Sans', sans-serif;
-      --r-sm: 10px; --r-md: 14px; --r-lg: 18px; --r-xl: 24px;
-      --shadow-md: 0 6px 24px rgba(175,84,84,.12);
-      --shadow-lg: 0 14px 44px rgba(175,84,84,.18);
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: var(--font-body);
-      background: linear-gradient(135deg, #f5e0dd 0%, #fdf3ef 100%);
-      color: var(--brown);
-      min-height: 100vh;
-    }
-
-    /* ── SPARKLE BG ── */
-    .sparkle-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-    .sparkle {
-      position: absolute; border-radius: 50%;
-      background: var(--caramel); opacity: 0;
-      animation: floatUp var(--dur, 6s) var(--delay, 0s) infinite ease-in-out;
-    }
-    @keyframes floatUp {
-      0%   { transform: translateY(100vh) scale(0); opacity: 0; }
-      20%  { opacity: .12; }
-      80%  { opacity: .06; }
-      100% { transform: translateY(-10vh) scale(1.4); opacity: 0; }
-    }
-
-    /* ── SHELL ── */
-    .address-shell {
-      max-width: 860px; margin: 36px auto 60px;
-      background: #fff; border-radius: var(--r-xl);
-      box-shadow: var(--shadow-lg); overflow: hidden;
-      position: relative; z-index: 1;
-      animation: shellDrop .55s cubic-bezier(.22,.9,.36,1) both;
-    }
-    @keyframes shellDrop {
-      from { opacity: 0; transform: translateY(40px) scale(.97); }
-      to   { opacity: 1; transform: translateY(0)   scale(1);    }
-    }
-
-    /* ── HEADER ── */
-    .address-header {
-      background:#6e2f2f;
-      padding: 32px 44px; display: flex; align-items: center; gap: 16px;
-      position: relative; overflow: hidden;
-    }
-    .address-header::after {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,.18) 50%, transparent 60%);
-      transform: translateX(-100%);
-      animation: headerShimmer 3.5s 1s infinite;
-    }
-    @keyframes headerShimmer {
-      0%   { transform: translateX(-100%); }
-      100% { transform: translateX(200%);  }
-    }
-    .header-bubble {
-      position: absolute; border-radius: 50%;
-      background: rgba(255,255,255,.08);
-      animation: bubblePulse var(--p, 4s) ease-in-out infinite alternate;
-    }
-    .header-bubble:nth-child(1){ width:160px; height:160px; top:-60px;  right:60px;  --p:5s;   }
-    .header-bubble:nth-child(2){ width:90px;  height:90px;  bottom:-30px; right:180px; --p:3.5s; }
-    .header-bubble:nth-child(3){ width:50px;  height:50px;  top:10px;   right:280px; --p:4.5s; }
-    @keyframes bubblePulse {
-      from { transform: scale(1)   translateY(0);   }
-      to   { transform: scale(1.1) translateY(-8px); }
-    }
-    .address-header-icon {
-      width: 52px; height: 52px;
-      background: rgba(255,255,255,.2); border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem; position: relative; z-index: 1;
-      animation: iconBounce 2.4s 1s ease-in-out infinite;
-    }
-    @keyframes iconBounce {
-      0%,100% { transform: translateY(0);   }
-      50%     { transform: translateY(-5px); }
-    }
-    .address-header h1 {
-      font-family: var(--font-display); font-size: 1.8rem; font-weight: 700;
-      color: #fff; margin: 0; position: relative; z-index: 1;
-    }
-    .address-header p {
-      font-size: .82rem; color: rgba(255,255,255,.8);
-      margin: 3px 0 0; position: relative; z-index: 1;
-    }
-
-    /* ── BODY ── */
-    .address-body { padding: 44px; }
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
-    .full-col  { grid-column: 1 / -1; }
-
-    /* ── FIELD GROUPS ── */
-    .field-group {
-      display: flex; flex-direction: column; gap: 7px;
-      opacity: 0; animation: fieldReveal .45s ease both;
-    }
-    .field-group:nth-child(1) { animation-delay: .12s; }
-    .field-group:nth-child(2) { animation-delay: .19s; }
-    .field-group:nth-child(3) { animation-delay: .26s; }
-    .field-group:nth-child(4) { animation-delay: .33s; }
-    .field-group:nth-child(5) { animation-delay: .40s; }
-    .field-group:nth-child(6) { animation-delay: .47s; }
-    .field-group:nth-child(7) { animation-delay: .54s; }
-    .field-group:nth-child(8) { animation-delay: .61s; }
-    .field-group:nth-child(9) { animation-delay: .68s; }
-    @keyframes fieldReveal {
-      from { opacity: 0; transform: translateY(14px); }
-      to   { opacity: 1; transform: translateY(0);    }
-    }
-
-    .field-group label {
-      font-size: .72rem; font-weight: 700; letter-spacing: .10em;
-      text-transform: uppercase; color: var(--brown-lt); transition: color .2s;
-    }
-    .field-group:focus-within label { color: var(--caramel); }
-
-    .field-input {
-      width: 100%; background: #fdf5ee;
-      border: 1.5px solid transparent; border-radius: var(--r-sm);
-      padding: 13px 16px; font-family: var(--font-body); font-size: .92rem;
-      color: var(--brown); outline: none;
-      transition: border-color .2s, background .2s, box-shadow .2s, transform .15s;
-    }
-    .field-input::placeholder { color: var(--muted); opacity: .7; }
-    .field-input:focus {
-      background: #fff; border-color: var(--caramel);
-      box-shadow: 0 0 0 4px rgba(184,134,78,.12);
-      transform: translateY(-1px);
-    }
-    .field-input.error   { border-color: #e05555 !important; animation: shake .35s ease; }
-    .field-input.success { border-color: #4caf50 !important; }
-    @keyframes shake {
-      0%,100% { transform: translateX(0);   }
-      20%     { transform: translateX(-5px); }
-      40%     { transform: translateX(5px);  }
-      60%     { transform: translateX(-4px); }
-      80%     { transform: translateX(4px);  }
-    }
-    textarea.field-input { resize: none; min-height: 100px; }
-
-    .error-text { font-size: .74rem; color: #e05555; animation: errorPop .2s ease; }
-    @keyframes errorPop {
-      from { opacity: 0; transform: translateY(-4px); }
-      to   { opacity: 1; transform: translateY(0);    }
-    }
-
-    /* ── ADDRESS TYPE ── */
-    .type-section {
-      margin-top: 8px; opacity: 0;
-      animation: fieldReveal .45s .76s ease both;
-    }
-    .type-label {
-      font-size: .72rem; font-weight: 700; letter-spacing: .10em;
-      text-transform: uppercase; color: var(--brown-lt);
-      margin-bottom: 12px; display: block;
-    }
-    .type-options { display: flex; gap: 10px; flex-wrap: wrap; }
-    .type-option { position: relative; }
-    .type-option input[type="radio"] { display: none; }
-    .type-option label {
-      display: flex; align-items: center; gap: 7px;
-      padding: 9px 18px; border: 1.5px solid var(--border);
-      border-radius: 50px; font-size: .83rem; font-weight: 600;
-      color: var(--muted); cursor: pointer;
-      transition: all .22s cubic-bezier(.34,1.56,.64,1);
-    }
-    .type-option label:hover {
-      border-color: var(--caramel); color: var(--caramel);
-      transform: translateY(-2px) scale(1.04);
-      box-shadow: 0 4px 14px rgba(184,134,78,.18);
-    }
-    .type-option input:checked + label {
-      border-color: var(--caramel); background: #fdf5ee; color: var(--caramel);
-      transform: translateY(-2px) scale(1.06);
-      box-shadow: 0 4px 18px rgba(184,134,78,.22);
-    }
-    .type-option label span { font-size: 1rem; }
-
-    /* ── ACTIONS ── */
-    .form-actions {
-      display: flex; justify-content: flex-end; gap: 12px;
-      margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border);
-      opacity: 0; animation: fieldReveal .45s .88s ease both;
-    }
-    .btn-cancel {
-      padding: 12px 26px; background: #f5f0f0; color: var(--muted);
-      border: none; border-radius: 50px; font-family: var(--font-body);
-      font-size: .88rem; font-weight: 600; cursor: pointer;
-      transition: background .2s, transform .18s;
-      text-decoration: none; display: inline-flex; align-items: center;
-    }
-    .btn-cancel:hover { background: #ede8e8; transform: translateY(-2px); color: var(--muted); }
-
-    .btn-save {
-      padding: 12px 32px;
-      background: linear-gradient(135deg, var(--caramel) 0%, #8c6030 100%);
-      color: #fff; border: none; border-radius: 50px;
-      font-family: var(--font-body); font-size: .88rem; font-weight: 700;
-      cursor: pointer; transition: transform .18s, box-shadow .18s;
-      box-shadow: 0 6px 20px rgba(184,134,78,.32);
-      position: relative; overflow: hidden;
-    }
-    .btn-save::after {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,.25) 50%, transparent 60%);
-      transform: translateX(-100%); transition: transform .4s;
-    }
-    .btn-save:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(184,134,78,.44); }
-    .btn-save:hover::after { transform: translateX(160%); }
-    .btn-save:active { transform: scale(.96); }
-    .btn-save.saving {
-      pointer-events: none;
-      animation: savePulse .6s ease infinite alternate;
-    }
-    @keyframes savePulse {
-      from { box-shadow: 0 6px 20px rgba(184,134,78,.32); }
-      to   { box-shadow: 0 6px 32px rgba(184,134,78,.60); }
-    }
-
-    @media (max-width: 640px) {
-      .address-shell  { margin: 0; border-radius: 0; }
-      .address-header { padding: 24px 20px; }
-      .address-body   { padding: 24px 20px; }
-      .form-grid      { grid-template-columns: 1fr; }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+  <%- include("../partials/user/dashboardStyles") %>
 </head>
 <body>
 
-<!-- Sparkle background -->
-<div class="sparkle-bg" aria-hidden="true" id="sparkleContainer"></div>
-
 <%- include("../partials/user/h2") %>
 
-<div class="address-shell">
+<div class="page-wrap">
 
-  <div class="address-header">
-    <div class="header-bubble"></div>
-    <div class="header-bubble"></div>
-    <div class="header-bubble"></div>
-    <div class="address-header-icon">✏️</div>
-    <div>
-      <h1>Edit Address</h1>
-      <p>Update your delivery details below</p>
+  <aside class="dash-sidebar">
+    <%- include("../partials/user/sider") %>
+  </aside>
+
+  <main class="dash-main" id="dashMain">
+
+    <div class="form-header">
+<div class="form-header-icon"><i class="fa-solid fa-pen-to-square" style="color:var(--rose)"></i></div>      <div>
+        <h1>Edit Address</h1>
+        <p>Update your delivery details below</p>
+      </div>
     </div>
-  </div>
 
-  <div class="address-body">
-    <form action="/address/edit/<%= address._id %>?redirect=<%= locals.redirect || '/address' %>" method="POST" class="form-grid">
+    <div class="form-card">
+      <form action="/address/edit/<%= address._id %>?redirect=<%= locals.redirect || '/address' %>" method="POST" class="form-grid">
 
-      <div class="field-group">
-        <label>Full Name</label>
-        <input type="text" id="name" name="name" class="field-input"
-               placeholder="Enter your name" value="<%= address.name %>">
-        <span class="error-text" id="nameError"></span>
-      </div>
-
-      <div class="field-group">
-        <label>Mobile Number</label>
-        <input type="tel" id="phone" name="phone" class="field-input"
-               placeholder="10-digit number" value="<%= address.phone %>">
-        <span class="error-text" id="phoneError"></span>
-      </div>
-
-      <div class="field-group">
-        <label>Pincode</label>
-        <input type="text" id="pincode" name="pincode" class="field-input"
-               placeholder="6-digit pincode" value="<%= address.pincode %>">
-        <span class="error-text" id="pincodeError"></span>
-      </div>
-
-      <div class="field-group">
-        <label>Locality / Street</label>
-        <input type="text" id="street" name="street" class="field-input"
-               placeholder="Area, street, sector" value="<%= address.street %>">
-        <span class="error-text" id="streetError"></span>
-      </div>
-
-      <div class="field-group full-col">
-        <label>Full Address</label>
-        <textarea name="address" class="field-input"
-                  placeholder="House no., Building, Floor, etc."><%= address.address || '' %></textarea>
-      </div>
-
-      <div class="field-group">
-        <label>City / District / Town</label>
-        <input type="text" id="city" name="city" class="field-input"
-               placeholder="Your city" value="<%= address.city %>">
-        <span class="error-text" id="cityError"></span>
-      </div>
-
-      <div class="field-group">
-        <label>State</label>
-        <input type="text" id="state" name="state" class="field-input"
-               placeholder="Your state" value="<%= address.state %>">
-        <span class="error-text" id="stateError"></span>
-      </div>
-
-      <div class="field-group">
-        <label>Landmark <span style="color:var(--muted);font-weight:400">(Optional)</span></label>
-        <input type="text" name="landmark" class="field-input"
-               placeholder="Near school, temple, etc." value="<%= address.landmark || '' %>">
-      </div>
-
-      <div class="field-group">
-        <label>Alternate Phone <span style="color:var(--muted);font-weight:400">(Optional)</span></label>
-        <input type="tel" name="altPhone" class="field-input"
-               placeholder="Alternate number" value="<%= address.altPhone || '' %>">
-      </div>
-
-      <!-- Address Type -->
-      <div class="full-col type-section">
-        <span class="type-label">Address Type</span>
-        <div class="type-options">
-          <% [['HOME','🏠','Home'],['WORK','💼','Work'],['FAMILY','👨‍👩‍👧','Family'],['FRIEND','🤝','Friend']].forEach(([val,icon,lbl]) => { %>
-          <div class="type-option">
-            <input type="radio" name="type" value="<%= val %>"
-                   id="type-<%= val %>" <%= address.type === val ? 'checked' : '' %>>
-            <label for="type-<%= val %>"><span><%= icon %></span> <%= lbl %></label>
-          </div>
-          <% }) %>
+        <div class="field-group">
+          <label>Full Name</label>
+          <input type="text" id="name" name="name" class="field-input"
+                 placeholder="Enter your name" value="<%= address.name %>">
+          <span class="error-text" id="nameError"></span>
         </div>
-      </div>
 
-      <!-- Actions -->
-      <div class="form-actions full-col">
-        <a href="<%= locals.redirect || '/address' %>" class="btn-cancel">
-          <i class="fas fa-arrow-left" style="margin-right:6px;font-size:.8rem"></i> Cancel
-        </a>
-        <button type="submit" class="btn-save">
-          <i class="fas fa-check" style="margin-right:6px"></i> Update Address
-        </button>
-      </div>
+        <div class="field-group">
+          <label>Mobile Number</label>
+          <input type="tel" id="phone" name="phone" class="field-input"
+                 placeholder="10-digit number" value="<%= address.phone %>">
+          <span class="error-text" id="phoneError"></span>
+        </div>
 
-    </form>
-  </div>
+        <div class="field-group">
+          <label>Pincode</label>
+          <input type="text" id="pincode" name="pincode" class="field-input"
+                 placeholder="6-digit pincode" value="<%= address.pincode %>">
+          <span class="error-text" id="pincodeError"></span>
+        </div>
+
+        <div class="field-group">
+          <label>Locality / Street</label>
+          <input type="text" id="street" name="street" class="field-input"
+                 placeholder="Area, street, sector" value="<%= address.street %>">
+          <span class="error-text" id="streetError"></span>
+        </div>
+
+        <div class="field-group full-col">
+          <label>Full Address</label>
+          <textarea name="address" class="field-input"
+                    placeholder="House no., Building, Floor, etc."><%= address.address || '' %></textarea>
+        </div>
+
+        <div class="field-group">
+          <label>City / District / Town</label>
+          <input type="text" id="city" name="city" class="field-input"
+                 placeholder="Your city" value="<%= address.city %>">
+          <span class="error-text" id="cityError"></span>
+        </div>
+
+        <div class="field-group">
+          <label>State</label>
+          <input type="text" id="state" name="state" class="field-input"
+                 placeholder="Your state" value="<%= address.state %>">
+          <span class="error-text" id="stateError"></span>
+        </div>
+
+        <div class="field-group">
+          <label>Landmark <span style="color:var(--muted);font-weight:400">(Optional)</span></label>
+          <input type="text" name="landmark" class="field-input"
+                 placeholder="Near school, temple, etc." value="<%= address.landmark || '' %>">
+        </div>
+
+        <div class="field-group">
+          <label>Alternate Phone <span style="color:var(--muted);font-weight:400">(Optional)</span></label>
+          <input type="tel" name="altPhone" class="field-input"
+                 placeholder="Alternate number" value="<%= address.altPhone || '' %>">
+        </div>
+
+        <div class="full-col">
+          <span class="type-label">Address Type</span>
+          <div class="type-options">
+           <% [
+  ['HOME','<i class="fa-solid fa-house" style="color:var(--rose)"></i>','Home'],
+  ['WORK','<i class="fa-solid fa-briefcase" style="color:var(--rose)"></i>','Work'],
+  ['FAMILY','<i class="fa-solid fa-people-roof" style="color:var(--rose)"></i>','Family'],
+  ['FRIEND','<i class="fa-solid fa-handshake" style="color:var(--rose)"></i>','Friend']
+].forEach(([val,icon,lbl]) => { %>
+<div class="type-option">
+  <input type="radio" name="type" value="<%= val %>"
+         id="type-<%= val %>" <%= address.type === val ? 'checked' : '' %>>
+  <label for="type-<%= val %>"><span><%- icon %></span> <%= lbl %></label>
+</div>
+<% }) %>
+          </div>
+        </div>
+
+        <div class="form-actions full-col">
+          <a href="<%= locals.redirect || '/address' %>" class="btn-cancel spa-link">
+            <i class="fas fa-arrow-left" style="margin-right:6px;font-size:.8rem"></i> Cancel
+          </a>
+          <button type="submit" class="btn-save">
+            <i class="fas fa-check" style="margin-right:6px"></i> Update Address
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <script>
+      const fields = {
+        name:    { id:'name',    error:'nameError',    regex:/^[A-Za-z ]{3,}$/,  msg:'Min 3 letters'           },
+        phone:   { id:'phone',   error:'phoneError',   regex:/^[6-9][0-9]{9}$/,  msg:'Invalid phone number'    },
+        pincode: { id:'pincode', error:'pincodeError', regex:/^[0-9]{6}$/,        msg:'6-digit pincode required'},
+        street:  { id:'street',  error:'streetError',  regex:/^.{3,}$/,           msg:'Required'                },
+        city:    { id:'city',    error:'cityError',    regex:/^[A-Za-z ]{2,}$/,  msg:'Invalid city'            },
+        state:   { id:'state',   error:'stateError',   regex:/^[A-Za-z ]{2,}$/,  msg:'Invalid state'           }
+      };
+
+      function validate(field) {
+        const input = document.getElementById(field.id);
+        const error = document.getElementById(field.error);
+        const ok    = field.regex.test(input.value.trim());
+        input.classList.toggle('error',   !ok);
+        input.classList.toggle('success',  ok);
+        error.textContent = ok ? '' : field.msg;
+        return ok;
+      }
+
+      Object.values(fields).forEach(f =>
+        document.getElementById(f.id).addEventListener('input', () => validate(f))
+      );
+
+      Object.values(fields).forEach(f => validate(f));
+
+      document.querySelector('#dashMain form').addEventListener('submit', function (e) {
+        const ok = Object.values(fields).map(validate).every(Boolean);
+        if (!ok) {
+          e.preventDefault();
+        } else {
+          document.querySelector('.btn-save').classList.add('saving');
+        }
+      });
+    </script>
+
+  </main>
 </div>
 
-<script>
-  /* ── Sparkles ── */
-  (function () {
-    const c = document.getElementById('sparkleContainer');
-    for (let i = 0; i < 18; i++) {
-      const s = document.createElement('div');
-      s.className = 'sparkle';
-      const size = 3 + Math.random() * 6;
-      s.style.cssText = `left:${Math.random()*100}%;width:${size}px;height:${size}px;--dur:${4+Math.random()*6}s;--delay:${Math.random()*8}s;`;
-      c.appendChild(s);
-    }
-  })();
-
-  /* ── Validation ── */
-  const fields = {
-    name:    { id:'name',    error:'nameError',    regex:/^[A-Za-z ]{3,}$/,  msg:'Min 3 letters'           },
-    phone:   { id:'phone',   error:'phoneError',   regex:/^[6-9][0-9]{9}$/,  msg:'Invalid phone number'    },
-    pincode: { id:'pincode', error:'pincodeError', regex:/^[0-9]{6}$/,        msg:'6-digit pincode required'},
-    street:  { id:'street',  error:'streetError',  regex:/^.{3,}$/,           msg:'Required'                },
-    city:    { id:'city',    error:'cityError',    regex:/^[A-Za-z ]{2,}$/,  msg:'Invalid city'            },
-    state:   { id:'state',   error:'stateError',   regex:/^[A-Za-z ]{2,}$/,  msg:'Invalid state'           }
-  };
-
-  function validate(field) {
-    const input = document.getElementById(field.id);
-    const error = document.getElementById(field.error);
-    const ok    = field.regex.test(input.value.trim());
-    input.classList.toggle('error',   !ok);
-    input.classList.toggle('success',  ok);
-    error.textContent = ok ? '' : field.msg;
-    return ok;
-  }
-
-  /* live validation on input */
-  Object.values(fields).forEach(f =>
-    document.getElementById(f.id).addEventListener('input', () => validate(f))
-  );
-
-  /* pre-validate filled values on load */
-  window.addEventListener('load', () =>
-    Object.values(fields).forEach(f => validate(f))
-  );
-
-  /* submit guard */
-  document.querySelector('form').addEventListener('submit', function (e) {
-    const ok = Object.values(fields).map(validate).every(Boolean);
-    if (!ok) {
-      e.preventDefault();
-    } else {
-      document.querySelector('.btn-save').classList.add('saving');
-    }
-  });
-</script>
 </body>
 </html>

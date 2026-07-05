@@ -1,0 +1,112 @@
+<div class="table-card">
+  <table>
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Category</th>
+        <th>Brand</th>
+        <th>Visibility</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (products.length === 0) { %>
+        <tr class="empty-row">
+          <td colspan="6">
+            <div class="empty-icon"><i class="ti ti-box-off" aria-hidden="true"></i></div>
+            <div>No products found</div>
+          </td>
+        </tr>
+      <% } %>
+      <% products.forEach(product => { %>
+        <tr>
+          <td>
+            <div class="prod-img-wrap">
+              <img
+                src="<%= product.productImages?.[0] || '/placeholder.png' %>"
+                class="prod-thumb"
+                alt="<%= product.productName %>"
+              >
+              <div>
+                <div class="prod-name"><%= product.productName %></div>
+                <% if (product.description) { %>
+                  <div class="prod-desc"><%= product.description.substring(0, 40) %><%= product.description.length > 40 ? '…' : '' %></div>
+                <% } %>
+              </div>
+            </div>
+          </td>
+          <td>
+            <% if (product.categoryId) { %>
+              <span class="badge-cat">
+                <i class="ti ti-tag" aria-hidden="true" style="font-size:10px;"></i>
+                <%= product.categoryId.name %>
+              </span>
+            <% } else { %>
+              <span style="color:var(--muted); font-size:12px;">—</span>
+            <% } %>
+          </td>
+          <td>
+            <% if (product.brand) { %>
+              <span class="badge-brand">
+                <i class="ti ti-rosette" aria-hidden="true" style="font-size:10px;"></i>
+                <%= product.brand %>
+              </span>
+            <% } else { %>
+              <span style="color:var(--muted); font-size:12px;">—</span>
+            <% } %>
+          </td>
+          <td>
+            <div class="form-check form-switch" style="margin:0;">
+              <input
+                class="form-check-input listing-toggle"
+                type="checkbox"
+                <%= product.isListed ? "checked" : "" %>
+                data-id="<%= product._id %>"
+                data-name="<%= product.productName %>"
+              >
+            </div>
+          </td>
+          <td>
+            <a href="/admin/products/<%= product._id %>" class="btn-view">
+              <i class="ti ti-eye" aria-hidden="true" style="font-size:12px;"></i> View
+            </a>
+          </td>
+          <td>
+            <button
+              type="button"
+              class="btn-edit edit-btn"
+              data-id="<%= product._id %>"
+              data-name="<%= product.productName %>"
+              data-desc="<%= product.description %>"
+              data-longdesc="<%= product.longDescription || '' %>"
+              data-brand="<%= product.brand || '' %>"
+              data-category="<%= product.categoryId ? product.categoryId._id : '' %>"
+              data-offer="<%= product.productOffer || 0 %>"
+              data-images='<%- JSON.stringify(product.productImages || []) %>'
+            >
+              <i class="ti ti-pencil" aria-hidden="true" style="font-size:12px;"></i> Edit
+            </button>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<div class="pg-footer">
+  <div class="pg-info">
+    Page <%= currentPage %> of <%= totalPages %>
+  </div>
+  <div class="pager">
+    <a class="page-btn <%= currentPage === 1 ? 'disabled' : '' %>" data-page="<%= currentPage - 1 %>" href="?page=<%= currentPage - 1 %>&search=<%= search %>" aria-label="Previous">
+      <i class="ti ti-chevron-left" aria-hidden="true"></i>
+    </a>
+    <% for (let i = 1; i <= totalPages; i++) { %>
+      <a class="page-btn <%= currentPage === i ? 'active' : '' %>" data-page="<%= i %>" href="?page=<%= i %>&search=<%= search %>"><%= i %></a>
+    <% } %>
+    <a class="page-btn <%= currentPage === totalPages ? 'disabled' : '' %>" data-page="<%= currentPage + 1 %>" href="?page=<%= currentPage + 1 %>&search=<%= search %>" aria-label="Next">
+      <i class="ti ti-chevron-right" aria-hidden="true"></i>
+    </a>
+  </div>
+</div>
