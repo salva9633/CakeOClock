@@ -53,7 +53,7 @@ const counts = {
     });
     counts.All = grandTotal;
  
-    return renderAdmin(req, res, "orders", {
+    return renderAdmin(req, res, "Orders", {
       orders,
       counts,
       total,
