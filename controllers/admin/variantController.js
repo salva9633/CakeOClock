@@ -1,7 +1,7 @@
 import Variant from "../../models/variantModel.js";
 import Batch from "../../models/batchModel.js";
 import Product from "../../models/productModel.js";
-
+import { renderAdmin } from "../../utils/renderAdmin.js";
 /* =========================
    ADD VARIANT
 ========================= */
@@ -51,6 +51,9 @@ if (error.code === 11000) {
 /* =========================
    VARIANT DETAIL (BATCH LIST)
 ========================= */
+/* =========================
+   VARIANT DETAIL (BATCH LIST)
+========================= */
 export const getVariantDetail = async (req, res) => {
   try {
     const { variantId } = req.params;
@@ -67,7 +70,7 @@ export const getVariantDetail = async (req, res) => {
 
     const batches = await Batch.find({ variantId }).lean();
 
-    res.render("products/variantDetails", { variant, batches });
+    renderAdmin(req, res, "products/variantDetails", { variant, batches });
   } catch (error) {
     console.error("VARIANT DETAIL ERROR:", error);
     res.status(500).send("Variant detail error");

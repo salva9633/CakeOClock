@@ -23,7 +23,10 @@ const contactMessageSchema = new mongoose.Schema({
 
   resolvedAt:     { type: Date, default: null },
   closedAt:       { type: Date, default: null },
-  lastActivityAt: { type: Date, default: Date.now }
+  lastActivityAt: { type: Date, default: Date.now },
+
+  unreadAdminCount: { type: Number, default: 0 },
+  unreadUserCount:  { type: Number, default: 0 },
 
 }, { timestamps: true });
 

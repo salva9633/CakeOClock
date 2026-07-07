@@ -178,8 +178,28 @@
               const b = badgeMap[msg.status] || badgeMap.open;
             %>
 <tr class="spa-link msg-row" data-href="/my-messages/<%= msg._id %>" onclick="window.location='/my-messages/<%= msg._id %>'">              <td class="subject-cell">
-                <strong><span class="ticket-no">#<%= msg.ticketNumber %></span><%= msg.subject %></strong>
-                <span class="preview"><%= firstMsg.length > 60 ? firstMsg.substring(0,60)+'…' : firstMsg %></span>
+<strong style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+  <span class="ticket-no">#<%= msg.ticketNumber %></span>
+  <%= msg.subject %>
+  <% if (msg.unreadUserCount > 0) { %>
+  <span style="
+    background:#8B3A52;
+    color:#fff;
+    font-size:10px;
+    font-weight:800;
+    min-width:20px;
+    height:20px;
+    border-radius:99px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:0 6px;
+    line-height:1;
+    flex-shrink:0;
+    box-shadow:0 2px 6px rgba(139,58,82,.35);
+  "><%= msg.unreadUserCount %></span>
+  <% } %>
+</strong>                <span class="preview"><%= firstMsg.length > 60 ? firstMsg.substring(0,60)+'…' : firstMsg %></span>
               </td>
               <td>
                 <span class="badge <%= b.cls %>">

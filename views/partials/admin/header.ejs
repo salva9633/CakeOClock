@@ -58,21 +58,25 @@
   .dropdown-menu a:hover { background-color: #f2f2f2; }
 
   .profile-dropdown.active .dropdown-menu { display: block; }
+  .admin-header-brand { display: flex; align-items: center; gap: 12px; }
+.admin-brand-logo { width: 44px; height: 44px; border-radius: 12px; overflow: hidden; flex-shrink: 0; }
+.admin-brand-logo img { width: 100%; height: 100%; object-fit: cover; }
+.admin-brand-name { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; }
+.admin-brand-sub { font-size: .64rem; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; }
 </style>
 
 <header class="admin-header">
-  <!-- Brand -->
-  <!-- <div class="sidebar-brand"> -->
-    <div class="brand-logo-wrap">
+  <div class="admin-header-brand">
+    <div class="admin-brand-logo">
       <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1780840131/WhatsApp_Image_2026-06-07_at_4.24.57_PM-removebg-preview_cmrltl.png"
            alt="Cake O Clock">
     </div>
-    <div class="brand-text-wrap">
-      <div class="brand-name" style="color: #f2f2f2;">Cake O'Clock</div>
-      <div class="brand-sub" style="color: #f2f2f2;">Admin Panel</div>
+    <div class="admin-brand-text">
+      <div class="admin-brand-name">Cake O'Clock</div>
+      <div class="admin-brand-sub">Admin Panel</div>
     </div>
   </div>
-  
+
   <div class="header-right">
     <div class="profile-dropdown">
       <button class="profile-btn" type="button">
@@ -80,7 +84,6 @@
         <span><%= admin?.name || "Admin" %></span>
         <i class="fa-solid fa-caret-down"></i>
       </button>
-
       <div class="dropdown-menu">
         <a href="/admin/logout">
           <i class="fa-solid fa-right-from-bracket"></i> Logout
@@ -89,7 +92,6 @@
     </div>
   </div>
 </header>
-
 <script>
   (function () {
     const profileBtn = document.querySelector(".profile-btn");

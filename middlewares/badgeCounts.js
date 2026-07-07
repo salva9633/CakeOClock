@@ -1,6 +1,8 @@
 import Cart from "../models/cartModel.js";
 import Wishlist from "../models/wishlistModel.js";
-import Order from "../models/orderModel.js"; // ADD
+import Order from "../models/orderModel.js"; 
+import ContactMessage from "../models/Contactmessagemodel.js";
+
 
 export const injectBadgeCounts = async (req, res, next) => {
   try {

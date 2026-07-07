@@ -1,5 +1,3 @@
-
-
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -21,10 +19,8 @@
   100% { background-position: -200% 0; }
 }
 
-/* ─── Page shell ─── */
 .pg { padding: 1.5rem 1rem; }
 
-/* ─── Header ─── */
 .pg-header {
   display: flex;
   justify-content: space-between;
@@ -44,7 +40,6 @@
 }
 .pg-header h1 i { color: var(--rose); font-size: 20px; }
 
-/* ─── Search ─── */
 .search-wrap {
   display: flex;
   align-items: center;
@@ -76,7 +71,6 @@
 }
 .search-clear:hover { color: var(--rose); }
 
-/* ─── Add button ─── */
 .add-btn {
   display: flex;
   align-items: center;
@@ -96,7 +90,6 @@
 .add-btn:hover { background: var(--rose-dk); transform: translateY(-1px); }
 .add-btn i { font-size: 15px; }
 
-/* ─── Stats row ─── */
 .stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -137,7 +130,6 @@
 .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
 .stat-value { font-size: 22px; font-weight: 500; color: var(--brown); line-height: 1.1; }
 
-/* ─── Table card ─── */
 .table-card {
   background: var(--white);
   border: 0.5px solid var(--border);
@@ -177,7 +169,6 @@
   vertical-align: middle;
 }
 
-/* ─── Product image cell ─── */
 .prod-img-wrap {
   display: flex;
   align-items: center;
@@ -194,7 +185,6 @@
 .prod-name { font-size: 13px; color: var(--brown); font-weight: 500; }
 .prod-desc { font-size: 11px; color: var(--muted); margin-top: 1px; }
 
-/* ─── Category / Brand badges ─── */
 .badge-cat {
   display: inline-flex;
   align-items: center;
@@ -218,7 +208,6 @@
   font-weight: 500;
 }
 
-/* ─── Toggle ─── */
 .form-switch .form-check-input {
   cursor: pointer;
   width: 36px;
@@ -226,7 +215,6 @@
 }
 .form-check-input:checked { background-color: var(--rose) !important; border-color: var(--rose) !important; }
 
-/* ─── Action buttons ─── */
 .btn-view {
   display: inline-flex;
   align-items: center;
@@ -257,7 +245,6 @@
 }
 .btn-edit:hover { border-color: var(--caramel); color: var(--caramel); background: #FEF0E8; }
 
-/* ─── Empty state ─── */
 .empty-row td {
   text-align: center;
   padding: 3rem 1rem !important;
@@ -266,7 +253,6 @@
 }
 .empty-icon { font-size: 36px; color: var(--border); margin-bottom: 8px; }
 
-/* ─── Pagination ─── */
 .pg-footer {
   display: flex;
   justify-content: space-between;
@@ -301,7 +287,6 @@
 .modal { z-index: 9999; }
 .modal-backdrop { z-index: 9998; }
 
-/* ─── Modals ─── */
 .custom-modal {
   background: var(--blush);
   border-radius: 16px;
@@ -345,6 +330,9 @@
   border-color: var(--rose);
   box-shadow: 0 0 0 3px rgba(201,123,138,.12);
 }
+.form-control.is-invalid, .form-select.is-invalid {
+  border-color: #dc3545;
+}
 textarea.form-control { resize: vertical; min-height: 80px; }
 
 .btn-cancel {
@@ -370,8 +358,8 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   transition: background .2s, transform .15s;
 }
 .btn-save:hover { background: var(--rose-dk); transform: translateY(-1px); }
+.btn-save:disabled { opacity: .6; cursor: not-allowed; transform: none; }
 
-/* ─── Image slots ─── */
 .image-grid { display: flex; flex-wrap: wrap; gap: 10px; }
 .image-slot {
   width: 90px;
@@ -391,7 +379,6 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 .image-slot .slot-plus { font-size: 24px; color: var(--border); line-height: 1; }
 .image-slot img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
 
-/* ─── Crop modal ─── */
 #cropModal .modal-dialog { max-width: 95vw; margin: 0 auto; }
 #cropModal .modal-content { height: 95vh; background: #111; color: #fff; border-radius: 16px; }
 #cropModal .modal-body { display: flex; align-items: center; justify-content: center; flex: 1; overflow: hidden; padding: 0; }
@@ -402,7 +389,6 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 
 <div class="pg">
 
-  <!-- Header -->
   <div class="pg-header">
     <h1><i class="ti ti-box" aria-hidden="true"></i> Products</h1>
 
@@ -426,8 +412,6 @@ textarea.form-control { resize: vertical; min-height: 80px; }
     </button>
   </div>
 
-
-  <!-- Table -->
   <div class="table-card">
     <table>
       <thead>
@@ -524,35 +508,29 @@ textarea.form-control { resize: vertical; min-height: 80px; }
     </table>
   </div>
 
-  <!-- Pagination -->
   <div class="pg-footer">
     <div class="pg-info">
       Page <%= currentPage %> of <%= totalPages %>
     </div>
-    <div class="pager">
-      <a
-        class="page-btn <%= currentPage === 1 ? 'disabled' : '' %>"
-        href="?page=<%= currentPage - 1 %>&search=<%= search %>"
-        aria-label="Previous"
-      >
+
+<div class="pager">
+      <a class="page-btn <%= currentPage === 1 ? 'disabled' : '' %>"
+         href="?page=<%= currentPage - 1 %>&search=<%= search %>"
+         aria-label="Previous">
         <i class="ti ti-chevron-left" aria-hidden="true"></i>
       </a>
 
       <% for (let i = 1; i <= totalPages; i++) { %>
-        <a
-          class="page-btn <%= currentPage === i ? 'active' : '' %>"
-          href="?page=<%= i %>&search=<%= search %>"
-        ><%= i %></a>
+        <a class="page-btn <%= currentPage === i ? 'active' : '' %>"
+           href="?page=<%= i %>&search=<%= search %>"><%= i %></a>
       <% } %>
 
-      <a
-        class="page-btn <%= currentPage === totalPages ? 'disabled' : '' %>"
-        href="?page=<%= currentPage + 1 %>&search=<%= search %>"
-        aria-label="Next"
-      >
+      <a class="page-btn <%= currentPage === totalPages ? 'disabled' : '' %>"
+         href="?page=<%= currentPage + 1 %>&search=<%= search %>"
+         aria-label="Next">
         <i class="ti ti-chevron-right" aria-hidden="true"></i>
       </a>
-    </div>
+    </div>  
   </div>
 
 </div><!-- /pg -->
@@ -561,7 +539,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 <!-- ─── ADD PRODUCT MODAL ─── -->
 <div class="modal fade" id="addProductModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
-    <form id="addProductForm" action="/admin/products/add" method="post" enctype="multipart/form-data" class="modal-content custom-modal">
+    <form id="addProductForm" action="/admin/products/add" method="post" enctype="multipart/form-data" class="modal-content custom-modal" novalidate>
       <div class="modal-header">
         <h5 class="modal-title"><i class="ti ti-plus" aria-hidden="true"></i> Add New Product</h5>
       </div>
@@ -584,6 +562,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
         <div class="col-md-6">
           <label class="form-label">Category</label>
           <select name="categoryId" id="categoryId" class="form-select">
+            <option value="">Select category</option>
             <% categories.forEach(cat => { %>
               <option value="<%= cat._id %>"><%= cat.name %></option>
             <% }) %>
@@ -598,7 +577,8 @@ textarea.form-control { resize: vertical; min-height: 80px; }
         <div class="col-md-6">
           <label class="form-label">Product Offer (%)</label>
           <input type="number" name="productOffer" id="productOffer" 
-            class="form-control" placeholder="e.g. 10" min="0" max="100" value="0">
+            class="form-control" placeholder="e.g. 10" min="0" max="90" value="0">
+          <small id="offerError" class="text-danger"></small>
         </div>
         <div class="col-12">
           <label class="form-label">Product Images <span style="color:var(--muted);font-weight:400;text-transform:none;">(max 5)</span></label>
@@ -611,6 +591,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
             <% } %>
           </div>
           <input type="file" id="imageInput" accept="image/*" hidden multiple>
+          <small id="imageError" class="text-danger d-block mt-1"></small>
         </div>
       </div>
       <div class="modal-footer">
@@ -645,39 +626,46 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 <!-- ─── EDIT MODAL ─── -->
 <div class="modal fade" id="editProductModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
-    <form id="editProductForm" method="post" enctype="multipart/form-data" class="modal-content custom-modal">
+    <form id="editProductForm" method="post" enctype="multipart/form-data" class="modal-content custom-modal" novalidate>
       <div class="modal-header">
         <h5 class="modal-title"><i class="ti ti-pencil" aria-hidden="true"></i> Edit Product</h5>
       </div>
       <div class="modal-body row g-3">
         <div class="col-12">
           <label class="form-label">Product Name</label>
-          <input id="editProductName" name="productName" class="form-control" required>
+          <input id="editProductName" name="productName" class="form-control">
+          <small id="editNameError" class="text-danger"></small>
         </div>
         <div class="col-12">
           <label class="form-label">Short Description</label>
-          <input id="editDescription" name="description" class="form-control" required>
+          <input id="editDescription" name="description" class="form-control">
+          <small id="editDescError" class="text-danger"></small>
         </div>
         <div class="col-12">
           <label class="form-label">Long Description</label>
           <textarea id="editLongDescription" name="longDescription" class="form-control"></textarea>
+          <small id="editLongDescError" class="text-danger"></small>
         </div>
         <div class="col-md-6">
           <label class="form-label">Category</label>
-          <select id="editCategory" name="categoryId" class="form-select" required>
+          <select id="editCategory" name="categoryId" class="form-select">
+            <option value="">Select category</option>
             <% categories.forEach(cat => { %>
               <option value="<%= cat._id %>"><%= cat.name %></option>
             <% }) %>
           </select>
+          <small id="editCategoryError" class="text-danger"></small>
         </div>
         <div class="col-md-6">
           <label class="form-label">Brand</label>
           <input id="editBrand" name="brand" class="form-control">
+          <small id="editBrandError" class="text-danger"></small>
         </div>
         <div class="col-md-6">
           <label class="form-label">Product Offer (%)</label>
           <input type="number" id="editProductOffer" name="productOffer" 
-            class="form-control" placeholder="e.g. 10" min="0" max="100" value="0">
+            class="form-control" placeholder="e.g. 10" min="0" max="90" value="0">
+          <small id="editOfferError" class="text-danger"></small>
         </div>
         <div class="col-12">
           <label class="form-label">Product Images <span style="color:var(--muted);font-weight:400;text-transform:none;">(max 5)</span></label>
@@ -690,6 +678,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
             <% } %>
           </div>
           <input type="file" id="editImageInput" accept="image/*" hidden multiple>
+          <small id="editImageError" class="text-danger d-block mt-1"></small>
         </div>
       </div>
       <div class="modal-footer">
@@ -708,283 +697,454 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.js"></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
 
-  /* ── Toggle listing ── */
-  let selectedProductId = null;
-  let selectedCheckbox  = null;
-
-  document.querySelectorAll(".listing-toggle").forEach(toggle => {
-    toggle.addEventListener("change", function () {
-      selectedProductId = this.dataset.id;
-      selectedCheckbox  = this;
-      const action = this.checked ? "list" : "unlist";
-
-      document.querySelectorAll(".modal.show").forEach(m => {
-        const inst = bootstrap.Modal.getInstance(m);
-        if (inst) inst.hide();
-      });
-
-      Swal.fire({
-        title: "Confirm Action",
-        text: `${action === 'list' ? 'List' : 'Unlist'} "${this.dataset.name}"?`,
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonColor: "#C97B8A",
-        cancelButtonColor: "#B08A8A",
-        confirmButtonText: "Confirm",
-        cancelButtonText: "Cancel"
-      }).then(async result => {
-        if (result.isConfirmed) {
-          try {
-            const res  = await fetch(`/admin/products/toggle/${selectedProductId}`, {
-              method: "PATCH", credentials: "same-origin",
-              headers: { "Content-Type": "application/json" }
-            });
-            const data = await res.json();
-            if (!data.success) throw new Error();
-            location.reload();
-          } catch {
-            Swal.fire("Error", "Toggle failed. Please try again.", "error");
-            selectedCheckbox.checked = !selectedCheckbox.checked;
-          }
-        } else {
-          selectedCheckbox.checked = !selectedCheckbox.checked;
-        }
-      });
-    });
-  });
-
-  /* ── Cropper state ── */
-  let cropper        = null;
-  let currentMode    = null;
-  let activeIndex    = null;
-  let cropperReady   = false;
-
-  const croppedImages     = [];
-  const editCroppedImages = [];
-
-  const imageInput     = document.getElementById("imageInput");
-  const editImageInput = document.getElementById("editImageInput");
-  const cropImage      = document.getElementById("cropImage");
-  const cropModalEl    = document.getElementById("cropModal");
-  const editModalEl    = document.getElementById("editProductModal");
-  let   editModalInst  = null;
-  let   cropModalInst  = null;
-
-  /* ── Edit btn ── */
-  document.querySelectorAll(".edit-btn").forEach(btn => {
-    btn.addEventListener("click", function () {
-      editCroppedImages.length = 0;
-      document.getElementById("editProductName").value    = this.dataset.name;
-      document.getElementById("editDescription").value    = this.dataset.desc;
-      document.getElementById("editLongDescription").value = this.dataset.longdesc;
-      document.getElementById("editBrand").value          = this.dataset.brand;
-      document.getElementById("editProductOffer").value   = this.dataset.offer || 0;
-      document.getElementById("editCategory").value       = this.dataset.category;
-      document.getElementById("editProductForm").action   = `/admin/products/edit/${this.dataset.id}`;
-
-      const images = JSON.parse(this.dataset.images || "[]");
-      document.querySelectorAll(".edit-slot").forEach((slot, i) => {
-        const img  = slot.querySelector("img");
-        const plus = slot.querySelector(".slot-plus");
-        img.hidden = true; img.src = ""; plus.style.display = "block";
-        if (images[i]) { img.src = images[i]; img.hidden = false; plus.style.display = "none"; }
-      });
-
-      const modal = bootstrap.Modal.getOrCreateInstance(editModalEl);
-      modal.show();
-      editModalInst = modal;
-    });
-  });
-
-  /* ── Slot clicks ── */
-  document.querySelectorAll(".image-slot:not(.edit-slot)").forEach(slot => {
-    slot.addEventListener("click", () => {
-      currentMode = "add"; activeIndex = Number(slot.dataset.index);
-      imageInput.value = ""; imageInput.click();
-    });
-  });
-  document.querySelectorAll(".edit-slot").forEach(slot => {
-    slot.addEventListener("click", () => {
-      currentMode = "edit"; activeIndex = Number(slot.dataset.index);
-      editImageInput.value = ""; editImageInput.click();
-    });
-  });
-
-  imageInput.addEventListener("change",     e => { if (e.target.files[0]) handleImageSelect(e.target.files[0]); });
-  editImageInput.addEventListener("change",  e => { if (e.target.files[0]) handleImageSelect(e.target.files[0]); });
-
-  function handleImageSelect(file) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      cropImage.src = reader.result;
-      cropperReady  = false;
-      if (currentMode === "edit" && editModalInst) editModalInst.hide();
-      cropModalInst = new bootstrap.Modal(cropModalEl);
-      cropModalInst.show();
-    };
-    reader.readAsDataURL(file);
-  }
-
-  cropModalEl.addEventListener("shown.bs.modal", () => {
-    if (cropperReady) return;
-    if (cropper) { cropper.destroy(); cropper = null; }
-    cropper = new Cropper(cropImage, {
-      aspectRatio: 1, viewMode: 2, autoCropArea: 1,
-      responsive: true, background: false, zoomable: true, movable: true
-    });
-    cropperReady = true;
-  });
-
-  cropModalEl.addEventListener("hidden.bs.modal", () => {
-    if (cropper) { cropper.destroy(); cropper = null; }
-    cropperReady = false;
-    if (currentMode === "edit" && editModalInst) {
-      setTimeout(() => editModalInst.show(), 200);
-    }
-    document.querySelectorAll(".modal-backdrop").forEach((b, i) => { if (i > 0) b.remove(); });
-  });
-
-  document.getElementById("cropSaveBtn").addEventListener("click", async () => {
-    if (!cropper) return;
-    const canvas = cropper.getCroppedCanvas({ width: 800, height: 800 });
-    const blob   = await new Promise(res => canvas.toBlob(res, "image/jpeg", 0.9));
-
-    const slotSelector = currentMode === "add"
-      ? `.image-slot[data-index="${activeIndex}"]:not(.edit-slot)`
-      : `.edit-slot[data-index="${activeIndex}"]`;
-
-    const store = currentMode === "add" ? croppedImages : editCroppedImages;
-    store[activeIndex] = blob;
-
-    const slot = document.querySelector(slotSelector);
-    const img  = slot.querySelector("img");
-    img.src = URL.createObjectURL(blob);
-    img.hidden = false;
-    slot.querySelector(".slot-plus").style.display = "none";
-
-    if (cropModalInst) cropModalInst.hide();
-  });
-
-  /* ── Add product form ── */
-  const addForm       = document.getElementById("addProductForm");
-  const nameInput     = document.getElementById("productName");
-  const descInput     = document.getElementById("description");
-  const longDescInput = document.getElementById("longDescription");
-  const categoryInput = document.getElementById("categoryId");
-  const brandInput    = document.getElementById("brand");
-
-  addForm.addEventListener("submit", async e => {
-    e.preventDefault();
-    let isValid = true;
-
-    const setErr = (el, errEl, msg) => {
-      if (msg) { errEl.innerText = msg; el.classList.add("is-invalid"); isValid = false; }
-      else      { errEl.innerText = ""; el.classList.remove("is-invalid"); }
-    };
-
-    const name     = nameInput.value.trim();
-    const desc     = descInput.value.trim();
-    const longDesc = longDescInput.value.trim();
-    const category = categoryInput.value;
-    const brand    = brandInput.value.trim();
-
-    setErr(nameInput,     document.getElementById("nameError"),     name     === "" ? "Product name required" : "");
-    setErr(descInput,     document.getElementById("descError"),     desc     === "" ? "Description required"  : "");
-    setErr(longDescInput, document.getElementById("longDescError"), longDesc === "" ? "Long description required" : longDesc.length < 10 ? "Minimum 10 characters" : "");
-    setErr(categoryInput, document.getElementById("categoryError"), !category ? "Select a category" : "");
-    if (brand && brand.length < 2) { setErr(brandInput, document.getElementById("brandError"), "Min 2 characters"); }
-    else { document.getElementById("brandError").innerText = ""; brandInput.classList.remove("is-invalid"); }
-
-    if (!croppedImages.some(img => img)) {
-      Swal.fire("No image", "Add at least one product image", "error");
-      isValid = false;
-    }
-
-    if (!isValid) return;
-
-    const fd = new FormData();
-    fd.append("productName",    name);
-    fd.append("description",    desc);
-    fd.append("longDescription", addForm.longDescription.value);
-    fd.append("categoryId",     category);
-    fd.append("brand",          addForm.brand.value);
-    fd.append("productOffer",   addForm.productOffer.value || 0);
-    croppedImages.forEach((blob, i) => { if (blob) fd.append("images", blob, `image_${i}.jpg`); });
-
-    try {
-      const res  = await fetch(addForm.action, { method: "POST", body: fd });
-      const data = await res.json();
-if (data.success) {
-          addForm.reset();
-          croppedImages.length = 0;
-          document.querySelectorAll(".image-slot:not(.edit-slot)").forEach(slot => {
-            const img = slot.querySelector("img");
-            img.hidden = true; img.src = "";
-            slot.querySelector(".slot-plus").style.display = "block";
-          });
-          window.location.href = data.redirectUrl;
-        }      else { Swal.fire({ icon: "error", title: "Error", text: data.message || "Product already exists" }); }
-    } catch { alert("Something went wrong"); }
-  });
-
-  /* ── Edit product form ── */
-  const editForm = document.getElementById("editProductForm");
-  editForm.addEventListener("submit", async e => {
-    e.preventDefault();
-    let isValid = true;
-
-    const name     = editForm.productName.value.trim();
-    const desc     = editForm.description.value.trim();
-    const longDesc = editForm.longDescription.value.trim();
-    const category = editForm.categoryId.value;
-    const brand    = editForm.brand.value.trim();
-
-    if (!name)                           { Swal.fire("Error", "Product name required", "error"); isValid = false; }
-    else if (!desc)                      { Swal.fire("Error", "Description required", "error"); isValid = false; }
-    else if (longDesc.length < 10)       { Swal.fire("Error", "Long description min 10 chars", "error"); isValid = false; }
-    else if (!category)                  { Swal.fire("Error", "Select a category", "error"); isValid = false; }
-    else if (brand && brand.length < 2)  { Swal.fire("Error", "Brand must be at least 2 characters", "error"); isValid = false; }
-
-    const hasNew      = editCroppedImages.some(img => img);
-    const hasExisting = document.querySelectorAll("#editImageSlots img:not([hidden])").length > 0;
-    if (!hasNew && !hasExisting) { Swal.fire("Error", "Add at least one image", "error"); isValid = false; }
-
-    if (!isValid) return;
-
-    const fd = new FormData();
-    fd.append("productName",    name);
-    fd.append("description",    desc);
-    fd.append("longDescription", editForm.longDescription.value);
-    fd.append("categoryId",     category);
-    fd.append("brand",          brand);
-    fd.append("productOffer",   editForm.productOffer.value || 0);
-    editCroppedImages.forEach((blob, i) => {
-      if (blob) { fd.append("images", blob, `image_${i}.jpg`); fd.append("imageIndexes[]", String(i)); }
-    });
-
-    try {
-      const res  = await fetch(editForm.action, { method: "POST", body: fd });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        Swal.fire({ icon: "success", title: "Updated", text: "Product updated successfully" }).then(() => { window.location.href = "/admin/products"; });
-      } else {
-        Swal.fire({ icon: "error", title: "Error", text: data.message || "Update failed" });
-      }
-    } catch (err) { console.error(err); }
-  });
-
-  /* ── Debounced search ── */
-  const searchForm  = document.querySelector('form[action="/admin/products"]');
+/* ---------- SEARCH DEBOUNCE ---------- */
+/* ---------- SEARCH DEBOUNCE ---------- */
+(function () {
   const searchInput = document.getElementById("adminSearchInput");
-  let   searchTimer = null;
+  const searchForm = searchInput ? searchInput.closest("form") : null;
+  if (!searchInput || !searchForm) return;
+
+  let searchTimer;
+  let lastSubmittedValue = searchInput.value.trim();
 
   searchInput.addEventListener("input", () => {
     clearTimeout(searchTimer);
-    searchTimer = setTimeout(() => searchForm.submit(), 500);
-  });
-  searchForm.addEventListener("submit", e => { e.preventDefault(); searchForm.submit(); });
+    searchTimer = setTimeout(() => {
+      const value = searchInput.value.trim();
+      if (value === lastSubmittedValue) return; // nothing changed, skip
+      lastSubmittedValue = value;
 
+      const url = "/admin/products" + (value ? `?search=${encodeURIComponent(value)}` : "");
+
+      if (typeof window.adminNavigate === "function") {
+        window.adminNavigate(url); // smooth AJAX nav, matches rest of admin panel
+      } else {
+        searchForm.submit(); // fallback if adminNav.js isn't loaded
+      }
+    }, 500);
+  });
+})();
+
+let selectedProductId = null;
+
+
+
+let addImageFiles = new Array(5).fill(null);
+let editImageFiles = new Array(5).fill(null);
+let editExistingImages = new Array(5).fill(null); // URLs already saved, to know what stays
+let editChangedIndexes = new Set();
+let cropperInstance = null;
+let cropTargetContext = null; // { mode: 'add'|'edit', index: n }
+
+/* ---------- helpers ---------- */
+function renderSlot(slotEl, src) {
+  const img = slotEl.querySelector("img");
+  const plus = slotEl.querySelector(".slot-plus");
+  if (src) {
+    img.src = src;
+    img.hidden = false;
+    plus.hidden = true;
+  } else {
+    img.src = "";
+    img.hidden = true;
+    plus.hidden = false;
+  }
+}
+
+function setFieldError(fieldId, errorId, message) {
+  const field = document.getElementById(fieldId);
+  const errorEl = document.getElementById(errorId);
+  if (message) {
+    field.classList.add("is-invalid");
+    errorEl.textContent = message;
+  } else {
+    field.classList.remove("is-invalid");
+    errorEl.textContent = "";
+  }
+}
+
+function clearErrors(ids) {
+  ids.forEach(({ fieldId, errorId }) => setFieldError(fieldId, errorId, ""));
+}
+
+/* ---------- shared validation ---------- */
+function validateProductFields({ name, desc, longDesc, categoryId, brand, offer }) {
+  const errors = {};
+
+  if (!name) {
+    errors.name = "Product name is required";
+  } else if (name.length < 3) {
+    errors.name = "Must be at least 3 characters";
+  } else if (name.length > 100) {
+    errors.name = "Must be under 100 characters";
+  }
+
+  if (!desc) {
+    errors.desc = "Short description is required";
+  } else if (desc.length < 10) {
+    errors.desc = "Must be at least 10 characters";
+  } else if (desc.length > 200) {
+    errors.desc = "Must be under 200 characters";
+  }
+
+  if (longDesc && longDesc.length > 3000) {
+    errors.longDesc = "Must be under 3000 characters";
+  }
+
+  if (!categoryId) {
+    errors.categoryId = "Please select a category";
+  }
+
+  if (brand && brand.length > 50) {
+    errors.brand = "Must be under 50 characters";
+  }
+
+  if (offer === "" || offer === null || isNaN(offer)) {
+    errors.offer = "Enter a valid number";
+  } else if (Number(offer) < 0 || Number(offer) > 90) {
+    errors.offer = "Must be between 0 and 90";
+  }
+
+  return errors;
+}
+
+/* ---------- ADD MODAL: image slots ---------- */
+document.querySelectorAll("#imageSlots .image-slot").forEach(slot => {
+  slot.addEventListener("click", () => {
+    cropTargetContext = { mode: "add", index: parseInt(slot.dataset.index) };
+    document.getElementById("imageInput").click();
+  });
+});
+
+document.getElementById("imageInput").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => openCropper(reader.result);
+  reader.readAsDataURL(file);
+  e.target.value = "";
+});
+
+/* ---------- EDIT MODAL: image slots ---------- */
+document.querySelectorAll("#editImageSlots .edit-slot").forEach(slot => {
+  slot.addEventListener("click", () => {
+    cropTargetContext = { mode: "edit", index: parseInt(slot.dataset.index) };
+    document.getElementById("editImageInput").click();
+  });
+});
+
+document.getElementById("editImageInput").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => openCropper(reader.result);
+  reader.readAsDataURL(file);
+  e.target.value = "";
+});
+
+/* ---------- CROPPER ---------- */
+function openCropper(dataUrl) {
+  const cropImage = document.getElementById("cropImage");
+  cropImage.src = dataUrl;
+
+  const cropModal = new bootstrap.Modal(document.getElementById("cropModal"));
+  cropModal.show();
+
+  document.getElementById("cropModal").addEventListener("shown.bs.modal", function onShown() {
+    if (cropperInstance) cropperInstance.destroy();
+    cropperInstance = new Cropper(cropImage, {
+      aspectRatio: 1,
+      viewMode: 1,
+      background: false
+    });
+    this.removeEventListener("shown.bs.modal", onShown);
+  }, { once: true });
+}
+
+document.getElementById("cropSaveBtn").addEventListener("click", () => {
+  if (!cropperInstance || !cropTargetContext) return;
+
+  const canvas = cropperInstance.getCroppedCanvas({ width: 600, height: 600 });
+  canvas.toBlob((blob) => {
+    const url = URL.createObjectURL(blob);
+    const { mode, index } = cropTargetContext;
+
+    if (mode === "add") {
+      addImageFiles[index] = blob;
+      renderSlot(document.querySelector(`#imageSlots .image-slot[data-index="${index}"]`), url);
+      document.getElementById("imageError").textContent = "";
+    } else {
+      editImageFiles[index] = blob;
+      editChangedIndexes.add(index);
+      renderSlot(document.querySelector(`#editImageSlots .edit-slot[data-index="${index}"]`), url);
+      document.getElementById("editImageError").textContent = "";
+    }
+
+    cropperInstance.destroy();
+    cropperInstance = null;
+    cropTargetContext = null;
+
+    bootstrap.Modal.getInstance(document.getElementById("cropModal")).hide();
+  }, "image/jpeg", 0.9);
+});
+
+/* =========================================================
+   ADD PRODUCT
+========================================================= */
+const addErrorFields = [
+  { fieldId: "productName", errorId: "nameError" },
+  { fieldId: "description", errorId: "descError" },
+  { fieldId: "longDescription", errorId: "longDescError" },
+  { fieldId: "categoryId", errorId: "categoryError" },
+  { fieldId: "brand", errorId: "brandError" },
+  { fieldId: "productOffer", errorId: "offerError" }
+];
+
+addErrorFields.forEach(({ fieldId, errorId }) => {
+  document.getElementById(fieldId).addEventListener("input", () => {
+    setFieldError(fieldId, errorId, "");
+  });
+});
+
+document.getElementById("addProductForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const form = e.target;
+
+  clearErrors(addErrorFields);
+  document.getElementById("imageError").textContent = "";
+
+  const name = form.productName.value.trim();
+  const desc = form.description.value.trim();
+  const longDesc = form.longDescription.value.trim();
+  const categoryId = form.categoryId.value;
+  const brand = form.brand.value.trim();
+  const offer = form.productOffer.value;
+
+  const errors = validateProductFields({ name, desc, longDesc, categoryId, brand, offer });
+
+  const hasAnyImage = addImageFiles.some(f => f !== null);
+  let imageErrorMsg = "";
+  if (!hasAnyImage) imageErrorMsg = "Please add at least one product image";
+
+  if (Object.keys(errors).length > 0 || imageErrorMsg) {
+    if (errors.name) setFieldError("productName", "nameError", errors.name);
+    if (errors.desc) setFieldError("description", "descError", errors.desc);
+    if (errors.longDesc) setFieldError("longDescription", "longDescError", errors.longDesc);
+    if (errors.categoryId) setFieldError("categoryId", "categoryError", errors.categoryId);
+    if (errors.brand) setFieldError("brand", "brandError", errors.brand);
+    if (errors.offer) setFieldError("productOffer", "offerError", errors.offer);
+    if (imageErrorMsg) document.getElementById("imageError").textContent = imageErrorMsg;
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("productName", name);
+  formData.append("description", desc);
+  formData.append("longDescription", longDesc);
+  formData.append("categoryId", categoryId);
+  formData.append("brand", brand);
+  formData.append("productOffer", offer);
+
+  addImageFiles.forEach((blob) => {
+    if (blob) formData.append("images", blob, "image.jpg");
+  });
+
+  const saveBtn = form.querySelector(".btn-save");
+  const originalText = saveBtn.textContent;
+  saveBtn.disabled = true;
+  saveBtn.textContent = "Saving...";
+
+  try {
+    const res = await fetch("/admin/products/add", { method: "POST", body: formData });
+    const data = await res.json();
+
+    if (data.success) {
+      Swal.fire("Success", "Product added successfully", "success").then(() => {
+        window.location.href = data.redirectUrl || "/admin/products";
+      });
+    } else {
+      Swal.fire("Error", data.message || "Failed to add product", "error");
+    }
+  } catch (err) {
+    console.error(err);
+    Swal.fire("Error", "Something went wrong", "error");
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = originalText;
+  }
+});
+
+/* =========================================================
+   EDIT PRODUCT
+========================================================= */
+const editErrorFields = [
+  { fieldId: "editProductName", errorId: "editNameError" },
+  { fieldId: "editDescription", errorId: "editDescError" },
+  { fieldId: "editLongDescription", errorId: "editLongDescError" },
+  { fieldId: "editCategory", errorId: "editCategoryError" },
+  { fieldId: "editBrand", errorId: "editBrandError" },
+  { fieldId: "editProductOffer", errorId: "editOfferError" }
+];
+
+editErrorFields.forEach(({ fieldId, errorId }) => {
+  document.getElementById(fieldId).addEventListener("input", () => {
+    setFieldError(fieldId, errorId, "");
+  });
+});
+
+document.querySelectorAll(".edit-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    selectedProductId = btn.dataset.id;
+    editChangedIndexes.clear();
+    editImageFiles = new Array(5).fill(null);
+    clearErrors(editErrorFields);
+    document.getElementById("editImageError").textContent = "";
+
+    document.getElementById("editProductName").value = btn.dataset.name || "";
+    document.getElementById("editDescription").value = btn.dataset.desc || "";
+    document.getElementById("editLongDescription").value = btn.dataset.longdesc || "";
+    document.getElementById("editBrand").value = btn.dataset.brand || "";
+    document.getElementById("editCategory").value = btn.dataset.category || "";
+    document.getElementById("editProductOffer").value = btn.dataset.offer || 0;
+
+    let images = [];
+    try { images = JSON.parse(btn.dataset.images || "[]"); } catch { images = []; }
+    editExistingImages = new Array(5).fill(null).map((_, i) => images[i] || null);
+
+    document.querySelectorAll("#editImageSlots .edit-slot").forEach((slot, i) => {
+      renderSlot(slot, images[i] || null);
+    });
+
+    document.getElementById("editProductForm").action = `/admin/products/edit/${selectedProductId}`;
+
+    new bootstrap.Modal(document.getElementById("editProductModal")).show();
+  });
+});
+
+document.getElementById("editProductForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!selectedProductId) return;
+
+  const form = e.target;
+  clearErrors(editErrorFields);
+  document.getElementById("editImageError").textContent = "";
+
+  const name = form.productName.value.trim();
+  const desc = form.description.value.trim();
+  const longDesc = form.longDescription.value.trim();
+  const categoryId = form.categoryId.value;
+  const brand = form.brand.value.trim();
+  const offer = form.productOffer.value;
+
+  const errors = validateProductFields({ name, desc, longDesc, categoryId, brand, offer });
+
+  // at least one image must remain (existing, untouched) or be newly added
+  const hasExistingImage = editExistingImages.some((url, i) => url && !editChangedIndexes.has(i));
+  const hasNewImage = [...editChangedIndexes].some(i => editImageFiles[i]);
+  let imageErrorMsg = "";
+  if (!hasExistingImage && !hasNewImage) {
+    imageErrorMsg = "Please keep or add at least one product image";
+  }
+
+  if (Object.keys(errors).length > 0 || imageErrorMsg) {
+    if (errors.name) setFieldError("editProductName", "editNameError", errors.name);
+    if (errors.desc) setFieldError("editDescription", "editDescError", errors.desc);
+    if (errors.longDesc) setFieldError("editLongDescription", "editLongDescError", errors.longDesc);
+    if (errors.categoryId) setFieldError("editCategory", "editCategoryError", errors.categoryId);
+    if (errors.brand) setFieldError("editBrand", "editBrandError", errors.brand);
+    if (errors.offer) setFieldError("editProductOffer", "editOfferError", errors.offer);
+    if (imageErrorMsg) document.getElementById("editImageError").textContent = imageErrorMsg;
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("productName", name);
+  formData.append("description", desc);
+  formData.append("longDescription", longDesc);
+  formData.append("categoryId", categoryId);
+  formData.append("brand", brand);
+  formData.append("productOffer", offer);
+
+  editChangedIndexes.forEach(index => {
+    const blob = editImageFiles[index];
+    if (blob) {
+      formData.append("images", blob, "image.jpg");
+      formData.append("imageIndexes[]", index);
+    }
+  });
+
+  const saveBtn = form.querySelector(".btn-save");
+  const originalText = saveBtn.textContent;
+  saveBtn.disabled = true;
+  saveBtn.textContent = "Saving...";
+
+  try {
+    const res = await fetch(`/admin/products/edit/${selectedProductId}`, {
+      method: "POST",
+      body: formData
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      Swal.fire("Updated", "Product updated successfully", "success").then(() => {
+        window.location.reload();
+      });
+    } else {
+      Swal.fire("Error", data.message || "Failed to update product", "error");
+    }
+  } catch (err) {
+    console.error(err);
+    Swal.fire("Error", "Something went wrong", "error");
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = originalText;
+  }
+});
+
+/* ---------- TOGGLE LISTING ---------- */
+/* ---------- TOGGLE LISTING ---------- */
+document.querySelectorAll(".listing-toggle").forEach(toggle => {
+  toggle.addEventListener("change", async (e) => {
+    const checkbox = e.target;
+    const id = checkbox.dataset.id;
+    const name = checkbox.dataset.name;
+    const wasChecked = checkbox.checked;
+
+    // Revert the visual toggle immediately — we only flip it for real
+    // after the user confirms and the API call succeeds.
+    checkbox.checked = !wasChecked;
+
+    const action = wasChecked ? "list" : "unlist";
+
+    const result = await Swal.fire({
+      icon: "question",
+      title: wasChecked ? "List this product?" : "Unlist this product?",
+      html: wasChecked
+        ? `Make <b>${name}</b> visible to customers?`
+        : `Hide <b>${name}</b> from customers?`,
+      showCancelButton: true,
+      confirmButtonColor: "#A85F6E",
+      cancelButtonColor: "#B08A8A",
+      confirmButtonText: wasChecked ? "List it" : "Unlist it",
+      cancelButtonText: "Cancel"
+    });
+
+    if (!result.isConfirmed) return; // checkbox already reverted, nothing else to do
+
+try {
+      const res = await fetch(`/admin/products/toggle/${id}`, { method: "PATCH" });
+      const data = await res.json();
+
+      if (!data.success) {
+        Swal.fire("Error", "Could not update listing status", "error");
+        return;
+      }
+
+      checkbox.checked = data.isListed;
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Something went wrong", "error");
+    }  });
 });
 </script>

@@ -51,17 +51,13 @@ body.modal-open {
 }
 
 .main-content {
-  margin-left: 260px;
-  margin-top: 64px;
-
-  width: calc(100% - 260px);
-  min-height: calc(100vh - 64px);
-
+  margin-left: var(--sidebar-width, 260px);
+  margin-top: var(--header-height, 64px);
+  width: calc(100% - var(--sidebar-width, 260px));
+  min-height: calc(100vh - var(--header-height, 64px));
   padding: 24px 30px;
   box-sizing: border-box;
-
   background: linear-gradient(135deg, #f5e6e8 0%, #f8d7da 100%);
-
   overflow-x: hidden;
 }
 

@@ -70,10 +70,9 @@ router.post("/update-password", userController.updatePassword);
  
 // ── HOME ──────────────────────────────────────────────
 router.get("/", userController.loadHomePage);
-
 router.get("/about", userController.getAbout);
 router.get("/contact-us", userController.getContactUs);
-router.post("/contact-us", userController.postContactUs);
+router.post("/contact-us", userAuth, userController.postContactUs);
 router.get("/customer-support", userController.getCustomerSupport);
  
 // ── PRODUCTS ──────────────────────────────────────────

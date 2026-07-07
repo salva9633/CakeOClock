@@ -6,6 +6,60 @@ import Batch from "../../models/batchModel.js";
 import { renderAdmin } from "../../utils/renderAdmin.js";
 
 /* =========================
+   SHARED VALIDATION
+========================= */
+function validateProductInput({ productName, description, longDescription, categoryId, brand, productOffer }) {
+  const errors = [];
+
+  const cleanName = (productName || "").trim();
+  const cleanDesc = (description || "").trim();
+  const cleanLongDesc = (longDescription || "").trim();
+  const cleanBrand = (brand || "").trim();
+
+  if (!cleanName) {
+    errors.push("Product name is required");
+  } else if (cleanName.length < 3 || cleanName.length > 100) {
+    errors.push("Product name must be 3-100 characters");
+  }
+
+  if (!cleanDesc) {
+    errors.push("Short description is required");
+  } else if (cleanDesc.length < 10 || cleanDesc.length > 200) {
+    errors.push("Short description must be 10-200 characters");
+  }
+
+  if (cleanLongDesc && cleanLongDesc.length > 3000) {
+    errors.push("Long description must be under 3000 characters");
+  }
+
+  if (!categoryId) {
+    errors.push("Category is required");
+  }
+
+  if (cleanBrand && cleanBrand.length > 50) {
+    errors.push("Brand name must be under 50 characters");
+  }
+
+  const cleanOffer = Number(productOffer);
+  if (productOffer === undefined || productOffer === null || productOffer === "" || isNaN(cleanOffer)) {
+    errors.push("Product offer must be a valid number");
+  } else if (cleanOffer < 0 || cleanOffer > 90) {
+    errors.push("Product offer must be between 0 and 90");
+  }
+
+  return {
+    errors,
+    clean: {
+      cleanName,
+      cleanDesc,
+      cleanLongDesc,
+      cleanBrand,
+      cleanOffer: Math.max(0, Math.min(90, Number(productOffer) || 0))
+    }
+  };
+}
+
+/* =========================
    GET PRODUCTS LIST
 ========================= */
 export const getProducts = async (req, res) => {
@@ -21,7 +75,6 @@ export const getProducts = async (req, res) => {
     }
 
     const totalProducts = await Product.countDocuments(filter);
-   
     const totalPages = Math.ceil(totalProducts / limit);
 
     const products = await Product.find(filter)
@@ -51,45 +104,55 @@ export const getProducts = async (req, res) => {
 ========================= */
 export const addProduct = async (req, res) => {
   try {
-const { productName, description, longDescription, categoryId, brand, discount, productOffer } = req.body;
-    if (!productName || !description || !categoryId) {
-      return res.status(400).json({ success: false, message: "Required fields missing" });
-    }
+    const { productName, description, longDescription, categoryId, brand, discount, productOffer } = req.body;
 
-    const cleanName = productName.trim();
-
-    const existingProduct = await Product.findOne({
-      productName: { $regex: `^${cleanName}$`, $options: "i" }
+    const { errors, clean } = validateProductInput({
+      productName, description, longDescription, categoryId, brand, productOffer
     });
 
+    if (errors.length > 0) {
+      return res.status(400).json({ success: false, message: errors[0] });
+    }
+
+    // category must actually exist
+    const categoryExists = await Category.findById(categoryId);
+    if (!categoryExists) {
+      return res.status(400).json({ success: false, message: "Invalid category selected" });
+    }
+
+    // require at least one image
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ success: false, message: "At least one product image is required" });
+    }
+    if (req.files.length > 5) {
+      return res.status(400).json({ success: false, message: "Maximum 5 images allowed" });
+    }
+
+    // duplicate name check
+    const existingProduct = await Product.findOne({
+      productName: { $regex: `^${clean.cleanName}$`, $options: "i" }
+    });
     if (existingProduct) {
       return res.status(400).json({ success: false, message: "Product already exists" });
     }
 
     const imageUrls = [];
-
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        const uploadResult = await cloudinary.uploader.upload(
-          `data:${file.mimetype};base64,${file.buffer.toString("base64")}`,
-          { folder: "cake_oclock/products" }
-        );
-        imageUrls.push(uploadResult.secure_url);
-      }
-    }
-const cleanProductOffer = Number(productOffer) || 0;
-    if (cleanProductOffer > 90) {
-      return res.status(400).json({ success: false, message: "Product offer cannot exceed 90%" });
+    for (const file of req.files) {
+      const uploadResult = await cloudinary.uploader.upload(
+        `data:${file.mimetype};base64,${file.buffer.toString("base64")}`,
+        { folder: "cake_oclock/products" }
+      );
+      imageUrls.push(uploadResult.secure_url);
     }
 
     const product = await Product.create({
-      productName: cleanName,
-      description,
-      longDescription,
+      productName: clean.cleanName,
+      description: clean.cleanDesc,
+      longDescription: clean.cleanLongDesc,
       categoryId,
-      brand,
+      brand: clean.cleanBrand,
       discount,
-      productOffer:  cleanProductOffer,
+      productOffer: clean.cleanOffer,
       productImages: imageUrls,
       isListed: true
     });
@@ -107,38 +170,50 @@ const cleanProductOffer = Number(productOffer) || 0;
 export const editProduct = async (req, res) => {
   try {
     const { productId } = req.params;
-const { productName, description, longDescription, categoryId, brand, productOffer } = req.body;
+    const { productName, description, longDescription, categoryId, brand, productOffer } = req.body;
+
     const product = await Product.findById(productId);
-
     if (!product) {
-      return res.status(404).json({ success: false });
+      return res.status(404).json({ success: false, message: "Product not found" });
     }
-const cleanName = productName.trim();
 
-    const duplicate = await Product.findOne({
-      productName: { $regex: `^${cleanName}$`, $options: "i" },
-      _id: { $ne: productId }
+    const { errors, clean } = validateProductInput({
+      productName, description, longDescription, categoryId, brand, productOffer
     });
 
+    if (errors.length > 0) {
+      return res.status(400).json({ success: false, message: errors[0] });
+    }
+
+    const categoryExists = await Category.findById(categoryId);
+    if (!categoryExists) {
+      return res.status(400).json({ success: false, message: "Invalid category selected" });
+    }
+
+    const duplicate = await Product.findOne({
+      productName: { $regex: `^${clean.cleanName}$`, $options: "i" },
+      _id: { $ne: productId }
+    });
     if (duplicate) {
       return res.status(400).json({ success: false, message: "A product with this name already exists" });
     }
-    product.productName = productName.trim();
-    product.description = description;
-    product.longDescription = longDescription;
-    product.categoryId = categoryId;
-    product.brand = brand;
 
-const cleanProductOffer = Number(productOffer) || 0;
-    if (cleanProductOffer > 90) {
-      return res.status(400).json({ success: false, message: "Product offer cannot exceed 90%" });
-    }
-    product.productOffer    = cleanProductOffer;
+    product.productName = clean.cleanName;
+    product.description = clean.cleanDesc;
+    product.longDescription = clean.cleanLongDesc;
+    product.categoryId = categoryId;
+    product.brand = clean.cleanBrand;
+    product.productOffer = clean.cleanOffer;
+
     while (product.productImages.length < 5) {
       product.productImages.push("");
     }
 
     if (req.files && req.files.length > 0) {
+      if (req.files.length > 5) {
+        return res.status(400).json({ success: false, message: "Maximum 5 images allowed" });
+      }
+
       let indexes = req.body["imageIndexes[]"] || req.body.imageIndexes || [];
       if (!Array.isArray(indexes)) indexes = [indexes];
 
@@ -149,17 +224,23 @@ const cleanProductOffer = Number(productOffer) || 0;
           { folder: "cake_oclock/products" }
         );
         const index = parseInt(indexes[i]);
-        if (!isNaN(index)) {
+        if (!isNaN(index) && index >= 0 && index < 5) {
           product.productImages[index] = result.secure_url;
         }
       }
+    }
+
+    // ensure at least one image remains after edit
+    const hasAnyImage = product.productImages.some(url => url && url.trim() !== "");
+    if (!hasAnyImage) {
+      return res.status(400).json({ success: false, message: "Product must have at least one image" });
     }
 
     await product.save();
     return res.json({ success: true });
   } catch (err) {
     console.error("EDIT PRODUCT ERROR:", err);
-    return res.status(500).json({ success: false });
+    return res.status(500).json({ success: false, message: "Update product failed" });
   }
 };
 
@@ -187,7 +268,8 @@ export const getProductDetail = async (req, res) => {
       variant.totalStock = batches.reduce((sum, b) => sum + b.availableStock, 0);
     }
 
-renderAdmin(req, res, "products/productDetails", { product, variants });  } catch (error) {
+    renderAdmin(req, res, "products/productDetails", { product, variants });
+  } catch (error) {
     console.error("PRODUCT DETAIL ERROR:", error);
     res.status(500).send("Product detail error");
   }
@@ -205,12 +287,9 @@ export const toggleProductListing = async (req, res) => {
     }
 
     product.isListed = !product.isListed;
-
-    
     await product.save({ validateBeforeSave: false });
 
     res.json({ success: true, isListed: product.isListed });
-
   } catch (error) {
     console.error(error);
     res.json({ success: false });

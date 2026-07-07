@@ -1,4 +1,4 @@
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 
 <style>
 :root {
@@ -33,13 +33,24 @@
 .vp-sub { font-size: 12px; color: var(--muted); margin-top: 5px; max-width: 480px; line-height: 1.5; }
 
 .add-btn {
-  background: linear-gradient(135deg, #AF5454, #d97373);
-  color: #fff; border: none; padding: 10px 20px; border-radius: 8px;
-  font-weight: 600; font-size: 13px; cursor: pointer;
-  display: flex; align-items: center; gap: 7px;
-  box-shadow: 0 2px 8px rgba(175,84,84,.25); transition: opacity .2s; white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--rose);
+  color: var(--white);
+  border: none;
+  padding: 0 18px;
+  height: 36px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .2s, transform .15s;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(175,84,84,.2);
 }
-.add-btn:hover { opacity: .88; }
+.add-btn:hover { background: var(--rose-dk); transform: translateY(-1px); }
+.add-btn i { font-size: 15px; }
 
 /* ── METRIC CARDS ── */
 .metrics {
@@ -60,12 +71,12 @@
 .metric.m4 { border-top-color: var(--muted);   animation-delay: .24s; }
 
 .metric-icon {
-  width: 32px; height: 32px; border-radius: 8px;
+  width: 34px; height: 34px; border-radius: 8px;
   background: var(--rose-lt); display: flex; align-items: center;
   justify-content: center; margin-bottom: 10px; transition: transform .2s;
 }
 .metric:hover .metric-icon { transform: scale(1.1); }
-.metric-icon i { font-size: 16px; color: var(--rose); }
+.metric-icon i { font-size: 17px; color: var(--rose); }
 .metric.m2 .metric-icon { background: #FEF0E8; }
 .metric.m2 .metric-icon i { color: var(--caramel); }
 .metric.m3 .metric-icon { background: var(--mint); }
@@ -98,10 +109,14 @@
 .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--rose); animation: pulse 1.8s ease infinite; }
 
 table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-thead { background: linear-gradient(135deg, #AF5454, #d97373); }
+thead {
+  background: var(--blush);
+  border-bottom: 1px solid var(--border);
+}
 thead th {
-  padding: 13px 16px; color: #fff; font-size: 12px;
-  font-weight: 600; text-align: center; letter-spacing: .03em;
+  padding: 11px 16px; color: var(--muted); font-size: 11px;
+  font-weight: 500; text-align: center; letter-spacing: .06em;
+  text-transform: uppercase;
 }
 tbody td {
   padding: 16px; font-size: 13px; color: var(--brown);
@@ -150,19 +165,34 @@ th:nth-child(6), td:nth-child(6) { width: 13%; }
 
 /* ── ACTION BUTTONS ── */
 .batches-btn {
-  background: transparent; border: 0.5px solid #7BB88A; color: #3A7A4A;
-  padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 500;
-  cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
-  text-decoration: none; transition: all .2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 0.5px solid var(--border);
+  background: var(--white);
+  color: #3A7A4A;
+  text-decoration: none;
+  transition: all .2s;
 }
-.batches-btn:hover { background: #7BB88A; color: #fff; }
+.batches-btn:hover { border-color: #7BB88A; background: #EAF6EE; color: #2E6B3B; }
 
 .edit-btn {
-  background: transparent; border: 0.5px solid var(--caramel); color: var(--caramel);
-  padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 500;
-  cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: all .2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 0.5px solid var(--border);
+  background: var(--white);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .2s;
 }
-.edit-btn:hover { background: var(--caramel); color: #fff; }
+.edit-btn:hover { border-color: var(--caramel); color: var(--caramel); background: #FEF0E8; }
 
 /* ── EMPTY STATE ── */
 .empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); font-size: 13px; }
@@ -172,8 +202,8 @@ th:nth-child(6), td:nth-child(6) { width: 13%; }
 .back-link {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 13px; color: var(--muted); text-decoration: none;
-  padding: 8px 14px; border: 0.5px solid var(--border);
-  border-radius: 8px; background: var(--white); transition: all .2s;
+  padding: 8px 16px; border: 0.5px solid var(--border);
+  border-radius: 20px; background: var(--white); transition: all .2s;
   opacity: 0; animation: fadeUp .4s ease .5s forwards;
 }
 .back-link:hover { color: var(--rose-dk); border-color: var(--rose); background: var(--rose-lt); }
@@ -182,8 +212,9 @@ th:nth-child(6), td:nth-child(6) { width: 13%; }
 .modal-content  { border-radius: 12px; border: 0.5px solid var(--border); }
 .modal-header   { border-bottom: 0.5px solid var(--border); }
 .modal-footer   { border-top: 0.5px solid var(--border); gap: 8px; }
-.modal-title    { font-size: 15px; font-weight: 600; color: var(--brown); }
-.form-label     { font-size: 13px; color: var(--brown); font-weight: 500; margin-bottom: 4px; }
+.modal-title    { font-size: 15px; font-weight: 600; color: var(--brown); display: flex; align-items: center; gap: 6px; }
+.modal-title i  { color: var(--rose); }
+.form-label     { font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .05em; }
 .form-control, .form-select {
   font-size: 13px; border: 0.5px solid var(--border); border-radius: 8px;
 }
@@ -191,11 +222,23 @@ th:nth-child(6), td:nth-child(6) { width: 13%; }
 .form-control.is-invalid, .form-select.is-invalid { background-image: none !important; border-color: #dc3545; }
 small.text-danger { font-size: 11px; margin-top: 4px; display: block; }
 .btn-save {
-  background: linear-gradient(135deg, #AF5454, #d97373); color: #fff;
-  border: none; padding: 9px 22px; border-radius: 8px; font-size: 13px;
-  font-weight: 600; cursor: pointer; transition: opacity .2s;
+  background: var(--rose); color: #fff;
+  border: none; padding: 7px 20px; border-radius: 20px; font-size: 13px;
+  font-weight: 500; cursor: pointer; transition: background .2s, transform .15s;
 }
-.btn-save:hover { opacity: .88; }
+.btn-save:hover { background: var(--rose-dk); transform: translateY(-1px); }
+
+.btn-secondary {
+  font-size: 13px;
+  padding: 7px 18px;
+  border-radius: 20px;
+  border: 0.5px solid var(--border);
+  background: var(--white);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .2s;
+}
+.btn-secondary:hover { border-color: var(--rose); color: var(--rose); }
 
 @media (max-width: 768px) {
   .metrics { grid-template-columns: repeat(2, 1fr); }
@@ -351,7 +394,7 @@ small.text-danger { font-size: 11px; margin-top: 4px; display: block; }
 <form id="addVariantForm" class="modal-content">
         <input type="hidden" name="productId" value="<%= product._id %>">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="ti ti-plus" style="color:var(--rose);margin-right:6px"></i>Add variant</h5>
+        <h5 class="modal-title"><i class="ti ti-plus" aria-hidden="true"></i> Add variant</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;padding:1.25rem;">
@@ -382,7 +425,7 @@ small.text-danger { font-size: 11px; margin-top: 4px; display: block; }
         
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button type="submit" class="btn-save">Save variant</button>
       </div>
     </form>
@@ -394,7 +437,7 @@ small.text-danger { font-size: 11px; margin-top: 4px; display: block; }
   <div class="modal-dialog">
     <form id="editVariantForm" method="post" class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="ti ti-edit" style="color:var(--rose);margin-right:6px"></i>Edit variant</h5>
+        <h5 class="modal-title"><i class="ti ti-edit" aria-hidden="true"></i> Edit variant</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;padding:1.25rem;">
@@ -425,7 +468,7 @@ small.text-danger { font-size: 11px; margin-top: 4px; display: block; }
         
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button type="submit" class="btn-save">Update variant</button>
       </div>
     </form>

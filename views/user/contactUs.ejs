@@ -1,5 +1,4 @@
 <%- include('../partials/user/header') %>
-<%- include('../partials/user/navbar') %>
 
 <!-- ============================================================
      CAKE O'CLOCK — CONTACT US
@@ -120,6 +119,8 @@
     .coc-form-card{ padding:30px 24px; }
   }
 </style>
+<body>
+  <%- include('../partials/user/navbar') %>
 
 <div class="coc-contact">
 
@@ -178,15 +179,17 @@
         </div>
 
         <!-- Form -->
+<!-- Form -->
         <div class="coc-form-card coc-reveal">
+          <% if (typeof user !== 'undefined' && user) { %>
           <form action="/contact-us" method="POST">
             <div class="coc-field">
               <label>Your Name</label>
-              <input type="text" name="name" placeholder="John Doe" required>
+              <input type="text" name="name" placeholder="John Doe" value="<%= user.name || '' %>" required>
             </div>
             <div class="coc-field">
               <label>Email Address</label>
-              <input type="email" name="email" placeholder="john@example.com" required>
+              <input type="email" name="email" placeholder="john@example.com" value="<%= user.email || '' %>" required readonly>
             </div>
             <div class="coc-field">
               <label>Subject</label>
@@ -201,6 +204,18 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             </button>
           </form>
+          <% } else { %>
+          <div style="text-align:center; padding:20px 10px;">
+            <h4 style="color:var(--choco); font-weight:700; font-size:1.05rem; margin-bottom:10px;">Please log in to send a message</h4>
+            <p style="color:#806369; font-size:.88rem; line-height:1.7; margin-bottom:22px;">
+              We ask you to sign in first so we can follow up with you directly about your enquiry.
+            </p>
+            <a href="/login?redirect=/contact-us" class="coc-submit" style="text-decoration:none; display:inline-flex;">
+              Log In to Continue
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+          <% } %>
         </div>
 
       </div>
@@ -208,6 +223,7 @@
   </section>
 
 </div>
+</body>
 
 <script>
   (function(){

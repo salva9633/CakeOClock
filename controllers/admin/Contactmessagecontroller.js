@@ -78,7 +78,9 @@ export const viewContactMessage = async (req, res) => {
     const msg = await ContactMessage.findById(req.params.id);
     if (!msg) return res.redirect("/admin/contact-messages");
 
-    if (msg.applyAutoClose()) await msg.save();
+  if (msg.applyAutoClose()) await msg.save();
+msg.unreadUserCount = 0; // ← ADD THIS
+await msg.save();
 
 renderAdmin(req, res, "contactMessageDetail", { title: "Message Detail", msg });  } catch (err) {
     console.error("viewContactMessage error:", err);
@@ -124,10 +126,11 @@ export const replyContactMessage = async (req, res) => {
       `
     });
 
-    msg.messages.push({ sender: 'admin', text: replyText.trim() });
-    msg.status = 'in_progress';
-    msg.lastActivityAt = new Date();
-    await msg.save();
+   msg.messages.push({ sender: 'admin', text: replyText.trim() });
+msg.unreadUserCount = (msg.unreadUserCount || 0) + 1; // ← ADD THIS
+msg.status = 'in_progress';
+msg.lastActivityAt = new Date();
+await msg.save();
 
     res.json({ success: true, message: "Reply sent successfully!" });
   } catch (err) {

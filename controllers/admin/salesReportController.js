@@ -65,12 +65,23 @@ export const loadSalesReport = async (req, res) => {
       req.query.endDate
     );
 
-    // Orders placed in this period — ANY status. This is what the
-    // "Order Details" table and the "Order Status" donut chart use, so the
-    // donut can actually show more than one slice.
-    const rangeQuery = { createdAt: { $gte: startDate, $lte: endDate } };
+// Orders placed in this period — Delivered only. This is what the
+    // "Order Details" table, metrics, and revenue chart all use.
+// Orders placed in this period — Delivered only. This is what the
+    // "Order Details" table, metrics, and revenue chart all use.
+    const rangeQuery = {
+      createdAt: { $gte: startDate, $lte: endDate },
+      status: "Delivered"
+    };
 
-    // ── Pagination (table lists every order in range, not just Delivered) ──
+    // Separate, unfiltered query (ALL statuses) used only for the
+    // "Order Status" donut chart — everything else on this page stays
+    // Delivered-only.
+    const allStatusOrdersInRange = await Order.find({
+      createdAt: { $gte: startDate, $lte: endDate }
+    });
+
+    // ── Pagination ──
     const page  = parseInt(req.query.page) || 1;
     const limit = 5;
     const skip  = (page - 1) * limit;
@@ -83,12 +94,8 @@ export const loadSalesReport = async (req, res) => {
     const orders = allOrdersInRange.slice(skip, skip + limit);
 
     // Revenue metrics and the revenue-over-time chart are computed from
-    // every order placed in the period, regardless of status — so the
-    // numbers always match what the "Order Details" table below shows.
-    // (If you later want "sales" to mean completed/Delivered orders only,
-    // swap this line for: allOrdersInRange.filter(o => o.status === "Delivered"))
+    // Delivered orders only, matching the "Order Details" table below.
     const deliveredOrders = allOrdersInRange;
-
     // ── Calculations ──
     const overallSalesCount  = deliveredOrders.length;
     const overallOrderAmount = deliveredOrders.reduce((sum, o) => sum + o.finalTotal, 0);
@@ -166,12 +173,12 @@ export const loadSalesReport = async (req, res) => {
       chartData = Object.values(dayMap);
     }
 
-    // ── Status counts — across ALL orders placed in the period ──
+  // ── Status counts — Delivered only, matching the rest of the report ──
+// ── Status counts — ALL statuses in range, for the donut chart only ──
     const statusCounts = {};
-    allOrdersInRange.forEach(o => {
+    allStatusOrdersInRange.forEach(o => {
       statusCounts[o.status] = (statusCounts[o.status] || 0) + 1;
     });
-
     return renderAdmin(req, res, "sales-report", {
       orders,
       overallSalesCount,
@@ -203,11 +210,10 @@ export const exportSalesPdf = async (req, res) => {
     const filter = req.query.filter || "monthly";
     const { startDate, endDate } = getDateRange(filter, req.query.startDate, req.query.endDate);
 
-    const orders = await Order.find({
+  const orders = await Order.find({
       createdAt: { $gte: startDate, $lte: endDate },
       status: "Delivered"
     }).sort({ createdAt: -1 });
-
     const doc = new PDFDocument({ margin: 40, size: 'A4' });
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", "attachment; filename=sales-report.pdf");
@@ -239,13 +245,11 @@ export const exportSalesPdf = async (req, res) => {
     const totalCoupon   = orders.reduce((s, o) => s + (o.discount || 0), 0);
     const totalDiscount = orders.reduce((s, o) => s + (o.offerDiscount || 0), 0);
 
-    const summaries = [
+  const summaries = [
       { label: 'Total Orders',    value: String(orders.length) },
       { label: 'Total Revenue',   value: `Rs.${totalRevenue.toLocaleString('en-IN')}` },
-      { label: 'Offer Discount',  value: `Rs.${totalDiscount.toFixed(2)}` },
       { label: 'Coupon Savings',  value: `Rs.${totalCoupon.toFixed(2)}` },
     ];
-
     const boxGap = 10;
     const boxW = (CW - boxGap * (summaries.length - 1)) / summaries.length;
     const boxH = 56;
@@ -358,12 +362,10 @@ export const exportSalesExcel = async (req, res) => {
       req.query.startDate,
       req.query.endDate
     );
-
-    const orders = await Order.find({
+const orders = await Order.find({
       createdAt: { $gte: startDate, $lte: endDate },
       status: "Delivered"
     }).sort({ createdAt: -1 });
-
     const workbook  = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Sales Report");
 

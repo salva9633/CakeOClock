@@ -53,8 +53,9 @@ export const viewMyMessage = async (req, res) => {
     const msg = await ContactMessage.findOne({ _id: req.params.id, email });
     if (!msg) return res.redirect("/my-messages");
 
-    if (msg.applyAutoClose()) await msg.save();
-
+if (msg.applyAutoClose()) await msg.save();
+msg.unreadUserCount = 0; // ← ADD THIS
+await msg.save();
     res.render("myMessageDetail", { msg, user: req.session.user });
   } catch (err) {
     console.error(err);
@@ -75,7 +76,9 @@ export const replyToTicket = async (req, res) => {
     const msg = await ContactMessage.findOne({ _id: req.params.id, email });
     if (!msg) return res.json({ success: false, message: "Ticket not found" });
 
-    if (msg.applyAutoClose()) await msg.save();
+if (msg.applyAutoClose()) await msg.save();
+msg.unreadUserCount = 0; // ← ADD THIS
+await msg.save();
 
     if (msg.status === 'closed') {
       return res.json({
@@ -85,6 +88,7 @@ export const replyToTicket = async (req, res) => {
     }
 
     msg.messages.push({ sender: 'user', text: replyText.trim() });
+    msg.unreadAdminCount = (msg.unreadAdminCount || 0) + 1; // ← ADD THIS
     msg.status = 'in_progress'; // customer reply (re)activates the ticket
     msg.lastActivityAt = new Date();
     await msg.save();

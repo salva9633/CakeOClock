@@ -38,18 +38,16 @@
       headers: { "X-Requested-With": "XMLHttpRequest" }
     });
 
-    // Real redirect (e.g. auth redirected to /login) — follow it.
     if (res.redirected) {
       window.location.href = res.url;
       return;
     }
 
-    // Server responded with an error status — don't silently reload
-    // the same URL, since that just reproduces the same error.
     if (!res.ok) {
       console.error(`Admin nav request failed: ${res.status} ${res.statusText} for ${url}`);
       contentEl.innerHTML = renderInlineError(res.status, url);
       if (pushState) history.pushState({ ajaxUrl: url }, "", url);
+      window.scrollTo(0, 0);          // ← add this
       return;
     }
 
@@ -57,6 +55,8 @@
     contentEl.innerHTML = html;
 
     if (pushState) history.pushState({ ajaxUrl: url }, "", url);
+
+    window.scrollTo(0, 0);            // ← add this — the actual fix
 
     updateActiveSidebar(url);
     runInlineScripts(contentEl);
