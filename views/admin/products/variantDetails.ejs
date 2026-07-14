@@ -152,6 +152,9 @@ tbody tr:hover { background: var(--blush); }
 .badge-expired .badge-dot   { background: #dc3545; }
 .badge-exhausted .badge-dot { background: #6c757d; }
 
+/* ── SOLD PILL ── */
+.sold-val { font-weight: 600; color: var(--caramel); }
+
 /* ── ACTION BUTTONS ── */
 .edit-btn {
   display: inline-flex;
@@ -306,6 +309,7 @@ small.text-danger { font-size: 11px; margin-top: 4px; display: block; }
           <th>Expiry</th>
           <th>Initial Stock</th>
           <th>Available</th>
+          <th>Total Sold</th>
           <th>Status</th>
           <th>Action</th>
         </tr>
@@ -320,6 +324,9 @@ small.text-danger { font-size: 11px; margin-top: 4px; display: block; }
             <span style="font-weight:600; color:<%= batch.availableStock > 0 ? '#1F7A47' : '#9B2222' %>">
               <%= batch.availableStock %>
             </span>
+          </td>
+          <td>
+            <span class="sold-val"><%= batch.totalSold || 0 %></span>
           </td>
           <td>
             <span class="status-badge badge-<%= batch.status %>">

@@ -59,9 +59,16 @@ const userNotLoggedIn = (req, res, next) => {
   }
   return next();
 };
-
 const adminAuth = (req, res, next) => {
   if (req.session?.admin?.role !== "admin") {
+    const isAjax = req.xhr
+      || req.headers['content-type']?.includes('application/json')
+      || req.headers['content-type']?.includes('multipart/form-data')
+      || req.headers['accept']?.includes('application/json');
+
+    if (isAjax) {
+      return res.status(401).json({ success: false, message: "Session expired. Please log in again.", redirectUrl: "/admin/login" });
+    }
     return res.redirect("/admin/login");
   }
   return next();

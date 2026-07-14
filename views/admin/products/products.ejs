@@ -385,6 +385,9 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 #cropModal .modal-header, #cropModal .modal-footer { background: #1a1a1a; border: none; }
 #cropModal .btn-close { filter: invert(1); }
 .cropper-container { max-height: 80vh !important; }
+
+/* Ensure SweetAlert2 always renders above Bootstrap modals/backdrops */
+.swal2-container { z-index: 10000 !important; }
 </style>
 
 <div class="pg">
@@ -575,9 +578,9 @@ textarea.form-control { resize: vertical; min-height: 80px; }
           <small id="brandError" class="text-danger"></small>
         </div>
         <div class="col-md-6">
-          <label class="form-label">Product Offer (%)</label>
-          <input type="number" name="productOffer" id="productOffer" 
-            class="form-control" placeholder="e.g. 10" min="0" max="90" value="0">
+          <label class="form-label">Product Offer (%) <span style="color:var(--muted);font-weight:400;text-transform:none;">(optional)</span></label>
+<input type="number" name="productOffer" id="productOffer" 
+  class="form-control" placeholder="Leave blank for no offer" min="0" max="90">
           <small id="offerError" class="text-danger"></small>
         </div>
         <div class="col-12">
@@ -662,9 +665,9 @@ textarea.form-control { resize: vertical; min-height: 80px; }
           <small id="editBrandError" class="text-danger"></small>
         </div>
         <div class="col-md-6">
-          <label class="form-label">Product Offer (%)</label>
-          <input type="number" id="editProductOffer" name="productOffer" 
-            class="form-control" placeholder="e.g. 10" min="0" max="90" value="0">
+          <label class="form-label">Product Offer (%) <span style="color:var(--muted);font-weight:400;text-transform:none;">(optional)</span></label>
+          <input type="number" name="productOffer" id="editProductOffer" 
+            class="form-control" placeholder="Leave blank for no offer" min="0" max="90">
           <small id="editOfferError" class="text-danger"></small>
         </div>
         <div class="col-12">
@@ -697,304 +700,333 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.js"></script>
 
 <script>
-
-/* ---------- SEARCH DEBOUNCE ---------- */
-/* ---------- SEARCH DEBOUNCE ---------- */
 (function () {
-  const searchInput = document.getElementById("adminSearchInput");
-  const searchForm = searchInput ? searchInput.closest("form") : null;
-  if (!searchInput || !searchForm) return;
 
-  let searchTimer;
-  let lastSubmittedValue = searchInput.value.trim();
-
-  searchInput.addEventListener("input", () => {
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(() => {
-      const value = searchInput.value.trim();
-      if (value === lastSubmittedValue) return; // nothing changed, skip
-      lastSubmittedValue = value;
-
-      const url = "/admin/products" + (value ? `?search=${encodeURIComponent(value)}` : "");
-
-      if (typeof window.adminNavigate === "function") {
-        window.adminNavigate(url); // smooth AJAX nav, matches rest of admin panel
-      } else {
-        searchForm.submit(); // fallback if adminNav.js isn't loaded
-      }
-    }, 500);
-  });
-})();
-
-let selectedProductId = null;
-
-
-
-let addImageFiles = new Array(5).fill(null);
-let editImageFiles = new Array(5).fill(null);
-let editExistingImages = new Array(5).fill(null); // URLs already saved, to know what stays
-let editChangedIndexes = new Set();
-let cropperInstance = null;
-let cropTargetContext = null; // { mode: 'add'|'edit', index: n }
-
-/* ---------- helpers ---------- */
-function renderSlot(slotEl, src) {
-  const img = slotEl.querySelector("img");
-  const plus = slotEl.querySelector(".slot-plus");
-  if (src) {
-    img.src = src;
-    img.hidden = false;
-    plus.hidden = true;
-  } else {
-    img.src = "";
-    img.hidden = true;
-    plus.hidden = false;
-  }
-}
-
-function setFieldError(fieldId, errorId, message) {
-  const field = document.getElementById(fieldId);
-  const errorEl = document.getElementById(errorId);
-  if (message) {
-    field.classList.add("is-invalid");
-    errorEl.textContent = message;
-  } else {
-    field.classList.remove("is-invalid");
-    errorEl.textContent = "";
-  }
-}
-
-function clearErrors(ids) {
-  ids.forEach(({ fieldId, errorId }) => setFieldError(fieldId, errorId, ""));
-}
-
-/* ---------- shared validation ---------- */
-function validateProductFields({ name, desc, longDesc, categoryId, brand, offer }) {
-  const errors = {};
-
-  if (!name) {
-    errors.name = "Product name is required";
-  } else if (name.length < 3) {
-    errors.name = "Must be at least 3 characters";
-  } else if (name.length > 100) {
-    errors.name = "Must be under 100 characters";
+  /* =========================================================
+     PROACTIVE CLEANUP — runs every time this script executes.
+     Removes any stray backdrop / modal-open state left on <body>
+     from a previously loaded page (important if the admin panel
+     navigates via AJAX and swaps only inner content, since
+     .modal-backdrop and body classes live outside that container).
+  ========================================================= */
+  document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+  if (!document.querySelector(".modal.show")) {
+    document.body.classList.remove("modal-open");
+    document.body.style.removeProperty("overflow");
+    document.body.style.removeProperty("padding-right");
   }
 
-  if (!desc) {
-    errors.desc = "Short description is required";
-  } else if (desc.length < 10) {
-    errors.desc = "Must be at least 10 characters";
-  } else if (desc.length > 200) {
-    errors.desc = "Must be under 200 characters";
+  /* =========================================================
+     INIT GUARD — prevents binding the same listeners twice if
+     this script block gets executed more than once (e.g. AJAX
+     navigation re-inserting this same page fragment/script).
+  ========================================================= */
+  if (window.__productsPageBound) return;
+  window.__productsPageBound = true;
+
+  /* ---------- SEARCH DEBOUNCE ---------- */
+  (function () {
+    const searchInput = document.getElementById("adminSearchInput");
+    const searchForm = searchInput ? searchInput.closest("form") : null;
+    if (!searchInput || !searchForm) return;
+
+    let searchTimer;
+    let lastSubmittedValue = searchInput.value.trim();
+
+    searchInput.addEventListener("input", () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        const value = searchInput.value.trim();
+        if (value === lastSubmittedValue) return; // nothing changed, skip
+        lastSubmittedValue = value;
+
+        const url = "/admin/products" + (value ? `?search=${encodeURIComponent(value)}` : "");
+
+        if (typeof window.adminNavigate === "function") {
+          window.adminNavigate(url); // smooth AJAX nav, matches rest of admin panel
+        } else {
+          searchForm.submit(); // fallback if adminNav.js isn't loaded
+        }
+      }, 500);
+    });
+  })();
+
+  let selectedProductId = null;
+
+  let addImageFiles = new Array(5).fill(null);
+  let editImageFiles = new Array(5).fill(null);
+  let editExistingImages = new Array(5).fill(null); // URLs already saved, to know what stays
+  let editChangedIndexes = new Set();
+  let cropperInstance = null;
+  let cropTargetContext = null; // { mode: 'add'|'edit', index: n }
+
+  /* ---------- helpers ---------- */
+  function renderSlot(slotEl, src) {
+    const img = slotEl.querySelector("img");
+    const plus = slotEl.querySelector(".slot-plus");
+    if (src) {
+      img.src = src;
+      img.hidden = false;
+      plus.hidden = true;
+    } else {
+      img.src = "";
+      img.hidden = true;
+      plus.hidden = false;
+    }
   }
 
-  if (longDesc && longDesc.length > 3000) {
-    errors.longDesc = "Must be under 3000 characters";
+  function setFieldError(fieldId, errorId, message) {
+    const field = document.getElementById(fieldId);
+    const errorEl = document.getElementById(errorId);
+    if (!field || !errorEl) return;
+    if (message) {
+      field.classList.add("is-invalid");
+      errorEl.textContent = message;
+    } else {
+      field.classList.remove("is-invalid");
+      errorEl.textContent = "";
+    }
   }
 
-  if (!categoryId) {
-    errors.categoryId = "Please select a category";
+  function clearErrors(ids) {
+    ids.forEach(({ fieldId, errorId }) => setFieldError(fieldId, errorId, ""));
   }
 
-  if (brand && brand.length > 50) {
-    errors.brand = "Must be under 50 characters";
-  }
+  /* ---------- shared validation ---------- */
+  function validateProductFields({ name, desc, longDesc, categoryId, brand, offer }) {
+    const errors = {};
 
-  if (offer === "" || offer === null || isNaN(offer)) {
+    if (!name) {
+      errors.name = "Product name is required";
+    } else if (name.length < 3) {
+      errors.name = "Must be at least 3 characters";
+    } else if (name.length > 100) {
+      errors.name = "Must be under 100 characters";
+    }
+
+    if (!desc) {
+      errors.desc = "Short description is required";
+    } else if (desc.length < 10) {
+      errors.desc = "Must be at least 10 characters";
+    } else if (desc.length > 200) {
+      errors.desc = "Must be under 200 characters";
+    }
+
+    if (longDesc && longDesc.length > 3000) {
+      errors.longDesc = "Must be under 3000 characters";
+    }
+
+    if (!categoryId) {
+      errors.categoryId = "Please select a category";
+    }
+
+    if (brand && brand.length > 50) {
+      errors.brand = "Must be under 50 characters";
+    }
+
+    // Offer is optional — only validate range if a value was actually entered
+if (offer !== "" && offer !== null && offer !== undefined) {
+  if (isNaN(offer)) {
     errors.offer = "Enter a valid number";
   } else if (Number(offer) < 0 || Number(offer) > 90) {
     errors.offer = "Must be between 0 and 90";
   }
-
-  return errors;
 }
 
-/* ---------- ADD MODAL: image slots ---------- */
-document.querySelectorAll("#imageSlots .image-slot").forEach(slot => {
-  slot.addEventListener("click", () => {
-    cropTargetContext = { mode: "add", index: parseInt(slot.dataset.index) };
-    document.getElementById("imageInput").click();
-  });
-});
-
-document.getElementById("imageInput").addEventListener("change", (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => openCropper(reader.result);
-  reader.readAsDataURL(file);
-  e.target.value = "";
-});
-
-/* ---------- EDIT MODAL: image slots ---------- */
-document.querySelectorAll("#editImageSlots .edit-slot").forEach(slot => {
-  slot.addEventListener("click", () => {
-    cropTargetContext = { mode: "edit", index: parseInt(slot.dataset.index) };
-    document.getElementById("editImageInput").click();
-  });
-});
-
-document.getElementById("editImageInput").addEventListener("change", (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => openCropper(reader.result);
-  reader.readAsDataURL(file);
-  e.target.value = "";
-});
-
-/* ---------- CROPPER ---------- */
-function openCropper(dataUrl) {
-  const cropImage = document.getElementById("cropImage");
-  cropImage.src = dataUrl;
-
-  const cropModal = new bootstrap.Modal(document.getElementById("cropModal"));
-  cropModal.show();
-
-  document.getElementById("cropModal").addEventListener("shown.bs.modal", function onShown() {
-    if (cropperInstance) cropperInstance.destroy();
-    cropperInstance = new Cropper(cropImage, {
-      aspectRatio: 1,
-      viewMode: 1,
-      background: false
-    });
-    this.removeEventListener("shown.bs.modal", onShown);
-  }, { once: true });
-}
-
-document.getElementById("cropSaveBtn").addEventListener("click", () => {
-  if (!cropperInstance || !cropTargetContext) return;
-
-  const canvas = cropperInstance.getCroppedCanvas({ width: 600, height: 600 });
-  canvas.toBlob((blob) => {
-    const url = URL.createObjectURL(blob);
-    const { mode, index } = cropTargetContext;
-
-    if (mode === "add") {
-      addImageFiles[index] = blob;
-      renderSlot(document.querySelector(`#imageSlots .image-slot[data-index="${index}"]`), url);
-      document.getElementById("imageError").textContent = "";
-    } else {
-      editImageFiles[index] = blob;
-      editChangedIndexes.add(index);
-      renderSlot(document.querySelector(`#editImageSlots .edit-slot[data-index="${index}"]`), url);
-      document.getElementById("editImageError").textContent = "";
-    }
-
-    cropperInstance.destroy();
-    cropperInstance = null;
-    cropTargetContext = null;
-
-    bootstrap.Modal.getInstance(document.getElementById("cropModal")).hide();
-  }, "image/jpeg", 0.9);
-});
-
-/* =========================================================
-   ADD PRODUCT
-========================================================= */
-const addErrorFields = [
-  { fieldId: "productName", errorId: "nameError" },
-  { fieldId: "description", errorId: "descError" },
-  { fieldId: "longDescription", errorId: "longDescError" },
-  { fieldId: "categoryId", errorId: "categoryError" },
-  { fieldId: "brand", errorId: "brandError" },
-  { fieldId: "productOffer", errorId: "offerError" }
-];
-
-addErrorFields.forEach(({ fieldId, errorId }) => {
-  document.getElementById(fieldId).addEventListener("input", () => {
-    setFieldError(fieldId, errorId, "");
-  });
-});
-
-document.getElementById("addProductForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const form = e.target;
-
-  clearErrors(addErrorFields);
-  document.getElementById("imageError").textContent = "";
-
-  const name = form.productName.value.trim();
-  const desc = form.description.value.trim();
-  const longDesc = form.longDescription.value.trim();
-  const categoryId = form.categoryId.value;
-  const brand = form.brand.value.trim();
-  const offer = form.productOffer.value;
-
-  const errors = validateProductFields({ name, desc, longDesc, categoryId, brand, offer });
-
-  const hasAnyImage = addImageFiles.some(f => f !== null);
-  let imageErrorMsg = "";
-  if (!hasAnyImage) imageErrorMsg = "Please add at least one product image";
-
-  if (Object.keys(errors).length > 0 || imageErrorMsg) {
-    if (errors.name) setFieldError("productName", "nameError", errors.name);
-    if (errors.desc) setFieldError("description", "descError", errors.desc);
-    if (errors.longDesc) setFieldError("longDescription", "longDescError", errors.longDesc);
-    if (errors.categoryId) setFieldError("categoryId", "categoryError", errors.categoryId);
-    if (errors.brand) setFieldError("brand", "brandError", errors.brand);
-    if (errors.offer) setFieldError("productOffer", "offerError", errors.offer);
-    if (imageErrorMsg) document.getElementById("imageError").textContent = imageErrorMsg;
-    return;
+    return errors;
   }
 
-  const formData = new FormData();
-  formData.append("productName", name);
-  formData.append("description", desc);
-  formData.append("longDescription", longDesc);
-  formData.append("categoryId", categoryId);
-  formData.append("brand", brand);
-  formData.append("productOffer", offer);
-
-  addImageFiles.forEach((blob) => {
-    if (blob) formData.append("images", blob, "image.jpg");
+  /* =========================================================
+     ADD MODAL: image slots — delegated (safe against re-render)
+  ========================================================= */
+  document.addEventListener("click", (e) => {
+    const addSlot = e.target.closest("#imageSlots .image-slot");
+    if (addSlot) {
+      cropTargetContext = { mode: "add", index: parseInt(addSlot.dataset.index) };
+      document.getElementById("imageInput").click();
+      return;
+    }
+    const editSlot = e.target.closest("#editImageSlots .edit-slot");
+    if (editSlot) {
+      cropTargetContext = { mode: "edit", index: parseInt(editSlot.dataset.index) };
+      document.getElementById("editImageInput").click();
+      return;
+    }
   });
 
-  const saveBtn = form.querySelector(".btn-save");
-  const originalText = saveBtn.textContent;
-  saveBtn.disabled = true;
-  saveBtn.textContent = "Saving...";
+  document.getElementById("imageInput").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => openCropper(reader.result);
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  });
 
-  try {
-    const res = await fetch("/admin/products/add", { method: "POST", body: formData });
-    const data = await res.json();
+  document.getElementById("editImageInput").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => openCropper(reader.result);
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  });
 
-    if (data.success) {
-      Swal.fire("Success", "Product added successfully", "success").then(() => {
-        window.location.href = data.redirectUrl || "/admin/products";
+  /* ---------- CROPPER ---------- */
+  function openCropper(dataUrl) {
+    const cropImage = document.getElementById("cropImage");
+    cropImage.src = dataUrl;
+
+    const cropModalEl = document.getElementById("cropModal");
+    const cropModal = bootstrap.Modal.getOrCreateInstance(cropModalEl);
+    cropModal.show();
+
+    cropModalEl.addEventListener("shown.bs.modal", function onShown() {
+      if (cropperInstance) cropperInstance.destroy();
+      cropperInstance = new Cropper(cropImage, {
+        aspectRatio: 1,
+        viewMode: 1,
+        background: false
       });
-    } else {
-      Swal.fire("Error", data.message || "Failed to add product", "error");
-    }
-  } catch (err) {
-    console.error(err);
-    Swal.fire("Error", "Something went wrong", "error");
-  } finally {
-    saveBtn.disabled = false;
-    saveBtn.textContent = originalText;
+      this.removeEventListener("shown.bs.modal", onShown);
+    }, { once: true });
   }
-});
 
-/* =========================================================
-   EDIT PRODUCT
-========================================================= */
-const editErrorFields = [
-  { fieldId: "editProductName", errorId: "editNameError" },
-  { fieldId: "editDescription", errorId: "editDescError" },
-  { fieldId: "editLongDescription", errorId: "editLongDescError" },
-  { fieldId: "editCategory", errorId: "editCategoryError" },
-  { fieldId: "editBrand", errorId: "editBrandError" },
-  { fieldId: "editProductOffer", errorId: "editOfferError" }
-];
+  document.getElementById("cropSaveBtn").addEventListener("click", () => {
+    if (!cropperInstance || !cropTargetContext) return;
 
-editErrorFields.forEach(({ fieldId, errorId }) => {
-  document.getElementById(fieldId).addEventListener("input", () => {
-    setFieldError(fieldId, errorId, "");
+    const canvas = cropperInstance.getCroppedCanvas({ width: 600, height: 600 });
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const { mode, index } = cropTargetContext;
+
+      if (mode === "add") {
+        addImageFiles[index] = blob;
+        renderSlot(document.querySelector(`#imageSlots .image-slot[data-index="${index}"]`), url);
+        document.getElementById("imageError").textContent = "";
+      } else {
+        editImageFiles[index] = blob;
+        editChangedIndexes.add(index);
+        renderSlot(document.querySelector(`#editImageSlots .edit-slot[data-index="${index}"]`), url);
+        document.getElementById("editImageError").textContent = "";
+      }
+
+      cropperInstance.destroy();
+      cropperInstance = null;
+      cropTargetContext = null;
+
+      bootstrap.Modal.getOrCreateInstance(document.getElementById("cropModal")).hide();
+    }, "image/jpeg", 0.9);
   });
-});
 
-document.querySelectorAll(".edit-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
+  /* =========================================================
+     ADD PRODUCT
+  ========================================================= */
+  const addErrorFields = [
+    { fieldId: "productName", errorId: "nameError" },
+    { fieldId: "description", errorId: "descError" },
+    { fieldId: "longDescription", errorId: "longDescError" },
+    { fieldId: "categoryId", errorId: "categoryError" },
+    { fieldId: "brand", errorId: "brandError" },
+    { fieldId: "productOffer", errorId: "offerError" }
+  ];
+
+  addErrorFields.forEach(({ fieldId, errorId }) => {
+    const el = document.getElementById(fieldId);
+    if (el) el.addEventListener("input", () => setFieldError(fieldId, errorId, ""));
+  });
+
+  document.getElementById("addProductForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = e.target;
+
+    clearErrors(addErrorFields);
+    document.getElementById("imageError").textContent = "";
+
+    const name = form.productName.value.trim();
+    const desc = form.description.value.trim();
+    const longDesc = form.longDescription.value.trim();
+    const categoryId = form.categoryId.value;
+    const brand = form.brand.value.trim();
+const offer = form.productOffer.value.trim() === "" ? 0 : form.productOffer.value;
+
+    const errors = validateProductFields({ name, desc, longDesc, categoryId, brand, offer });
+
+    const hasAnyImage = addImageFiles.some(f => f !== null);
+    let imageErrorMsg = "";
+    if (!hasAnyImage) imageErrorMsg = "Please add at least one product image";
+
+    if (Object.keys(errors).length > 0 || imageErrorMsg) {
+      if (errors.name) setFieldError("productName", "nameError", errors.name);
+      if (errors.desc) setFieldError("description", "descError", errors.desc);
+      if (errors.longDesc) setFieldError("longDescription", "longDescError", errors.longDesc);
+      if (errors.categoryId) setFieldError("categoryId", "categoryError", errors.categoryId);
+      if (errors.brand) setFieldError("brand", "brandError", errors.brand);
+      if (errors.offer) setFieldError("productOffer", "offerError", errors.offer);
+      if (imageErrorMsg) document.getElementById("imageError").textContent = imageErrorMsg;
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("productName", name);
+    formData.append("description", desc);
+    formData.append("longDescription", longDesc);
+    formData.append("categoryId", categoryId);
+    formData.append("brand", brand);
+    formData.append("productOffer", offer);
+
+    addImageFiles.forEach((blob) => {
+      if (blob) formData.append("images", blob, "image.jpg");
+    });
+
+    const saveBtn = form.querySelector(".btn-save");
+    const originalText = saveBtn.textContent;
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Saving...";
+
+    try {
+      const res = await fetch("/admin/products/add", { method: "POST", body: formData });
+      const data = await res.json();
+
+      if (data.success) {
+        Swal.fire("Success", "Product added successfully", "success").then(() => {
+          window.location.href = data.redirectUrl || "/admin/products";
+        });
+      } else {
+        Swal.fire("Error", data.message || "Failed to add product", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Something went wrong", "error");
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = originalText;
+    }
+  });
+
+  /* =========================================================
+     EDIT PRODUCT
+  ========================================================= */
+  const editErrorFields = [
+    { fieldId: "editProductName", errorId: "editNameError" },
+    { fieldId: "editDescription", errorId: "editDescError" },
+    { fieldId: "editLongDescription", errorId: "editLongDescError" },
+    { fieldId: "editCategory", errorId: "editCategoryError" },
+    { fieldId: "editBrand", errorId: "editBrandError" },
+    { fieldId: "editProductOffer", errorId: "editOfferError" }
+  ];
+
+  editErrorFields.forEach(({ fieldId, errorId }) => {
+    const el = document.getElementById(fieldId);
+    if (el) el.addEventListener("input", () => setFieldError(fieldId, errorId, ""));
+  });
+
+  /* delegated click handler — works even if table rows are
+     re-rendered via pagination/search without a full reload */
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".edit-btn");
+    if (!btn) return;
+
     selectedProductId = btn.dataset.id;
     editChangedIndexes.clear();
     editImageFiles = new Array(5).fill(null);
@@ -1018,95 +1050,99 @@ document.querySelectorAll(".edit-btn").forEach(btn => {
 
     document.getElementById("editProductForm").action = `/admin/products/edit/${selectedProductId}`;
 
-    new bootstrap.Modal(document.getElementById("editProductModal")).show();
+    bootstrap.Modal.getOrCreateInstance(
+      document.getElementById("editProductModal")
+    ).show();
   });
-});
 
-document.getElementById("editProductForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  if (!selectedProductId) return;
+  document.getElementById("editProductForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!selectedProductId) return;
 
-  const form = e.target;
-  clearErrors(editErrorFields);
-  document.getElementById("editImageError").textContent = "";
+    const form = e.target;
+    clearErrors(editErrorFields);
+    document.getElementById("editImageError").textContent = "";
 
-  const name = form.productName.value.trim();
-  const desc = form.description.value.trim();
-  const longDesc = form.longDescription.value.trim();
-  const categoryId = form.categoryId.value;
-  const brand = form.brand.value.trim();
-  const offer = form.productOffer.value;
+    const name = form.productName.value.trim();
+    const desc = form.description.value.trim();
+    const longDesc = form.longDescription.value.trim();
+    const categoryId = form.categoryId.value;
+const brand = form.brand.value.trim();
+    const offer = form.productOffer.value.trim() === "" ? 0 : form.productOffer.value;
 
-  const errors = validateProductFields({ name, desc, longDesc, categoryId, brand, offer });
+    const errors = validateProductFields({ name, desc, longDesc, categoryId, brand, offer });
 
-  // at least one image must remain (existing, untouched) or be newly added
-  const hasExistingImage = editExistingImages.some((url, i) => url && !editChangedIndexes.has(i));
-  const hasNewImage = [...editChangedIndexes].some(i => editImageFiles[i]);
-  let imageErrorMsg = "";
-  if (!hasExistingImage && !hasNewImage) {
-    imageErrorMsg = "Please keep or add at least one product image";
-  }
-
-  if (Object.keys(errors).length > 0 || imageErrorMsg) {
-    if (errors.name) setFieldError("editProductName", "editNameError", errors.name);
-    if (errors.desc) setFieldError("editDescription", "editDescError", errors.desc);
-    if (errors.longDesc) setFieldError("editLongDescription", "editLongDescError", errors.longDesc);
-    if (errors.categoryId) setFieldError("editCategory", "editCategoryError", errors.categoryId);
-    if (errors.brand) setFieldError("editBrand", "editBrandError", errors.brand);
-    if (errors.offer) setFieldError("editProductOffer", "editOfferError", errors.offer);
-    if (imageErrorMsg) document.getElementById("editImageError").textContent = imageErrorMsg;
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append("productName", name);
-  formData.append("description", desc);
-  formData.append("longDescription", longDesc);
-  formData.append("categoryId", categoryId);
-  formData.append("brand", brand);
-  formData.append("productOffer", offer);
-
-  editChangedIndexes.forEach(index => {
-    const blob = editImageFiles[index];
-    if (blob) {
-      formData.append("images", blob, "image.jpg");
-      formData.append("imageIndexes[]", index);
+    // at least one image must remain (existing, untouched) or be newly added
+    // at least one image must remain (existing, untouched) or be newly added
+    const hasExistingImage = editExistingImages.some((url, i) => url && !editChangedIndexes.has(i));
+    const hasNewImage = [...editChangedIndexes].some(i => editImageFiles[i]);
+    let imageErrorMsg = "";
+    if (!hasExistingImage && !hasNewImage) {
+      imageErrorMsg = "Please keep or add at least one product image";
     }
-  });
 
-  const saveBtn = form.querySelector(".btn-save");
-  const originalText = saveBtn.textContent;
-  saveBtn.disabled = true;
-  saveBtn.textContent = "Saving...";
+    if (Object.keys(errors).length > 0 || imageErrorMsg) {
+      if (errors.name) setFieldError("editProductName", "editNameError", errors.name);
+      if (errors.desc) setFieldError("editDescription", "editDescError", errors.desc);
+      if (errors.longDesc) setFieldError("editLongDescription", "editLongDescError", errors.longDesc);
+      if (errors.categoryId) setFieldError("editCategory", "editCategoryError", errors.categoryId);
+      if (errors.brand) setFieldError("editBrand", "editBrandError", errors.brand);
+      if (errors.offer) setFieldError("editProductOffer", "editOfferError", errors.offer);
+      if (imageErrorMsg) document.getElementById("editImageError").textContent = imageErrorMsg;
+      return;
+    }
 
-  try {
-    const res = await fetch(`/admin/products/edit/${selectedProductId}`, {
-      method: "POST",
-      body: formData
+    const formData = new FormData();
+    formData.append("productName", name);
+    formData.append("description", desc);
+    formData.append("longDescription", longDesc);
+    formData.append("categoryId", categoryId);
+    formData.append("brand", brand);
+    formData.append("productOffer", offer);
+
+    editChangedIndexes.forEach(index => {
+      const blob = editImageFiles[index];
+      if (blob) {
+        formData.append("images", blob, "image.jpg");
+        formData.append("imageIndexes[]", index);
+      }
     });
-    const data = await res.json();
 
-    if (data.success) {
-      Swal.fire("Updated", "Product updated successfully", "success").then(() => {
-        window.location.reload();
+    const saveBtn = form.querySelector(".btn-save");
+    const originalText = saveBtn.textContent;
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Saving...";
+
+    try {
+      const res = await fetch(`/admin/products/edit/${selectedProductId}`, {
+        method: "POST",
+        body: formData
       });
-    } else {
-      Swal.fire("Error", data.message || "Failed to update product", "error");
-    }
-  } catch (err) {
-    console.error(err);
-    Swal.fire("Error", "Something went wrong", "error");
-  } finally {
-    saveBtn.disabled = false;
-    saveBtn.textContent = originalText;
-  }
-});
+      const data = await res.json();
 
-/* ---------- TOGGLE LISTING ---------- */
-/* ---------- TOGGLE LISTING ---------- */
-document.querySelectorAll(".listing-toggle").forEach(toggle => {
-  toggle.addEventListener("change", async (e) => {
-    const checkbox = e.target;
+      if (data.success) {
+        Swal.fire("Updated", "Product updated successfully", "success").then(() => {
+          window.location.reload();
+        });
+      } else {
+        Swal.fire("Error", data.message || "Failed to update product", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Something went wrong", "error");
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = originalText;
+    }
+  });
+
+  /* =========================================================
+     TOGGLE LISTING — delegated
+  ========================================================= */
+  document.addEventListener("change", async (e) => {
+    const checkbox = e.target.closest(".listing-toggle");
+    if (!checkbox) return;
+
     const id = checkbox.dataset.id;
     const name = checkbox.dataset.name;
     const wasChecked = checkbox.checked;
@@ -1114,8 +1150,6 @@ document.querySelectorAll(".listing-toggle").forEach(toggle => {
     // Revert the visual toggle immediately — we only flip it for real
     // after the user confirms and the API call succeeds.
     checkbox.checked = !wasChecked;
-
-    const action = wasChecked ? "list" : "unlist";
 
     const result = await Swal.fire({
       icon: "question",
@@ -1132,7 +1166,7 @@ document.querySelectorAll(".listing-toggle").forEach(toggle => {
 
     if (!result.isConfirmed) return; // checkbox already reverted, nothing else to do
 
-try {
+    try {
       const res = await fetch(`/admin/products/toggle/${id}`, { method: "PATCH" });
       const data = await res.json();
 
@@ -1145,6 +1179,20 @@ try {
     } catch (err) {
       console.error(err);
       Swal.fire("Error", "Something went wrong", "error");
-    }  });
-});
+    }
+  });
+
+  /* =========================================================
+     CLEAN UP ORPHANED BACKDROPS whenever any modal fully closes
+  ========================================================= */
+  document.addEventListener("hidden.bs.modal", () => {
+    if (!document.querySelector(".modal.show")) {
+      document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+      document.body.classList.remove("modal-open");
+      document.body.style.removeProperty("overflow");
+      document.body.style.removeProperty("padding-right");
+    }
+  });
+
+})();
 </script>

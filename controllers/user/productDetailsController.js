@@ -4,6 +4,7 @@ import Variant  from "../../models/variantModel.js";
 import Batch    from "../../models/batchModel.js";
 import Review   from "../../models/reviewModel.js";
 import Order    from "../../models/orderModel.js";
+import Wishlist from "../../models/wishlistModel.js";
 import { getFinalPrice } from "../../utils/offerCalculator.js";
 /* ===============================
    LOAD PRODUCT DETAILS PAGE
@@ -147,7 +148,7 @@ if (!product.isListed) {
         ? (allReviews.reduce((sum, r) => sum + (r.rating || 0), 0) / totalReviews).toFixed(1)
         : "0.0";
  
-    let canReview = false;
+let canReview = false;
  
     if (userId) {
       const deliveredOrder = await Order.findOne({
@@ -161,7 +162,15 @@ if (!product.isListed) {
       }).lean();
       canReview = !!deliveredOrder;
     }
- 
+let isWishlisted = false;
+
+if (userId) {
+  const wishlistDoc = await Wishlist.findOne({
+    userId,
+    "products.productId": productId
+  }).lean();
+  isWishlisted = !!wishlistDoc;
+}
 /* -------- Offer Calculation -------- */
 
 const priceData = await getFinalPrice(selectedVariant);
@@ -184,6 +193,7 @@ res.render("productDetails", {
   avgRating,
   initialStock,
   canReview,
+  isWishlisted,
   isLoggedIn: !!userId,
   offerData,
   user:          req.session?.user || null,

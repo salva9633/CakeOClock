@@ -49,8 +49,8 @@
   <small class="error-message"></small>
 </div>
 
-<div class="field">
-  <label>Max Discount</label>
+<div class="field" id="maxDiscountField">
+  <label>Max Discount <span id="maxDiscOptional" style="font-size:10px;color:var(--muted);text-transform:none;font-weight:400;">(optional for fixed)</span></label>
   <input type="number" name="maxDiscount" placeholder="e.g. 200">
   <small class="error-message"></small>
 </div>
@@ -615,14 +615,13 @@ else if (description.value.trim().length < 5) {
   );
 }
 
-if (!maxDiscount.value) {
-  showError(maxDiscount, "Max discount is required");
-}
-else if (Number(maxDiscount.value) <= 0) {
-  showError(
-    maxDiscount,
-    "Max discount must be greater than 0"
-  );
+// Max discount is only required for percentage coupons
+if (discountType.value === 'percentage') {
+  if (!maxDiscount.value) {
+    showError(maxDiscount, "Max discount is required for percentage coupons");
+  } else if (Number(maxDiscount.value) <= 0) {
+    showError(maxDiscount, "Max discount must be greater than 0");
+  }
 }
 
  if (
@@ -651,6 +650,12 @@ if (!minPurchase.value) {
 else if (Number(minPurchase.value) < 100) {
   showError(minPurchase, "Minimum purchase should be at least ₹100");
 }
+else if (
+  discountType.value === "fixed" &&
+  Number(minPurchase.value) <= Number(discountValue.value)
+) {
+  showError(minPurchase, "Minimum purchase must be greater than the discount value");
+}
 
   const today = new Date();
   today.setHours(0,0,0,0);
@@ -663,7 +668,7 @@ else if (Number(minPurchase.value) < 100) {
     showError(expiryDate, "Select a future date");
   }
 
-  if(valid){
+if(valid){
     code.value = codeValue;
 
     Swal.fire({
@@ -676,17 +681,84 @@ else if (Number(minPurchase.value) < 100) {
       confirmButtonText: "Yes, add it",
     }).then((result) => {
       if (result.isConfirmed) {
-        form.submit();
+        submitCouponForm();
       }
     });
   }
 });
 
+async function submitCouponForm() {
+  const formData = new FormData(form);
+  const payload = Object.fromEntries(formData.entries());
+
+  try {
+    const res = await fetch(form.action, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    // Success path redirects server-side (res.redirect), so if we land
+    // here with res.ok and no JSON body issue, just follow it.
+    if (res.redirected) {
+      window.location.href = res.url;
+      return;
+    }
+
+    const data = await res.json();
+
+    if (!data.success) {
+      Swal.fire({
+        icon: "error",
+        title: "Could not add coupon",
+        text: data.message || "Something went wrong.",
+        confirmButtonColor: "#A85F6E",
+      });
+      return;
+    }
+
+    // Fallback in case backend ever responds with JSON success instead of redirect
+    Swal.fire({
+      icon: "success",
+      title: "Coupon added!",
+      confirmButtonColor: "#A85F6E",
+      timer: 1500,
+      showConfirmButton: false,
+    }).then(() => {
+      window.location.href = "/admin/coupons";
+    });
+
+  } catch (err) {
+    console.error(err);
+    Swal.fire({
+      icon: "error",
+      title: "Network error",
+      text: "Please try again.",
+      confirmButtonColor: "#A85F6E",
+    });
+  }
+}
 document.getElementById("code").addEventListener("input", function () {
   this.value = this.value
     .toUpperCase()
     .replace(/[^A-Z0-9]/g, "");
 });
+
+
+// Show/hide max discount hint based on discount type
+document.querySelector('[name="discountType"]').addEventListener('change', function() {
+  const hint = document.getElementById('maxDiscOptional');
+  if (!hint) return;
+  hint.style.display = this.value === 'fixed' ? 'inline' : 'none';
+});
+// Run on page load
+(function() {
+  const dt = document.querySelector('[name="discountType"]');
+  const hint = document.getElementById('maxDiscOptional');
+  if (dt && hint) hint.style.display = dt.value === 'fixed' ? 'inline' : 'none';
+})();
+
+
 
 async function toggleStatus(id, isActive) {
   const action = isActive ? "deactivate" : "activate";

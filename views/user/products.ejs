@@ -65,8 +65,10 @@
       align-self: flex-start;
       width: 245px;
       min-width: 245px;
-      height: 100vh;
-      overflow-y: auto;
+      height: auto;
+      max-height: 100vh;
+      overflow-y: visible;
+      overflow-x: hidden;
       background: var(--white);
       border-right: 1px solid var(--border);
       display: flex;
@@ -169,7 +171,7 @@
     .clear-filter-btn:hover { background: var(--rose); color: #fff; border-color: var(--rose); }
 
     /* ── MAIN CONTENT ── */
-    .main-content { flex: 1; min-width: 0; padding: 26px 30px 56px; overflow-y: auto; }
+    .main-content { flex: 1; min-width: 0; padding: 26px 30px 56px; overflow-y: visible; }
 
     .topbar {
       display: flex;
@@ -534,17 +536,36 @@
     }
 
     /* RESPONSIVE */
-    @media (max-width: 860px) {
+    @media (max-width: 991px) {
       .sidebar {
-        position: static;
-        width: 100%; min-width: 0;
-        height: auto;
+        position: static !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
         border-right: none;
         border-bottom: 1px solid var(--border);
       }
       .shop-wrap { flex-direction: column; }
       .main-content { padding: 16px 14px 42px; }
       .breadcrumb-strip { padding: 11px 14px; }
+      .product-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .product-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+      }
+      .card-img-zone { height: 150px !important; }
+      .card-name { font-size: .85rem !important; }
+      .price-now { font-size: .95rem !important; }
+      .atc-btn { font-size: .72rem !important; padding: 7px 6px !important; }
+      .main-content { padding: 10px 8px 32px !important; }
     }
   </style>
 </head>
@@ -572,12 +593,25 @@
   <% } %>
 </div>
 
+<!-- MOBILE FILTER TOGGLE — only visible on mobile -->
+<div id="filterToggleBar" style="display:none; padding:10px 14px; background:#fff; border-bottom:1px solid #f0d4db;">
+  <button onclick="toggleMobileFilter()" style="
+    width:100%; padding:10px 16px;
+    background:linear-gradient(135deg,#C2607A,#8B3A52);
+    color:#fff; border:none; border-radius:10px;
+    font-family:'Lato',sans-serif; font-size:.88rem; font-weight:700;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+  ">
+    <i class="fas fa-sliders-h"></i>
+    <span id="filterToggleLabel">Show Filters</span>
+  </button>
+</div>
+
 <!-- SHOP WRAP -->
 <div class="shop-wrap">
 
   <!-- ════ SIDEBAR ════ -->
-  <aside class="sidebar">
-    <div class="sidebar-head">
+<aside class="sidebar" id="filterSidebar">    <div class="sidebar-head">
       <h2>Refine</h2>
       <p>Filter &amp; Sort</p>
     </div>
@@ -1105,6 +1139,44 @@ async function confirmAddToCart() {
     if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.textContent = 'Add to Cart'; }
   }
 }
+</script>
+
+<script>
+/* ── MOBILE FILTER TOGGLE ── */
+function toggleMobileFilter() {
+  var sidebar = document.getElementById('filterSidebar');
+  var label   = document.getElementById('filterToggleLabel');
+  var isOpen  = sidebar.classList.contains('mob-filter-open');
+  if (isOpen) {
+    sidebar.classList.remove('mob-filter-open');
+    sidebar.style.display = 'none';
+    label.textContent = 'Show Filters';
+  } else {
+    sidebar.classList.add('mob-filter-open');
+    sidebar.style.display = 'block';
+    label.textContent = 'Hide Filters';
+  }
+}
+
+/* ── SHOW/HIDE FILTER TOGGLE BAR ON MOBILE ── */
+(function() {
+  function handleResize() {
+    var toggleBar = document.getElementById('filterToggleBar');
+    var sidebar   = document.getElementById('filterSidebar');
+    if (!toggleBar || !sidebar) return;
+    if (window.innerWidth <= 991) {
+      toggleBar.style.display = 'block';
+      if (!sidebar.classList.contains('mob-filter-open')) {
+        sidebar.style.display = 'none';
+      }
+    } else {
+      toggleBar.style.display = 'none';
+      sidebar.style.display = '';
+    }
+  }
+  handleResize();
+  window.addEventListener('resize', handleResize);
+})();
 </script>
 
 </body>

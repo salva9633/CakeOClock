@@ -141,14 +141,14 @@ export const toggleWishlist = async (req, res) => {
       });
     } else {
     
-      wishlist.products.splice(existingIndex, 1);
+ wishlist.products.splice(existingIndex, 1);
 
       await wishlist.save();
 
       return res.json({
         success: true,
         wished: false,
-        message: "add cake to wishlist",
+        message: "Removed from wishlist",
         wishlistCount: wishlist.products.length,
       });
     }

@@ -53,7 +53,6 @@
   const clearBtn = document.getElementById('clearBtn');
   const form     = document.getElementById('searchForm');
 
-  // ── 1. Preserve search value from URL on page load ──
   const params    = new URLSearchParams(window.location.search);
   const urlSearch = params.get('search') || '';
   if (urlSearch) {
@@ -61,46 +60,35 @@
     clearBtn.style.display = 'block';
   }
 
-  // ── 2. Show / hide clear button on typing ──
   input.addEventListener('input', () => {
     clearBtn.style.display = input.value.trim() ? 'block' : 'none';
   });
 
-  // ── 3. Clear button — preserve other filters ──
   clearBtn.addEventListener('click', () => {
     input.value            = '';
     clearBtn.style.display = 'none';
     input.focus();
-
-    // If on products page, keep existing filters but remove search
     const cp = new URLSearchParams(window.location.search);
     cp.delete('search');
     cp.set('page', '1');
     window.location.href = '/products?' + cp.toString();
   });
 
-  // ── 4. On submit, carry current sidebar filters (only on /products page) ──
   form.addEventListener('submit', function (e) {
     const onProductsPage = window.location.pathname === '/products';
-    if (!onProductsPage) return; // normal submit on other pages
-
+    if (!onProductsPage) return;
     e.preventDefault();
-
-    // Pick up whatever filters are currently active in the sidebar
     const cat   = document.querySelector('input[name="category"]:checked')?.value || '';
     const price = document.querySelector('input[name="price"]:checked')?.value    || '';
     const brand = document.querySelector('input[name="brand"]:checked')?.value    || '';
     const sort  = document.getElementById('sortOptions')?.value                   || '';
-
     document.getElementById('hdr-sort').value     = sort;
     document.getElementById('hdr-category').value = cat;
     document.getElementById('hdr-price').value    = price;
     document.getElementById('hdr-brand').value    = brand;
-
     form.submit();
   });
 
-  // ── 5. Debounce — auto-submit after 500ms of no typing ──
   let debounceTimer;
   input.addEventListener('input', () => {
     clearTimeout(debounceTimer);
@@ -108,15 +96,12 @@
     if (val.length === 0) return;
     debounceTimer = setTimeout(() => form.dispatchEvent(new Event('submit')), 500);
   });
-
 })();
 </script>
 
         <!-- Icons -->
         <div class="d-flex align-items-center gap-4">
 
-
-                  
 <!-- ❤ Wishlist Icon -->
 <a href="/wishlist" class="text-reset header-icon" title="My Wishlist"
    style="position:relative; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; text-decoration:none;">
@@ -134,7 +119,12 @@
            <!-- 🛒 Cart Icon -->
 <a href="/cart" class="text-reset header-icon" title="My Cart" 
    style="position:relative; display:inline-flex;">
-  <img width="25" height="25" src="media/icons8-cart-50.png" alt="cart" />
+  <svg width="25" height="25" viewBox="0 0 24 24" fill="none" 
+       stroke="#8B3A52" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="9" cy="21" r="1"/>
+    <circle cx="20" cy="21" r="1"/>
+    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+  </svg>
  <% const _cc2 = locals.cartCount || 0; %>
 <span id="cart-count" style="
     position:absolute; top:-8px; right:-8px;
@@ -145,19 +135,20 @@
     line-height:1;"><%= _cc2 > 0 ? _cc2 : '' %></span>
 </a>
 
-
             <!-- User Dropdown / Auth Links -->
             <% if (locals.user) { %>
-                <div class="dropdown">
-                    <a class="nav-link dropdown-toggle fw-bold header-action"
+                <div class="dropdown" id="userDd" style="position:relative;">
+                    <a class="nav-link fw-bold header-action"
                        href="#"
                        role="button"
-                       data-bs-toggle="dropdown"
-                       style="color:#AF5454;">
+                       id="userDdBtn"
+                       style="color:#AF5454; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
                         <%= locals.user.name %>
+                        <i class="fas fa-chevron-down" id="userDdCaret" style="font-size:.65rem; transition:transform .2s;"></i>
                     </a>
 
-                    <ul class="dropdown-menu dropdown-menu-end custom-dropdown">
+                    <ul class="dropdown-menu dropdown-menu-end custom-dropdown" id="userDdMenu"
+                        style="display:none; position:absolute; top:calc(100% + 8px); right:0; z-index:9999;">
                         <li><a class="dropdown-item" href="/profile">Profile</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="/logout" style="color:#c0392b;">Logout</a></li>
@@ -177,6 +168,44 @@
         </div>
 
     </div> <!-- container-fluid -->
+
+    <!-- ✅ User dropdown toggle — plain JS, no Bootstrap dependency -->
+    <script>
+    (function () {
+      var dd    = document.getElementById('userDd');
+      var btn   = document.getElementById('userDdBtn');
+      var menu  = document.getElementById('userDdMenu');
+      var caret = document.getElementById('userDdCaret');
+      if (!dd || !btn || !menu) return;
+
+      function closeMenu() {
+        menu.style.display = 'none';
+        if (caret) caret.style.transform = 'rotate(0deg)';
+      }
+      function openMenu() {
+        menu.style.display = 'block';
+        if (caret) caret.style.transform = 'rotate(180deg)';
+      }
+
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (menu.style.display === 'block') {
+          closeMenu();
+        } else {
+          openMenu();
+        }
+      });
+
+      document.addEventListener('click', function (e) {
+        if (!dd.contains(e.target)) closeMenu();
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeMenu();
+      });
+    })();
+    </script>
 
     <!-- ✅ Block status poller — auto logout if admin blocks user -->
 <script>
@@ -220,7 +249,7 @@
 </script>
 
 </nav>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <!-- ── Secondary Nav ── -->
 <div style="background:#fff; border-bottom: 1px solid rgba(139,58,82,0.12); text-align:center; padding: 10px 0;">
   <a href="/" style="margin: 0 20px; font-size:.85rem; font-weight:600; letter-spacing:.08em; color:#5a2d3a; text-decoration:none;">HOME</a>

@@ -578,11 +578,23 @@
   .swal-slim-title  { font-size: 15px !important; font-weight: 600 !important; color: #5C3A3A !important; padding: 0 !important; }
   .swal-slim-text   { font-size: 12px !important; color: #B08A8A !important; margin-top: 4px !important; }
 </style>
+
 <script>
+  window.addEventListener('pageshow', function (event) {
+  if (event.persisted) {
+    // Page was restored from bfcache — force a fresh load with current data
+    window.location.reload();
+  }
+});
 const ORDER_ID        = '<%= order._id %>';
 const STATUS_ORDER    = ['Pending','Processing','Shipped','Delivered','Cancelled','Returned'];
 const LOCKED = ['Cancelled','Returned'];
 let   lastKnownStatus = '<%= order.status %>';
+
+function getOrderIdFromUrl() {
+  const parts = window.location.pathname.split('/').filter(Boolean);
+  return parts[parts.length - 1];
+}
 
 function showToast(msg, type) {
   var t = document.getElementById('toast');
@@ -598,15 +610,15 @@ async function submitStatusUpdate() {
   btn.disabled = true;
   btn.innerHTML = '<i class="ti ti-loader" aria-hidden="true"></i> Updating…';
   try {
-    var res  = await fetch('/admin/orders/' + ORDER_ID + '/status', {
-      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+    var res  = await fetch('/admin/orders/' + getOrderIdFromUrl() + '/status', {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: status })
     });
     var data = await res.json();
     if (data.success) {
       lastKnownStatus = status;
       updateDetailUI(status);
-      showToast('Status updated to "' + status + '"', 'success');
+      showToast('Status updated to "' + status + '"', 'success'); // ✅ toast ONLY here (manual update)
     } else {
       showToast(data.message || 'Update failed', 'error');
     }
@@ -619,9 +631,8 @@ async function submitStatusUpdate() {
 }
 
 async function handleReturn(orderId, itemId, action) {
-  // ── Confirmation SweetAlert ──
   const isApprove = action === 'approve';
-const confirm = await Swal.fire({
+  const confirm = await Swal.fire({
     title: isApprove ? '✅ Approve Return?' : '✕ Reject Return?',
     text: isApprove ? 'Refund goes to wallet.' : 'Request will be declined.',
     icon: isApprove ? 'success' : 'error',
@@ -638,7 +649,6 @@ const confirm = await Swal.fire({
     }
   });
   if (!confirm.isConfirmed) return;
-  // ────────────────────────────
 
   var url = isApprove ? '/admin/approve-return' : '/admin/reject-return';
   try {
@@ -660,16 +670,17 @@ const confirm = await Swal.fire({
 
 async function pollStatus() {
   try {
-    var res  = await fetch('/admin/orders/' + ORDER_ID + '/poll-status');
+    var res  = await fetch('/admin/orders/' + getOrderIdFromUrl() + '/poll-status');
     var data = await res.json();
     if (data.success && data.status !== lastKnownStatus) {
       lastKnownStatus = data.status;
       updateDetailUI(data.status);
-      showToast('Status changed to "' + data.status + '"', 'success');
+      // 🔕 No toast here — polling should update UI silently.
+      // Toast only fires from submitStatusUpdate() (manual admin action).
     }
   } catch (e) { /* silent */ }
 }
-setInterval(pollStatus, 8000);
+var pollIntervalId = setInterval(pollStatus, 8000);
 
 function updateDetailUI(newStatus) {
   var badge = document.getElementById('current-badge');
@@ -698,4 +709,11 @@ function updateDetailUI(newStatus) {
     }
   }
 }
+
+window.addEventListener('pageshow', function (event) {
+  if (event.persisted) {
+    clearInterval(pollIntervalId);
+    window.location.reload();
+  }
+});
 </script>

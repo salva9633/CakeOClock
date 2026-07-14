@@ -1,0 +1,322 @@
+/* ============================================================
+   CAKE O'CLOCK — GLOBAL RESPONSIVE FIX
+   Add this to every EJS page inside <head>:
+   <link rel="stylesheet" href="/css/responsive.css">
+   OR add it once in your header.ejs / h2.ejs partials
+============================================================ */
+
+/* ── RESET & BASE ── */
+*, *::before, *::after { box-sizing: border-box; }
+img, video, iframe { max-width: 100%; height: auto; }
+table { width: 100%; }
+
+/* ── PREVENT HORIZONTAL SCROLL ── */
+html, body { overflow-x: hidden; max-width: 100%; }
+
+/* ── CONTAINERS ── */
+.container, .container-fluid {
+  width: 100%;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* ============================================================
+   NAVBAR — h2.ejs
+============================================================ */
+@media (max-width: 991px) {
+  .main-navbar { height: auto; padding: 10px 0; }
+  .main-navbar .container-fluid {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 8px 16px !important;
+  }
+  /* Hide center nav links on mobile */
+  .main-navbar ul.nav {
+    display: none !important;
+  }
+  /* Stack icons and user toggle */
+  .main-navbar .d-flex.align-items-center {
+    gap: 8px !important;
+  }
+  .coc-user-btn { font-size: .82rem !important; }
+  .coc-user-menu { right: 0; left: auto; min-width: 160px; }
+}
+
+@media (max-width: 480px) {
+  .main-navbar .container-fluid { padding: 6px 12px !important; }
+  .nav-brand img { height: 44px !important; }
+  .nav-icon-btn { width: 34px !important; height: 34px !important; }
+  .coc-user-btn { font-size: .78rem !important; }
+}
+
+/* ── Mobile hamburger menu ── */
+.mob-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--rose);
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+.mob-nav {
+  display: none;
+  width: 100%;
+  background: var(--cream);
+  padding: 10px 0;
+  border-top: 1px solid rgba(175,84,84,.15);
+}
+.mob-nav.open { display: block; }
+.mob-nav a {
+  display: block;
+  padding: 10px 20px;
+  font-family: 'Lato', sans-serif;
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--ink);
+  text-decoration: none;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(175,84,84,.08);
+}
+.mob-nav a:hover { background: rgba(175,84,84,.07); color: var(--rose); }
+@media (max-width: 991px) { .mob-menu-btn { display: inline-flex; align-items: center; } }
+
+/* ============================================================
+   PAGE WRAP — Dashboard / Profile pages
+============================================================ */
+.page-wrap {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+}
+@media (max-width: 768px) {
+  .page-wrap {
+    flex-direction: column;
+  }
+  .dash-sidebar {
+    width: 100% !important;
+    min-width: unset !important;
+    border-right: none !important;
+    border-bottom: 1px solid rgba(139,74,90,.1);
+  }
+  .dash-main {
+    width: 100% !important;
+    padding: 16px !important;
+  }
+}
+
+/* ============================================================
+   CARDS / GRIDS — general
+============================================================ */
+@media (max-width: 768px) {
+  /* Any 2+ column grid becomes single column */
+  .row { margin: 0 !important; }
+  .col, [class*="col-"] {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+  /* Stack any CSS grid */
+  [style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================
+   TABLES — make them scroll on mobile
+============================================================ */
+@media (max-width: 768px) {
+  .table-responsive-wrap,
+  .msg-table,
+  .cm-table,
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+}
+
+/* ============================================================
+   BUTTONS — full width on small screens
+============================================================ */
+@media (max-width: 480px) {
+  .btn-full-mob {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* ============================================================
+   HOME PAGE — hero, stats, categories
+============================================================ */
+@media (max-width: 768px) {
+  .hero-title { font-size: 3rem !important; }
+  .hero-subtitle { font-size: .9rem !important; }
+  .metrics,
+  .cm-stats,
+  .stats { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 480px) {
+  .hero-title { font-size: 2.2rem !important; }
+  .metrics,
+  .cm-stats,
+  .stats { grid-template-columns: 1fr !important; }
+  .category-item { width: 90px !important; }
+  .category-img-wrapper { width: 90px !important; height: 90px !important; }
+}
+
+/* ============================================================
+   PRODUCTS PAGE
+============================================================ */
+@media (max-width: 991px) {
+  /* Sidebar filter collapses */
+  .filter-sidebar {
+    display: none;
+    width: 100% !important;
+  }
+  .filter-sidebar.open { display: block; }
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+@media (max-width: 480px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+}
+
+/* ============================================================
+   CART PAGE
+============================================================ */
+@media (max-width: 768px) {
+  .cart-grid,
+  .checkout-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .cart-item {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  .cart-img { width: 100% !important; height: 160px !important; }
+}
+
+/* ============================================================
+   CHECKOUT / PAYMENT
+============================================================ */
+@media (max-width: 768px) {
+  .checkout-grid { grid-template-columns: 1fr !important; }
+  .address-grid  { grid-template-columns: 1fr !important; }
+  .order-summary { margin-top: 20px; }
+}
+
+/* ============================================================
+   PROFILE / DASHBOARD PAGES
+============================================================ */
+@media (max-width: 768px) {
+  .profile-grid,
+  .story-grid,
+  .coc-c-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .page-topbar {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  .page-topbar-stats { flex-wrap: wrap; gap: 8px; }
+  .pt-stat { min-width: 60px; }
+}
+
+/* ============================================================
+   MY MESSAGES / ORDER LIST TABLE
+============================================================ */
+@media (max-width: 600px) {
+  .msg-table th:nth-child(3),
+  .msg-table td:nth-child(3),
+  .msg-table th:nth-child(4),
+  .msg-table td:nth-child(4) {
+    display: none !important;
+  }
+  .view-btn { padding: 5px 10px !important; font-size: .72rem !important; }
+}
+
+/* ============================================================
+   ABOUT / CONTACT PAGES
+============================================================ */
+@media (max-width: 768px) {
+  .coc-c-hero { padding: 60px 0 40px !important; }
+  .coc-c-hero h1 { font-size: 2rem !important; }
+  .coc-c-grid { grid-template-columns: 1fr !important; }
+  .coc-form-card { padding: 24px 16px !important; }
+  .values-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 480px) {
+  .values-grid { grid-template-columns: 1fr !important; }
+  .stats-section {
+    grid-template-columns: 1fr !important;
+    padding: 28px 20px !important;
+  }
+  .stats-row { grid-template-columns: repeat(3, 1fr) !important; }
+  .timeline { flex-direction: column !important; align-items: flex-start !important; }
+  .timeline::before { display: none !important; }
+  .testimonials { grid-template-columns: 1fr !important; }
+}
+
+/* ============================================================
+   FOOTER
+============================================================ */
+@media (max-width: 768px) {
+  .footer-grid,
+  footer .row {
+    grid-template-columns: 1fr !important;
+    flex-direction: column !important;
+    text-align: center;
+  }
+  .socials { justify-content: center !important; }
+}
+
+/* ============================================================
+   MODALS — full screen on mobile
+============================================================ */
+@media (max-width: 480px) {
+  .modal-dialog {
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+  .modal-content {
+    border-radius: 16px 16px 0 0 !important;
+    min-height: 50vh;
+  }
+  .coc-modal,
+  .modal { border-radius: 16px 16px 0 0 !important; }
+}
+
+/* ============================================================
+   ADMIN PANEL — sidebar collapse
+============================================================ */
+@media (max-width: 991px) {
+  .page-wrapper {
+    flex-direction: column !important;
+  }
+  .sidebar {
+    width: 100% !important;
+    height: auto !important;
+    position: relative !important;
+  }
+  .main-content {
+    width: 100% !important;
+    padding: 16px !important;
+  }
+}
+
+/* ============================================================
+   UTILITY HELPERS
+============================================================ */
+@media (max-width: 768px) {
+  .hide-mob  { display: none !important; }
+  .show-mob  { display: block !important; }
+  .text-mob-center { text-align: center !important; }
+  .p-mob-sm { padding: 12px !important; }
+  .gap-mob-sm { gap: 8px !important; }
+}

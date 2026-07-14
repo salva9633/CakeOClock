@@ -79,6 +79,10 @@
       background: #a5665e;
     }
 
+    .btn:disabled {
+      cursor: not-allowed;
+    }
+
     .error {
       color: #c0392b;
       margin-top: 10px;
@@ -96,14 +100,29 @@
     .back-link:hover {
       text-decoration: underline;
     }
+
+    .resend-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: #bd7b72;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-decoration: underline;
+      margin: 6px 0 0;
+      padding: 4px;
+    }
+
+    .resend-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      text-decoration: none;
+    }
   </style>
 </head>
 
 <body>
-
-
-
-
 
 <form class="otp-card" action="/verifyEmailOtp?step=<%= locals.step || 'old' %>" method="POST">
 
@@ -124,11 +143,15 @@
     <input class="otp-input" type="text" name="otp6" maxlength="1" required>
   </div>
 
- <% if (typeof error !== "undefined" && error) { %>
-  <div class="error"><%= error %></div>
-<% } %>
+  <p id="timer" style="color:#8c5852;font-size:0.9rem;font-weight:600;"></p>
 
-  <button type="submit" class="btn">
+  <button type="button" id="resendBtn" class="resend-btn">Resend OTP</button>
+
+  <% if (typeof error !== "undefined" && error) { %>
+    <div class="error"><%= error %></div>
+  <% } %>
+
+  <button type="submit" class="btn" id="submitBtn">
     <%= (locals.step === 'new') ? 'Verify & Update Email' : 'Verify & Continue' %>
   </button>
 
@@ -136,23 +159,101 @@
 
 </form>
 
-  <script>
-    const inputs = document.querySelectorAll(".otp-input");
+<script>
+  const expiresAt = <%= expiresAt || 'null' %>;
+  const timerEl    = document.getElementById("timer");
+  const submitBtn  = document.getElementById("submitBtn");
+  const resendBtn  = document.getElementById("resendBtn");
+  const step       = "<%= locals.step || 'old' %>";
+  let interval;
 
-    inputs.forEach((input, index) => {
-      input.addEventListener("input", () => {
-        if (input.value && index < inputs.length - 1) {
-          inputs[index + 1].focus();
-        }
-      });
+  function startTimer(newExpiresAt) {
+    if (interval) clearInterval(interval);
+    resendBtn.style.display = "none";
 
-      input.addEventListener("keydown", (e) => {
-        if (e.key === "Backspace" && !input.value && index > 0) {
-          inputs[index - 1].focus();
-        }
-      });
+    const tick = () => {
+      const secondsLeft = Math.max(0, Math.round((newExpiresAt - Date.now()) / 1000));
+      const m = String(Math.floor(secondsLeft / 60)).padStart(2, "0");
+      const s = String(secondsLeft % 60).padStart(2, "0");
+
+      if (secondsLeft <= 0) {
+        timerEl.textContent = "OTP expired";
+        timerEl.style.color = "#c0392b";
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = "0.6";
+
+        const errorEl = document.querySelector(".error");
+        if (errorEl) errorEl.style.display = "none";
+
+        document.querySelectorAll(".otp-input").forEach(inp => {
+          inp.disabled = true;
+          inp.value = "";
+        });
+
+        resendBtn.style.display = "inline-block";
+        clearInterval(interval);
+      } else {
+        timerEl.textContent = `OTP expires in ${m}:${s}`;
+      }
+    };
+
+    tick();
+    interval = setInterval(tick, 1000);
+  }
+
+  if (expiresAt) startTimer(expiresAt);
+
+  resendBtn.addEventListener("click", async () => {
+    resendBtn.disabled = true;
+    resendBtn.textContent = "Sending...";
+
+    try {
+      const res = await fetch(`/resendEmailOtp?step=${step}`, { method: "POST" });
+      const data = await res.json();
+
+      if (data.success) {
+        document.querySelectorAll(".otp-input").forEach(inp => {
+          inp.disabled = false;
+          inp.value = "";
+        });
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = "1";
+        timerEl.style.color = "#8c5852";
+
+        const errorEl = document.querySelector(".error");
+        if (errorEl) errorEl.style.display = "none";
+
+        startTimer(data.expiresAt);
+      } else {
+        timerEl.textContent = data.message;
+        timerEl.style.color = "#c0392b";
+      }
+    } catch (err) {
+      timerEl.textContent = "Failed to resend. Try again.";
+      timerEl.style.color = "#c0392b";
+    } finally {
+      resendBtn.disabled = false;
+      resendBtn.textContent = "Resend OTP";
+    }
+  });
+</script>
+
+<script>
+  const inputs = document.querySelectorAll(".otp-input");
+  inputs.forEach((input, index) => {
+    input.addEventListener("input", () => {
+      if (input.value && index < inputs.length - 1) {
+        inputs[index + 1].focus();
+      }
     });
-  </script>
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Backspace" && !input.value && index > 0) {
+        inputs[index - 1].focus();
+      }
+    });
+  });
+</script>
 
 </body>
 </html>

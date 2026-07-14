@@ -59,7 +59,7 @@
     window.scrollTo(0, 0);            // ← add this — the actual fix
 
     updateActiveSidebar(url);
-    runInlineScripts(contentEl);
+await runInlineScripts(contentEl); 
   } catch (err) {
     console.error("Admin AJAX nav failed, falling back to full reload:", err);
     window.location.href = url;
@@ -93,23 +93,28 @@ function renderInlineError(status, url) {
     });
   }
 
-  function runInlineScripts(container) {
-    container.querySelectorAll("script").forEach((oldScript) => {
+  async function runInlineScripts(container) {
+    const scripts = [...container.querySelectorAll("script")];
+    for (const oldScript of scripts) {
       const newScript = document.createElement("script");
       [...oldScript.attributes].forEach((attr) =>
         newScript.setAttribute(attr.name, attr.value)
       );
 
       if (oldScript.src) {
-        oldScript.replaceWith(newScript);
-        return;
+        await new Promise((resolve) => {
+          newScript.onload  = resolve;
+          newScript.onerror = resolve;
+          oldScript.replaceWith(newScript);
+        });
+        continue;
       }
 
       // Wrap in an IIFE so top-level const/let never collide
       // with the same page's script running from a previous visit
       newScript.textContent = `(function(){\n${oldScript.textContent}\n})();`;
       oldScript.replaceWith(newScript);
-    });
+    }
     document.dispatchEvent(new CustomEvent("admin:content-loaded", { detail: { container } }));
   }
 

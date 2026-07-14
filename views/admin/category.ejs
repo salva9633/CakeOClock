@@ -253,7 +253,7 @@ small.err-msg { font-size: 11px; color: #dc3545; margin-top: 3px; display: block
           >
 <span class="clear-icon <%= (search && search.trim()) ? '' : 'd-none' %>" id="clearIcon">✕</span>        </div>
       </form>
-      <button class="add-btn" onclick="openAddModal()">
+      <button class="add-btn" id="newCategoryBtn">
         <i class="ti ti-plus" aria-hidden="true"></i> New category
       </button>
     </div>
@@ -308,17 +308,21 @@ small.err-msg { font-size: 11px; color: #dc3545; margin-top: 3px; display: block
           </td>
        <td>
             <div class="offer-wrap">
-              <input
+            <input
                 type="number"
                 class="offer-input"
                 placeholder="0%"
                 value="<%= item.categoryOffer || '' %>"
-                min="0" max="100"
+                min="0" max="90"
                 id="offerInput_<%= item._id %>"
+                data-category-id="<%= item._id %>"
+                data-category-name="<%= item.name %>"
               >
               <button
                 class="offer-save-btn"
-                onclick="saveCategoryOffer('<%= item._id %>', '<%= item.name %>')">
+                data-action="save-offer"
+                data-id="<%= item._id %>"
+                data-name="<%= item.name %>">
                 Save
               </button>
             </div>
@@ -326,7 +330,8 @@ small.err-msg { font-size: 11px; color: #dc3545; margin-top: 3px; display: block
           <td>
             <span
               class="status-badge <%= item.isActive ? 'badge-active' : 'badge-inactive' %>"
-              onclick="toggleStatus('<%= item._id %>')"
+              data-action="toggle-status"
+              data-id="<%= item._id %>"
               title="Click to toggle"
             >
               <span class="status-dot"></span>
@@ -337,7 +342,12 @@ small.err-msg { font-size: 11px; color: #dc3545; margin-top: 3px; display: block
             <div class="actions-cell">
               <button
                 class="edit-btn"
-                onclick="openEditModal('<%= item._id %>','<%= item.name %>','<%= item.description %>','<%= item.image %>','<%= item.isActive %>')"
+                data-action="edit"
+                data-id="<%= item._id %>"
+                data-name="<%= item.name %>"
+                data-desc="<%= item.description %>"
+                data-image="<%= item.image %>"
+                data-active="<%= item.isActive %>"
               >
                 <i class="ti ti-edit" aria-hidden="true"></i> Edit
               </button>
@@ -376,7 +386,7 @@ small.err-msg { font-size: 11px; color: #dc3545; margin-top: 3px; display: block
   <div class="modal-box">
     <div class="modal-hd">
       <h5><i class="ti ti-plus"></i> Add category</h5>
-      <button class="modal-close" onclick="closeAddModal()">×</button>
+      <button class="modal-close" data-action="close-add">×</button>
     </div>
     <div class="modal-bd">
       <div>
@@ -387,12 +397,12 @@ small.err-msg { font-size: 11px; color: #dc3545; margin-top: 3px; display: block
       <div class="modal-row">
         <div>
           <label class="form-label">Image</label>
-          <div id="imageBox" class="img-box" onclick="document.getElementById('catImage').click()">
+          <div id="imageBox" class="img-box" data-action="pick-add-image">
             <img id="preview" style="display:none">
             <span id="imgText"><i class="ti ti-photo" style="display:block;font-size:20px;margin-bottom:4px;"></i>Add image</span>
           </div>
           <small id="imgError" class="err-msg"></small>
-          <input type="file" id="catImage" hidden accept="image/*" onchange="previewImage(event)">
+          <input type="file" id="catImage" hidden accept="image/*">
         </div>
         <div style="flex:1">
           <label class="form-label">Description</label>
@@ -409,8 +419,8 @@ small.err-msg { font-size: 11px; color: #dc3545; margin-top: 3px; display: block
       </div>
     </div>
     <div class="modal-ft">
-      <button class="btn btn-secondary btn-sm" onclick="closeAddModal()">Cancel</button>
-      <button class="btn-save" onclick="submitCategory()">Add category</button>
+      <button class="btn btn-secondary btn-sm" data-action="close-add">Cancel</button>
+      <button class="btn-save" data-action="submit-add">Add category</button>
     </div>
   </div>
 </div>
@@ -420,7 +430,7 @@ small.err-msg { font-size: 11px; color: #dc3545; margin-top: 3px; display: block
   <div class="modal-box">
     <div class="modal-hd">
       <h5><i class="ti ti-edit"></i> Edit category</h5>
-      <button class="modal-close" onclick="closeEditModal()">×</button>
+      <button class="modal-close" data-action="close-edit">×</button>
     </div>
     <div class="modal-bd">
       <input type="hidden" id="editId">
@@ -432,11 +442,11 @@ small.err-msg { font-size: 11px; color: #dc3545; margin-top: 3px; display: block
       <div class="modal-row">
         <div>
           <label class="form-label">Thumbnail</label>
-          <div id="editImageBox" class="img-box" onclick="document.getElementById('editImage').click()">
+          <div id="editImageBox" class="img-box" data-action="pick-edit-image">
             <img id="editPreview" style="width:100%;height:100%;object-fit:cover;">
           </div>
           <small id="editImgError" class="err-msg"></small>
-          <input type="file" id="editImage" hidden accept="image/*" onchange="previewEditImage(event)">
+          <input type="file" id="editImage" hidden accept="image/*">
         </div>
         <div style="flex:1">
           <label class="form-label">Description</label>
@@ -453,8 +463,8 @@ small.err-msg { font-size: 11px; color: #dc3545; margin-top: 3px; display: block
       </div>
     </div>
     <div class="modal-ft">
-      <button class="btn btn-secondary btn-sm" onclick="closeEditModal()">Cancel</button>
-      <button class="btn-save" onclick="updateCategory()">Update category</button>
+      <button class="btn btn-secondary btn-sm" data-action="close-edit">Cancel</button>
+      <button class="btn-save" data-action="submit-edit">Update category</button>
     </div>
   </div>
 </div>
@@ -462,223 +472,278 @@ small.err-msg { font-size: 11px; color: #dc3545; margin-top: 3px; display: block
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// ── MODAL OPEN/CLOSE ──
-function openAddModal()  { document.getElementById("addModal").classList.add("open"); }
-function closeAddModal() { document.getElementById("addModal").classList.remove("open"); }
-function openEditModal(id, name, desc, image, status) {
-  document.getElementById("editId").value     = id;
-  document.getElementById("editName").value   = name;
-  document.getElementById("editDesc").value   = desc;
-  document.getElementById("editStatus").value = status;
-  const ep = document.getElementById("editPreview");
-  ep.src = image || "";
-  ep.style.display = image ? "block" : "none";
-  document.getElementById("editModal").classList.add("open");
-}
-function closeEditModal() { document.getElementById("editModal").classList.remove("open"); }
+(function () {
+  // ── SAFE HELPERS ──
+  function $(id) { return document.getElementById(id); }
+  function on(el, evt, fn) { if (el) el.addEventListener(evt, fn); }
 
-["addModal","editModal"].forEach(id => {
-  document.getElementById(id).addEventListener("click", function(e) {
-    if (e.target === this) this.classList.remove("open");
+  // ── MODAL OPEN/CLOSE ──
+  function openAddModal() { const m = $("addModal"); if (m) m.classList.add("open"); }
+  function closeAddModal() { const m = $("addModal"); if (m) m.classList.remove("open"); }
+
+  function openEditModal(id, name, desc, image, status) {
+    const editId = $("editId"), editName = $("editName"), editDesc = $("editDesc"),
+          editStatus = $("editStatus"), ep = $("editPreview"), m = $("editModal");
+    if (editId) editId.value = id;
+    if (editName) editName.value = name;
+    if (editDesc) editDesc.value = desc;
+    if (editStatus) editStatus.value = status;
+    if (ep) {
+      ep.src = image || "";
+      ep.style.display = image ? "block" : "none";
+    }
+    if (m) m.classList.add("open");
+  }
+  function closeEditModal() { const m = $("editModal"); if (m) m.classList.remove("open"); }
+
+  // Close modal when clicking outside the box — safe against missing elements
+  document.querySelectorAll(".modal-overlay").forEach(function (overlay) {
+    overlay.addEventListener("click", function (e) {
+      if (e.target === overlay) overlay.classList.remove("open");
+    });
   });
-});
 
-// ── IMAGE PREVIEW ──
-function previewImage(e) {
-  const file = e.target.files[0]; if (!file) return;
-  const prev = document.getElementById("preview");
-  prev.src = URL.createObjectURL(file);
-  prev.style.display = "block";
-  document.getElementById("imgText").style.display = "none";
-  document.getElementById("imgError").innerText = "";
-  document.getElementById("imageBox").classList.remove("err");
-}
-function previewEditImage(e) {
-  const file = e.target.files[0]; if (!file) return;
-  const ep = document.getElementById("editPreview");
-  ep.src = URL.createObjectURL(file);
-  ep.style.display = "block";
-  document.getElementById("editImgError").innerText = "";
-  document.getElementById("editImageBox").classList.remove("err");
-}
+  // ── IMAGE PREVIEW ──
+  function previewImage(e) {
+    const file = e.target.files && e.target.files[0]; if (!file) return;
+    const prev = $("preview"), imgText = $("imgText"), imgError = $("imgError"), imageBox = $("imageBox");
+    if (prev) { prev.src = URL.createObjectURL(file); prev.style.display = "block"; }
+    if (imgText) imgText.style.display = "none";
+    if (imgError) imgError.innerText = "";
+    if (imageBox) imageBox.classList.remove("err");
+  }
+  function previewEditImage(e) {
+    const file = e.target.files && e.target.files[0]; if (!file) return;
+    const ep = $("editPreview"), editImgError = $("editImgError"), editImageBox = $("editImageBox");
+    if (ep) { ep.src = URL.createObjectURL(file); ep.style.display = "block"; }
+    if (editImgError) editImgError.innerText = "";
+    if (editImageBox) editImageBox.classList.remove("err");
+  }
 
-// ── VALIDATION HELPERS ──
-function setErr(inputEl, errEl, msg) {
-  if (inputEl) inputEl.classList.add("err");
-  errEl.innerText = msg;
-}
-function clearErr(inputEl, errEl) {
-  if (inputEl) inputEl.classList.remove("err");
-  errEl.innerText = "";
-}
-function validateImage(file, boxEl, errEl) {
-  if (!file) { setErr(null, errEl, "Image required"); boxEl.classList.add("err"); return false; }
-  const valid = ["image/jpeg","image/png","image/jpg"];
-  if (!valid.includes(file.type)) { setErr(null, errEl, "Only JPG/PNG allowed"); boxEl.classList.add("err"); return false; }
-  if (file.size > 2*1024*1024)    { setErr(null, errEl, "Max size 2MB"); boxEl.classList.add("err"); return false; }
-  boxEl.classList.remove("err"); boxEl.classList.add("ok"); return true;
-}
+  // ── VALIDATION HELPERS ──
+  function setErr(inputEl, errEl, msg) {
+    if (inputEl) inputEl.classList.add("err");
+    if (errEl) errEl.innerText = msg;
+  }
+  function clearErr(inputEl, errEl) {
+    if (inputEl) inputEl.classList.remove("err");
+    if (errEl) errEl.innerText = "";
+  }
+  function validateImage(file, boxEl, errEl) {
+    if (!file) { setErr(null, errEl, "Image required"); if (boxEl) boxEl.classList.add("err"); return false; }
+    const valid = ["image/jpeg", "image/png", "image/jpg"];
+    if (!valid.includes(file.type)) { setErr(null, errEl, "Only JPG/PNG allowed"); if (boxEl) boxEl.classList.add("err"); return false; }
+    if (file.size > 2 * 1024 * 1024) { setErr(null, errEl, "Max size 2MB"); if (boxEl) boxEl.classList.add("err"); return false; }
+    if (boxEl) { boxEl.classList.remove("err"); boxEl.classList.add("ok"); }
+    return true;
+  }
 
-// ── SUBMIT ADD ──
-function submitCategory() {
-  const name    = document.getElementById("catName");
-  const desc    = document.getElementById("catDesc");
-  const image   = document.getElementById("catImage").files[0];
-  const nameErr = document.getElementById("nameError");
-  const descErr = document.getElementById("descError");
-  const imgErr  = document.getElementById("imgError");
-  const imgBox  = document.getElementById("imageBox");
+  // ── SUBMIT ADD ──
+  function submitCategory() {
+    const name = $("catName"), desc = $("catDesc"), catImage = $("catImage"),
+          nameErr = $("nameError"), descErr = $("descError"), imgErr = $("imgError"), imgBox = $("imageBox"),
+          catStatus = $("catStatus");
+    if (!name || !desc || !catImage) return;
 
-  clearErr(name, nameErr); clearErr(desc, descErr); imgErr.innerText = ""; imgBox.classList.remove("err","ok");
+    const image = catImage.files[0];
+    clearErr(name, nameErr); clearErr(desc, descErr);
+    if (imgErr) imgErr.innerText = "";
+    if (imgBox) imgBox.classList.remove("err", "ok");
 
-  let ok = true;
-  if (!name.value.trim())                { setErr(name, nameErr, "Name required"); ok = false; }
-  else if (name.value.trim().length < 3) { setErr(name, nameErr, "Min 3 characters"); ok = false; }
-  if (!desc.value.trim())                { setErr(desc, descErr, "Description required"); ok = false; }
-  if (!validateImage(image, imgBox, imgErr)) ok = false;
-  if (!ok) return;
+    let ok = true;
+    if (!name.value.trim()) { setErr(name, nameErr, "Name required"); ok = false; }
+    else if (name.value.trim().length < 3) { setErr(name, nameErr, "Min 3 characters"); ok = false; }
+    if (!desc.value.trim()) { setErr(desc, descErr, "Description required"); ok = false; }
+    if (!validateImage(image, imgBox, imgErr)) ok = false;
+    if (!ok) return;
 
-  const fd = new FormData();
-  fd.append("name", name.value.trim());
-  fd.append("description", desc.value.trim());
-  fd.append("image", image);
-  fd.append("isActive", document.getElementById("catStatus").value);
+    const fd = new FormData();
+    fd.append("name", name.value.trim());
+    fd.append("description", desc.value.trim());
+    fd.append("image", image);
+    fd.append("isActive", catStatus ? catStatus.value : "true");
 
-fetch("/admin/category/add", { method: "POST", body: fd })
+    fetch("/admin/category/add", { method: "POST", body: fd })
+      .then(r => r.json())
+      .then(data => {
+        closeAddModal();
+        if (!data.success) {
+          Swal.fire({ icon: "error", title: "Failed!", text: data.message || "Something went wrong", confirmButtonColor: "#A85F6E" });
+          return;
+        }
+        Swal.fire({ icon: "success", title: "Category Added!", text: data.message, timer: 1500, showConfirmButton: false })
+          .then(() => location.reload());
+      })
+      .catch(() => {
+        Swal.fire({ icon: "error", title: "Network Error", text: "Could not connect. Please try again.", confirmButtonColor: "#A85F6E" });
+      });
+  }
+
+  // ── SUBMIT EDIT ──
+  function updateCategory() {
+    const name = $("editName"), desc = $("editDesc"), editImage = $("editImage"),
+          nameErr = $("editNameError"), descErr = $("editDescError"), imgErr = $("editImgError"),
+          imgBox = $("editImageBox"), editStatus = $("editStatus"), editId = $("editId");
+    if (!name || !desc || !editImage || !editId) return;
+
+    const image = editImage.files[0];
+    clearErr(name, nameErr); clearErr(desc, descErr);
+    if (imgErr) imgErr.innerText = "";
+    if (imgBox) imgBox.classList.remove("err", "ok");
+
+    let ok = true;
+    if (!name.value.trim()) { setErr(name, nameErr, "Name required"); ok = false; }
+    else if (name.value.trim().length < 3) { setErr(name, nameErr, "Min 3 characters"); ok = false; }
+    if (!desc.value.trim()) { setErr(desc, descErr, "Description required"); ok = false; }
+    if (image && !validateImage(image, imgBox, imgErr)) ok = false;
+    if (!ok) return;
+
+    const fd = new FormData();
+    fd.append("name", name.value.trim());
+    fd.append("description", desc.value.trim());
+    fd.append("isActive", editStatus ? editStatus.value : "true");
+    if (image) fd.append("image", image);
+
+    fetch(`/admin/category/edit/${editId.value}`, { method: "PATCH", body: fd })
+      .then(r => r.json())
+      .then(data => {
+        closeEditModal();
+        if (!data.success) {
+          Swal.fire({ icon: "error", title: "Duplicate Category!", text: data.message, confirmButtonColor: "#A85F6E" });
+          return;
+        }
+        Swal.fire({ icon: "success", title: "Updated!", timer: 1500, showConfirmButton: false })
+          .then(() => location.reload());
+      })
+      .catch(() => {
+        Swal.fire({ icon: "error", title: "Network Error", text: "Could not connect. Please try again.", confirmButtonColor: "#A85F6E" });
+      });
+  }
+
+  // ── TOGGLE STATUS ──
+  function toggleStatus(id) {
+  fetch(`/admin/category/status/${id}`, { method: "PATCH" })
     .then(r => r.json())
     .then(data => {
-      closeAddModal();   // ← close modal first, then show Swal
       if (!data.success) {
-        Swal.fire({ icon: "error", title: "Failed!", text: data.message || "Something went wrong", confirmButtonColor: "#A85F6E" });
+        Swal.fire({ icon: "error", title: "Failed", text: data.message || "Could not update status", confirmButtonColor: "#A85F6E" });
         return;
       }
-      Swal.fire({ icon: "success", title: "Category Added!", text: data.message, timer: 1500, showConfirmButton: false })
-        .then(() => location.reload());
-    })
-
-    .catch(() => {
-      Swal.fire({ icon: "error", title: "Network Error", text: "Could not connect. Please try again.", confirmButtonColor: "#A85F6E" });
-    });
-}
-
-// ── SUBMIT EDIT ──
-function updateCategory() {
-  const name    = document.getElementById("editName");
-  const desc    = document.getElementById("editDesc");
-  const image   = document.getElementById("editImage").files[0];
-  const nameErr = document.getElementById("editNameError");
-  const descErr = document.getElementById("editDescError");
-  const imgErr  = document.getElementById("editImgError");
-  const imgBox  = document.getElementById("editImageBox");
-
-  clearErr(name, nameErr); clearErr(desc, descErr); imgErr.innerText = ""; imgBox.classList.remove("err","ok");
-
-  let ok = true;
-  if (!name.value.trim())              { setErr(name, nameErr, "Name required"); ok = false; }
-  else if (name.value.trim().length<3) { setErr(name, nameErr, "Min 3 characters"); ok = false; }
-  if (!desc.value.trim())              { setErr(desc, descErr, "Description required"); ok = false; }
-  if (image && !validateImage(image, imgBox, imgErr)) ok = false;
-  if (!ok) return;
-
-  const fd = new FormData();
-  fd.append("name", name.value.trim());
-  fd.append("description", desc.value.trim());
-  fd.append("isActive", document.getElementById("editStatus").value);
-  if (image) fd.append("image", image);
-
-  fetch(`/admin/category/edit/${document.getElementById("editId").value}`, { method: "PATCH", body: fd })
-    .then(r => r.json())
- .then(data => {
-      closeEditModal();   // ← close modal first, then show Swal
-      if (!data.success) {
-        Swal.fire({ icon: "error", title: "Duplicate Category!", text: data.message, confirmButtonColor: "#A85F6E" });
-        return;
-      }
-      Swal.fire({ icon: "success", title: "Updated!", timer: 1500, showConfirmButton: false })
-        .then(() => location.reload());
+      location.reload();
     })
     .catch(() => {
       Swal.fire({ icon: "error", title: "Network Error", text: "Could not connect. Please try again.", confirmButtonColor: "#A85F6E" });
     });
 }
 
-// ── TOGGLE STATUS ──
-function toggleStatus(id) {
-  fetch(`/admin/category/status/${id}`, { method: "PATCH" }).then(() => location.reload());
-}
+  // ── CATEGORY OFFER ──
+  async function saveCategoryOffer(categoryId, categoryName) {
+    const input = $("offerInput_" + categoryId);
+    if (!input) return;
+    const value = input.value.trim();
 
-// ── CATEGORY OFFER ──
-async function saveCategoryOffer(categoryId, categoryName) {
-  const input = document.getElementById('offerInput_' + categoryId);
-  const value = input.value.trim();
+    if (value === "" || isNaN(value)) {
+      Swal.fire({ icon: "warning", title: "Invalid Value", text: "Please enter a valid offer percentage.", confirmButtonColor: "#A85F6E" });
+      return;
+    }
 
-  if (value === '' || isNaN(value)) {
-    Swal.fire({ icon: 'warning', title: 'Invalid Value', text: 'Please enter a valid offer percentage.', confirmButtonColor: '#A85F6E' });
-    return;
+    const percent = Number(value);
+    if (percent < 0 || percent > 90) {
+      Swal.fire({ icon: "warning", title: "Invalid Range", text: "Offer must be between 0 and 90.", confirmButtonColor: "#A85F6E" });
+      return;
+    }
+    const result = await Swal.fire({
+      icon: "question",
+      title: percent === 0 ? "Remove Offer?" : "Apply Offer?",
+      html: percent === 0
+        ? `Remove category offer from <b>${categoryName}</b>?`
+        : `Apply <b>${percent}% OFF</b> to all products in <b>${categoryName}</b>?`,
+      showCancelButton: true,
+      confirmButtonColor: "#A85F6E",
+      cancelButtonColor: "#B08A8A",
+      confirmButtonText: percent === 0 ? "Remove" : "Apply",
+      cancelButtonText: "Cancel"
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      const res = await fetch("/admin/add-category-offer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ categoryId, offerPercentage: percent })
+      });
+      const data = await res.json();
+      if (data.success) {
+        Swal.fire({ icon: "success", title: "Success", text: data.message, confirmButtonColor: "#A85F6E", timer: 2000, showConfirmButton: false })
+          .then(() => location.reload());
+      } else {
+        Swal.fire({ icon: "error", title: "Failed", text: data.message || "Something went wrong", confirmButtonColor: "#A85F6E" });
+      }
+    } catch (err) {
+      Swal.fire({ icon: "error", title: "Error", text: "Network error. Please try again.", confirmButtonColor: "#A85F6E" });
+    }
   }
 
-  const percent = Number(value);
-  if (percent < 0 || percent > 100) {
-    Swal.fire({ icon: 'warning', title: 'Invalid Range', text: 'Offer must be between 0 and 100.', confirmButtonColor: '#A85F6E' });
-    return;
-  }
+  // ── EVENT DELEGATION: all data-action buttons ──
+  // This single listener replaces every inline onclick="" in the file above,
+  // so nothing depends on onclick-referenced globals existing at click time.
+  document.addEventListener("click", function (e) {
+    const target = e.target.closest("[data-action], #newCategoryBtn");
+    if (!target) return;
 
-  const result = await Swal.fire({
-    icon: 'question',
-    title: percent === 0 ? 'Remove Offer?' : 'Apply Offer?',
-    html: percent === 0
-      ? `Remove category offer from <b>${categoryName}</b>?`
-      : `Apply <b>${percent}% OFF</b> to all products in <b>${categoryName}</b>?`,
-    showCancelButton: true,
-    confirmButtonColor: '#A85F6E',
-    cancelButtonColor:  '#B08A8A',
-    confirmButtonText:  percent === 0 ? 'Remove' : 'Apply',
-    cancelButtonText:   'Cancel'
+    if (target.id === "newCategoryBtn") { openAddModal(); return; }
+
+    const action = target.dataset.action;
+    switch (action) {
+      case "close-add":     closeAddModal(); break;
+      case "close-edit":    closeEditModal(); break;
+      case "submit-add":    submitCategory(); break;
+      case "submit-edit":   updateCategory(); break;
+      case "pick-add-image": { const f = $("catImage"); if (f) f.click(); break; }
+      case "pick-edit-image": { const f = $("editImage"); if (f) f.click(); break; }
+      case "toggle-status": toggleStatus(target.dataset.id); break;
+      case "save-offer":    saveCategoryOffer(target.dataset.id, target.dataset.name); break;
+      case "edit":
+        openEditModal(
+          target.dataset.id,
+          target.dataset.name,
+          target.dataset.desc,
+          target.dataset.image,
+          target.dataset.active
+        );
+        break;
+    }
   });
 
-  if (!result.isConfirmed) return;
+  on($("catImage"), "change", previewImage);
+  on($("editImage"), "change", previewEditImage);
 
-  try {
-    const res  = await fetch('/admin/add-category-offer', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ categoryId, offerPercentage: percent })
-    });
-    const data = await res.json();
-    if (data.success) {
-      Swal.fire({ icon: 'success', title: 'Success', text: data.message, confirmButtonColor: '#A85F6E', timer: 2000, showConfirmButton: false })
-        .then(() => location.reload());
-    } else {
-      Swal.fire({ icon: 'error', title: 'Failed', text: data.message || 'Something went wrong', confirmButtonColor: '#A85F6E' });
-    }
-  } catch (err) {
-    Swal.fire({ icon: 'error', title: 'Error', text: 'Network error. Please try again.', confirmButtonColor: '#A85F6E' });
-  }
-}
+  // ── SEARCH ──
+  const searchInput = $("searchInput");
+  const clearIcon   = $("clearIcon");
+  const searchForm  = $("searchForm");
 
-// ── SEARCH ──
-const searchInput = document.getElementById("searchInput");
-const clearIcon   = document.getElementById("clearIcon");
-const searchForm  = document.getElementById("searchForm");
+  on(searchInput, "keydown", function (e) {
+    if (e.key === "Enter") { e.preventDefault(); if (searchForm) searchForm.submit(); }
+  });
 
-searchInput.addEventListener("keydown", function (e) {
-  if (e.key === "Enter") { e.preventDefault(); searchForm.submit(); }
-});
+  on(clearIcon, "click", function () {
+    window.location.href = "/admin/category";
+  });
 
-clearIcon.addEventListener("click", function () {
-  window.location.href = "/admin/category";
-});
-
-let searchTimer;
-searchInput.addEventListener("input", function () {
-  clearIcon.classList.toggle("d-none", !this.value.trim());
-  clearTimeout(searchTimer);
-  searchTimer = setTimeout(() => {
-    const addOpen  = document.getElementById("addModal").classList.contains("open");
-    const editOpen = document.getElementById("editModal").classList.contains("open");
-    if (addOpen || editOpen) return;
-    if (this.value.trim()) searchForm.submit();
-    else window.location.href = "/admin/category";
-  }, 500);
-});
+  let searchTimer;
+  on(searchInput, "input", function () {
+    if (clearIcon) clearIcon.classList.toggle("d-none", !this.value.trim());
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      const addModal = $("addModal"), editModal = $("editModal");
+      const addOpen  = addModal && addModal.classList.contains("open");
+      const editOpen = editModal && editModal.classList.contains("open");
+      if (addOpen || editOpen) return;
+      if (this.value.trim()) { if (searchForm) searchForm.submit(); }
+      else window.location.href = "/admin/category";
+    }, 500);
+  });
+})();
 </script>

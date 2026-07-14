@@ -705,8 +705,8 @@ body{
               <i class="fas fa-shopping-bag"></i> Add to Cart
             <% } else { %>Out of Stock<% } %>
           </button>
-          <button id="wishlist-btn" class="btn-wish" onclick="toggleWishlist()" title="Wishlist">
-            <i class="far fa-heart" id="wishlist-icon"></i>
+      <button id="wishlist-btn" class="btn-wish <%= locals.isWishlisted ? 'wishlisted' : '' %>" onclick="toggleWishlist()" title="Wishlist">
+            <i class="<%= locals.isWishlisted ? 'fas' : 'far' %> fa-heart" id="wishlist-icon"></i>
           </button>
         </div>
 
@@ -1010,8 +1010,7 @@ async function addToCart() {
   }
 }
 
-/* WISHLIST */
-let isWishlisted = false;
+let isWishlisted = <%= locals.isWishlisted ? 'true' : 'false' %>;
 
 async function toggleWishlist() {
   try {
@@ -1020,15 +1019,15 @@ async function toggleWishlist() {
       headers:{ 'Content-Type':'application/json' },
       body: JSON.stringify({ productId: '<%= product._id %>' })
     });
-    const data = await res.json();
+   const data = await res.json();
     if (data.redirect) { window.location.href = '/login'; return; }
     if (data.success) {
-      isWishlisted = data.wishlisted;
+      isWishlisted = data.wished;
       const icon = document.getElementById('wishlist-icon');
       const btn  = document.getElementById('wishlist-btn');
       if (isWishlisted) {
         icon.className = 'fas fa-heart'; btn.classList.add('wishlisted');
-        showToast('Saved to Wishlist ❤️', 'info');
+        showToast('add to Wishlist ❤️', 'info');
       } else {
         icon.className = 'far fa-heart'; btn.classList.remove('wishlisted');
         showToast('Removed from Wishlist');
@@ -1148,11 +1147,10 @@ async function submitReview() {
         confirmButtonColor:'#B85C5C' });
     }
   } catch { showToast('Something went wrong', 'error'); }
-  finally {
+ finally {
     if (postBtn) { postBtn.disabled = false; postBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Post Review'; }
   }
 }
-</script>
 </script>
 
 <script>

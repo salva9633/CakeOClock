@@ -174,8 +174,8 @@ export const getCart = async (req, res) => {
  
       item.variantUnavailable = item.variantId?.isAvailable === false;
  
-      const priceData      = await getFinalPrice(item.variantId);
-      item.effectivePrice  = (item.price < priceData.finalPrice) ? item.price : priceData.finalPrice;
+    const priceData      = await getFinalPrice(item.variantId);
+      item.effectivePrice  = priceData.finalPrice;
       item.discountPercent = priceData.discountPercent;
       item.regularPrice    = item.variantId?.regularPrice || item.price;
  
@@ -300,14 +300,14 @@ export const updateCartItem = async (req, res) => {
       const isBlocked = outOfStock || exceeds || variantUnavailable || productUnlisted;
       if (isBlocked) { hasBlocked = true; continue; }
  
-      const priceData      = await getFinalPrice(i.variantId);
-      const effectivePrice = (i.price < priceData.finalPrice) ? i.price : priceData.finalPrice;
+const priceData      = await getFinalPrice(i.variantId);
+      const effectivePrice = priceData.finalPrice;
       const regularPrice   = i.variantId?.regularPrice || i.price;
- 
+
       subtotal      += regularPrice   * i.quantity;
       discountTotal += (regularPrice - effectivePrice) * i.quantity;
     }
- 
+
     const total      = subtotal - discountTotal;
     const savings    = discountTotal;
     const cartCount  = populatedCart.items.reduce((s, i) => s + i.quantity, 0);
@@ -376,14 +376,14 @@ export const removeCartItem = async (req, res) => {
       const isBlocked = outOfStock || exceeds || variantUnavailable || productUnlisted;
       if (isBlocked) { hasBlocked = true; continue; }
  
-      const priceData      = await getFinalPrice(i.variantId);
-      const effectivePrice = (i.price < priceData.finalPrice) ? i.price : priceData.finalPrice;
+const priceData      = await getFinalPrice(i.variantId);
+      const effectivePrice = priceData.finalPrice;
       const regularPrice   = i.variantId?.regularPrice || i.price;
- 
+
       subtotal      += regularPrice   * i.quantity;
       discountTotal += (regularPrice - effectivePrice) * i.quantity;
     }
- 
+
     const total     = subtotal - discountTotal;
     const savings   = discountTotal;
     const cartCount = (populatedCart?.items || []).reduce((s, i) => s + i.quantity, 0);

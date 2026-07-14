@@ -22,36 +22,66 @@
 
         <div class="field">
           <label>Code</label>
-          <input type="text" name="code" value="<%= coupon.code %>" required>
-        </div>
+<input
+  type="text"
+  name="code"
+  value="<%= coupon.code %>"
+  maxlength="20"
+  autocomplete="off"
+  required
+>        </div>
 
         <div class="field">
           <label>Discount Type</label>
-          <select name="discountType">
-            <option value="percentage" <%= coupon.discountType === 'percentage' ? 'selected' : '' %>>Percentage</option>
+<select name="discountType" required>
+              <option value="percentage" <%= coupon.discountType === 'percentage' ? 'selected' : '' %>>Percentage</option>
             <option value="fixed"      <%= coupon.discountType === 'fixed'      ? 'selected' : '' %>>Fixed</option>
           </select>
         </div>
 
         <div class="field">
           <label>Discount Value</label>
-          <input type="number" name="discountValue" value="<%= coupon.discountValue %>" required>
+<input
+  type="number"
+  name="discountValue"
+  value="<%= coupon.discountValue %>"
+  min="1"
+  step="1"
+  required
+>
         </div>
 
         <div class="field">
           <label>Max Discount</label>
-          <input type="number" name="maxDiscount" value="<%= coupon.maxDiscount %>">
-        </div>
+<input
+  type="number"
+  name="maxDiscount"
+  value="<%= coupon.maxDiscount %>"
+  min="1"
+  step="1"
+>        </div>
 
         <div class="field">
           <label>Description</label>
-          <input type="text" name="description" value="<%= coupon.description %>">
-        </div>
+<input
+  type="text"
+  name="description"
+  value="<%= coupon.description %>"
+  minlength="5"
+  maxlength="100"
+  required
+>        </div>
 
         <div class="field">
           <label>Usage Limit</label>
-          <input type="number" name="usageLimit" value="<%= coupon.usageLimit %>">
-        </div>
+<input
+  type="number"
+  name="usageLimit"
+  value="<%= coupon.usageLimit %>"
+  min="1"
+  max="1000"
+  required
+>        </div>
 
         <div class="field">
           <label>Expiry Date</label>
@@ -60,20 +90,21 @@
 
         <div class="field">
           <label>Min Purchase</label>
-          <input type="number" name="minPurchase" value="<%= coupon.minPurchase %>">
-        </div>
+<input
+  type="number"
+  name="minPurchase"
+  value="<%= coupon.minPurchase %>"
+  min="100"
+  step="1"
+  required
+>        </div>
 
       </div>
 
       <div class="form-actions">
         <button type="submit" class="btn-save">Save Changes</button>
         <div class="field" style="display:flex;align-items:center;gap:10px;margin-top:10px">
-  <input type="checkbox" name="isFirstOrderOnly" value="true" id="firstOrderOnly"
-    <%= coupon.isFirstOrderOnly ? 'checked' : '' %>
-    style="width:18px;height:18px;accent-color:var(--rose-dk);cursor:pointer">
-  <label for="firstOrderOnly" style="text-transform:none;font-size:13px;color:var(--brown);cursor:pointer">
-    First order only
-  </label>
+
 </div>
         <a href="/admin/coupons" class="btn-cancel">Cancel</a>
       </div>
@@ -238,5 +269,203 @@
   background: var(--rose-lt);
   color: var(--rose-dk);
   border-color: var(--rose);
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+(() => {
+    const form = document.querySelector("form");
+    if (!form) return;
+
+    const code = form.code;
+    const discountType = form.discountType;
+    const discountValue = form.discountValue;
+    const maxDiscount = form.maxDiscount;
+    const description = form.description;
+    const usageLimit = form.usageLimit;
+    const expiryDate = form.expiryDate;
+    const minPurchase = form.minPurchase;
+
+    // Create error messages
+    [...form.querySelectorAll(".field")].forEach(field => {
+        if (!field.querySelector(".error-msg")) {
+            const small = document.createElement("small");
+            small.className = "error-msg";
+            field.appendChild(small);
+        }
+    });
+
+    function clearErrors() {
+        document.querySelectorAll(".error-msg").forEach(e => e.textContent = "");
+        form.querySelectorAll(".input-error").forEach(i => i.classList.remove("input-error"));
+    }
+
+    function showError(input, message) {
+        input.classList.add("input-error");
+        input.parentElement.querySelector(".error-msg").textContent = message;
+    }
+
+    function validate() {
+
+        clearErrors();
+
+        let valid = true;
+
+        // Coupon Code
+        code.value = code.value.trim().toUpperCase();
+
+        if (!code.value) {
+            showError(code, "Coupon code is required");
+            valid = false;
+        }
+        else if (!/^[A-Z0-9]{5,20}$/.test(code.value)) {
+            showError(code, "Only A-Z and 0-9 (5-20 characters)");
+            valid = false;
+        }
+
+        // Description
+        if (description.value.trim().length < 5) {
+            showError(description, "Description must contain at least 5 characters");
+            valid = false;
+        }
+
+        const discount = Number(discountValue.value);
+        const max = Number(maxDiscount.value);
+        const min = Number(minPurchase.value);
+        const usage = Number(usageLimit.value);
+
+        // Discount Value
+        if (discountType.value === "percentage") {
+
+            if (discount < 1 || discount > 100) {
+                showError(discountValue, "Percentage must be between 1 and 100");
+                valid = false;
+            }
+
+            if (!maxDiscount.value) {
+                showError(maxDiscount, "Max discount is required");
+                valid = false;
+            }
+            else if (max <= 0) {
+                showError(maxDiscount, "Max discount must be greater than 0");
+                valid = false;
+            }
+
+        } else {
+
+            if (discount <= 0) {
+                showError(discountValue, "Fixed discount must be greater than 0");
+                valid = false;
+            }
+
+            maxDiscount.value = "";
+
+        }
+
+        // Usage Limit
+        if (!usageLimit.value) {
+            showError(usageLimit, "Usage limit is required");
+            valid = false;
+        }
+        else if (usage < 1 || usage > 1000) {
+            showError(usageLimit, "Usage limit must be between 1 and 1000");
+            valid = false;
+        }
+
+        // Minimum Purchase
+        if (!minPurchase.value) {
+            showError(minPurchase, "Minimum purchase is required");
+            valid = false;
+        }
+        else if (min < 100) {
+            showError(minPurchase, "Minimum purchase should be at least ₹100");
+            valid = false;
+        }
+
+        if (discountType.value === "fixed" && discount >= min) {
+            showError(minPurchase, "Minimum purchase must be greater than discount value");
+            valid = false;
+        }
+
+        // Expiry Date
+        if (!expiryDate.value) {
+            showError(expiryDate, "Expiry date is required");
+            valid = false;
+        } else {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            const selected = new Date(expiryDate.value);
+
+            if (selected <= today) {
+                showError(expiryDate, "Select a future date");
+                valid = false;
+            }
+        }
+
+        return valid;
+    }
+
+    // Auto uppercase coupon code
+    code.addEventListener("input", () => {
+        code.value = code.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    });
+
+    // Real-time validation
+    [
+        code,
+        discountType,
+        discountValue,
+        maxDiscount,
+        description,
+        usageLimit,
+        expiryDate,
+        minPurchase
+    ].forEach(input => {
+        input.addEventListener("input", validate);
+        input.addEventListener("change", validate);
+    });
+
+    // Submit
+    form.addEventListener("submit", function(e) {
+
+        e.preventDefault();
+
+        if (!validate()) return;
+
+        Swal.fire({
+            title: "Save Changes?",
+            text: "Update this coupon?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#A85F6E",
+            confirmButtonText: "Yes, Save",
+            cancelButtonText: "Cancel"
+        }).then(result => {
+
+            if (result.isConfirmed) {
+                form.submit();
+            }
+
+        });
+
+    });
+
+})();
+</script>
+
+<style>
+.error-msg{
+    display:block;
+    color:#dc2626;
+    font-size:12px;
+    margin-top:5px;
+    font-weight:500;
+}
+
+.input-error{
+    border:1px solid #dc2626 !important;
+    background:#fff5f5 !important;
 }
 </style>

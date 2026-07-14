@@ -92,6 +92,7 @@ router.post("/editProfile", userAuth, upload.single("profileImage"), profileCont
  
 router.get("/verifyEmailOtp",  userAuth, profileController.verifyEmailOtpPage);
 router.post("/verifyEmailOtp", userAuth, profileController.verifyEmailOtp);
+router.post("/resendEmailOtp", userAuth, profileController.resendEmailOtp);router.post("/verifyEmailOtp", userAuth, profileController.verifyEmailOtp);
  
 // ── CHANGE PASSWORD ───────────────────────────────────
 router.get("/changePassword",        userAuth, profileController.loadChangePassword);

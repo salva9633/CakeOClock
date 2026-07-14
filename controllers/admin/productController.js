@@ -40,11 +40,16 @@ function validateProductInput({ productName, description, longDescription, categ
     errors.push("Brand name must be under 50 characters");
   }
 
-  const cleanOffer = Number(productOffer);
-  if (productOffer === undefined || productOffer === null || productOffer === "" || isNaN(cleanOffer)) {
-    errors.push("Product offer must be a valid number");
-  } else if (cleanOffer < 0 || cleanOffer > 90) {
-    errors.push("Product offer must be between 0 and 90");
+let cleanOffer = 0;
+  if (productOffer !== undefined && productOffer !== null && productOffer !== "") {
+    const parsedOffer = Number(productOffer);
+    if (isNaN(parsedOffer)) {
+      errors.push("Product offer must be a valid number");
+    } else if (parsedOffer < 0 || parsedOffer > 90) {
+      errors.push("Product offer must be between 0 and 90");
+    } else {
+      cleanOffer = parsedOffer;
+    }
   }
 
   return {
@@ -54,7 +59,7 @@ function validateProductInput({ productName, description, longDescription, categ
       cleanDesc,
       cleanLongDesc,
       cleanBrand,
-      cleanOffer: Math.max(0, Math.min(90, Number(productOffer) || 0))
+      cleanOffer
     }
   };
 }

@@ -22,7 +22,7 @@ const userProfile = async (req, res) => {
     user.totalOrders   = totalOrders;
     user.wishlistCount = wishlistDoc?.products?.length || 0;
 
-    res.render("profile", { user });
+    res.status(200).render("profile", { user });
   } catch (error) {
     console.error(error);
     res.redirect("/pageNotFound");
@@ -34,7 +34,7 @@ const editProfileLoad = async (req, res) => {
     const user = await User.findById(req.session.user.id);
     if (!user) return res.redirect("/login");
 
-    res.render("editProfile", { user });
+    res.status(200).render("editProfile", { user });
   } catch (error) {
     console.error(error);
     res.redirect("/pageNotFound");
@@ -64,7 +64,7 @@ const editProfilePost = async (req, res) => {
 if (email && email !== user.email) {
   const existing = await User.findOne({ email, _id: { $ne: user._id } });
   if (existing) {
-    return res.render("editProfile", { user, emailError: "Email already in use" });
+    return res.status(400).render("editProfile", { user, emailError: "Email already in use" });
   }
 
   // Step 1: Send OTP to OLD email
@@ -72,11 +72,11 @@ if (email && email !== user.email) {
   console.log("Old email OTP:", otp);
 
   req.session.emailChangeOtp    = otp;
-  req.session.emailChangeExpiry = Date.now() + 5 * 60 * 1000;
+  req.session.emailChangeExpiry = Date.now() +  60 * 1000;
   req.session.newEmail          = email;          // store new email for later
   req.session.oldEmailVerified  = false;          // not yet verified
 
-  await sendVerificationEmail(user.email, otp);   // ← send to OLD email
+  await sendVerificationEmail(user.email, otp,1);   // ← send to OLD email
 
   return res.redirect("/verifyEmailOtp?step=old");
 }
@@ -106,7 +106,11 @@ const verifyEmailOtpPage = (req, res) => {
     return res.redirect("/editProfile");
   }
 
-  res.render("verifyEmailOtp", { step, error: undefined });
+  res.status(200).render("verifyEmailOtp", {
+    step,
+    error: undefined,
+    expiresAt: req.session.emailChangeExpiry || null
+  });
 };
 
 // FIXED ✅ — two-step: verify old email OTP, then send & verify new email OTP
@@ -120,10 +124,11 @@ const verifyEmailOtp = async (req, res) => {
       return res.redirect("/editProfile");
     }
 
-    if (otp !== req.session.emailChangeOtp) {
-      return res.render("verifyEmailOtp", {
+if (otp !== req.session.emailChangeOtp) {
+      return res.status(400).render("verifyEmailOtp", {
         error: "Invalid OTP. Please try again.",
-        step
+        step,
+        expiresAt: req.session.emailChangeExpiry || null
       });
     }
 
@@ -137,9 +142,9 @@ const verifyEmailOtp = async (req, res) => {
       console.log("New email OTP:", newOtp);
 
       req.session.emailChangeOtp    = newOtp;
-      req.session.emailChangeExpiry = Date.now() + 5 * 60 * 1000;
+      req.session.emailChangeExpiry = Date.now() +  60 * 1000;
 
-      await sendVerificationEmail(req.session.newEmail, newOtp); // ← send to NEW email
+      await sendVerificationEmail(req.session.newEmail, newOtp,1); // ← send to NEW email
 
 return res.redirect(303, "/verifyEmailOtp?step=new");
 } else {
@@ -158,7 +163,7 @@ return res.redirect(303, "/verifyEmailOtp?step=new");
   delete req.session.newEmail;
   delete req.session.oldEmailVerified;
 
-return res.send(`
+return res.status(200).send(`
   <!DOCTYPE html>
   <html>
   <head>
@@ -188,6 +193,53 @@ return res.send(`
   }
 };
 
+/* ================= RESEND EMAIL CHANGE OTP ================= */
+const resendEmailOtp = async (req, res) => {
+  try {
+    const step = req.query.step || "old";
+
+    if (!req.session.newEmail) {
+      return res.status(400).json({ success: false, message: "Session expired. Please start again." });
+    }
+
+    if (step === "new" && !req.session.oldEmailVerified) {
+      return res.status(400).json({ success: false, message: "Session expired. Please start again." });
+    }
+
+    // 30-second cooldown between resend clicks
+    if (req.session.emailResendCooldown && Date.now() < req.session.emailResendCooldown) {
+      const secondsLeft = Math.ceil((req.session.emailResendCooldown - Date.now()) / 1000);
+      return res.status(429).json({
+        success: false,
+        message: `Please wait ${secondsLeft} seconds before resending.`
+      });
+    }
+    req.session.emailResendCooldown = Date.now() + 30 * 1000;
+
+    const user = await User.findById(req.session.user.id);
+    if (!user) return res.status(400).json({ success: false, message: "Session expired." });
+
+    const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    console.log(`Resent ${step} email OTP:`, newOtp);
+
+    req.session.emailChangeOtp    = newOtp;
+    req.session.emailChangeExpiry = Date.now() + 60 * 1000;
+
+    const targetEmail = step === "old" ? user.email : req.session.newEmail;
+    await sendVerificationEmail(targetEmail, newOtp, 1);
+
+    return res.status(200).json({
+      success: true,
+      message: "OTP resent successfully",
+      expiresAt: req.session.emailChangeExpiry
+    });
+
+  } catch (error) {
+    console.error("Resend email OTP error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 
 /* ================= ADDRESS PAGE ================= */
 const addressPage = async (req, res) => {
@@ -198,7 +250,7 @@ const addressPage = async (req, res) => {
 
     const user = await User.findById(req.session.user.id);
 
-    res.render("address", {
+    res.status(200).render("address", {
       addresses: user.addresses
     });
 
@@ -259,7 +311,7 @@ const editAddressPage = async (req, res) => {
 
     const redirect = req.query.redirect || "/address"; 
 
-    res.render("editAddress", { address, redirect }); 
+    res.status(200).render("editAddress", { address, redirect }); 
   } catch (error) {
     console.error(error);
     res.redirect("/pageNotFound");
@@ -314,7 +366,7 @@ const loadChangePassword = async (req, res) => {
 
     if (!user) return res.redirect("/login");
 
-    res.render("changePassword", {
+    res.status(200).render("changePassword", {
       user,
       error: null,
       success: null
@@ -336,7 +388,7 @@ const changePassword = async (req, res) => {
 
     
     if (user.authType === "google") {
-      return res.render("user/changePassword", {
+      return res.status(400).render("user/changePassword", {
         user,
         error: "Password change is not available for Google login accounts",
         success: null
@@ -345,7 +397,7 @@ const changePassword = async (req, res) => {
 
     
     if (!user.password) {
-      return res.render("user/changePassword", {
+      return res.status(200).render("user/changePassword", {
         user,
         error: null,
         success: null,
@@ -354,7 +406,7 @@ const changePassword = async (req, res) => {
     }
 
     if (!currentPassword || !newPassword || !confirmPassword) {
-      return res.render("user/changePassword", {
+      return res.status(400).render("user/changePassword", {
         user,
         error: "All fields are required",
         success: null
@@ -363,7 +415,7 @@ const changePassword = async (req, res) => {
 
     
     if (newPassword.length < 8) {
-      return res.render("user/changePassword", {
+      return res.status(400).render("user/changePassword", {
         user,
         error: "Password must be at least 8 characters",
         success: null
@@ -372,7 +424,7 @@ const changePassword = async (req, res) => {
 
 
     if (newPassword !== confirmPassword) {
-      return res.render("user/changePassword", {
+      return res.status(400).render("user/changePassword", {
         user,
         error: "Passwords do not match",
         success: null
@@ -382,7 +434,7 @@ const changePassword = async (req, res) => {
     
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
-      return res.render("user/changePassword", {
+      return res.status(400).render("user/changePassword", {
         user,
         error: "Current password is incorrect",
         success: null
@@ -392,7 +444,7 @@ const changePassword = async (req, res) => {
   
     const samePassword = await bcrypt.compare(newPassword, user.password);
     if (samePassword) {
-      return res.render("user/changePassword", {
+      return res.status(400).render("user/changePassword", {
         user,
         error: "New password must be different from old password",
         success: null
@@ -418,7 +470,7 @@ const changePassword = async (req, res) => {
 const checkCurrentPassword = async (req, res) => {
   try {
     if (!req.session.user) {
-      return res.json({ valid: false });
+      return res.status(401).json({ valid: false });
     }
 
     const { currentPassword } = req.body;
@@ -427,12 +479,12 @@ const checkCurrentPassword = async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user || !user.password) {
-      return res.json({ valid: false });
+      return res.status(400).json({ valid: false });
     }
 
     const isMatch = await bcrypt.compare(currentPassword, user.password);
 
-    return res.json({ valid: isMatch });
+    return res.status(200).json({ valid: isMatch });
 
   } catch (error) {
     console.error("Password check error:", error);
@@ -453,5 +505,6 @@ export {
   changePassword,
   verifyEmailOtpPage,
   verifyEmailOtp,
+  resendEmailOtp,
   checkCurrentPassword
 };

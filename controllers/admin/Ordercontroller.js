@@ -77,12 +77,17 @@ export const loadOrderDetail = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id).populate("items.productId");
     if (!order) return res.redirect("/admin/orders");
-return renderAdmin(req, res, "Orderdetail", { order, title: "Order Detail" });  } catch (error) {
+
+    // Prevent browser/bfcache from serving a stale order detail page
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.set('Pragma', 'no-cache');
+
+    return renderAdmin(req, res, "Orderdetail", { order, title: "Order Detail" });
+  } catch (error) {
     console.error("loadOrderDetail error:", error);
     return res.redirect("/admin/pagenotfound");
   }
-};
- 
+}; 
 // ─────────────────────────────────────────
 // PATCH /admin/orders/:id/status
 // Update overall order status + sync all item statuses
@@ -91,61 +96,61 @@ export const updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
     const STATUS_ORDER = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'];
- 
+
     if (!STATUS_ORDER.includes(status)) {
       return res.status(400).json({ success: false, message: 'Invalid status' });
     }
- 
+
     const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
- 
-    
-const LOCKED = ['Cancelled', 'Returned'];
-if (LOCKED.includes(order.status)) {
-  return res.status(400).json({
-    success: false,
-    message: `Cannot change status from "${order.status}"`,
-  });
-}
 
-// Cannot cancel after delivery
-if (status === 'Cancelled' && order.status === 'Delivered') {
-  return res.status(400).json({
-    success: false,
-    message: `Cannot cancel a delivered order`,
-  });
-}
- 
-const currentIdx = STATUS_ORDER.indexOf(order.status);
-const newIdx = STATUS_ORDER.indexOf(status);
+    const LOCKED = ['Cancelled', 'Returned'];
+    if (LOCKED.includes(order.status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot change status from "${order.status}"`,
+      });
+    }
 
-// only next step allowed
-if (newIdx !== currentIdx + 1) {
-  return res.status(400).json({
-    success: false,
-    message: `Order status must follow step-by-step flow`,
-  });
-}
-    
+    // Cannot cancel after delivery
+    if (status === 'Cancelled' && order.status === 'Delivered') {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot cancel a delivered order`,
+      });
+    }
+
+    // Allow jumping straight to Cancelled from any non-locked, non-delivered state.
+    // All other transitions must still follow the step-by-step flow.
+    if (status !== 'Cancelled') {
+      const currentIdx = STATUS_ORDER.indexOf(order.status);
+      const newIdx = STATUS_ORDER.indexOf(status);
+
+      if (newIdx !== currentIdx + 1) {
+        return res.status(400).json({
+          success: false,
+          message: `Order status must follow step-by-step flow`,
+        });
+      }
+    }
+
     order.status = status;
- 
-  
+
     order.items.forEach(item => {
       if (!['Cancelled', 'Returned'].includes(item.status)) {
         item.status = status;
       }
     });
- 
+
     await order.save();
- 
+
     return res.json({ success: true, message: 'Status updated', status: order.status });
- 
+
   } catch (error) {
     console.error('updateOrderStatus error:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
-};
- 
+}; 
 // ─────────────────────────────────────────
 // PATCH /admin/orders/:id/items/:itemId/status
 // Update a single item's status

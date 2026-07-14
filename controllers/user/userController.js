@@ -102,6 +102,12 @@ const {
         message: "Passwords do not match"
       });
     }
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+      return res.status(400).json({
+        success: false,
+        message: "Enter a valid 10-digit phone number"
+      });
+    }
 
     const findUser = await User.findOne({ email });
     if (findUser) {
@@ -114,7 +120,7 @@ const {
     const otp = generateOtp();
     console.log("Generated OTP:", otp);
 
-    const emailSent = await sendVerificationEmail(email, otp);
+    const emailSent = await sendVerificationEmail(email, otp,65 / 60);
     if (!emailSent) {
       return res.status(500).json({
         success: false,
@@ -289,7 +295,7 @@ const resendOtp = async (req, res) => {
     req.session.userOtp = otp;
     req.session.otpExpiry = Date.now() + 65 * 1000;
     console.log(otp);
-    const emailSent = await sendVerificationEmail(email, otp);
+    const emailSent = await sendVerificationEmail(email, otp,65 / 60);
     if (!emailSent) {
       return res.status(500).json({ message: "Failed to resend OTP" });
     }
@@ -397,7 +403,7 @@ const sendForgotOtp = async (req, res) => {
     req.session.forgotOtpExpiry = Date.now() + 5 * 60 * 1000;
     req.session.forgotEmail = email;
 
-    const emailSent = await sendVerificationEmail(email, otp);
+    const emailSent = await sendVerificationEmail(email, otp,1);
     if (!emailSent) {
       return res.status(500).json({ message: "Failed to send OTP" });
     }

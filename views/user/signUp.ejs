@@ -616,18 +616,19 @@ type="email"
         }
 
         function phoneValidateChecking() {
-            const phoneval = phoneid.value;
-            if (phoneval.trim() === "") {
-                error3.style.display = "block";
-                error3.innerHTML = "Enter valid phone number";
-            } else if (phoneval.length !== 10) {
-                error3.style.display = "block";
-                error3.innerHTML = "Enter 10 digit number";
-            } else {
-                error3.style.display = "none";
-                error3.innerHTML = "";
-            }
-        }
+    const phoneval = phoneid.value.trim();
+    const phonepattern = /^[6-9]\d{9}$/;
+    if (phoneval === "") {
+        error3.style.display = "block";
+        error3.innerHTML = "Please enter your phone number";
+    } else if (!phonepattern.test(phoneval)) {
+        error3.style.display = "block";
+        error3.innerHTML = "Enter a valid 10-digit phone number";
+    } else {
+        error3.style.display = "none";
+        error3.innerHTML = "";
+    }
+}
 
         function passValidateChecking() {
             const passval = passid.value;

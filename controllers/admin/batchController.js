@@ -31,33 +31,36 @@ export const updateBatch = async (req, res) => {
   try {
     const { batchId } = req.params;
     const { manufacturedAt, expiryDays, initialStock } = req.body;
-
     const batch = await Batch.findById(batchId);
-
+    if (!batch) {
+      return res.status(404).send("Batch not found");
+    }
     const mfd = new Date(manufacturedAt);
     const expiryAt = new Date(mfd);
     expiryAt.setDate(expiryAt.getDate() + Number(expiryDays));
-
     const now = new Date();
     const isExpired = expiryAt < now;
+    const newInitialStock = Number(initialStock);
 
-  
-    const difference = Number(initialStock) - batch.initialStock;
+    const newAvailableStock = isExpired ? 0 : newInitialStock;
 
-    
-    const baseAvailable = batch.status === "expired" ? 0 : batch.availableStock;
-    const newAvailableStock = Math.max(0, baseAvailable + difference);
+    const newStatus = isExpired
+      ? "expired"
+      : newAvailableStock === 0
+      ? "exhausted"
+      : "active";
 
-    
-    const newStatus = isExpired ? "expired" : (newAvailableStock === 0 ? "exhausted" : "active");
-
-    await Batch.findByIdAndUpdate(batchId, {
-      manufacturedAt: mfd,
-      expiryAt,
-      initialStock: Number(initialStock),
-      availableStock: isExpired ? 0 : newAvailableStock,
-      status: newStatus
-    }, { new: true });
+    await Batch.findByIdAndUpdate(
+      batchId,
+      {
+        manufacturedAt: mfd,
+        expiryAt,
+        initialStock: newInitialStock,
+        availableStock: newAvailableStock,
+        status: newStatus
+      },
+      { new: true }
+    );
 
     res.redirect(`/admin/variants/${batch.variantId}`);
   } catch (err) {

@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Edit Address – Cake O'Clock</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/css/cake.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
   <%- include("../partials/user/dashboardStyles") %>
@@ -59,11 +58,12 @@
           <span class="error-text" id="streetError"></span>
         </div>
 
-        <div class="field-group full-col">
-          <label>Full Address</label>
-          <textarea name="address" class="field-input"
-                    placeholder="House no., Building, Floor, etc."><%= address.address || '' %></textarea>
-        </div>
+       <div class="field-group full-col">
+  <label>Full Address</label>
+  <textarea id="address" name="address" class="field-input"
+            placeholder="House no., Building, Floor, etc."><%= address.address || '' %></textarea>
+  <span class="error-text" id="addressError"></span>
+</div>
 
         <div class="field-group">
           <label>City / District / Town</label>
@@ -122,11 +122,12 @@
     </div>
 
     <script>
-      const fields = {
+const fields = {
         name:    { id:'name',    error:'nameError',    regex:/^[A-Za-z ]{3,}$/,  msg:'Min 3 letters'           },
         phone:   { id:'phone',   error:'phoneError',   regex:/^[6-9][0-9]{9}$/,  msg:'Invalid phone number'    },
-        pincode: { id:'pincode', error:'pincodeError', regex:/^[0-9]{6}$/,        msg:'6-digit pincode required'},
+        pincode: { id:'pincode', error:'pincodeError', regex:/^[1-9][0-9]{5}$/,  msg:'Enter a valid 6-digit pincode' },
         street:  { id:'street',  error:'streetError',  regex:/^.{3,}$/,           msg:'Required'                },
+        address: { id:'address', error:'addressError', regex:/^.{10,}$/,         msg:'Enter a complete address (min 10 characters)' },
         city:    { id:'city',    error:'cityError',    regex:/^[A-Za-z ]{2,}$/,  msg:'Invalid city'            },
         state:   { id:'state',   error:'stateError',   regex:/^[A-Za-z ]{2,}$/,  msg:'Invalid state'           }
       };
@@ -134,7 +135,15 @@
       function validate(field) {
         const input = document.getElementById(field.id);
         const error = document.getElementById(field.error);
-        const ok    = field.regex.test(input.value.trim());
+        const value = input.value.trim();
+
+        if (field.id === 'pincode' && /^(\d)\1{5}$/.test(value)) {
+          input.classList.add('error'); input.classList.remove('success');
+          error.textContent = 'Pincode cannot be all the same digit';
+          return false;
+        }
+
+        const ok = field.regex.test(value);
         input.classList.toggle('error',   !ok);
         input.classList.toggle('success',  ok);
         error.textContent = ok ? '' : field.msg;

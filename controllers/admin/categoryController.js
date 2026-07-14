@@ -38,7 +38,9 @@ const categoryInfo = async (req, res) => {
 
     const totalPages = Math.ceil(totalCategories / limit);
 
-renderAdmin(req, res, "category", { cat, currentPage: page, totalPages, search });  } catch (error) {
+    res.status(200);
+    renderAdmin(req, res, "category", { cat, currentPage: page, totalPages, search });
+  } catch (error) {
     console.log(error);
     res.redirect("/admin/pagenotfound");
   }
@@ -48,15 +50,15 @@ renderAdmin(req, res, "category", { cat, currentPage: page, totalPages, search }
 const toggleCategoryStatus = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
-    if (!category) return res.json({ success: false });
+    if (!category) return res.status(404).json({ success: false, message: "Category not found" });
 
     category.isActive = !category.isActive;
     await category.save();
 
-    res.json({ success: true });
+    res.status(200).json({ success: true });
   } catch (error) {
     console.log(error);
-    res.json({ success: false });
+    res.status(500).json({ success: false });
   }
 };
 
@@ -73,7 +75,7 @@ const addCategory = async (req, res) => {
     const isActive = req.body?.isActive;
 
     if (!name || !description || !req.file) {
-      return res.json({ success: false, message: "All fields are required" });
+      return res.status(400).json({ success: false, message: "All fields are required" });
     }
 
 const exists = await Category.findOne({
@@ -82,7 +84,7 @@ const exists = await Category.findOne({
     });
 
     if (exists) {
-      return res.json({ success: false, message: "Category already exists" });
+      return res.status(409).json({ success: false, message: "Category already exists" });
     }
 
     const result = await streamUpload(req.file.buffer);
@@ -94,21 +96,26 @@ const exists = await Category.findOne({
       isActive: isActive === "true"
     });
 
-    res.json({ success: true, message: "Category added successfully" });
+    res.status(201).json({ success: true, message: "Category added successfully" });
   } catch (error) {
     console.log(error);
-    res.json({ success: false, message: "Something went wrong" });
+    res.status(500).json({ success: false, message: "Something went wrong" });
   }
 };
 
 /* ================= DELETE CATEGORY ================= */
 const deleteCategory = async (req, res) => {
   try {
-    await Category.findByIdAndUpdate(req.params.id, { isDeleted: true });
-    res.json({ success: true });
+    const updated = await Category.findByIdAndUpdate(req.params.id, { isDeleted: true });
+
+    if (!updated) {
+      return res.status(404).json({ success: false, message: "Category not found" });
+    }
+
+    res.status(200).json({ success: true });
   } catch (error) {
     console.log(error);
-    res.json({ success: false });
+    res.status(500).json({ success: false });
   }
 };
 
@@ -123,7 +130,7 @@ const editCategory = async (req, res) => {
     });
 
     if (duplicate) {
-      return res.json({ success: false, message: "Category name already exists" });
+      return res.status(409).json({ success: false, message: "Category name already exists" });
     }
 
     const updateData = {
@@ -137,11 +144,16 @@ const editCategory = async (req, res) => {
       updateData.image = result.secure_url;
     }
 
-    await Category.findByIdAndUpdate(req.params.id, updateData);
-    res.json({ success: true });
+    const updated = await Category.findByIdAndUpdate(req.params.id, updateData);
+
+    if (!updated) {
+      return res.status(404).json({ success: false, message: "Category not found" });
+    }
+
+    res.status(200).json({ success: true });
   } catch (error) {
     console.log(error);
-    res.json({ success: false });
+    res.status(500).json({ success: false });
   }
 };
 
@@ -150,28 +162,33 @@ const addCategoryOffer = async (req, res) => {
 
     const { categoryId, offerPercentage } = req.body;
 
-    const pct = Number(offerPercentage);
+const pct = Number(offerPercentage);
 
-    if (isNaN(pct) || pct <= 0 || pct > 90) {
-      return res.json({
+    if (isNaN(pct) || pct < 0 || pct > 90) {
+      return res.status(400).json({
         success: false,
-        message: "Offer percentage must be between 1 and 90"
+        message: "Offer percentage must be between 0 and 90"
       });
     }
 
     const category = await Category.findById(categoryId);
 
+    if (!category) {
+      return res.status(404).json({ success: false, message: "Category not found" });
+    }
+
     category.categoryOffer = pct;
 
     await category.save();
 
-    res.json({
+    res.status(200).json({
       success: true,
       message: "Category offer added"
     });
 
   } catch (error) {
     console.log(error);
+    res.status(500).json({ success: false, message: "Something went wrong" });
   }
 };
 
@@ -182,16 +199,21 @@ const removeCategoryOffer = async (req, res) => {
 
     const category = await Category.findById(categoryId);
 
+    if (!category) {
+      return res.status(404).json({ success: false, message: "Category not found" });
+    }
+
     category.categoryOffer = 0;
 
     await category.save();
 
-    res.json({
+    res.status(200).json({
       success: true
     });
 
   } catch (error) {
     console.log(error);
+    res.status(500).json({ success: false, message: "Something went wrong" });
   }
 };
 
