@@ -284,8 +284,8 @@
 .page-btn.active { background: var(--rose); color: var(--white); border-color: var(--rose); }
 .page-btn.disabled { opacity: .4; pointer-events: none; }
 
-.modal { z-index: 9999; }
-.modal-backdrop { z-index: 9998; }
+.modal { z-index: 10010; }
+.modal-backdrop { z-index: 10005; }
 
 .custom-modal {
   background: var(--blush);
@@ -387,7 +387,8 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 .cropper-container { max-height: 80vh !important; }
 
 /* Ensure SweetAlert2 always renders above Bootstrap modals/backdrops */
-.swal2-container { z-index: 10000 !important; }
+.swal2-container { z-index: 10020 !important; }
+
 </style>
 
 <div class="pg">
@@ -757,8 +758,9 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   let editImageFiles = new Array(5).fill(null);
   let editExistingImages = new Array(5).fill(null); // URLs already saved, to know what stays
   let editChangedIndexes = new Set();
-  let cropperInstance = null;
+ let cropperInstance = null;
   let cropTargetContext = null; // { mode: 'add'|'edit', index: n }
+  let activeParentModalId = null; // which modal ("addProductModal"/"editProductModal") to reopen after cropping  let cropTargetContext = null; // { mode: 'add'|'edit', index: n }
 
   /* ---------- helpers ---------- */
   function renderSlot(slotEl, src) {
@@ -839,16 +841,18 @@ if (offer !== "" && offer !== null && offer !== undefined) {
   /* =========================================================
      ADD MODAL: image slots — delegated (safe against re-render)
   ========================================================= */
-  document.addEventListener("click", (e) => {
+document.addEventListener("click", (e) => {
     const addSlot = e.target.closest("#imageSlots .image-slot");
     if (addSlot) {
       cropTargetContext = { mode: "add", index: parseInt(addSlot.dataset.index) };
+      activeParentModalId = "addProductModal";
       document.getElementById("imageInput").click();
       return;
     }
     const editSlot = e.target.closest("#editImageSlots .edit-slot");
     if (editSlot) {
       cropTargetContext = { mode: "edit", index: parseInt(editSlot.dataset.index) };
+      activeParentModalId = "editProductModal";
       document.getElementById("editImageInput").click();
       return;
     }
@@ -873,26 +877,38 @@ if (offer !== "" && offer !== null && offer !== undefined) {
   });
 
   /* ---------- CROPPER ---------- */
-  function openCropper(dataUrl) {
+function openCropper(dataUrl) {
     const cropImage = document.getElementById("cropImage");
-    cropImage.src = dataUrl;
-
     const cropModalEl = document.getElementById("cropModal");
-    const cropModal = bootstrap.Modal.getOrCreateInstance(cropModalEl);
-    cropModal.show();
+    const parentModalEl = activeParentModalId ? document.getElementById(activeParentModalId) : null;
 
-    cropModalEl.addEventListener("shown.bs.modal", function onShown() {
-      if (cropperInstance) cropperInstance.destroy();
-      cropperInstance = new Cropper(cropImage, {
-        aspectRatio: 1,
-        viewMode: 1,
-        background: false
-      });
-      this.removeEventListener("shown.bs.modal", onShown);
-    }, { once: true });
+    const showCrop = () => {
+      cropImage.src = dataUrl;
+      const cropModal = bootstrap.Modal.getOrCreateInstance(cropModalEl);
+      cropModal.show();
+
+      cropModalEl.addEventListener("shown.bs.modal", function onShown() {
+        if (cropperInstance) cropperInstance.destroy();
+        cropperInstance = new Cropper(cropImage, {
+          aspectRatio: 1,
+          viewMode: 1,
+          background: false
+        });
+        this.removeEventListener("shown.bs.modal", onShown);
+      }, { once: true });
+    };
+
+    // Hide the parent modal (Add/Edit) before showing the crop modal so only
+    // one Bootstrap modal is ever visible — avoids stacked-backdrop issues.
+    if (parentModalEl && parentModalEl.classList.contains("show")) {
+      parentModalEl.addEventListener("hidden.bs.modal", showCrop, { once: true });
+      bootstrap.Modal.getOrCreateInstance(parentModalEl).hide();
+    } else {
+      showCrop();
+    }
   }
 
-  document.getElementById("cropSaveBtn").addEventListener("click", () => {
+document.getElementById("cropSaveBtn").addEventListener("click", () => {
     if (!cropperInstance || !cropTargetContext) return;
 
     const canvas = cropperInstance.getCroppedCanvas({ width: 600, height: 600 });
@@ -911,10 +927,9 @@ if (offer !== "" && offer !== null && offer !== undefined) {
         document.getElementById("editImageError").textContent = "";
       }
 
-      cropperInstance.destroy();
-      cropperInstance = null;
       cropTargetContext = null;
-
+      // hiding triggers the cropModal "hidden.bs.modal" handler below,
+      // which destroys the cropper instance and reopens the parent modal
       bootstrap.Modal.getOrCreateInstance(document.getElementById("cropModal")).hide();
     }, "image/jpeg", 0.9);
   });
@@ -1185,6 +1200,29 @@ const brand = form.brand.value.trim();
   /* =========================================================
      CLEAN UP ORPHANED BACKDROPS whenever any modal fully closes
   ========================================================= */
+/* =========================================================
+     CLEAN UP ORPHANED BACKDROPS whenever any modal fully closes
+  ========================================================= */
+/* =========================================================
+     When the crop modal closes for ANY reason (Crop & Use, Cancel/X,
+     or backdrop click), destroy the cropper and reopen whichever
+     parent modal (Add/Edit) launched it.
+  ========================================================= */
+  document.getElementById("cropModal").addEventListener("hidden.bs.modal", () => {
+    if (cropperInstance) {
+      cropperInstance.destroy();
+      cropperInstance = null;
+    }
+    if (activeParentModalId) {
+      const parentEl = document.getElementById(activeParentModalId);
+      if (parentEl) bootstrap.Modal.getOrCreateInstance(parentEl).show();
+      activeParentModalId = null;
+    }
+  });
+
+  /* =========================================================
+     CLEAN UP ORPHANED BACKDROPS whenever any modal fully closes
+  ========================================================= */
   document.addEventListener("hidden.bs.modal", () => {
     if (!document.querySelector(".modal.show")) {
       document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
@@ -1195,4 +1233,6 @@ const brand = form.brand.value.trim();
   });
 
 })();
+
+
 </script>

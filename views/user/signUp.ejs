@@ -414,8 +414,7 @@
                         <span class="input-icon">
                             <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
                         </span>
-                        <input type="text" id="name" name="name" class="form-control" placeholder="Your name">
-                    </div>
+<input type="text" id="name" name="name" class="form-control" placeholder="Your name" maxlength="50">                    </div>
                     <div id="error1" class="error-message"></div>
                 </div>
 
@@ -578,15 +577,18 @@ type="email"
         const error5 = document.getElementById("error5");
         const error6 = document.getElementById("error6");
 
-        function nameValidateChecking() {
-            const nameval = nameid.value;
+function nameValidateChecking() {
+            const nameval = nameid.value.trim();
             const namepattern = /^[A-Za-z\s]+$/;
-            if (nameval.trim() === "") {
+            if (nameval === "") {
                 error1.style.display = "block";
                 error1.innerHTML = "Please enter a valid name";
             } else if (!namepattern.test(nameval)) {
                 error1.style.display = "block";
                 error1.innerHTML = "Name can only contain alphabets and spaces";
+            } else if (nameval.length < 2 || nameval.length > 50) {
+                error1.style.display = "block";
+                error1.innerHTML = "Name must be between 2 and 50 characters";
             } else {
                 error1.style.display = "none";
                 error1.innerHTML = "";

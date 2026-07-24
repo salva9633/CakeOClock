@@ -55,8 +55,8 @@
       .status-Shipped    { background:#d0efff; color:#0a3d62; }
       .status-Delivered  { background:#d4edda; color:#155724; }
       .status-Cancelled  { background:#f8d7da; color:#721c24; }
-      .status-Returned, .status-Return\ Requested { background:#e2d9f3; color:#432874; }
-
+.status-Returned, .status-Return-Requested { background:#e2d9f3; color:#432874; }
+.status-Return-Rejected { background:#f8d7da; color:#721c24; }
       .section-card {
         background: var(--cream); border-radius: 16px; padding: 22px;
         margin-bottom: 20px; box-shadow: 0 2px 14px rgba(0,0,0,.045);
@@ -185,8 +185,7 @@
           <% } %>
         </div>
       </div>
-      <span id="order-status-badge" class="status-badge status-<%= order.status %>">
-        <%= order.status %>
+<span id="order-status-badge" class="status-badge status-<%= order.status.replace(/ /g,'-') %>">        <%= order.status %>
       </span>
       <div class="invoice-btn-wrap <%= order.status === 'Delivered' ? 'show' : '' %>" id="header-invoice-wrap">
         <button class="btn-rose" onclick="downloadInvoice()">
@@ -248,7 +247,9 @@
                 </span>
               </div>
               <div style="margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                <span class="status-badge status-<%= item.status %> item-status-badge">
+
+                
+<span class="status-badge status-<%= item.status %> item-status-badge">                  
                   <%= item.status %>
                 </span>
                 <% if (item.cancelReason) { %>
@@ -276,6 +277,9 @@
               <% if (['Returned','Return Requested'].includes(item.status)) { %>
                 <span style="font-size:.75rem;color:#6a2fc2;font-weight:700;text-align:right">↩ Return<br>Requested</span>
               <% } %>
+              <% if (item.status === 'Return Rejected') { %>
+  <span style="font-size:.75rem;color:#c0392b;font-weight:700;text-align:right">✕ Return<br>Rejected</span>
+<% } %>
             </div>
           </div>
           <% }) %>
@@ -427,12 +431,10 @@
 
       function updateStatusUI(newStatus) {
         const badge = document.getElementById('order-status-badge');
-        if (badge) { badge.className = `status-badge status-${newStatus}`; badge.textContent = newStatus; }
-        document.querySelectorAll('.item-status-badge').forEach(el => {
+if (badge) { badge.className = `status-badge status-${newStatus.replace(/ /g,'-')}`; badge.textContent = newStatus; }        document.querySelectorAll('.item-status-badge').forEach(el => {
           const cur = el.textContent.trim();
           if (!['Cancelled','Returned','Return Requested'].includes(cur)) {
-            el.className   = `status-badge status-${newStatus} item-status-badge`;
-            el.textContent = newStatus;
+el.className   = `status-badge status-${newStatus.replace(/ /g,'-')} item-status-badge`;            el.textContent = newStatus;
           }
         });
         const wrap = document.getElementById('actions-wrap');

@@ -4,7 +4,8 @@ import PDFDocument from "pdfkit";
 import User from "../../models/userModel.js";
 import WalletTransaction from "../../models/walletModel.js";
 import Coupon from "../../models/couponModel.js";
- 
+import { getItemRefundAmount, refreshCouponEligibility, sumAllocatedDiscount } from "../../utils/refundHelper.js";
+
 /* ── GET /orders ────────────────────────────────────────────────────── */
 export const listOrders = async (req, res) => {
   try {
@@ -46,7 +47,51 @@ export const orderDetail = async (req, res) => {
     res.redirect("/orders");
   }
 };
- 
+
+/**
+ * Recomputes the display-only order.itemTotal / order.discount / order.tax /
+ * order.shippingCharge / order.finalTotal after an item is cancelled or
+ * returned, and refreshes coupon.isStillEligible for reporting.
+ *
+ * This NEVER touches item.allocatedCouponDiscount or item.effectivePaidAmount
+ * — those were fixed at checkout and are what refunds are computed from.
+ * For legacy orders (placed before this migration, i.e. no order.coupon),
+ * it falls back to the old dynamic-recalculation behavior so existing
+ * orders keep working exactly as before.
+ */
+async function recalculateOrderTotalsAfterItemChange(order) {
+  const activeItems  = order.items.filter(i => !["Cancelled", "Returned"].includes(i.status));
+  const newItemTotal = activeItems.reduce((s, i) => s + i.price * i.quantity, 0);
+  const newShipping  = newItemTotal === 0 ? 0 : newItemTotal >= 499 ? 0 : 49;
+  const newTax       = Math.round(newItemTotal * 0);
+
+  let newDiscount = 0;
+
+  if (order.coupon && order.coupon.code) {
+    // New system: allocations are immutable — just sum what's left, and
+    // refresh the eligibility flag for reporting only.
+    newDiscount = sumAllocatedDiscount(activeItems);
+    refreshCouponEligibility(order, newItemTotal);
+  } else if (order.couponCode) {
+    // Legacy order — preserve the old dynamic recompute behavior.
+    const couponDoc = await Coupon.findOne({ code: order.couponCode });
+    if (couponDoc && newItemTotal >= couponDoc.minPurchase) {
+      newDiscount = couponDoc.discountType === "percentage"
+        ? Math.min((newItemTotal * couponDoc.discountValue) / 100, couponDoc.maxDiscount || Infinity)
+        : couponDoc.discountValue;
+      newDiscount = Math.round(Math.min(newDiscount, newItemTotal));
+    } else {
+      order.couponCode = null;
+    }
+  }
+
+  order.itemTotal      = newItemTotal;
+  order.discount       = newDiscount;
+  order.shippingCharge = newShipping;
+  order.tax            = newTax;
+  order.finalTotal     = Math.max(0, newItemTotal - newDiscount + newTax + newShipping);
+}
+
 /* ── POST /orders/:id/cancel ────────────────────────────────────────── */
 export const cancelOrder = async (req, res) => {
   try {
@@ -60,14 +105,30 @@ export const cancelOrder = async (req, res) => {
     if (!["Pending", "Processing"].includes(order.status)) {
       return res.json({ success: false, message: "Order cannot be cancelled at this stage" });
     }
- 
+ // Skip stock restoration for orders whose payment never succeeded —
+    // stock was never actually committed/deducted for a failed payment,
+    // so restoring it here would incorrectly inflate available stock.
+    const paymentFailed = order.paymentStatus === "Failed";
+
+    let totalRefund = 0;
     for (const item of order.items) {
       if (item.status === "Cancelled") continue;
-      await restoreStock(item.variantId, item.quantity);
+      if (!paymentFailed) {
+        await restoreStock(item.variantId, item.quantity);
+      }
+
+      const itemRefund = getItemRefundAmount(order, item);
+      item.refundAmount = itemRefund;
+      item.isRefunded   = true;
+      totalRefund += itemRefund;
+
       item.status = "Cancelled";
     }
+
+    // Whole-order cancellation also refunds tax + shipping that was charged.
+    totalRefund += (order.tax || 0) + (order.shippingCharge || 0);
+    totalRefund = Math.round(totalRefund * 100) / 100;
  
-    const refundAmount   = order.finalTotal || order.itemTotal || 0;
     order.status         = "Cancelled";
     order.cancelReason   = reason || null;
     order.cancelledAt    = new Date();   
@@ -78,14 +139,14 @@ export const cancelOrder = async (req, res) => {
     await order.save();
  
     if (["Razorpay", "Wallet", "Online"].includes(order.paymentMethod) && order.paymentStatus === "Paid") {
-      if (refundAmount > 0) {
+      if (totalRefund > 0) {
         const user = await User.findById(order.userId);
-        const newBalance = (user.walletBalance || 0) + refundAmount;
+        const newBalance = (user.walletBalance || 0) + totalRefund;
         await User.findByIdAndUpdate(order.userId, { walletBalance: newBalance });
         await WalletTransaction.create({
           userId:       order.userId,
           type:         "credit",
-          amount:       refundAmount,
+          amount:       totalRefund,
           description:  `Refund for cancelled order ${order.orderId}`,
           orderId:      order._id,
           balanceAfter: newBalance
@@ -113,38 +174,25 @@ export const cancelOrderItem = async (req, res) => {
     const item = order.items.id(itemId);
     if (!item) return res.json({ success: false, message: "Item not found" });
  
-    if (!["Pending", "Processing"].includes(item.status)) {
+if (!["Pending", "Processing"].includes(item.status)) {
       return res.json({ success: false, message: "Item cannot be cancelled" });
     }
  
-    await restoreStock(item.variantId, item.quantity);
+    // Skip stock restoration for failed-payment orders — stock was never
+    // deducted/committed for these, so restoring it would double-count.
+    if (order.paymentStatus !== "Failed") {
+      await restoreStock(item.variantId, item.quantity);
+    }
+
+    // Refund exactly what was actually paid for this item (immutable,
+    // set at checkout) — never recalculated based on remaining items.
+    const itemRefundAmount = getItemRefundAmount(order, item);
+    item.refundAmount = itemRefundAmount;
+    item.isRefunded   = true;
     item.status       = "Cancelled";
     item.cancelReason = reason || null;
- 
-    const activeItems  = order.items.filter(i => i.status !== "Cancelled");
-    const newItemTotal = activeItems.reduce((s, i) => s + i.price * i.quantity, 0);
-    const newShipping  = newItemTotal === 0 ? 0 : newItemTotal >= 499 ? 0 : 49;
-    const newTax       = Math.round(newItemTotal * 0);
- 
-    // Re-check the coupon's minPurchase against the new total
-    let newDiscount = 0;
-    if (order.couponCode) {
-      const couponDoc = await Coupon.findOne({ code: order.couponCode });
-      if (couponDoc && newItemTotal >= couponDoc.minPurchase) {
-        newDiscount = couponDoc.discountType === "percentage"
-          ? Math.min((newItemTotal * couponDoc.discountValue) / 100, couponDoc.maxDiscount || Infinity)
-          : couponDoc.discountValue;
-        newDiscount = Math.round(Math.min(newDiscount, newItemTotal));
-      } else {
-        order.couponCode = null;
-      }
-    }
- 
-    order.itemTotal      = newItemTotal;
-    order.discount       = newDiscount;
-    order.shippingCharge = newShipping;
-    order.tax            = newTax;
-    order.finalTotal     = newItemTotal - newDiscount + newTax + newShipping;
+
+    await recalculateOrderTotalsAfterItemChange(order);
  
     const allCancelled = order.items.every(i => i.status === "Cancelled");
     if (allCancelled) {
@@ -156,15 +204,14 @@ export const cancelOrderItem = async (req, res) => {
     await order.save();
  
     if (["Razorpay", "Wallet", "Online"].includes(order.paymentMethod) && order.paymentStatus === "Paid") {
-      const refundAmount = item.price * item.quantity;
-      if (refundAmount > 0) {
+      if (itemRefundAmount > 0) {
         const user = await User.findById(order.userId);
-        const newBalance = (user.walletBalance || 0) + refundAmount;
+        const newBalance = (user.walletBalance || 0) + itemRefundAmount;
         await User.findByIdAndUpdate(order.userId, { walletBalance: newBalance });
         await WalletTransaction.create({
           userId:       order.userId,
           type:         "credit",
-          amount:       refundAmount,
+          amount:       itemRefundAmount,
           description:  `Refund for cancelled item ${item.productName} (Order: ${order.orderId})`,
           orderId:      order._id,
           balanceAfter: newBalance
@@ -201,17 +248,13 @@ export const returnOrder = async (req, res) => {
       if (item.status === "Delivered") {
         item.status       = "Return Requested";
         item.returnReason = reason.trim();
-        await restoreStock(item.variantId, item.quantity);
+        // stock restored + refund calculated only on admin approval — see approveReturnRequest
       }
     }
  
-    order.status         = "Return Requested";
+order.status         = "Return Requested";
     order.returnReason   = reason.trim();
-    order.itemTotal      = 0;
-    order.shippingCharge = 0;
-    order.tax            = 0;
-    order.finalTotal     = 0;
- 
+
     await order.save();
  
     res.json({ success: true, message: "Return request submitted successfully" });
@@ -255,6 +298,7 @@ export const downloadInvoice = async (req, res) => {
     const invoiceTax       = order.tax || 0;
     const invoiceDiscount  = order.discount || 0;
     const invoiceFinal     = Math.max(0, invoiceItemTotal - invoiceDiscount + invoiceTax + invoiceShipping);
+    const invoiceCouponCode = order.coupon?.code || order.couponCode || null;
  
     // ── page setup ────────────────────────────────────────────────
     const doc = new PDFDocument({ margin: 0, size: "A4" });
@@ -495,8 +539,8 @@ export const downloadInvoice = async (req, res) => {
     if (invoiceDiscount > 0) {
       summaryRows.push(["Discount", `-Rs.${invoiceDiscount.toLocaleString("en-IN")}`, GREEN]);
     }
-    if (order.couponCode) {
-      summaryRows.push([`Coupon  (${order.couponCode})`, "Applied", ROSE_DK]);
+    if (invoiceCouponCode) {
+      summaryRows.push([`Coupon  (${invoiceCouponCode})`, "Applied", ROSE_DK]);
     }
     if (invoiceTax > 0) {
       summaryRows.push(["Tax", `Rs.${invoiceTax.toLocaleString("en-IN")}`, BROWN]);
@@ -574,38 +618,18 @@ export const returnOrderItem = async (req, res) => {
       return res.json({ success: false, message: "Only delivered items can be returned" });
     }
  
-    item.status       = "Return Requested";
+item.status       = "Return Requested";
     item.returnReason = reason.trim();
-    await restoreStock(item.variantId, item.quantity);
+    // stock restored + refund calculated only on admin approval — see approveReturnRequest
  
     const allReturned = order.items.every(i => i.status === "Return Requested");
     if (allReturned) {
       order.status = "Return Requested";
     }
  
-    const activeItems  = order.items.filter(i => !["Cancelled", "Returned"].includes(i.status));
-    const newItemTotal = activeItems.reduce((s, i) => s + i.price * i.quantity, 0);
-    const newShipping  = newItemTotal === 0 ? 0 : newItemTotal >= 499 ? 0 : 49;
-    const newTax       = Math.round(newItemTotal * 0);
- 
-    let newDiscount = 0;
-    if (order.couponCode) {
-      const couponDoc = await Coupon.findOne({ code: order.couponCode });
-      if (couponDoc && newItemTotal >= couponDoc.minPurchase) {
-        newDiscount = couponDoc.discountType === "percentage"
-          ? Math.min((newItemTotal * couponDoc.discountValue) / 100, couponDoc.maxDiscount || Infinity)
-          : couponDoc.discountValue;
-        newDiscount = Math.round(Math.min(newDiscount, newItemTotal));
-      } else {
-        order.couponCode = null;
-      }
-    }
- 
-    order.itemTotal      = newItemTotal;
-    order.discount       = newDiscount;
-    order.shippingCharge = newShipping;
-    order.tax            = newTax;
-    order.finalTotal     = allReturned ? 0 : newItemTotal - newDiscount + newTax + newShipping;
+    // NOTE: item totals/discount are NOT finalized here — this is just a
+    // request awaiting admin approval. Refund + totals recalculation happens
+    // in approveReturnRequest, where the actual refund is issued.
  
     await order.save();
     res.json({ success: true, message: "Return request submitted successfully" });
@@ -616,8 +640,7 @@ export const returnOrderItem = async (req, res) => {
 };
  
 /* ── Helper: restore stock to last active batch ─────────────────────── */
-async function restoreStock(variantId, quantity) {
-  const batch = await Batch.findOne({
+export async function restoreStock(variantId, quantity) {  const batch = await Batch.findOne({
     variantId,
     status: { $in: ["active", "exhausted"] }
   }).sort({ manufacturedAt: -1 });

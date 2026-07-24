@@ -438,6 +438,7 @@
               id="name"
               value="<%= user.name %>"
               placeholder="Your full name"
+              maxlength="30"
             >
             <span class="error-text" id="nameError"></span>
           </div>
@@ -552,11 +553,14 @@ document.getElementById('editForm').addEventListener('submit', function (e) {
 
   /* Name */
   const namePattern = /^[A-Za-z ]+$/;
-  if (name.value.trim() === '') {
+  const trimmedNameVal = name.value.trim();
+  if (trimmedNameVal === '') {
     showError(name, 'nameError', 'Name is required'); isValid = false;
-  } else if (name.value.trim().length < 3) {
+  } else if (trimmedNameVal.length < 3) {
     showError(name, 'nameError', 'Name must be at least 3 characters'); isValid = false;
-  } else if (!namePattern.test(name.value.trim())) {
+  } else if (trimmedNameVal.length > 30) {
+    showError(name, 'nameError', 'Name cannot exceed 30 characters'); isValid = false;
+  } else if (!namePattern.test(trimmedNameVal)) {
     showError(name, 'nameError', 'Name can contain only letters'); isValid = false;
   }
 

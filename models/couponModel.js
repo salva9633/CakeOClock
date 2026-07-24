@@ -56,7 +56,6 @@ const couponSchema = new mongoose.Schema({
     default: false
   },
 
-  
   isFirstOrderOnly: {
     type: Boolean,
     default: false
@@ -70,11 +69,20 @@ const couponSchema = new mongoose.Schema({
     }
   ],
 
-  
   assignedTo: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     default: null
+  },
+
+  // Reserved for future support of product/category-scoped coupons.
+  // Not yet enforced anywhere in the checkout/allocation logic — all
+  // coupons currently behave as ORDER-level. Safe to add now so the
+  // schema doesn't need another migration later.
+  applyOn: {
+    type: String,
+    enum: ["ORDER", "PRODUCT", "CATEGORY"],
+    default: "ORDER"
   }
 
 }, { timestamps: true });

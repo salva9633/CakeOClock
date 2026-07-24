@@ -77,7 +77,7 @@ function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-function generateReferralCode(name) {
+export function generateReferralCode(name) {
 
   return (
     name.substring(0, 4).toUpperCase() +
@@ -85,6 +85,8 @@ function generateReferralCode(name) {
   );
 
 }
+
+
 const createUser = async (req, res) => {
   try {
 const {
@@ -96,6 +98,15 @@ const {
   confirmPassword,
   referral
 } = req.body;
+
+    const trimmedName = (name || "").trim();
+    if (trimmedName.length < 2 || trimmedName.length > 30) {
+      return res.status(400).json({
+        success: false,
+        message: "Name must be between 2 and 30 characters"
+      });
+    }
+
     if (password !== confirmPassword) {
       return res.status(400).json({
         success: false,

@@ -1,5 +1,6 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.css">
 <style>:root {
   --rose: #C97B8A; --rose-dk: #A85F6E; --rose-lt: #FAE8ED;
   --blush: #FDF0F3; --caramel: #D4A574; --brown: #5C3A3A;
@@ -231,7 +232,35 @@ small.err-msg { font-size: 11px; color: #dc3545; margin-top: 3px; display: block
 .btn-save:hover { opacity: .88; }
 
 /* ── SWAL ABOVE MODAL ── */
+/* ── SWAL ABOVE MODAL ── */
 .swal2-container { z-index: 9999 !important; }
+
+/* ── CROP MODAL ── */
+#cropModal .modal-box {
+  max-width: 95vw;
+  width: 700px;
+  background: #111;
+  color: #fff;
+}
+#cropModal .modal-hd { background: #1a1a1a; }
+#cropModal .modal-bd {
+  padding: 0;
+  height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  overflow: hidden;
+}
+#cropModal .modal-ft {
+  background: #1a1a1a;
+  border-top: none;
+  justify-content: space-between;
+  align-items: center;
+}
+#cropModal .modal-ft small { color: #999; font-size: 12px; }
+.cropper-container { max-height: 60vh !important; max-width: 100% !important; }
+
 </style>
 <div class="cp">
 
@@ -425,6 +454,24 @@ small.err-msg { font-size: 11px; color: #dc3545; margin-top: 3px; display: block
   </div>
 </div>
 
+
+<!-- ── CROP MODAL ── -->
+<div class="modal-overlay" id="cropModal">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <h5><i class="ti ti-crop"></i> Crop image</h5>
+      <button class="modal-close" data-action="close-crop">×</button>
+    </div>
+    <div class="modal-bd">
+      <img id="cropImage" style="max-width:100%; display:block;">
+    </div>
+    <div class="modal-ft">
+      <small>Drag to crop • Scroll to zoom</small>
+      <button class="btn-save" data-action="crop-save">Crop &amp; use image</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── EDIT MODAL ── -->
 <div class="modal-overlay" id="editModal">
   <div class="modal-box">
@@ -471,17 +518,40 @@ small.err-msg { font-size: 11px; color: #dc3545; margin-top: 3px; display: block
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.js"></script>
 <script>
 (function () {
   // ── SAFE HELPERS ──
   function $(id) { return document.getElementById(id); }
   function on(el, evt, fn) { if (el) el.addEventListener(evt, fn); }
 
+  // ── CROP STATE ──
+  let cropperInstance = null;
+  let cropMode = null;            // 'add' | 'edit'
+  let activeParentModalId = null; // which modal to reopen after cropping
+  let addImageBlob = null;        // cropped blob for Add modal
+  let editImageBlob = null;       // cropped blob for Edit modal (only set if a NEW image is picked)
   // ── MODAL OPEN/CLOSE ──
-  function openAddModal() { const m = $("addModal"); if (m) m.classList.add("open"); }
+function openAddModal() {
+    addImageBlob = null;
+    const nameEl = $("catName"), descEl = $("catDesc"), statusEl = $("catStatus");
+    const prev = $("preview"), imgText = $("imgText"), imgBox = $("imageBox");
+    const nameErr = $("nameError"), descErr = $("descError"), imgErr = $("imgError");
+    if (nameEl) nameEl.value = "";
+    if (descEl) descEl.value = "";
+    if (statusEl) statusEl.value = "true";
+    if (prev) { prev.src = ""; prev.style.display = "none"; }
+    if (imgText) imgText.style.display = "block";
+    if (imgBox) imgBox.classList.remove("err", "ok");
+    if (nameErr) nameErr.innerText = "";
+    if (descErr) descErr.innerText = "";
+    if (imgErr) imgErr.innerText = "";
+    const m = $("addModal"); if (m) m.classList.add("open");
+  }
   function closeAddModal() { const m = $("addModal"); if (m) m.classList.remove("open"); }
 
   function openEditModal(id, name, desc, image, status) {
+    editImageBlob = null;
     const editId = $("editId"), editName = $("editName"), editDesc = $("editDesc"),
           editStatus = $("editStatus"), ep = $("editPreview"), m = $("editModal");
     if (editId) editId.value = id;
@@ -492,32 +562,113 @@ small.err-msg { font-size: 11px; color: #dc3545; margin-top: 3px; display: block
       ep.src = image || "";
       ep.style.display = image ? "block" : "none";
     }
+    const editImgError = $("editImgError"), editImageBox = $("editImageBox"),
+          editNameError = $("editNameError"), editDescError = $("editDescError");
+    if (editImgError) editImgError.innerText = "";
+    if (editImageBox) editImageBox.classList.remove("err", "ok");
+    if (editNameError) editNameError.innerText = "";
+    if (editDescError) editDescError.innerText = "";
     if (m) m.classList.add("open");
   }
   function closeEditModal() { const m = $("editModal"); if (m) m.classList.remove("open"); }
 
   // Close modal when clicking outside the box — safe against missing elements
-  document.querySelectorAll(".modal-overlay").forEach(function (overlay) {
+// Close modal when clicking outside the box — safe against missing elements.
+  // cropModal is handled separately below since closing it must also destroy
+  // the cropper instance and reopen whichever parent modal launched it.
+  document.querySelectorAll(".modal-overlay:not(#cropModal)").forEach(function (overlay) {
     overlay.addEventListener("click", function (e) {
       if (e.target === overlay) overlay.classList.remove("open");
     });
   });
 
   // ── IMAGE PREVIEW ──
+// ── IMAGE SELECT → OPEN CROPPER ──
   function previewImage(e) {
     const file = e.target.files && e.target.files[0]; if (!file) return;
-    const prev = $("preview"), imgText = $("imgText"), imgError = $("imgError"), imageBox = $("imageBox");
-    if (prev) { prev.src = URL.createObjectURL(file); prev.style.display = "block"; }
-    if (imgText) imgText.style.display = "none";
-    if (imgError) imgError.innerText = "";
-    if (imageBox) imageBox.classList.remove("err");
+    cropMode = "add";
+    activeParentModalId = "addModal";
+    const reader = new FileReader();
+    reader.onload = () => openCropper(reader.result);
+    reader.readAsDataURL(file);
+    e.target.value = ""; // allow re-picking the same file later
   }
   function previewEditImage(e) {
     const file = e.target.files && e.target.files[0]; if (!file) return;
-    const ep = $("editPreview"), editImgError = $("editImgError"), editImageBox = $("editImageBox");
-    if (ep) { ep.src = URL.createObjectURL(file); ep.style.display = "block"; }
-    if (editImgError) editImgError.innerText = "";
-    if (editImageBox) editImageBox.classList.remove("err");
+    cropMode = "edit";
+    activeParentModalId = "editModal";
+    const reader = new FileReader();
+    reader.onload = () => openCropper(reader.result);
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  }
+
+  // ── CROPPER ──
+  function openCropper(dataUrl) {
+    const cropImage = $("cropImage");
+    const cropModalEl = $("cropModal");
+    const parentEl = activeParentModalId ? $(activeParentModalId) : null;
+
+    const showCrop = () => {
+      cropImage.src = dataUrl;
+      cropModalEl.classList.add("open");
+      if (cropperInstance) cropperInstance.destroy();
+      cropperInstance = new Cropper(cropImage, {
+        aspectRatio: 1,
+        viewMode: 1,
+        background: false
+      });
+    };
+
+    // Hide the parent modal (Add/Edit) first so only one overlay is ever visible.
+    if (parentEl && parentEl.classList.contains("open")) {
+      parentEl.classList.remove("open");
+      setTimeout(showCrop, 0);
+    } else {
+      showCrop();
+    }
+  }
+
+  function closeCropModal(reopenParent) {
+    const cropModalEl = $("cropModal");
+    if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
+    if (cropModalEl) cropModalEl.classList.remove("open");
+    if (reopenParent && activeParentModalId) {
+      const parentEl = $(activeParentModalId);
+      if (parentEl) parentEl.classList.add("open");
+    }
+    activeParentModalId = null;
+  }
+
+  function saveCrop() {
+    if (!cropperInstance) return;
+    const canvas = cropperInstance.getCroppedCanvas({ width: 600, height: 600 });
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+if (cropMode === "add") {
+        addImageBlob = blob;
+        const prev = $("preview"), imgText = $("imgText"), imgError = $("imgError"), imageBox = $("imageBox");
+        if (prev) { prev.src = url; prev.style.display = "block"; }
+        if (imgText) imgText.style.display = "none";
+        if (imgError) imgError.innerText = "";
+        if (imageBox) { imageBox.classList.remove("err"); imageBox.classList.add("ok"); }
+      } else if (cropMode === "edit") {
+        editImageBlob = blob;
+        const ep = $("editPreview"), editImgError = $("editImgError"), editImageBox = $("editImageBox");
+        if (ep) { ep.src = url; ep.style.display = "block"; }
+        if (editImgError) editImgError.innerText = "";
+        if (editImageBox) { editImageBox.classList.remove("err"); editImageBox.classList.add("ok"); }
+      }
+      closeCropModal(true);
+    }, "image/jpeg", 0.9);
+  }
+
+  // Crop modal's own backdrop click — closes AND reopens the parent modal
+  const cropModalBackdropEl = $("cropModal");
+  if (cropModalBackdropEl) {
+    cropModalBackdropEl.addEventListener("click", function (e) {
+      if (e.target === cropModalBackdropEl) closeCropModal(true);
+    });
   }
 
   // ── VALIDATION HELPERS ──
@@ -539,14 +690,14 @@ small.err-msg { font-size: 11px; color: #dc3545; margin-top: 3px; display: block
   }
 
   // ── SUBMIT ADD ──
-  function submitCategory() {
-    const name = $("catName"), desc = $("catDesc"), catImage = $("catImage"),
+function submitCategory() {
+    const name = $("catName"), desc = $("catDesc"),
           nameErr = $("nameError"), descErr = $("descError"), imgErr = $("imgError"), imgBox = $("imageBox"),
           catStatus = $("catStatus");
-    if (!name || !desc || !catImage) return;
+    if (!name || !desc) return;
 
-    const image = catImage.files[0];
-    clearErr(name, nameErr); clearErr(desc, descErr);
+    const image = addImageBlob; // cropped image, set by saveCrop()
+    clearErr(name, nameErr); clearErr(desc, descErr);    
     if (imgErr) imgErr.innerText = "";
     if (imgBox) imgBox.classList.remove("err", "ok");
 
@@ -581,13 +732,14 @@ small.err-msg { font-size: 11px; color: #dc3545; margin-top: 3px; display: block
 
   // ── SUBMIT EDIT ──
   function updateCategory() {
-    const name = $("editName"), desc = $("editDesc"), editImage = $("editImage"),
+    const name = $("editName"), desc = $("editDesc"),
           nameErr = $("editNameError"), descErr = $("editDescError"), imgErr = $("editImgError"),
           imgBox = $("editImageBox"), editStatus = $("editStatus"), editId = $("editId");
-    if (!name || !desc || !editImage || !editId) return;
+    if (!name || !desc || !editId) return;
 
-    const image = editImage.files[0];
+    const image = editImageBlob; // only set if a NEW image was cropped; otherwise existing thumbnail stays
     clearErr(name, nameErr); clearErr(desc, descErr);
+
     if (imgErr) imgErr.innerText = "";
     if (imgBox) imgBox.classList.remove("err", "ok");
 
@@ -696,9 +848,10 @@ small.err-msg { font-size: 11px; color: #dc3545; margin-top: 3px; display: block
 
     const action = target.dataset.action;
     switch (action) {
-      case "close-add":     closeAddModal(); break;
+case "close-add":     closeAddModal(); break;
       case "close-edit":    closeEditModal(); break;
-      case "submit-add":    submitCategory(); break;
+      case "close-crop":    closeCropModal(true); break;
+      case "crop-save":     saveCrop(); break;      case "submit-add":    submitCategory(); break;
       case "submit-edit":   updateCategory(); break;
       case "pick-add-image": { const f = $("catImage"); if (f) f.click(); break; }
       case "pick-edit-image": { const f = $("editImage"); if (f) f.click(); break; }

@@ -669,8 +669,16 @@ async function handleReturn(orderId, itemId, action) {
 }
 
 async function pollStatus() {
+  const id = getOrderIdFromUrl();
+  // Guard: only poll while we're actually on a valid order-detail URL.
+  // If the admin has navigated away (e.g. back to /admin/orders), the last
+  // path segment won't be a 24-char hex ObjectId — stop polling for good.
+  if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+    clearInterval(pollIntervalId);
+    return;
+  }
   try {
-    var res  = await fetch('/admin/orders/' + getOrderIdFromUrl() + '/poll-status');
+    var res  = await fetch('/admin/orders/' + id + '/poll-status');
     var data = await res.json();
     if (data.success && data.status !== lastKnownStatus) {
       lastKnownStatus = data.status;

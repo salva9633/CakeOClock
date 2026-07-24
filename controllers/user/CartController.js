@@ -142,7 +142,7 @@ export const getCart = async (req, res) => {
       })
       .populate({
         path:   "items.variantId",
-        select: "salePrice regularPrice weight size isAvailable",
+        select: "salePrice regularPrice weight size isAvailable productId",
       })
       .lean();
  
@@ -233,34 +233,39 @@ export const updateCartItem = async (req, res) => {
     const cart = await Cart.findOne({ userId });
     if (!cart) return res.status(404).json({ success: false, message: "Cart not found" });
  
-    const item = cart.items.id(itemId);
+ const item = cart.items.id(itemId);
     if (!item) return res.status(404).json({ success: false, message: "Item not found" });
  
-    if (Number(quantity) <= 0) {
+    const previousQty = item.quantity; // remember before mutating, to detect increase vs decrease
+    const itemDeleted = Number(quantity) <= 0;
+
+    const itemBatches = await Batch.find({
+      variantId:      item.variantId,
+      status:         "active",
+      expiryAt:       { $gt: new Date() },
+      availableStock: { $gt: 0 }
+    }).lean();
+    const itemTotalStock = itemBatches.reduce((s, b) => s + b.availableStock, 0);
+
+    if (itemDeleted) {
       item.deleteOne();
     } else {
-      const batches = await Batch.find({
-        variantId:      item.variantId,
-        status:         "active",
-        expiryAt:       { $gt: new Date() },
-        availableStock: { $gt: 0 }
-      }).lean();
-      const totalStock = batches.reduce((s, b) => s + b.availableStock, 0);
- 
-      if (Number(quantity) > totalStock) {
+      const isIncreasing = Number(quantity) > previousQty;
+
+      if (isIncreasing && Number(quantity) > itemTotalStock) {
         return res.status(400).json({
           success: false,
-          message: `Only ${totalStock} in stock`
+          message: `Only ${itemTotalStock} in stock`
         });
       }
- 
+
       if (Number(quantity) > MAX_QTY) {
         return res.status(400).json({
           success: false,
           message: `Maximum ${MAX_QTY} per item allowed`
         });
       }
- 
+
       item.quantity = Number(quantity);
     }
  
@@ -268,14 +273,14 @@ export const updateCartItem = async (req, res) => {
  
     // ── FIX 1: Recalculate totals using effectivePrice (offer price) ──
     // We need to re-populate to get variant data for getFinalPrice
-    const populatedCart = await Cart.findOne({ userId })
+const populatedCart = await Cart.findOne({ userId })
       .populate({
         path:   "items.productId",
         select: "isListed",
       })
       .populate({
         path:   "items.variantId",
-        select: "salePrice regularPrice isAvailable",
+        select: "salePrice regularPrice isAvailable productId",
       })
       .lean();
  
@@ -320,6 +325,11 @@ const priceData      = await getFinalPrice(i.variantId);
       savings,
       cartCount,
       hasBlocked,   // FIX 2: tell frontend if checkout should be blocked
+      itemId,
+      itemDeleted,
+      itemQuantity: itemDeleted ? 0 : item.quantity,
+      itemStock:    itemTotalStock,
+      itemAtMax:    !itemDeleted && item.quantity >= itemTotalStock,
     });
  
   } catch (err) {

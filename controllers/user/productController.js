@@ -43,12 +43,12 @@ const loadProductsPage = async (req, res) => {
       .lean();
  
     // ── 4. PRICE FILTER ON VARIANTS ───────────────────────
-    const priceFilter = { isAvailable: true };
- 
-   if (price) {
-  const [min, max] = price.split("-").map(Number);
-  priceFilter.regularPrice = { $gte: min, $lte: max };
-}
+    const priceFilter = {};
+
+    if (price) {
+      const [min, max] = price.split("-").map(Number);
+      priceFilter.regularPrice = { $gte: min, $lte: max };
+    }
  
     const productIds = allProducts.map(p => p._id);
  
@@ -163,8 +163,16 @@ return {
  
     // ── 7. SORTING ────────────────────────────────────────
     const sorters = {
-      priceLowHigh: (a, b) => a.startingPrice - b.startingPrice,
-      priceHighLow: (a, b) => b.startingPrice - a.startingPrice,
+      priceLowHigh: (a, b) => {
+        if (a.startingPrice === null) return 1;
+        if (b.startingPrice === null) return -1;
+        return a.startingPrice - b.startingPrice;
+      },
+      priceHighLow: (a, b) => {
+        if (a.startingPrice === null) return 1;
+        if (b.startingPrice === null) return -1;
+        return b.startingPrice - a.startingPrice;
+      },
       az:           (a, b) => a.productName.localeCompare(b.productName),
       za:           (a, b) => b.productName.localeCompare(a.productName),
       newest:       (a, b) => new Date(b.createdAt) - new Date(a.createdAt),

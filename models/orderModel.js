@@ -9,6 +9,25 @@ const orderItemSchema = new mongoose.Schema({
   quantity:     { type: Number, required: true },
   price:        { type: Number, required: true },
   regularPrice: { type: Number },
+
+  // ===== Coupon Allocation (set once at checkout, then immutable) =====
+  allocatedCouponDiscount: {
+    type: Number,
+    default: 0
+  },
+  effectivePaidAmount: {
+    type: Number,
+    default: 0
+  },
+  refundAmount: {
+    type: Number,
+    default: 0
+  },
+  isRefunded: {
+    type: Boolean,
+    default: false
+  },
+
   status: {
     type: String,
     enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Returned", "Return Requested", "Return Rejected"],
@@ -34,23 +53,60 @@ const orderSchema = new mongoose.Schema({
     pincode:  { type: String, required: true },
     type:     { type: String }
   },
-// ADD these fields to your existing orderSchema:
-offerDiscount: { type: Number, default: 0 },
-referralDiscount: { type: Number, default: 0 },
-referralCodeUsed: { type: String, default: null },
+
+  offerDiscount: { type: Number, default: 0 },
+  referralDiscount: { type: Number, default: 0 },
+  referralCodeUsed: { type: String, default: null },
+
   items: [orderItemSchema],
 
-paymentMethod: { type: String, enum: ["COD", "Online", "Razorpay", "Wallet"], default: "COD" },
-paymentStatus: { type: String, enum: ["Pending", "Paid", "Failed", "Refunded"], default: "Pending" },
-razorpayOrderId:   { type: String, default: null },
-razorpayPaymentId: { type: String, default: null },
+  paymentMethod: { type: String, enum: ["COD", "Online", "Razorpay", "Wallet"], default: "COD" },
+  paymentStatus: { type: String, enum: ["Pending", "Paid", "Failed", "Refunded"], default: "Pending" },
+  razorpayOrderId:   { type: String, default: null },
+  razorpayPaymentId: { type: String, default: null },
 
   itemTotal:      { type: Number, required: true },
-  discount:       { type: Number, default: 0 },
-couponCode: {
-  type: String,
-  default: null
-},  tax:            { type: Number, default: 0 },
+
+  // ── Legacy display fields ──────────────────────────────────────────
+  // Kept for backward compatibility with existing views/templates that
+  // read order.discount / order.couponCode directly. These are kept in
+  // sync with `coupon` below by the controllers, but are NOT the source
+  // of truth for refund logic — that's always the per-item fields above
+  // and `coupon.totalDiscount`.
+  discount:   { type: Number, default: 0 },
+  couponCode: { type: String, default: null },
+
+  // ===== Structured coupon metadata (source of truth) =====
+  coupon: {
+    code: {
+      type: String,
+      default: null
+    },
+    couponId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Coupon",
+      default: null
+    },
+    discountType: {
+      type: String,
+      enum: ["percentage", "fixed", null],
+      default: null
+    },
+    totalDiscount: {
+      type: Number,
+      default: 0
+    },
+    minimumPurchase: {
+      type: Number,
+      default: 0
+    },
+    isStillEligible: {
+      type: Boolean,
+      default: true
+    }
+  },
+
+  tax:            { type: Number, default: 0 },
   shippingCharge: { type: Number, default: 0 },
   finalTotal:     { type: Number, required: true },
   status: {

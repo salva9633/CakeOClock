@@ -4,7 +4,7 @@ import Wishlist from "../../models/wishlistModel.js";
 import cloudinary from "../../config/cloudinary.js";
 import bcrypt from "bcrypt";
 import { sendVerificationEmail } from "../../utils/email.js";
-
+import { generateReferralCode } from "./userController.js";
 /* ================= PROFILE PAGE ================= */
 const userProfile = async (req, res) => {
   try {
@@ -13,6 +13,21 @@ const userProfile = async (req, res) => {
     const userId = req.session.user.id;
     const user   = await User.findById(userId);
     if (!user) return res.redirect("/login");
+
+    // Backfill: some signup paths (e.g. Google OAuth) may not have
+    // generated a referral code at creation time. Generate one lazily
+    // here so every user ends up with one, regardless of how they signed up.
+    if (!user.referralCode) {
+      let code;
+      let exists = true;
+      // guard against the tiny chance of a collision with an existing code
+      while (exists) {
+        code = generateReferralCode(user.name || "USER");
+        exists = await User.exists({ referralCode: code });
+      }
+      user.referralCode = code;
+      await user.save();
+    }
 
     const [totalOrders, wishlistDoc] = await Promise.all([
       Order.countDocuments({ userId }),
@@ -49,8 +64,15 @@ const editProfilePost = async (req, res) => {
     const user = await User.findById(req.session.user.id);
     if (!user) return res.redirect("/login");
 
-  
-    user.name = name;
+    const trimmedName = (name || "").trim();
+    if (trimmedName.length < 2 || trimmedName.length > 30) {
+      return res.status(400).render("editProfile", {
+        user,
+        nameError: "Name must be between 2 and 30 characters"
+      });
+    }
+
+    user.name = trimmedName;
     user.phone = phone;
     user.gender = gender;
 
@@ -268,7 +290,12 @@ const addAddress = async (req, res) => {
       address, landmark, city, state, pincode, type
     } = req.body;
 
-    const from = req.query.from; 
+    const from = req.query.from;
+
+    const trimmedName = (name || "").trim();
+    if (!/^[A-Za-z ]{3,30}$/.test(trimmedName)) {
+      return res.redirect("/pageNotFound");
+    }
 
     await User.findByIdAndUpdate(req.session.user.id, {
       $push: {
@@ -329,6 +356,11 @@ const updateAddress = async (req, res) => {
       state,
       pincode,
       type } = req.body;
+
+    const trimmedName = (name || "").trim();
+    if (!/^[A-Za-z ]{3,30}$/.test(trimmedName)) {
+      return res.redirect("/pageNotFound");
+    }
 
     await User.updateOne(
       {

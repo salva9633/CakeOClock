@@ -9,6 +9,7 @@ import Razorpay from "razorpay";
 import crypto from "crypto";
 import WalletTransaction from "../../models/walletModel.js";
 import { deductStockFIFO } from "../../utils/batchService.js";
+import { allocateCouponAcrossItems } from "../../utils/refundHelper.js";
 
 const razorpayInstance = new Razorpay({
   key_id:     process.env.RAZORPAY_KEY_ID,
@@ -18,6 +19,30 @@ const razorpayInstance = new Razorpay({
 const TAX_RATE            = 0;
 const SHIPPING_FREE_ABOVE = 499;
 const SHIPPING_CHARGE     = 49;
+
+/**
+ * Builds the order.coupon metadata sub-object.
+ */
+function buildCouponMeta(couponDoc, totalDiscount) {
+  if (!couponDoc) {
+    return {
+      code: null,
+      couponId: null,
+      discountType: null,
+      totalDiscount: 0,
+      minimumPurchase: 0,
+      isStillEligible: true
+    };
+  }
+  return {
+    code: couponDoc.code,
+    couponId: couponDoc._id,
+    discountType: couponDoc.discountType,
+    totalDiscount,
+    minimumPurchase: couponDoc.minPurchase || 0,
+    isStillEligible: true
+  };
+}
 
 /* ── GET /checkout ─────────────────────────────────────────────────── */
 export const loadCheckout = async (req, res) => {
@@ -430,6 +455,10 @@ if (couponCode) {
       });
     }
 
+    // ── Allocate coupon discount proportionally across items (immutable) ──
+    const allocatedItems = allocateCouponAcrossItems(orderItems, discount);
+    const couponMeta      = buildCouponMeta(couponDoc, discount);
+
     const order = await Order.create({
       userId,
       address: {
@@ -437,12 +466,13 @@ if (couponCode) {
         address: addr.address, landmark: addr.landmark,
         city: addr.city, state: addr.state, pincode: addr.pincode, type: addr.type
       },
-      items:         orderItems,
+      items:         allocatedItems,
       paymentMethod,
       paymentStatus: paymentMethod === "COD" ? "Pending" : "Paid",
       itemTotal,
-      discount,
-      couponCode:    usedCoupon,
+      discount,        // legacy display field, mirrors coupon.totalDiscount
+      couponCode:    usedCoupon, // legacy display field, mirrors coupon.code
+      coupon:        couponMeta,
       tax,
       shippingCharge,
       finalTotal,
@@ -618,6 +648,10 @@ export const verifyRazorpayPayment = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid order amount" });
     }
 
+    // ── Allocate coupon discount proportionally across items (immutable) ──
+    const allocatedItems = allocateCouponAcrossItems(orderItems, discount);
+    const couponMeta      = buildCouponMeta(couponDoc, discount);
+
     const order = await Order.create({
       userId,
       address: {
@@ -625,7 +659,7 @@ export const verifyRazorpayPayment = async (req, res) => {
         address: addr.address, landmark: addr.landmark,
         city: addr.city, state: addr.state, pincode: addr.pincode, type: addr.type
       },
-      items:             orderItems,
+      items:             allocatedItems,
       paymentMethod:     "Razorpay",
       paymentStatus:     "Paid",
       razorpayOrderId:   razorpay_order_id,
@@ -633,6 +667,7 @@ export const verifyRazorpayPayment = async (req, res) => {
       itemTotal,
       discount,
       couponCode:        usedCoupon,
+      coupon:            couponMeta,
       tax,
       shippingCharge,
       finalTotal,
@@ -692,9 +727,11 @@ export const razorpayFailure = async (req, res) => {
     const shippingCharge = itemTotal >= SHIPPING_FREE_ABOVE ? 0 : SHIPPING_CHARGE;
     const tax            = Math.round(itemTotal * TAX_RATE);
 
-    let discount = 0;
+    let discount   = 0;
+    let usedCoupon = null;
+    let couponDoc  = null;
     if (couponCode) {
-      const couponDoc = await Coupon.findOne({
+      couponDoc = await Coupon.findOne({
         code: couponCode.toUpperCase(), isActive: true,
         isDeleted: false, expiryDate: { $gte: new Date() }
       });
@@ -703,10 +740,18 @@ export const razorpayFailure = async (req, res) => {
           ? Math.min((itemTotal * couponDoc.discountValue) / 100, couponDoc.maxDiscount || Infinity)
           : couponDoc.discountValue;
         discount = Math.round(Math.min(discount, itemTotal));
+        usedCoupon = couponDoc.code;
       }
     }
 
     const finalTotal = itemTotal - discount + tax + shippingCharge;
+
+    // ── Allocate coupon discount proportionally across items (immutable) ──
+    // NOTE: previously this endpoint never stored couponCode/coupon on the
+    // failed order at all — that's fixed here too, so a retried payment
+    // (verifyRetryPayment) has correct coupon context.
+    const allocatedItems = allocateCouponAcrossItems(orderItems, discount);
+    const couponMeta      = buildCouponMeta(couponDoc, discount);
 
     await Order.create({
       userId,
@@ -715,12 +760,13 @@ export const razorpayFailure = async (req, res) => {
         address: addr.address, landmark: addr.landmark,
         city: addr.city, state: addr.state, pincode: addr.pincode, type: addr.type
       },
-      items:             orderItems,
+      items:             allocatedItems,
       paymentMethod:     "Razorpay",
       paymentStatus:     "Failed",       // ← key field
       razorpayOrderId:   razorpay_order_id || "",
       razorpayPaymentId: razorpay_payment_id || "",
-      itemTotal, discount, tax, shippingCharge, finalTotal,
+      itemTotal, discount, couponCode: usedCoupon, coupon: couponMeta,
+      tax, shippingCharge, finalTotal,
       status: "Pending"
     });
 
