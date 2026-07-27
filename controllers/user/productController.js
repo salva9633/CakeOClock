@@ -5,12 +5,34 @@ import Review   from "../../models/reviewModel.js";
 import Offer    from "../../models/offerModel.js";
 import { getOrderStatus } from "./orderController.js";
 
+const validateLimit = (limit, layout) => {
+  const n = Number(limit);
+  if (!n || n <= 0) return 9; // default fallback (3x3)
+
+  if (layout === "4k") {
+    // must be multiple of 7
+    return n % 9=== 0 ? n : Math.round(n / 9) * 9 || 18;
+  }
+
+  if (layout === "laptop") {
+    // must be multiple of 3
+    return n % 3 === 0 ? n : Math.round(n / 3) * 3 || 9;
+  }
+
+  if (layout === "laptop-lg") {
+    // fixed 10 for large laptop/desktop — no divisibility constraint
+    return n === 10 ? n : 10;
+  }
+
+  // mobile/tablet: must be even
+  return n % 2 === 0 ? n : n - 1 || 8;
+};
 const loadProductsPage = async (req, res) => {
   try {
-    const { search, category, brand, price, sort, page = 1 } = req.query;
- 
-    const limit = 8;
-    const skip  = (page - 1) * limit;
+  const { search, category, brand, price, sort, page = 1, limit: reqLimit, layout } = req.query;
+
+const limit = validateLimit(reqLimit, layout);
+const skip  = (page - 1) * limit;
  
     // ── 1. ACTIVE CATEGORIES ──────────────────────────────
     const activeCategories  = await Category.find({ isActive: true }).lean();
@@ -193,18 +215,20 @@ return {
     const brands = await Product.distinct("brand", { isListed: true });
  
     return res.render("products", {
-      products:     paginatedProducts,
-      categories:   activeCategories,
-      brands,
-      currentPage:  Number(page),
-      totalPages,
-      totalProducts,
-      search:       search   || "",
-      sort:         sort     || "",
-      category:     category || "",
-      price:        price    || "",
-      brand:        brand    || "",
-    });
+  products:     paginatedProducts,
+  categories:   activeCategories,
+  brands,
+  currentPage:  Number(page),
+  totalPages,
+  totalProducts,
+  search:       search   || "",
+  sort:         sort     || "",
+  category:     category || "",
+  price:        price    || "",
+  brand:        brand    || "",
+  limit,
+  layout:       layout || "",
+});
  
   } catch (error) {
     console.error("loadProductsPage error:", error);

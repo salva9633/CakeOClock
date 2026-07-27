@@ -1,20 +1,207 @@
 <!-- Navbar -->
+
+<style>
+.search-row-wrap { width: 400px; max-width: 100%; }
+.search-form-wrap { flex: 1 1 auto; }
+
+/* Hamburger toggle — hidden on desktop */
+.mobile-menu-toggle {
+  display: none;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  background: rgba(232,160,160,0.18);
+  border: 1.5px solid rgba(139,58,82,0.2);
+  border-radius: 50%;
+  color: #8B3A52;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
+}
+.mobile-menu-toggle:focus { outline: none; box-shadow: none; }
+
+/* ══════════════ NEW: mobile profile avatar (hidden on desktop) ══════════════ */
+.user-avatar-mobile {
+  display: none;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: rgba(232,160,160,0.25);
+  color: #8B3A52;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: .82rem;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.user-avatar-mobile img { width: 100%; height: 100%; object-fit: cover; }
+
+@media (max-width: 991.98px) {
+  nav .container-fluid { flex-wrap: wrap; row-gap: 10px; padding-left: 24px; padding-right: 24px; }
+
+  /* Shrink logo so logo + icons fit on one row down to 320px */
+  .navbar-brand img { height: 48px; }
+
+  .order-lg-2 { gap: 10px !important; }
+  .order-lg-2 .header-icon i.fa-heart { font-size: .95rem !important; }
+  .order-lg-2 .header-icon svg { width: 21px !important; height: 21px !important; }
+
+  /* Swap name+chevron for a compact circular avatar on mobile */
+  .user-name-desktop,
+  .user-caret-desktop { display: none !important; }
+  .user-avatar-mobile { display: inline-flex !important; }
+
+  /* Row 2: search bar + hamburger, side by side, full width */
+  .search-row-wrap {
+    order: 3;
+    width: 100%;
+    max-width: 100%;
+    margin: 4px 0 0 !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .mobile-menu-toggle { display: inline-flex; }
+}
+
+@media (max-width: 575.98px) {
+  nav .container-fluid { padding-left: 16px; padding-right: 16px; }
+  .navbar-brand img { height: 40px; }
+  .search-form-wrap input.form-control { font-size: .85rem; padding-right: 70px; }
+  .order-lg-2 { gap: 8px !important; }
+}
+
+.secondary-nav-wrap { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 0; }
+.secondary-nav-wrap a { margin: 4px 12px !important; }
+
+/* On mobile the secondary nav becomes a dropdown panel toggled by the hamburger */
+@media (max-width: 991.98px) {
+  .secondary-nav-wrap {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background: #fff;
+    border-top: 1px solid rgba(139,58,82,0.12);
+    padding: 14px 16px;
+  }
+  .secondary-nav-wrap.show {
+    display: flex;
+  }
+  .secondary-nav-wrap a {
+    margin: 8px 0 !important;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .secondary-nav-wrap a { margin: 4px 8px !important; font-size: .75rem !important; }
+  .secondary-nav-wrap.show a { margin: 8px 0 !important; }
+}
+</style>
+
 <nav class="navbar navbar-expand-lg navbar-light py-2">
-    
+
     <div class="container-fluid px-5">
 
 <a class="navbar-brand" href="/" style="display:inline-flex; align-items:center;">
-<img 
+<img
     src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1780840131/WhatsApp_Image_2026-06-07_at_4.24.57_PM-removebg-preview_cmrltl.png"
     alt="Cake O Clock"
-    style="height:60px; width:auto; object-fit:contain; 
+    style="height:60px; width:auto; object-fit:contain;
            mix-blend-mode:multiply;
            filter: contrast(1.1);">
 </a>
-        <!-- Search Bar -->
-       <form class="d-flex mx-auto" action="/products" method="GET" 
-  style="width: 400px; position: relative;" id="searchForm">
-  
+
+        <!-- Icons (shown first in row 1 on mobile, right side on desktop via flex order) -->
+        <div class="d-flex align-items-center gap-4 order-lg-2">
+
+<!-- ❤ Wishlist Icon -->
+<a href="/wishlist" class="text-reset header-icon" title="My Wishlist"
+   style="position:relative; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; text-decoration:none;">
+  <i class="fas fa-heart fa-lg" style="color:#8B3A52;"></i>
+  <% const _wc2 = locals.wishlistCount || 0; %>
+<span id="wishlist-count" style="
+    position:absolute; top:-8px; right:-8px;
+    background:#8B3A52; color:#fff;
+    border-radius:50%; width:18px; height:18px;
+    font-size:.62rem; font-weight:700;
+    display:<%= _wc2 > 0 ? 'flex' : 'none' %>; align-items:center; justify-content:center;
+    line-height:1;"><%= _wc2 > 0 ? _wc2 : '' %></span>
+</a>
+
+           <!-- 🛒 Cart Icon -->
+<a href="/cart" class="text-reset header-icon" title="My Cart"
+   style="position:relative; display:inline-flex;">
+  <svg width="25" height="25" viewBox="0 0 24 24" fill="none"
+       stroke="#8B3A52" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="9" cy="21" r="1"/>
+    <circle cx="20" cy="21" r="1"/>
+    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+  </svg>
+ <% const _cc2 = locals.cartCount || 0; %>
+<span id="cart-count" style="
+    position:absolute; top:-8px; right:-8px;
+    background:#8B3A52; color:#fff;
+    border-radius:50%; width:18px; height:18px;
+    font-size:.62rem; font-weight:700;
+    display:<%= _cc2 > 0 ? 'flex' : 'none' %>; align-items:center; justify-content:center;
+    line-height:1;"><%= _cc2 > 0 ? _cc2 : '' %></span>
+</a>
+
+            <!-- User Dropdown / Auth Links -->
+            <% if (locals.user) { %>
+                <div class="dropdown" id="userDd" style="position:relative;">
+                    <a class="nav-link fw-bold header-action"
+                       href="#"
+                       role="button"
+                       id="userDdBtn"
+                       style="color:#AF5454; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+                        <!-- NEW: mobile-only circular avatar -->
+                        <span class="user-avatar-mobile">
+                          <% if (user.authType === "google" && user.googleImage) { %>
+            <img src="<%= user.googleImage %>" alt="Profile">
+          <% } else if (user.profileImage) { %>
+            <img src="<%= user.profileImage %>" alt="Profile">
+          <% } else { %>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRa4dLHtaXEf7QlVZYYQSnAbAi_8RuuLEzps2qyfORSMg&s" alt="Default">
+          <% } %>
+                          
+                        </span>
+                        <span class="user-name-desktop"><%= locals.user.name %></span>
+                        <i class="fas fa-chevron-down user-caret-desktop" id="userDdCaret" style="font-size:.65rem; transition:transform .2s;"></i>
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end custom-dropdown" id="userDdMenu"
+                        style="display:none; position:absolute; top:calc(100% + 8px); right:0; z-index:9999;">
+                        <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/logout" style="color:#c0392b;">Logout</a></li>
+                    </ul>
+                </div>
+
+          <% } else { %>
+                <!-- Guest Links -->
+                <a href="/signUp" class="text-reset header-action" style="text-decoration:none;">
+                    <span class="small fw-bold">Sign Up</span>
+                </a>
+                <a href="/login" class="text-reset header-action" style="text-decoration:none;">
+                    <span class="small fw-bold">Log In</span>
+                </a>
+            <% } %>
+
+        </div>
+
+        
+
+        <!-- Search Bar (row 2 on mobile, own full-width line) -->
+       <div class="d-flex align-items-center mx-auto search-row-wrap order-lg-1">
+       <form class="d-flex search-form-wrap" action="/products" method="GET"
+  style="position: relative;" id="searchForm">
+
   <input class="form-control rounded-pill px-4 py-2"
     type="text"
     name="search"
@@ -22,14 +209,14 @@
     placeholder="Search cakes..."
     autocomplete="off"
     value="<%= typeof searchQuery !== 'undefined' ? searchQuery : (new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('search') || '') %>"
-    style="color:#8B3A52; background-color: rgba(232,160,160,0.18); 
+    style="color:#8B3A52; background-color: rgba(232,160,160,0.18);
            border: 1.5px solid rgba(139,58,82,0.2); outline: none;
            padding-right: 80px;">
 
   <!-- Clear button -->
   <button type="button" id="clearBtn"
-    style="display:none; position:absolute; right:44px; top:50%; 
-           transform:translateY(-50%); background:none; border:none; 
+    style="display:none; position:absolute; right:44px; top:50%;
+           transform:translateY(-50%); background:none; border:none;
            color:#8B3A52; font-size:1rem; cursor:pointer; padding:0 6px;">
     <i class="fas fa-times"></i>
   </button>
@@ -46,6 +233,16 @@
   <input type="hidden" name="price"    id="hdr-price">
   <input type="hidden" name="brand"    id="hdr-brand">
 </form>
+
+
+<!-- ☰ Mobile menu toggle — now sits in row 1, next to icons -->
+        <button type="button" id="mobileMenuToggle" class="mobile-menu-toggle" aria-label="Menu" aria-expanded="false">
+          <i class="fas fa-bars"></i>
+        </button>
+
+       </div>
+
+    </div> <!-- container-fluid -->
 
 <script>
 (function () {
@@ -99,76 +296,6 @@
 })();
 </script>
 
-        <!-- Icons -->
-        <div class="d-flex align-items-center gap-4">
-
-<!-- ❤ Wishlist Icon -->
-<a href="/wishlist" class="text-reset header-icon" title="My Wishlist"
-   style="position:relative; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; text-decoration:none;">
-  <i class="fas fa-heart fa-lg" style="color:#8B3A52;"></i>
-  <% const _wc2 = locals.wishlistCount || 0; %>
-<span id="wishlist-count" style="
-    position:absolute; top:-8px; right:-8px;
-    background:#8B3A52; color:#fff;
-    border-radius:50%; width:18px; height:18px;
-    font-size:.62rem; font-weight:700;
-    display:<%= _wc2 > 0 ? 'flex' : 'none' %>; align-items:center; justify-content:center;
-    line-height:1;"><%= _wc2 > 0 ? _wc2 : '' %></span>
-</a>
-
-           <!-- 🛒 Cart Icon -->
-<a href="/cart" class="text-reset header-icon" title="My Cart" 
-   style="position:relative; display:inline-flex;">
-  <svg width="25" height="25" viewBox="0 0 24 24" fill="none" 
-       stroke="#8B3A52" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="9" cy="21" r="1"/>
-    <circle cx="20" cy="21" r="1"/>
-    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-  </svg>
- <% const _cc2 = locals.cartCount || 0; %>
-<span id="cart-count" style="
-    position:absolute; top:-8px; right:-8px;
-    background:#8B3A52; color:#fff;
-    border-radius:50%; width:18px; height:18px;
-    font-size:.62rem; font-weight:700;
-    display:<%= _cc2 > 0 ? 'flex' : 'none' %>; align-items:center; justify-content:center;
-    line-height:1;"><%= _cc2 > 0 ? _cc2 : '' %></span>
-</a>
-
-            <!-- User Dropdown / Auth Links -->
-            <% if (locals.user) { %>
-                <div class="dropdown" id="userDd" style="position:relative;">
-                    <a class="nav-link fw-bold header-action"
-                       href="#"
-                       role="button"
-                       id="userDdBtn"
-                       style="color:#AF5454; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
-                        <%= locals.user.name %>
-                        <i class="fas fa-chevron-down" id="userDdCaret" style="font-size:.65rem; transition:transform .2s;"></i>
-                    </a>
-
-                    <ul class="dropdown-menu dropdown-menu-end custom-dropdown" id="userDdMenu"
-                        style="display:none; position:absolute; top:calc(100% + 8px); right:0; z-index:9999;">
-                        <li><a class="dropdown-item" href="/profile">Profile</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/logout" style="color:#c0392b;">Logout</a></li>
-                    </ul>
-                </div>
-
-          <% } else { %>
-                <!-- Guest Links -->
-                <a href="/signUp" class="text-reset header-action" style="text-decoration:none;">
-                    <span class="small fw-bold">Sign Up</span>
-                </a>
-                <a href="/login" class="text-reset header-action" style="text-decoration:none;">
-                    <span class="small fw-bold">Log In</span>
-                </a>
-            <% } %>
-
-        </div>
-
-    </div> <!-- container-fluid -->
-
     <!-- ✅ User dropdown toggle — plain JS, no Bootstrap dependency -->
     <script>
     (function () {
@@ -203,6 +330,51 @@
 
       document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') closeMenu();
+      });
+    })();
+    </script>
+
+    <!-- ☰ Mobile hamburger menu toggle — opens/closes the secondary nav (Home/Shop/About/Contact/Support) -->
+    <script>
+    (function () {
+      var toggleBtn = document.getElementById('mobileMenuToggle');
+      var secNav    = document.querySelector('.secondary-nav-wrap');
+      if (!toggleBtn || !secNav) return;
+
+      var icon = toggleBtn.querySelector('i');
+
+      function closeMenu() {
+        secNav.classList.remove('show');
+        toggleBtn.setAttribute('aria-expanded', 'false');
+        if (icon) { icon.classList.remove('fa-times'); icon.classList.add('fa-bars'); }
+      }
+      function openMenu() {
+        secNav.classList.add('show');
+        toggleBtn.setAttribute('aria-expanded', 'true');
+        if (icon) { icon.classList.remove('fa-bars'); icon.classList.add('fa-times'); }
+      }
+
+      toggleBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        secNav.classList.contains('show') ? closeMenu() : openMenu();
+      });
+
+      // Close after tapping a link inside the menu
+      secNav.querySelectorAll('a').forEach(function (a) {
+        a.addEventListener('click', closeMenu);
+      });
+
+      // Close when tapping outside
+      document.addEventListener('click', function (e) {
+        if (!secNav.contains(e.target) && e.target !== toggleBtn && !toggleBtn.contains(e.target)) {
+          closeMenu();
+        }
+      });
+
+      // Reset state if resized back to desktop
+      window.addEventListener('resize', function () {
+        if (window.innerWidth > 991.98) closeMenu();
       });
     })();
     </script>
@@ -249,9 +421,51 @@
 </script>
 
 </nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var toggleBtn = document.getElementById('mobileMenuToggle');
+  var secNav    = document.querySelector('.secondary-nav-wrap');
+  if (!toggleBtn || !secNav) return;
+
+  var icon = toggleBtn.querySelector('i');
+
+  function closeMenu() {
+    secNav.classList.remove('show');
+    toggleBtn.setAttribute('aria-expanded', 'false');
+    if (icon) { icon.classList.remove('fa-times'); icon.classList.add('fa-bars'); }
+  }
+  function openMenu() {
+    secNav.classList.add('show');
+    toggleBtn.setAttribute('aria-expanded', 'true');
+    if (icon) { icon.classList.remove('fa-bars'); icon.classList.add('fa-times'); }
+  }
+
+  toggleBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    secNav.classList.contains('show') ? closeMenu() : openMenu();
+  });
+
+  secNav.querySelectorAll('a').forEach(function (a) {
+    a.addEventListener('click', closeMenu);
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!secNav.contains(e.target) && e.target !== toggleBtn && !toggleBtn.contains(e.target)) {
+      closeMenu();
+    }
+  });
+
+  window.addEventListener('resize', function () {
+    if (window.innerWidth > 991.98) closeMenu();
+  });
+});
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<!-- ── Secondary Nav ── -->
-<div style="background:#fff; border-bottom: 1px solid rgba(139,58,82,0.12); text-align:center; padding: 10px 0;">
+<!-- ── Secondary Nav (becomes the hamburger dropdown on mobile) ── -->
+<div class="secondary-nav-wrap" style="background:#fff; border-bottom: 1px solid rgba(139,58,82,0.12); text-align:center; padding: 10px 16px;">
   <a href="/" style="margin: 0 20px; font-size:.85rem; font-weight:600; letter-spacing:.08em; color:#5a2d3a; text-decoration:none;">HOME</a>
   <a href="/products" style="margin: 0 20px; font-size:.85rem; font-weight:600; letter-spacing:.08em; color:#5a2d3a; text-decoration:none;">SHOP</a>
   <a href="/about" style="margin: 0 20px; font-size:.85rem; font-weight:600; letter-spacing:.08em; color:#5a2d3a; text-decoration:none;">ABOUT US</a>

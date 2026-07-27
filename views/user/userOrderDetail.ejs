@@ -132,6 +132,15 @@
 
       .strike { text-decoration: line-through; color: #bbb; font-size: .8rem; }
 
+      /* ── NEW: per-item effective-paid / coupon-share / refund line ── */
+      .item-money-line {
+        margin-top: 6px; font-size: .78rem; color: var(--muted);
+        display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      }
+      .item-money-line .eff-paid { color: var(--text); font-weight: 700; }
+      .item-money-line .coupon-share { color: #1a7a3a; font-weight: 600; }
+      .item-money-line .refund-amt { color: #721c24; font-weight: 600; }
+
       #live-toast {
         position: fixed; top: 22px; right: 22px;
         background: var(--rose-dk); color: #fff;
@@ -159,8 +168,97 @@
       .flex-grow-1 { flex: 1; min-width: 0; }
       .item-info-block { flex: 1; min-width: 0; }
 
-      @media (max-width: 800px) {
+    /* ══════════════════════════════════════════
+         RESPONSIVE — mobile / tablet / laptop / 4K
+         ══════════════════════════════════════════ */
+
+      /* ── Tablet & below (≤ 991px): stack the two columns ── */
+      @media (max-width: 991px) {
         .detail-grid { grid-template-columns: 1fr; }
+        .section-card { padding: 18px; }
+        .order-hero { padding: 18px 20px; }
+      }
+
+      /* ── Mobile (≤ 767px) ── */
+      @media (max-width: 767px) {
+        .breadbar { font-size: .78rem; margin-bottom: 14px; }
+
+        .order-hero {
+          padding: 16px 16px;
+          gap: 12px;
+        }
+        .order-hero-id { font-size: 1.1rem; }
+        .order-hero-meta { font-size: .76rem; }
+        #header-invoice-wrap { width: 100%; }
+        #header-invoice-wrap .btn-rose { width: 100%; justify-content: center; }
+
+        .status-banner { padding: 11px 14px; font-size: .82rem; }
+
+        .section-card { padding: 15px; border-radius: 12px; margin-bottom: 14px; }
+        .section-title { font-size: .76rem; margin-bottom: 12px; }
+
+        /* Item row: stack image+info above actions instead of side-by-side */
+        .item-row {
+          flex-wrap: wrap;
+          padding: 12px 0;
+        }
+        .item-img { width: 56px; height: 56px; }
+        .item-info-block { flex-basis: calc(100% - 70px); }
+        .item-actions {
+          flex-direction: row;
+          justify-content: flex-start;
+          align-items: center;
+          min-width: 0;
+          width: 100%;
+          margin-top: 10px;
+          padding-left: 70px;
+        }
+
+        .item-money-line { font-size: .74rem; }
+
+        .price-row { font-size: .85rem; }
+        .price-row.total { font-size: .98rem; }
+
+        .addr-box { padding: 12px 14px; font-size: .84rem; }
+
+        .btn-action { font-size: .78rem; padding: 9px 12px; }
+        .btn-invoice { font-size: .84rem; padding: 10px 14px; }
+
+        #live-toast {
+          left: 14px; right: 14px; top: 14px;
+          padding: 11px 16px; font-size: .8rem;
+          text-align: center;
+        }
+      }
+
+      /* ── Small mobile (≤ 420px) ── */
+      @media (max-width: 420px) {
+        .order-hero-id { font-size: 1rem; }
+        .status-badge { font-size: .68rem; padding: 3px 10px; }
+        .item-info-block .fw-bold { font-size: .88rem; }
+        .item-actions { padding-left: 0; flex-wrap: wrap; }
+        .section-title svg { width: 13px; height: 13px; }
+      }
+
+      /* ── Large laptop / desktop (≥ 1280px) ── */
+      @media (min-width: 1280px) {
+        .page-wrap { max-width: 1300px; margin: 0 auto; }
+        .section-card { padding: 26px; }
+        .order-hero { padding: 26px 30px; }
+      }
+
+      /* ── 4K and ultra-wide (≥ 2560px) ── */
+      @media (min-width: 2560px) {
+        .page-wrap { max-width: 1700px; }
+        .order-hero-id { font-size: 1.6rem; }
+        .order-hero-meta { font-size: .95rem; }
+        .section-card { padding: 34px; border-radius: 20px; }
+        .section-title { font-size: .95rem; }
+        .item-img { width: 84px; height: 84px; }
+        .item-info-block .fw-bold { font-size: 1.1rem; }
+        .price-row { font-size: 1.02rem; }
+        .price-row.total { font-size: 1.25rem; }
+        .btn-invoice, .btn-rose { font-size: 1rem; padding: 13px 20px; }
       }
     </style>
 
@@ -228,6 +326,18 @@
           </div>
 
           <% order.items.forEach(item => { %>
+          <%
+            // ── Effective amount actually paid for this item ──
+            // effectivePaidAmount is set once at checkout (subtotal minus
+            // this item's share of any coupon). Legacy orders placed before
+            // this field existed fall back to the plain subtotal, which is
+            // correct for them since they never had per-item allocation.
+            const itemSubtotal = item.price * item.quantity;
+            const effPaid = (item.effectivePaidAmount && item.effectivePaidAmount > 0)
+              ? item.effectivePaidAmount
+              : itemSubtotal;
+            const couponShare = item.allocatedCouponDiscount || 0;
+          %>
           <div class="item-row">
             <img src="<%= item.productImage || 'https://placehold.co/68x68/fde2d9/8B4A5A?text=🎂' %>"
                  class="item-img" alt="<%= item.productName %>">
@@ -243,9 +353,23 @@
                 <% } %>
                 <span class="fw-bold" style="color:var(--text)">₹<%= item.price %></span>
                 <span style="font-size:.8rem;color:var(--muted)">
-                  Subtotal: <strong style="color:var(--rose)">₹<%= (item.price * item.quantity).toLocaleString('en-IN') %></strong>
+                  Subtotal: <strong style="color:var(--rose)">₹<%= itemSubtotal.toLocaleString('en-IN') %></strong>
                 </span>
               </div>
+
+              <!-- ── NEW: effective paid / coupon share / refund ── -->
+              <div class="item-money-line">
+                <% if (couponShare > 0) { %>
+                  <span>Coupon share: <span class="coupon-share">−₹<%= couponShare.toLocaleString('en-IN') %></span></span>
+                  <span>·</span>
+                <% } %>
+                <span>You paid: <span class="eff-paid">₹<%= effPaid.toLocaleString('en-IN') %></span></span>
+                <% if (item.isRefunded && item.refundAmount > 0) { %>
+                  <span>·</span>
+                  <span>Refunded: <span class="refund-amt">₹<%= item.refundAmount.toLocaleString('en-IN') %></span></span>
+                <% } %>
+              </div>
+
               <div style="margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
 
                 

@@ -164,7 +164,9 @@ export const updateOrderStatus = async (req, res) => {
     }
 
     if (isCancelling) {
-      totalRefund += (order.tax || 0) + (order.shippingCharge || 0);
+      // Delivery fee is non-refundable — the delivery cost was already
+      // incurred by the business. Only item value + tax are refunded.
+      totalRefund += (order.tax || 0);
       totalRefund = Math.round(totalRefund * 100) / 100;
 
       order.cancelledAt    = new Date();
@@ -243,7 +245,11 @@ export const updateItemStatus = async (req, res) => {
 
       const activeItems  = order.items.filter(i => i.status !== 'Cancelled');
       const newItemTotal = activeItems.reduce((s, i) => s + i.price * i.quantity, 0);
-      const newShipping  = newItemTotal === 0 ? 0 : newItemTotal >= 499 ? 0 : 49;
+      // Delivery fee is frozen at whatever was actually charged at checkout
+      // — never recalculated upward on a partial cancellation, even if the
+      // remaining total drops below the free-delivery threshold. Doing so
+      // would make "Total Paid" appear to increase with no matching wallet
+      // transaction, which is confusing on both the user and admin views.
 
       let newDiscount;
       if (order.coupon && order.coupon.code) {
@@ -255,10 +261,10 @@ export const updateItemStatus = async (req, res) => {
         newDiscount = order.discount || 0;
       }
 
-      order.itemTotal      = newItemTotal;
-      order.discount       = newDiscount;
-      order.shippingCharge = newShipping;
-      order.finalTotal     = Math.max(0, newItemTotal - newDiscount + (order.tax || 0) + newShipping);
+      order.itemTotal  = newItemTotal;
+      order.discount   = newDiscount;
+      // order.shippingCharge intentionally left untouched — see note above.
+      order.finalTotal = Math.max(0, newItemTotal - newDiscount + (order.tax || 0) + order.shippingCharge);
     }
 
     const allCancelled = order.items.every(i => i.status === 'Cancelled');
@@ -387,6 +393,9 @@ export const approveReturnRequest = async (req, res) => {
     const newItemTotal = activeItems.reduce(
       (sum, i) => sum + i.price * i.quantity, 0
     );
+    // Delivery fee is frozen at whatever was actually charged at checkout —
+    // never recalculated upward on a return, for the same reason as the
+    // cancellation paths above (see recalculateOrderTotalsAfterItemChange).
 
     let newDiscount;
     if (order.coupon && order.coupon.code) {
@@ -411,7 +420,8 @@ export const approveReturnRequest = async (req, res) => {
 
     order.itemTotal  = newItemTotal;
     order.discount   = newDiscount;
-    order.finalTotal = Math.max(0, newItemTotal - newDiscount + (order.tax || 0) + (order.shippingCharge || 0));
+    // order.shippingCharge intentionally left untouched — see note above.
+    order.finalTotal = Math.max(0, newItemTotal - newDiscount + (order.tax || 0) + order.shippingCharge);
     // ──────────────────────────────────────────
 
     // credit wallet

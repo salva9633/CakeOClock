@@ -157,6 +157,26 @@
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25) 30%, rgba(255,255,255,0.35) 50%, rgba(255,255,255,0.25) 70%, transparent);
 }
+@media (max-width: 991.98px) {
+  footer div[style*="grid-template-columns:1.6fr 1fr 1fr 1fr"] {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 32px !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  footer { padding: 50px 20px 0 !important; }
+  footer div[style*="grid-template-columns:1.6fr 1fr 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+    gap: 30px !important;
+  }
+  .ft-cake-float { display: none; }
+  /* NEW */
+  footer div[style*="justify-content:space-between"] {
+    flex-direction: column !important;
+    text-align: center !important;
+  }
+}
 
 /* ── Floating cake icon ── */
 .ft-cake-float {

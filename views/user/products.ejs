@@ -681,9 +681,9 @@
     <div class="topbar">
       <div class="topbar-left">
         <%
-          const start = (currentPage - 1) * 8 + 1;
-          const end   = start + products.length - 1;
-        %>
+  const start = (currentPage - 1) * limit + 1;
+  const end   = start + products.length - 1;
+%>
         <span class="result-label">
           Showing <strong><%= start %>–<%= end %></strong> of <strong><%= totalProducts %></strong> results
         </span>
@@ -838,24 +838,27 @@
       <ul class="pagination justify-content-center gap-1">
         <% if (currentPage > 1) { %>
           <li class="page-item">
-            <a class="page-link"
-              href="?page=<%= currentPage - 1 %>&search=<%= search||'' %>&sort=<%= sort||'' %>&category=<%= category||'' %>&price=<%= price||'' %>&brand=<%= brand||'' %>">
+
+           <a class="page-link"
+  href="?page=<%= currentPage - 1 %>&search=<%= search||'' %>&sort=<%= sort||'' %>&category=<%= category||'' %>&price=<%= price||'' %>&brand=<%= brand||'' %>&limit=<%= limit %>&layout=<%= layout||'' %>">
               <i class="fas fa-chevron-left" style="font-size:.7rem"></i>
             </a>
           </li>
         <% } %>
         <% for (let i = 1; i <= totalPages; i++) { %>
           <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-            <a class="page-link"
-              href="?page=<%= i %>&search=<%= search||'' %>&sort=<%= sort||'' %>&category=<%= category||'' %>&price=<%= price||'' %>&brand=<%= brand||'' %>">
+
+<a class="page-link"
+  href="?page=<%= i %>&search=<%= search||'' %>&sort=<%= sort||'' %>&category=<%= category||'' %>&price=<%= price||'' %>&brand=<%= brand||'' %>&limit=<%= limit %>&layout=<%= layout||'' %>">              
               <%= i %>
             </a>
           </li>
         <% } %>
         <% if (currentPage < totalPages) { %>
           <li class="page-item">
-            <a class="page-link"
-              href="?page=<%= currentPage + 1 %>&search=<%= search||'' %>&sort=<%= sort||'' %>&category=<%= category||'' %>&price=<%= price||'' %>&brand=<%= brand||'' %>">
+
+<a class="page-link"
+  href="?page=<%= currentPage + 1 %>&search=<%= search||'' %>&sort=<%= sort||'' %>&category=<%= category||'' %>&price=<%= price||'' %>&brand=<%= brand||'' %>&limit=<%= limit %>&layout=<%= layout||'' %>">              
               <i class="fas fa-chevron-right" style="font-size:.7rem"></i>
             </a>
           </li>
@@ -874,6 +877,8 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+
+  
 /* ── FILTER / SORT ── */
 /* ── FILTER / SORT ── */
 function applyAll() {
@@ -884,6 +889,7 @@ function applyAll() {
   const category = document.querySelector('input[name="category"]:checked')?.value || '';
   const price    = document.querySelector('input[name="price"]:checked')?.value     || '';
   const brand    = document.querySelector('input[name="brand"]:checked')?.value     || '';
+  const { layout, limit } = getLayoutConfig();
 
   if (search)   params.set('search',   search);
   if (sort)     params.set('sort',     sort);
@@ -891,9 +897,12 @@ function applyAll() {
   if (price)    params.set('price',    price);
   if (brand)    params.set('brand',    brand);
   params.set('page', '1');
+  params.set('limit', limit);
+  params.set('layout', layout);
 
   window.location.href = '/products?' + params.toString();
 }
+
 
 function clearFilters() {
   window.location.href = '/products';
@@ -1177,6 +1186,45 @@ function toggleMobileFilter() {
   handleResize();
   window.addEventListener('resize', handleResize);
 })();
+</script>
+<script>
+/* ── RESPONSIVE PRODUCT LIMIT ── */
+function getLayoutConfig() {
+  const w = window.innerWidth;
+  if (w >= 2560) return { layout: '4k',        limit: 18}; // multiple of 7
+  if (w >= 1280) return { layout: 'laptop-lg', limit: 10 }; // large laptop/desktop
+  if (w >= 1024) return { layout: 'laptop',    limit: 9  }; // multiple of 3
+  if (w >= 768)  return { layout: 'tablet',    limit: 8  }; // even
+  return             { layout: 'mobile',    limit: 4  };    // even
+}
+
+(function syncLimitToScreenSize() {
+  const params        = new URLSearchParams(window.location.search);
+  const urlLayout     = params.get('layout');
+  const { layout, limit } = getLayoutConfig();
+
+  // Only redirect if the layout bucket actually changed
+  // (prevents redirect loops and unnecessary reloads on same breakpoint)
+  if (urlLayout !== layout) {
+    params.set('layout', layout);
+    params.set('limit', limit);
+    params.set('page', '1');
+    window.location.search = params.toString();
+  }
+})();
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const params    = new URLSearchParams(window.location.search);
+    const urlLayout = params.get('layout');
+    const { layout } = getLayoutConfig();
+    if (urlLayout !== layout) {
+      applyAll(); // re-triggers with new layout + existing filters
+    }
+  }, 400);
+});
 </script>
 
 </body>

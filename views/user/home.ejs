@@ -765,6 +765,27 @@ width: 80px;
   .about-inner { padding: 0 20px; }
   .features-strip { padding: 40px 20px; }
 }
+@media (max-width: 768px) {
+  .categories-grid { gap: 26px; }
+  .cat-ring { width: 110px; height: 110px; }
+  .about-title, .section-title, .gallery-title {
+    font-size: clamp(1.8rem, 6vw, 2.6rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-trust { gap: 18px; margin-top: 32px; }
+  .trust-number { font-size: 1.5rem; }
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .btn-hero-primary, .btn-hero-ghost { justify-content: center; text-align: center; }
+  .about-features { grid-template-columns: 1fr; }
+  .promo-heading { font-size: 1.6rem; }
+  .promo-body { max-width: 100%; }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .marquee-item { font-size: .62rem; padding: 0 18px; }
+  .carousel-control-prev, .carousel-control-next { width: 36px; height: 36px; }
+}
+
 </style>
 
 <body>

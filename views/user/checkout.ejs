@@ -330,12 +330,105 @@
     .empty-addr { text-align: center; padding: 24px; color: var(--muted); font-size: .88rem; }
 
     /* ── Spinner ── */
+/* ── Spinner ── */
     .spinner {
       display: inline-block; width: 13px; height: 13px;
       border: 2px solid rgba(255,255,255,.4); border-top-color: #fff;
       border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; margin-right: 4px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ══════════════════════════════════════════
+       RESPONSIVE — mobile / tablet / laptop / 4K
+       ══════════════════════════════════════════ */
+
+    /* ── Tablet & below (≤ 991px): summary loses sticky, sits after address ── */
+    @media (max-width: 991px) {
+      .summary-card { position: static; top: auto; }
+      .checkout-card, .coupon-card { padding: 22px 20px; }
+      .page-title { font-size: 1.5rem; }
+      .steps-bar { margin-bottom: 24px; }
+    }
+
+    /* ── Tablet (768px – 991px) ── */
+    @media (max-width: 991px) and (min-width: 768px) {
+      .container { max-width: 100%; padding-left: 24px; padding-right: 24px; }
+    }
+
+    /* ── Mobile (≤ 767px) ── */
+    @media (max-width: 767px) {
+      .page-strip { padding: 14px 0 10px; }
+      .container { padding-left: 14px; padding-right: 14px; }
+      .page-title { font-size: 1.3rem; }
+
+      /* Steps bar: shrink dots, tighten line gaps */
+      .step-dot { width: 24px; height: 24px; font-size: .62rem; }
+      .step-line { margin: 0 4px; }
+      .steps-bar { margin-bottom: 20px; }
+
+      /* Cards: less padding on small screens */
+      .checkout-card, .coupon-card, .summary-card {
+        padding: 16px 14px;
+        border-radius: 16px;
+      }
+
+      /* Coupon apply row stacks instead of side-by-side */
+      .coupon-apply-row { flex-direction: column; }
+      .btn-apply { width: 100%; padding: 12px; }
+
+      /* Coupon item: allow wrap, shrink icon */
+      .coupon-item { flex-wrap: wrap; padding: 11px 12px; }
+      .coupon-icon { width: 32px; height: 32px; font-size: .85rem; }
+      .coupon-desc { white-space: normal; }
+
+      /* Address item: reduce left padding since radio is smaller context */
+      .addr-item { padding: 14px 14px 14px 46px; }
+      .addr-radio { left: 14px; width: 18px; height: 18px; }
+      .addr-line { font-size: .78rem; }
+
+      /* Order summary rows: shrink image + text */
+      .item-img { width: 46px; height: 46px; }
+      .item-name { font-size: .82rem; }
+      .item-meta { font-size: .7rem; }
+      .item-price .final { font-size: .82rem; }
+
+      .price-row { font-size: .82rem; }
+      .price-row.total-row .val { font-size: 1.05rem; }
+
+      .btn-place { padding: 13px; font-size: .88rem; }
+    }
+
+    /* ── Small mobile (≤ 420px) ── */
+    @media (max-width: 420px) {
+      .page-title { font-size: 1.15rem; }
+      .step span { font-size: .7rem; }
+      .coupon-card-title, .card-heading h5, .summary-title {
+        font-size: 1.05rem;
+      }
+      .card-heading-icon, .coupon-card-title-icon {
+        width: 30px; height: 30px; font-size: .85rem;
+      }
+      .addr-name { font-size: .86rem; }
+      .btn-add-addr { font-size: .82rem; padding: 11px; }
+    }
+
+    /* ── Large laptop / desktop (≥ 1280px): give summary more breathing room ── */
+    @media (min-width: 1280px) {
+      .container { max-width: 1180px; }
+      .checkout-card, .coupon-card, .summary-card { padding: 30px 32px; }
+    }
+
+    /* ── 4K and ultra-wide (≥ 2560px): cap width, scale typography up ── */
+    @media (min-width: 2560px) {
+      .container { max-width: 1500px; }
+      .page-title { font-size: 2.1rem; }
+      .checkout-card, .coupon-card, .summary-card { padding: 38px 40px; border-radius: 26px; }
+      .card-heading h5, .coupon-card-title, .summary-title { font-size: 1.5rem; }
+      .item-img { width: 66px; height: 66px; }
+      .btn-place { font-size: 1.05rem; padding: 18px; }
+      .price-row { font-size: 1rem; }
+      .price-row.total-row .val { font-size: 1.4rem; }
+    }
   </style>
 </head>
 <body>

@@ -88,6 +88,9 @@
 .item-sub{font-size:10px;color:var(--muted);margin-top:1px}
 .item-cancel-reason{font-size:10px;color:#C03030;margin-top:1px}
 .item-return-reason{font-size:10px;color:#7030C9;margin-top:1px}
+.item-eff-paid{font-size:10px;color:var(--brown);font-weight:600;margin-top:1px}
+.item-coupon-share{font-size:10px;color:#2A7D3A;margin-top:1px}
+.item-refund{font-size:10px;color:#C03030;font-weight:600;margin-top:1px}
 .inv-tbl .qty-cell{text-align:center;color:var(--brown);font-weight:500}
 .inv-tbl .price-cell{text-align:center;color:var(--muted)}
 .inv-tbl .total-cell{text-align:right;font-weight:500;color:var(--brown)}
@@ -272,6 +275,19 @@
               </thead>
               <tbody>
                 <% order.items.forEach(function(item) { %>
+                <%
+                  // ── Effective amount actually paid for this item ──
+                  // effectivePaidAmount is set once at checkout (subtotal
+                  // minus this item's share of any coupon). Legacy orders
+                  // placed before this field existed fall back to the plain
+                  // subtotal, which is correct for them since they never
+                  // had per-item coupon allocation.
+                  var itemSubtotal = item.price * item.quantity;
+                  var effPaid = (item.effectivePaidAmount && item.effectivePaidAmount > 0)
+                    ? item.effectivePaidAmount
+                    : itemSubtotal;
+                  var couponShare = item.allocatedCouponDiscount || 0;
+                %>
                 <tr>
                   <td>
                     <div class="item-cell">
@@ -285,6 +301,13 @@
                         <% if (item.weight) { %>
                           <div class="item-sub"><%= item.weight %>g</div>
                         <% } %>
+                        <% if (couponShare > 0) { %>
+                          <div class="item-coupon-share">Coupon: −₹<%= couponShare.toLocaleString('en-IN') %></div>
+                        <% } %>
+                        <div class="item-eff-paid">Effective paid: ₹<%= effPaid.toLocaleString('en-IN') %></div>
+                        <% if (item.isRefunded && item.refundAmount > 0) { %>
+                          <div class="item-refund">Refunded: ₹<%= item.refundAmount.toLocaleString('en-IN') %></div>
+                        <% } %>
                         <% if (item.cancelReason) { %>
                           <div class="item-cancel-reason">Reason: <%= item.cancelReason %></div>
                         <% } %>
@@ -296,7 +319,7 @@
                   </td>
                   <td class="qty-cell"><%= item.quantity %></td>
                   <td class="price-cell">₹<%= item.price.toLocaleString('en-IN') %></td>
-                  <td class="total-cell">₹<%= (item.price * item.quantity).toLocaleString('en-IN') %></td>
+                  <td class="total-cell">₹<%= itemSubtotal.toLocaleString('en-IN') %></td>
                   <td class="status-cell">
                     <span class="badge b-<%= item.status.replace(' ','-') %> item-status-badge">
                       <%= item.status %>

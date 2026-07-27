@@ -244,6 +244,32 @@
 .dropdown-toggle:focus {
     box-shadow: none !important;
 }
+/* ── Responsive additions ── */
+.hero-title {
+    font-size: clamp(2.5rem, 8vw, 7rem);
+}
+
+.category-item {
+    width: 100px;
+}
+
+.category-img-wrapper {
+    width: 100px;
+    height: 100px;
+}
+
+@media (max-width: 768px) {
+    .navbar-brand img { height: 45px; }
+    .hero-subtitle { font-size: 1rem; letter-spacing: .5px; }
+    .category-item { width: 85px; }
+    .category-img-wrapper { width: 85px; height: 85px; }
+}
+
+@media (max-width: 480px) {
+    .navbar-brand img { height: 38px; }
+    .category-item { width: 70px; }
+    .category-img-wrapper { width: 70px; height: 70px; }
+}
 
     </style>
 

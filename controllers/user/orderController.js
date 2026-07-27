@@ -62,8 +62,14 @@ export const orderDetail = async (req, res) => {
 async function recalculateOrderTotalsAfterItemChange(order) {
   const activeItems  = order.items.filter(i => !["Cancelled", "Returned"].includes(i.status));
   const newItemTotal = activeItems.reduce((s, i) => s + i.price * i.quantity, 0);
-  const newShipping  = newItemTotal === 0 ? 0 : newItemTotal >= 499 ? 0 : 49;
   const newTax       = Math.round(newItemTotal * 0);
+
+  // Delivery fee is frozen at whatever was actually charged at checkout —
+  // it is NEVER recalculated upward after a partial cancellation/return,
+  // even if the remaining total drops below the free-delivery threshold.
+  // Recalculating it up would make "Total Paid" appear to increase with
+  // no matching wallet transaction, which is misleading. It only ever
+  // drops to 0 on a full-order cancellation (handled by the caller).
 
   let newDiscount = 0;
 
@@ -87,9 +93,9 @@ async function recalculateOrderTotalsAfterItemChange(order) {
 
   order.itemTotal      = newItemTotal;
   order.discount       = newDiscount;
-  order.shippingCharge = newShipping;
+  // order.shippingCharge intentionally left untouched — see note above.
   order.tax            = newTax;
-  order.finalTotal     = Math.max(0, newItemTotal - newDiscount + newTax + newShipping);
+  order.finalTotal     = Math.max(0, newItemTotal - newDiscount + newTax + order.shippingCharge);
 }
 
 /* ── POST /orders/:id/cancel ────────────────────────────────────────── */
@@ -125,8 +131,9 @@ export const cancelOrder = async (req, res) => {
       item.status = "Cancelled";
     }
 
-    // Whole-order cancellation also refunds tax + shipping that was charged.
-    totalRefund += (order.tax || 0) + (order.shippingCharge || 0);
+    // Delivery fee is non-refundable — the delivery cost was already
+    // incurred by the business. Only item value + tax are refunded.
+    totalRefund += (order.tax || 0);
     totalRefund = Math.round(totalRefund * 100) / 100;
  
     order.status         = "Cancelled";
