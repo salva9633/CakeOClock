@@ -124,11 +124,11 @@ const editCategory = async (req, res) => {
   try {
     const { name, description, isActive } = req.body;
 
-      const duplicate = await Category.findOne({
-      name: { $regex: `^${name.trim()}$`, $options: "i" },
-      _id: { $ne: req.params.id }
-    });
-
+    const duplicate = await Category.findOne({
+  name: { $regex: `^${name.trim()}$`, $options: "i" },
+  _id: { $ne: req.params.id },
+  isDeleted: { $ne: true }
+});
     if (duplicate) {
       return res.status(409).json({ success: false, message: "Category name already exists" });
     }
