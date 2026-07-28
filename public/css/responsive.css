@@ -82,14 +82,10 @@ html, body { overflow-x: hidden; max-width: 100%; }
 .mob-nav a:hover { background: rgba(175,84,84,.07); color: var(--rose); }
 @media (max-width: 991px) { .mob-menu-btn { display: inline-flex; align-items: center; } }
 
+
 /* ============================================================
    PAGE WRAP — Dashboard / Profile pages
 ============================================================ */
-.page-wrap {
-  display: flex;
-  flex-direction: row;
-  gap: 0;
-}
 @media (max-width: 768px) {
   .page-wrap {
     flex-direction: column;
@@ -105,7 +101,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
     padding: 16px !important;
   }
 }
-
 /* ============================================================
    CARDS / GRIDS — general
 ============================================================ */
@@ -155,13 +150,13 @@ html, body { overflow-x: hidden; max-width: 100%; }
   .hero-subtitle { font-size: .9rem !important; }
   .metrics,
   .cm-stats,
-  .stats { grid-template-columns: repeat(2, 1fr) !important; }
+  .home-stats { grid-template-columns: repeat(2, 1fr) !important; }
 }
 @media (max-width: 480px) {
   .hero-title { font-size: 2.2rem !important; }
   .metrics,
   .cm-stats,
-  .stats { grid-template-columns: 1fr !important; }
+  .home-stats { grid-template-columns: 1fr !important; }
   .category-item { width: 90px !important; }
   .category-img-wrapper { width: 90px !important; height: 90px !important; }
 }
@@ -213,6 +208,9 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
 /* ============================================================
    PROFILE / DASHBOARD PAGES
+   NOTE: .stats-row (profile stat cards) is handled entirely by
+   dashboardStyles.ejs — do not add rules for it here, it will
+   conflict/override those breakpoints.
 ============================================================ */
 @media (max-width: 768px) {
   .profile-grid,
@@ -257,7 +255,11 @@ html, body { overflow-x: hidden; max-width: 100%; }
     grid-template-columns: 1fr !important;
     padding: 28px 20px !important;
   }
-  .stats-row { grid-template-columns: repeat(3, 1fr) !important; }
+  /* Renamed from .stats-row to avoid colliding with the profile
+     page's .stats-row (Total Orders / Wallet / Wishlist cards).
+     If the About page's stats block still uses class="stats-row"
+     in its EJS, rename that markup to class="about-stats-row". */
+  .about-stats-row { grid-template-columns: repeat(3, 1fr) !important; }
   .timeline { flex-direction: column !important; align-items: flex-start !important; }
   .timeline::before { display: none !important; }
   .testimonials { grid-template-columns: 1fr !important; }

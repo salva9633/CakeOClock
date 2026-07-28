@@ -35,7 +35,7 @@
       .page-topbar { margin-bottom: var(--gap-lg); }
 
       .wallet-grid { display: grid; grid-template-columns: 320px 1fr; gap: var(--gap-lg); align-items: start; }
-      .wallet-col { display: flex; flex-direction: column; gap: var(--gap-md); }
+      .wallet-col { display: flex; flex-direction: column; gap: var(--gap-md); min-width: 0; }
 
       /* ── Balance card: calmer, one focal point instead of competing motion ── */
       .wallet-balance-card {
@@ -50,18 +50,20 @@
         font-size: 1.25rem; margin-bottom: 14px; position: relative; z-index: 1;
       }
       .wallet-balance-card .label { font-size:.74rem; opacity:.75; letter-spacing:.07em; text-transform:uppercase; margin-bottom:6px; position:relative; z-index:1; }
-      .wallet-balance-card .amount { font-family: var(--font-display); font-size: 2.2rem; font-weight: 700; line-height: 1; position: relative; z-index: 1; margin-bottom: 4px; }
+      .wallet-balance-card .amount { font-family: var(--font-display); font-size: 2.2rem; font-weight: 700; line-height: 1; position: relative; z-index: 1; margin-bottom: 4px; word-break: break-word; }
       .wallet-balance-card .sub { font-size:.74rem; opacity:.65; position:relative; z-index:1; }
 
-      /* ── Stats: one quiet strip instead of three separate bordered cards ── */
-      .stats-row {
+      /* ── Stats: one quiet strip instead of three separate bordered cards ──
+           NOTE: namespaced as .wallet-stats-row / .wallet-stat-card / .wallet-stat-label
+           so this never collides with dashboardStyles.ejs's .stats-row / .stat-card
+           (used by the Profile page for a very different card design). */
+      .wallet-stats-row {
         display: grid; grid-template-columns: repeat(3,1fr);
-        /* background: var(--cream); border: 1.5px solid var(--border); border-radius: var(--r-lg); */
       }
-      .stat-card { padding: 16px 8px; text-align: center; }
-      .stat-card + .stat-card { border-left: 1.5px solid var(--border); }
-      .stat-card .stat-val { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; color: var(--rose); }
-      .stat-card .stat-label { font-size: .7rem; color: var(--muted); margin-top: 3px; }
+      .wallet-stat-card { padding: 16px 8px; text-align: center; min-width: 0; }
+      .wallet-stat-card + .wallet-stat-card { border-left: 1.5px solid var(--border); }
+      .wallet-stat-card .stat-val { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; color: var(--rose); }
+      .wallet-stat-card .wallet-stat-label { font-size: .7rem; color: var(--muted); margin-top: 3px; }
 
       .side-card {
         background: var(--cream); border: 1.5px solid var(--border); border-radius: var(--r-lg);
@@ -105,7 +107,7 @@
       .transactions-title {
         font-family: var(--font-display); font-size: 1.1rem; color: var(--text);
         margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid var(--border);
-        display: flex; align-items: center; gap: 8px;
+        display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
       }
       .txn-count { font-size: .75rem; color: var(--muted); font-family: var(--font-body); font-weight: 400; margin-left: auto; }
 
@@ -124,14 +126,14 @@
       .txn-icon.credit { background: #e6f4ea; }
       .txn-icon.debit  { background: #fdecea; }
       .txn-info { flex: 1; min-width: 0; }
-      .txn-desc { font-size: .88rem; font-weight: 600; color: var(--text); }
+      .txn-desc { font-size: .88rem; font-weight: 600; color: var(--text); word-break: break-word; }
       .txn-meta { font-size: .74rem; color: var(--muted); margin-top: 3px; }
-      .txn-order { font-size: .71rem; color: var(--rose); margin-top: 3px; }
+      .txn-order { font-size: .71rem; color: var(--rose); margin-top: 3px; word-break: break-word; }
       .txn-amount { text-align: right; flex-shrink: 0; }
-      .txn-amount .val { font-size: 1rem; font-weight: 700; }
+      .txn-amount .val { font-size: 1rem; font-weight: 700; white-space: nowrap; }
       .txn-amount .val.credit { color: #2a8c4a; }
       .txn-amount .val.debit  { color: #c0392b; }
-      .txn-amount .balance { font-size: .71rem; color: var(--muted); margin-top: 3px; }
+      .txn-amount .balance { font-size: .71rem; color: var(--muted); margin-top: 3px; white-space: nowrap; }
       .txn-badge { display: inline-block; font-size: .6rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 2px 7px; border-radius: 5px; margin-top: 5px; }
       .txn-badge.credit { background: #e6f4ea; color: #2a8c4a; }
       .txn-badge.debit  { background: #fdecea; color: #c0392b; }
@@ -155,8 +157,54 @@
       .pg-btn.active { background: linear-gradient(135deg, var(--rose), var(--rose-dk)); border-color: var(--rose); color: #fff; }
       .pg-btn.disabled { opacity: .35; pointer-events: none; }
 
+      /* ══════════════════════════════
+         RESPONSIVE
+      ══════════════════════════════ */
+      @media (max-width: 900px) {
+        .wallet-grid { grid-template-columns: 260px 1fr; gap: var(--gap-md); }
+      }
+
       @media (max-width: 700px) {
         .wallet-grid { grid-template-columns: 1fr; }
+        .transactions-card { padding: 22px 20px; }
+      }
+
+      @media (max-width: 600px) {
+        .transactions-card { padding: 20px 16px; }
+        .txn-item { padding: 14px 4px; gap: 12px; }
+        .side-card { padding: 18px; }
+      }
+
+      @media (max-width: 480px) {
+        .wallet-balance-card { padding: 20px 18px; }
+        .wallet-balance-card .amount { font-size: 1.7rem; }
+        .wallet-icon-wrap { width: 38px; height: 38px; font-size: 1.1rem; margin-bottom: 10px; }
+
+        .wallet-stat-card { padding: 12px 4px; }
+        .wallet-stat-card .stat-val { font-size: 1.1rem; }
+        .wallet-stat-card .wallet-stat-label { font-size: .65rem; }
+
+        .quick-btns { gap: 6px; }
+        .quick-btn { min-width: 0; flex: 1 1 40%; font-size: .75rem; padding: 7px 8px; }
+
+        .side-card { padding: 16px; }
+        .side-card-title { font-size: .84rem; }
+
+        .transactions-title { font-size: 1rem; }
+        .txn-count { margin-left: 0; width: 100%; }
+
+        .txn-item { flex-wrap: wrap; }
+        .txn-info { min-width: 60%; }
+        .txn-amount { margin-left: auto; text-align: right; }
+
+        .pg-btn { min-width: 30px; height: 30px; font-size: .78rem; }
+      }
+
+      @media (max-width: 360px) {
+        .wallet-balance-card .amount { font-size: 1.5rem; }
+        .quick-btn { flex: 1 1 45%; }
+        .txn-icon { width: 36px; height: 36px; font-size: .95rem; }
+        .txn-desc { font-size: .84rem; }
       }
     </style>
 
@@ -182,18 +230,18 @@
           <div class="sub">Cake O'Clock Wallet</div>
         </div>
 
-        <div class="stats-row">
-          <div class="stat-card">
+        <div class="wallet-stats-row">
+          <div class="wallet-stat-card">
             <div class="stat-val"><%= transactions.filter(t => t.type === 'credit').length %></div>
-            <div class="stat-label">Credits</div>
+            <div class="wallet-stat-label">Credits</div>
           </div>
-          <div class="stat-card">
+          <div class="wallet-stat-card">
             <div class="stat-val"><%= transactions.filter(t => t.type === 'debit').length %></div>
-            <div class="stat-label">Debits</div>
+            <div class="wallet-stat-label">Debits</div>
           </div>
-          <div class="stat-card">
+          <div class="wallet-stat-card">
             <div class="stat-val"><%= totalTransactions %></div>
-            <div class="stat-label">Total</div>
+            <div class="wallet-stat-label">Total</div>
           </div>
         </div>
 
