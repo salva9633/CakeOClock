@@ -376,9 +376,13 @@ color: rgba(139,58,82,0.35);
                 <div class="divider-line"></div>
             </div>
 
-            <div class="error-message" id="errorMessage">
-                Invalid credentials. Please try again.
-            </div>
+           <% if (message) { %>
+  <div class="error-message show" id="errorMessage">
+    <%= message %>
+  </div>
+<% } else { %>
+  <div class="error-message" id="errorMessage"></div>
+<% } %>
 
             <form action="/admin/login" method="POST">
 
@@ -434,6 +438,13 @@ color: rgba(139,58,82,0.35);
                 : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
         });
     </script>
+    <script>
+  window.addEventListener('pageshow', function (event) {
+    if (event.persisted) {
+      window.location.reload();
+    }
+  });
+</script>
 
 </body>
 </html>

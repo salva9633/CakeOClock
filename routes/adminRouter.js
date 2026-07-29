@@ -4,6 +4,7 @@ import { customerInfo, blockUser, unblockUser } from "../controllers/admin/custo
 import { categoryInfo, toggleCategoryStatus, deleteCategory, editCategory, addCategory } from "../controllers/admin/categoryController.js";
 import upload from "../middlewares/multer.js";
 import { adminAuth } from "../middlewares/auth.js";
+import noCache from "../middlewares/noCache.js";   
 import productRoutes from "./admin/productRoutes.js";
 import variantRoutes from "./admin/variantRoutes.js";
 import batchRoutes from "./admin/batchRoutes.js";
@@ -48,6 +49,9 @@ router.use((req, res, next) => {
   res.locals.layout = "layout";
   return next();
 });
+
+
+router.use(noCache);   
 
 import {
   loadContactMessages,

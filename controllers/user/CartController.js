@@ -172,12 +172,13 @@ export const getCart = async (req, res) => {
       item.outOfStock    = totalStock === 0;
       item.exceedsStock  = item.quantity > totalStock;
  
-      item.variantUnavailable = item.variantId?.isAvailable === false;
- 
-    const priceData      = await getFinalPrice(item.variantId);
-      item.effectivePrice  = priceData.finalPrice;
-      item.discountPercent = priceData.discountPercent;
+item.variantUnavailable = item.variantId?.isAvailable === false;
+
       item.regularPrice    = item.variantId?.regularPrice || item.price;
+      item.effectivePrice  = item.price;
+      item.discountPercent = item.regularPrice > 0
+        ? Math.round(((item.regularPrice - item.effectivePrice) / item.regularPrice) * 100)
+        : 0;
  
       item.isBlocked = item.outOfStock || item.exceedsStock || item.variantUnavailable || !item.productId.isListed;
  
@@ -305,8 +306,7 @@ const populatedCart = await Cart.findOne({ userId })
       const isBlocked = outOfStock || exceeds || variantUnavailable || productUnlisted;
       if (isBlocked) { hasBlocked = true; continue; }
  
-const priceData      = await getFinalPrice(i.variantId);
-      const effectivePrice = priceData.finalPrice;
+const effectivePrice = i.price;
       const regularPrice   = i.variantId?.regularPrice || i.price;
 
       subtotal      += regularPrice   * i.quantity;
@@ -386,8 +386,7 @@ export const removeCartItem = async (req, res) => {
       const isBlocked = outOfStock || exceeds || variantUnavailable || productUnlisted;
       if (isBlocked) { hasBlocked = true; continue; }
  
-const priceData      = await getFinalPrice(i.variantId);
-      const effectivePrice = priceData.finalPrice;
+const effectivePrice = i.price;
       const regularPrice   = i.variantId?.regularPrice || i.price;
 
       subtotal      += regularPrice   * i.quantity;
