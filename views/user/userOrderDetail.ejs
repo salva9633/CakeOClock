@@ -158,6 +158,7 @@
       }
       .status-banner.cancelled { background: #fff0f0; border: 1px solid #f5c6cb; color: #721c24; }
       .status-banner.returned  { background: #f0ebfc; border: 1px solid #d6bfef; color: #432874; }
+      .status-banner.payfailed { background: #fff0f0; border: 1px solid #f5c6cb; color: #721c24; }
 
       /* Plain-CSS two column layout (no Bootstrap dependency, so it keeps
          working after an SPA swap where the Bootstrap CDN link never gets
@@ -295,6 +296,14 @@
 
     <% const isCancelled = order.status === 'Cancelled'; %>
     <% const isReturned  = ['Returned','Return Requested'].includes(order.status); %>
+    <%
+      // Orders whose online payment attempt never succeeded (Razorpay
+      // "Failed") should offer Retry Payment, not Cancel — the customer
+      // hasn't actually paid, so there's nothing to "cancel" in the
+      // refund sense. COD orders are unaffected since they're never
+      // marked paymentStatus "Failed".
+      const paymentFailed = order.paymentMethod !== 'COD' && order.paymentStatus === 'Failed';
+    %>
 
     <% if (isCancelled) { %>
     <div class="status-banner cancelled">
@@ -311,6 +320,15 @@
       <div>
         <strong>Return Requested</strong>
         <% if (order.returnReason) { %><br><span style="opacity:.8;font-size:.83rem"><%= order.returnReason %></span><% } %>
+      </div>
+    </div>
+    <% } %>
+    <% if (paymentFailed && !isCancelled) { %>
+    <div class="status-banner payfailed">
+      <span style="font-size:1.2rem">⚠</span>
+      <div>
+        <strong>Payment Failed</strong>
+        <br><span style="opacity:.8;font-size:.83rem">Your payment for this order didn't go through. Retry payment to confirm this order, or it will remain unfulfilled.</span>
       </div>
     </div>
     <% } %>
@@ -386,7 +404,7 @@
             </div>
 
             <div class="item-actions">
-              <% if (['Pending','Processing'].includes(item.status)) { %>
+              <% if (['Pending','Processing'].includes(item.status) && !paymentFailed) { %>
                 <button class="btn-action" style="background:#fff0f0;color:#721c24;font-size:.78rem;padding:6px 11px"
                   onclick="cancelItem('<%= order._id %>','<%= item._id %>','<%= item.productName %>')">
                   ✕ Cancel
@@ -476,7 +494,15 @@
           </div>
           <div style="display:flex;flex-direction:column;gap:10px" id="actions-wrap">
 
-            <% if (['Pending','Processing'].includes(order.status)) { %>
+            <% if (paymentFailed) { %>
+              <button class="btn-action retry-payment-btn"
+                style="background:#fff0f0;color:#721c24;padding:11px;width:100%"
+                onclick="retryPayment('<%= order._id %>')">
+                ↻ Retry Payment
+              </button>
+            <% } %>
+
+            <% if (['Pending','Processing'].includes(order.status) && !paymentFailed) { %>
               <button class="btn-action cancel-order-btn"
                 style="background:#fff0f0;color:#721c24;padding:11px;width:100%"
                 onclick="cancelFullOrder('<%= order._id %>','<%= order.orderId %>')">
@@ -519,6 +545,7 @@
 
     <div id="live-toast"></div>
 
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
       const ORDER_DATA = {
@@ -666,6 +693,68 @@ el.className   = `status-badge status-${newStatus.replace(/ /g,'-')} item-status
         const data = await res.json();
         if (data.success) Swal.fire({icon:'success',title:'Return Submitted',text:data.message,confirmButtonColor:'#8B4A5A'}).then(refreshOrder);
         else Swal.fire({icon:'error',title:'Failed',text:data.message,confirmButtonColor:'#8B4A5A'});
+      }
+
+      /* ── Retry payment for a Razorpay order stuck in "Failed" ────── */
+      async function retryPayment(orderId) {
+        try {
+          const res  = await fetch('/checkout/retry-razorpay-order', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ orderId })
+          });
+          const data = await res.json();
+
+          if (!data.success) {
+            return Swal.fire({ icon:'error', title:'Unable to retry', text:data.message, confirmButtonColor:'#8B4A5A' });
+          }
+
+          const options = {
+            key:      data.razorpayKeyId,
+            amount:   data.razorpayOrder.amount,
+            currency: data.razorpayOrder.currency,
+            order_id: data.razorpayOrder.id,
+            name:     "Cake O'Clock",
+            description: `Payment for ${ORDER_DATA._id}`,
+            handler: async function (response) {
+              try {
+                const verifyRes = await fetch('/checkout/verify-retry-payment', {
+                  method:  'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body:    JSON.stringify({
+                    razorpay_order_id:   response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_signature:  response.razorpay_signature,
+                    orderId
+                  })
+                });
+                const verifyData = await verifyRes.json();
+                if (verifyData.success) {
+                  window.location.href = `/order-success/${verifyData.orderId}`;
+                } else {
+                  Swal.fire({ icon:'error', title:'Payment verification failed', text:verifyData.message, confirmButtonColor:'#8B4A5A' });
+                }
+              } catch (e) {
+                Swal.fire({ icon:'error', title:'Error', text:'Something went wrong verifying payment.', confirmButtonColor:'#8B4A5A' });
+              }
+            },
+            modal: {
+              ondismiss: function () {
+                Swal.fire({ icon:'info', title:'Payment cancelled', text:'You can retry anytime.', confirmButtonColor:'#8B4A5A' });
+              }
+            },
+            theme: { color: '#8B4A5A' }
+          };
+
+          const rzp = new Razorpay(options);
+          rzp.on('payment.failed', function () {
+            Swal.fire({ icon:'error', title:'Payment failed', text:'Please try again.', confirmButtonColor:'#8B4A5A' }).then(refreshOrder);
+          });
+          rzp.open();
+
+        } catch (e) {
+          Swal.fire({ icon:'error', title:'Error', text:'Something went wrong. Please try again.', confirmButtonColor:'#8B4A5A' });
+        }
       }
     </script>
   </main>
