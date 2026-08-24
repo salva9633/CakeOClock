@@ -120,16 +120,17 @@
   .vm-cancel-btn {
     flex: 1;
     padding: 12px;
-    border: 1.5px solid #e0ccd3;
+    border: none;
     border-radius: 13px;
-    background: #fff;
+    background: #f3dbe2;
     color: #8b3a52;
     font-weight: 700;
     font-size: .88rem;
     cursor: pointer;
-    transition: background .18s, border-color .18s;
+    transition: background .18s, transform .14s;
   }
-  .vm-cancel-btn:hover { background: #fdf5f7; border-color: #c9a0b0; }
+  .vm-cancel-btn:hover { background: #e9c5d1; }
+  .vm-cancel-btn:active { transform: scale(.97); }
 </style>
 
 <div class="modal fade" id="variantModal" tabindex="-1" aria-hidden="true">

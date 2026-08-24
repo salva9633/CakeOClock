@@ -191,6 +191,7 @@
       font-size: .9rem; color: var(--rose-dk);
       display: flex; align-items: center; justify-content: center;
       transition: background .2s;
+      opacity: 1; /* FIX: enabled qty buttons always fully solid */
     }
     .qty-btn:hover:not(:disabled) { background: var(--rose); color: #fff; }
     .qty-btn:disabled { opacity: .4; cursor: not-allowed; }
@@ -204,12 +205,15 @@
     /* Blocked qty box */
     .qty-box.qty-disabled .qty-btn { pointer-events: none; opacity: .35; }
     .qty-box.qty-disabled .qty-val  { color: #bbb; }
+    .qty-box:not(.qty-disabled) .qty-btn { opacity: 1; pointer-events: auto; } /* FIX: reset when enabled */
 
     .remove-btn {
       background: none; border: none;
-      color: #c0a0a8; font-size: .8rem;
+      color: var(--rose-dk); /* FIX: was #c0a0a8 (too pale, looked disabled) */
+      font-size: .8rem; font-weight: 600;
       cursor: pointer; padding: 4px 8px;
       border-radius: 8px; transition: color .2s, background .2s;
+      opacity: 1;
     }
     .remove-btn:hover { color: #e05050; background: #fde8e8; }
 
@@ -268,12 +272,14 @@
       transition: opacity .2s, transform .15s;
       text-align: center;
       text-decoration: none;
+      opacity: 1; /* FIX: enabled checkout button always fully solid */
     }
     .checkout-btn:hover:not(:disabled) { opacity: .9; transform: translateY(-1px); }
     .checkout-btn:disabled {
       background: #ddd; color: #aaa;
       box-shadow: none; cursor: not-allowed;
       transform: none;
+      opacity: 1; /* keep disabled state visible/flat, not faded-looking */
     }
 
     /* Checkout blocked notice */
@@ -324,7 +330,19 @@
     }
 
     .swal-custom-popup { border-radius: 20px !important; padding: 32px 24px !important; }
-    .swal-custom-btn   { border-radius: 12px !important; padding: 10px 36px !important; font-weight: 700 !important; }
+    .swal-custom-btn   { border-radius: 12px !important; padding: 10px 36px !important; font-weight: 700 !important; opacity: 1 !important; }
+
+    /* FIX: "Keep it" / cancel button in SweetAlert2 modals looked pale/disabled.
+       Force solid background + solid white text so it reads as an active, clickable button. */
+    .swal-cancel-btn {
+      background: #a8677a !important;
+      color: #fff !important;
+      opacity: 1 !important;
+      box-shadow: none !important;
+    }
+    .swal-cancel-btn:hover {
+      background: #96566a !important;
+    }
   </style>
 </head>
 
@@ -725,8 +743,9 @@ toast('<i class="fas fa-check-circle"></i> Quantity updated');
       confirmButtonText:  'Yes, Remove',
       cancelButtonText:   'Keep it',
       confirmButtonColor: '#8b3a52',
-      cancelButtonColor:  '#d6c0bc',
-      customClass: { popup: 'swal-custom-popup', confirmButton: 'swal-custom-btn' }
+      /* FIX: removed pale cancelButtonColor (#d6c0bc). Solid look now comes
+         from the .swal-cancel-btn class defined in <style> above. */
+      customClass: { popup: 'swal-custom-popup', confirmButton: 'swal-custom-btn', cancelButton: 'swal-custom-btn swal-cancel-btn' }
     });
 
     if (!confirmed.isConfirmed) return;

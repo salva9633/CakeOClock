@@ -210,23 +210,28 @@
       pointer-events: none;
     }
 
-    /* OOS dimming */
+    /* OOS dimming — stronger, unmistakable at a glance */
+    .wc.is-oos {
+      opacity: .72;
+    }
     .wc.is-oos .wimg img {
-      filter: grayscale(.4) brightness(.92);
+      filter: grayscale(.85) brightness(.75) blur(1.5px);
     }
     .oos-overlay {
       position: absolute; inset: 0;
-      background: rgba(255,248,250,.6);
+      background: rgba(60,30,38,.38);
+      backdrop-filter: blur(1px);
       display: flex; align-items: center; justify-content: center;
       z-index: 2;
     }
     .oos-badge-img {
-      background: rgba(255,255,255,.94);
-      border: 1.5px solid var(--border);
-      color: var(--rose-dk);
-      font-size: .6rem; font-weight: 800;
+      background: rgba(139,58,82,.95);
+      border: 1.5px solid rgba(255,255,255,.4);
+      color: #fff;
+      font-size: .66rem; font-weight: 800;
       letter-spacing: .1em; text-transform: uppercase;
-      padding: 4px 12px; border-radius: 20px;
+      padding: 6px 16px; border-radius: 20px;
+      box-shadow: 0 4px 14px rgba(0,0,0,.25);
     }
 
     /* REMOVE BUTTON */
@@ -279,6 +284,7 @@
   text-decoration: none !important;
 }
     .wc:hover .wname { color: var(--rose); }
+    .wc.is-oos .wname { color: #a08088; }
 
     .wdesc {
       font-size: .76rem; color: var(--muted);

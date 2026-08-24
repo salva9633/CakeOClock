@@ -435,11 +435,22 @@ export const validateCart = async (req, res) => {
     }
  
     const blockedNames = [];
+    const orphanedIds  = [];   // cart rows whose product was hard-deleted from the DB
  
     for (const item of cart.items) {
-      // Product deleted / unlisted
-      if (!item.productId || !item.productId.isListed) {
-        blockedNames.push(item.productId?.productName || "A product");
+      // Product was deleted from the DB entirely — this is a stale/ghost
+      // cart row the user never even sees (getCart already hides items
+      // with a null productId). Don't block checkout on it — collect it
+      // for cleanup after the loop instead.
+      if (!item.productId) {
+        orphanedIds.push(item._id);
+        continue;
+      }
+
+      // Product still exists but was unlisted by an admin — this one IS
+      // visible in the user's cart, so it should still block checkout.
+      if (!item.productId.isListed) {
+        blockedNames.push(item.productId.productName || "A product");
         continue;
       }
       // Variant unavailable
@@ -458,6 +469,15 @@ export const validateCart = async (req, res) => {
       if (totalStock === 0 || item.quantity > totalStock) {
         blockedNames.push(item.productId.productName);
       }
+    }
+
+    // Purge orphaned/ghost rows now that we know which ones they are,
+    // so future validate calls don't trip on them
+    if (orphanedIds.length > 0) {
+      await Cart.updateOne(
+        { userId },
+        { $pull: { items: { _id: { $in: orphanedIds } } } }
+      );
     }
  
     if (blockedNames.length > 0) {

@@ -1,7 +1,7 @@
 import Wishlist from "../../models/wishlistModel.js";
 import Product from "../../models/productModel.js";
 import Variant from "../../models/variantModel.js";
-
+import Batch from "../../models/batchModel.js";
 /* ══════════════════════════════════════
    CLEAN INVALID WISHLIST ITEMS
 ══════════════════════════════════════ */
@@ -208,31 +208,59 @@ export const getWishlist = async (req, res) => {
             item.productId.toString() === product._id.toString()
         );
 
-        let variant = await Variant.findOne({
-          _id: wishItem.variantId,
+        // Check ALL available variants of this product, not just the one
+        // originally saved to the wishlist — a product can have multiple
+        // variants (e.g. 500g / 1kg) and only some may be out of stock.
+        const allVariants = await Variant.find({
+          productId:   product._id,
           isAvailable: true,
-        }).lean();
+        })
+          .sort({ regularPrice: 1 })
+          .lean();
 
-        
-        if (!variant) {
-          variant = await Variant.findOne({
-            productId: product._id,
-            isAvailable: true,
-          })
-            .sort({ salePrice: 1 })
-            .lean();
+        let variant    = null;
+        let totalStock = 0;
+
+        for (const v of allVariants) {
+          const batches = await Batch.find({
+            variantId:      v._id,
+            status:         "active",
+            availableStock: { $gt: 0 }
+          }).lean();
+          const stock = batches.reduce((s, b) => s + b.availableStock, 0);
+          if (stock > 0) {
+            variant    = v;
+            totalStock = stock;
+            break; // first variant (cheapest) that actually has stock
+          }
         }
 
+        // No variant has stock anywhere — fall back to the originally
+        // saved variant just so the card still has a name/id to display,
+        // but it will correctly render as Out of Stock.
+        if (!variant) {
+          variant = allVariants.find(
+            v => v._id.toString() === wishItem.variantId?.toString()
+          ) || allVariants[0] || null;
+          totalStock = 0;
+        }
+
+        const outOfStock = !variant || totalStock === 0;
+        
         return {
           ...product,
 
           variantId: variant?._id || null,
 
-          startingPrice: variant?.regularPrice || null,
+          // No stock → no startingPrice, so the template's
+          // `hasStock = !!product.startingPrice` correctly flips to false
+          startingPrice: (variant && !outOfStock) ? variant.regularPrice : null,
 
           regularPrice: variant?.regularPrice || null,
 
           isBlocked: !product.isListed,
+
+          outOfStock,
 
           discount: 0,
 
