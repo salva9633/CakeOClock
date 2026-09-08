@@ -307,6 +307,49 @@ img { display: block; }
   color: var(--muted);
   margin-bottom: 32px;
 }
+/* Customize Cake Button */
+.btn-customize {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  margin-top: 26px;
+
+  background: linear-gradient(
+    135deg,
+    var(--rose-dk),
+    var(--burgundy)
+  );
+
+  color: #fff;
+  border-radius: 50px;
+
+  font-family: 'DM Sans', sans-serif;
+  font-size: .9rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+
+  text-decoration: none;
+
+  box-shadow: 0 8px 24px rgba(168,95,110,.28);
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    background .2s ease;
+}
+
+.btn-customize:hover {
+  color: #fff;
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 12px 32px rgba(168,95,110,.38);
+}
+
+.btn-customize i {
+  font-size: 1rem;
+}
 .about-features {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -901,31 +944,122 @@ width: 80px;
      ABOUT
 ══════════════════════════════════════ -->
 <section class="about-section reveal" id="about">
+
   <div class="about-inner">
+
     <div>
-      <div class="about-eyebrow">Our Story</div>
-      <h2 class="about-title">Where Your Imagination<br>Becomes <em>a Cake</em></h2>
+
+      <div class="about-eyebrow">
+        Our Story
+      </div>
+
+      <h2 class="about-title">
+        Where Your Imagination<br>
+        Becomes <em>a Cake</em>
+      </h2>
+
       <p class="about-body">
-        Cake O'Clock creates beautifully handcrafted and fully customized cakes made to match your design, flavor, and style. Every cake is made fresh with quality ingredients and creative detailing.
+
+        Cake O'Clock creates beautifully handcrafted
+        and fully customized cakes made to match your
+        design, flavor, and style. Every cake is made
+        fresh with quality ingredients and creative detailing.
+
         <br><br>
-        From birthdays and weddings to any special moment, we make your celebrations sweeter and more meaningful — one slice at a time.
+
+        From birthdays and weddings to any special moment,
+        we make your celebrations sweeter and more meaningful
+        — one slice at a time.
+
       </p>
+
+
       <div class="about-features">
-        <div class="about-feat"><div class="feat-icon"><i class="fa-solid fa-leaf" style="color:#7AAE5C;"></i></div> Fresh Ingredients</div>
-        <div class="about-feat"><div class="feat-icon"><i class="fa-solid fa-palette" style="color:#C97B8A;"></i></div> Custom Designs</div>
-        <div class="about-feat"><div class="feat-icon"><i class="fa-solid fa-bolt" style="color:#D4A574;"></i></div> Same-Day Delivery</div>
-        <div class="about-feat"><div class="feat-icon"><i class="fa-solid fa-cake-candles" style="color:#A85F6E;"></i></div> 50+ Flavours</div>
+
+        <div class="about-feat">
+          <div class="feat-icon">
+            <i class="fa-solid fa-leaf"
+               style="color:#7AAE5C;"></i>
+          </div>
+          Fresh Ingredients
+        </div>
+
+
+        <div class="about-feat">
+          <div class="feat-icon">
+            <i class="fa-solid fa-palette"
+               style="color:#C97B8A;"></i>
+          </div>
+          Custom Designs
+        </div>
+
+
+        <div class="about-feat">
+          <div class="feat-icon">
+            <i class="fa-solid fa-bolt"
+               style="color:#D4A574;"></i>
+          </div>
+          Same-Day Delivery
+        </div>
+
+
+        <div class="about-feat">
+          <div class="feat-icon">
+            <i class="fa-solid fa-cake-candles"
+               style="color:#A85F6E;"></i>
+          </div>
+          50+ Flavours
+        </div>
+
       </div>
+
+
+      <!-- ⭐ NEW CUSTOMIZATION BUTTON -->
+
+      <a
+        href="/customizedCake"
+        class="btn-customize"
+      >
+
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+        Customize Your Cake
+
+        <i class="fa-solid fa-arrow-right"></i>
+
+      </a>
+
+
     </div>
+
+
     <div class="about-img-stack">
+
       <div class="about-img-main">
-        <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1780683245/5png_e4engj.png" alt="Team Baking" loading="lazy">
+
+        <img
+          src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1780683245/5png_e4engj.png"
+          alt="Team Baking"
+          loading="lazy"
+        >
+
       </div>
+
+
       <div class="about-img-float">
-        <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1782823931/88aac0_1c56659ce1bf40fa9502e04d79cba6cf_mv2_cnbfad.png" alt="Cake Detail" loading="lazy">
+
+        <img
+          src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1782823931/88aac0_1c56659ce1bf40fa9502e04d79cba6cf_mv2_cnbfad.png"
+          alt="Cake Detail"
+          loading="lazy"
+        >
+
       </div>
+
     </div>
+
   </div>
+
 </section>
 
 <!-- ══════════════════════════════════════

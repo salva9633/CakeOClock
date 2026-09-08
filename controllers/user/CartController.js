@@ -134,7 +134,7 @@ export const getCart = async (req, res) => {
   try {
     const userId = req.session.user?.id;
     if (!userId) return res.redirect("/login");
- 
+
     const cart = await Cart.findOne({ userId })
       .populate({
         path:   "items.productId",
@@ -144,44 +144,63 @@ export const getCart = async (req, res) => {
         path:   "items.variantId",
         select: "salePrice regularPrice weight size isAvailable productId",
       })
+      .populate({
+        path:   "items.customizedCakeId",
+        select: "cakeType weight referenceImage status quotedPrice",
+      })
       .lean();
- 
+
     if (!cart || cart.items.length === 0) {
       return res.render("cart", { items: [], total: 0, savings: 0, hasOutOfStock: false });
     }
- 
-    const items = cart.items.filter((item) => item.productId);
- 
-    // Mark unlisted products as blocked
+
+    const items = cart.items.filter((item) => item.productId || item.customizedCakeId);
+
     for (const item of items) {
+
+      // ── CUSTOMIZED CAKE ITEM — no stock/listing checks apply ──
+      if (item.customizedCakeId) {
+        item.isCustomizedCake   = true;
+        item.totalStock         = 1;
+        item.outOfStock         = false;
+        item.exceedsStock       = false;
+        item.variantUnavailable = false;
+        item.regularPrice       = item.price;
+        item.effectivePrice     = item.price;
+        item.discountPercent    = 0;
+        item.isBlocked          = item.customizedCakeId.status !== "quoted";
+        if (item.isBlocked) {
+          item.unavailableReason = "This customized cake is no longer available for checkout";
+        }
+        continue;
+      }
+
       if (!item.productId.isListed) {
         item.isBlocked = true;
         item.unavailableReason = "Product no longer available";
       }
-    }
- 
-    for (const item of items) {
+
       const batches = await Batch.find({
         variantId:      item.variantId?._id || item.variantId,
         status:         "active",
         availableStock: { $gt: 0 }
       }).lean();
- 
+
       const totalStock   = batches.reduce((s, b) => s + b.availableStock, 0);
       item.totalStock    = totalStock;
       item.outOfStock    = totalStock === 0;
       item.exceedsStock  = item.quantity > totalStock;
- 
-item.variantUnavailable = item.variantId?.isAvailable === false;
+
+      item.variantUnavailable = item.variantId?.isAvailable === false;
 
       item.regularPrice    = item.variantId?.regularPrice || item.price;
       item.effectivePrice  = item.price;
       item.discountPercent = item.regularPrice > 0
         ? Math.round(((item.regularPrice - item.effectivePrice) / item.regularPrice) * 100)
         : 0;
- 
+
       item.isBlocked = item.outOfStock || item.exceedsStock || item.variantUnavailable || !item.productId.isListed;
- 
+
       if (!item.productId.isListed) {
         item.unavailableReason = "Product no longer available";
       } else if (item.variantUnavailable) {
@@ -192,22 +211,13 @@ item.variantUnavailable = item.variantId?.isAvailable === false;
         item.unavailableReason = `Only ${item.totalStock} left in stock`;
       }
     }
- 
+
     const validItems    = items.filter(i => !i.isBlocked);
     const hasOutOfStock = items.some(i => i.isBlocked);
     const total         = validItems.reduce((s, i) => s + i.effectivePrice * i.quantity, 0);
     const originalTotal = validItems.reduce((s, i) => s + i.regularPrice   * i.quantity, 0);
     const savings       = originalTotal - total;
- 
-    console.log("hasOutOfStock:", hasOutOfStock);
-    console.log("blocked items:", items.filter(i => i.isBlocked).map(i => ({
-      name: i.productId?.productName,
-      outOfStock: i.outOfStock,
-      totalStock: i.totalStock,
-      exceedsStock: i.exceedsStock,
-      variantUnavailable: i.variantUnavailable
-    })));
- 
+
     return res.render("cart", {
       items,
       total,
@@ -219,7 +229,6 @@ item.variantUnavailable = item.variantId?.isAvailable === false;
     res.status(500).send("Server Error");
   }
 };
- 
 /* ══════════════════════════════════════
    UPDATE CART ITEM QTY
 ══════════════════════════════════════ */
@@ -235,40 +244,38 @@ export const updateCartItem = async (req, res) => {
     if (!cart) return res.status(404).json({ success: false, message: "Cart not found" });
  
  const item = cart.items.id(itemId);
-    if (!item) return res.status(404).json({ success: false, message: "Item not found" });
- 
-    const previousQty = item.quantity; // remember before mutating, to detect increase vs decrease
-    const itemDeleted = Number(quantity) <= 0;
+if (!item) return res.status(404).json({ success: false, message: "Item not found" });
 
-    const itemBatches = await Batch.find({
-      variantId:      item.variantId,
-      status:         "active",
-      expiryAt:       { $gt: new Date() },
-      availableStock: { $gt: 0 }
-    }).lean();
-    const itemTotalStock = itemBatches.reduce((s, b) => s + b.availableStock, 0);
+const previousQty = item.quantity;
+const itemDeleted = Number(quantity) <= 0;
+const isCustomizedCake = !!item.customizedCakeId;
 
-    if (itemDeleted) {
-      item.deleteOne();
-    } else {
-      const isIncreasing = Number(quantity) > previousQty;
+// Customized cakes have no variant/batch stock to check against —
+// cap them at MAX_QTY instead of a real stock number.
+let itemTotalStock = MAX_QTY;
+if (!isCustomizedCake) {
+  const itemBatches = await Batch.find({
+    variantId:      item.variantId,
+    status:         "active",
+    expiryAt:       { $gt: new Date() },
+    availableStock: { $gt: 0 }
+  }).lean();
+  itemTotalStock = itemBatches.reduce((s, b) => s + b.availableStock, 0);
+}
 
-      if (isIncreasing && Number(quantity) > itemTotalStock) {
-        return res.status(400).json({
-          success: false,
-          message: `Only ${itemTotalStock} in stock`
-        });
-      }
+if (itemDeleted) {
+  item.deleteOne();
+} else {
+  const isIncreasing = Number(quantity) > previousQty;
 
-      if (Number(quantity) > MAX_QTY) {
-        return res.status(400).json({
-          success: false,
-          message: `Maximum ${MAX_QTY} per item allowed`
-        });
-      }
-
-      item.quantity = Number(quantity);
-    }
+  if (!isCustomizedCake && isIncreasing && Number(quantity) > itemTotalStock) {
+    return res.status(400).json({ success: false, message: `Only ${itemTotalStock} in stock` });
+  }
+  if (Number(quantity) > MAX_QTY) {
+    return res.status(400).json({ success: false, message: `Maximum ${MAX_QTY} per item allowed` });
+  }
+  item.quantity = Number(quantity);
+}
  
     await cart.save();
  
@@ -290,6 +297,12 @@ const populatedCart = await Cart.findOne({ userId })
     let hasBlocked    = false;
  
     for (const i of populatedCart.items) {
+      // Customized cake items skip normal stock/listing checks entirely
+      if (i.customizedCakeId) {
+        subtotal += i.price * i.quantity;
+        continue;
+      }
+
       // Skip blocked/unlisted items from totals (same logic as getCart)
       const variantUnavailable = i.variantId?.isAvailable === false;
       const productUnlisted    = !i.productId?.isListed;
@@ -371,6 +384,12 @@ export const removeCartItem = async (req, res) => {
     let hasBlocked    = false;
  
     for (const i of (populatedCart?.items || [])) {
+      // Customized cake items skip normal stock/listing checks entirely
+      if (i.customizedCakeId) {
+        subtotal += i.price * i.quantity;
+        continue;
+      }
+
       const variantUnavailable = i.variantId?.isAvailable === false;
       const productUnlisted    = !i.productId?.isListed;
  
@@ -419,6 +438,23 @@ const effectivePrice = i.price;
    Called by the checkout button click —
    checks stock, isListed, isAvailable
    without a page reload.
+
+   FIX (customized-cake drop bug):
+   This function previously treated ANY item
+   with a null productId as an "orphaned" row
+   (a product hard-deleted from the DB) and
+   permanently $pull'd it from the cart.
+   Customized-cake cart rows also have a null
+   productId (they carry customizedCakeId
+   instead), so every customized cake sitting
+   in the cart was being misclassified as
+   orphaned and silently deleted from the DB
+   the moment the user clicked "Proceed to
+   Checkout" — before checkoutController.js
+   was ever reached. Now customized-cake items
+   are checked against their own `status`
+   field (must be "quoted") instead of being
+   swept into the orphan-cleanup path.
 ══════════════════════════════════════ */
 export const validateCart = async (req, res) => {
   try {
@@ -428,6 +464,7 @@ export const validateCart = async (req, res) => {
     const cart = await Cart.findOne({ userId })
       .populate({ path: "items.productId", select: "productName isListed" })
       .populate({ path: "items.variantId", select: "regularPrice isAvailable" })
+      .populate({ path: "items.customizedCakeId", select: "cakeType status" })
       .lean();
  
     if (!cart || cart.items.length === 0) {
@@ -438,6 +475,16 @@ export const validateCart = async (req, res) => {
     const orphanedIds  = [];   // cart rows whose product was hard-deleted from the DB
  
     for (const item of cart.items) {
+
+      // ── CUSTOMIZED CAKE CART ITEM — validate against its own status,
+      // never fall into the "orphaned product" cleanup path below. ──
+      if (item.customizedCakeId) {
+        if (item.customizedCakeId.status !== "quoted") {
+          blockedNames.push(`Customized ${item.customizedCakeId.cakeType} Cake`);
+        }
+        continue;
+      }
+
       // Product was deleted from the DB entirely — this is a stale/ghost
       // cart row the user never even sees (getCart already hides items
       // with a null productId). Don't block checkout on it — collect it

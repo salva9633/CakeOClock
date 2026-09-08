@@ -394,17 +394,22 @@
       <% } else { %>
         <% items.forEach(item => { %>
           <%
-            const name       = item.productId?.productName || 'Product';
-            const img        = item.productId?.productImages?.[0] || 'https://placehold.co/160x160/fde2d9/C2607A?text=';
-            const variant    = item.variantId?.weight || item.variantId?.size || '';
+            const isCustom   = !!item.customizedCakeId;
+            const name       = isCustom
+                                  ? `Customized ${item.customizedCakeId.cakeType} Cake`
+                                  : (item.productId?.productName || 'Product');
+            const img        = isCustom
+                                  ? (item.customizedCakeId.referenceImage || 'https://placehold.co/160x160/fde2d9/C2607A?text=')
+                                  : (item.productId?.productImages?.[0] || 'https://placehold.co/160x160/fde2d9/C2607A?text=');
+            const variant    = isCustom ? item.customizedCakeId.weight : (item.variantId?.weight || item.variantId?.size || '');
             const price      = item.effectivePrice || item.price;
             const regular    = item.regularPrice || price;
             const disc       = item.discountPercent || 0;
             const blocked    = item.isBlocked;
-            const unlisted   = !item.productId?.isListed;
-            const varUnavail = item.variantUnavailable || item.variantId?.isAvailable === false;
-            const oos        = item.outOfStock;
-            const exceeds    = item.exceedsStock;
+            const unlisted   = !isCustom && !item.productId?.isListed;
+            const varUnavail = !isCustom && (item.variantUnavailable || item.variantId?.isAvailable === false);
+            const oos        = !isCustom && item.outOfStock;
+            const exceeds    = !isCustom && item.exceedsStock;
             /* stamp label & tag label per reason */
             const stampLabel = unlisted   ? 'Unavailable'
                              : varUnavail ? 'Unavailable'
@@ -449,23 +454,19 @@
               </div>
 
              <div class="item-footer">
-                <div class="qty-box">
-                  <button class="qty-btn"
-                          onclick="changeQty('<%= item._id %>', -1)">
-                    <i class="fas fa-minus" style="font-size:.65rem;"></i>
-                  </button>
-                  <span class="qty-val" id="qty-<%= item._id %>"><%= item.quantity %></span>
-                  <button class="qty-btn"
-                          id="qty-plus-<%= item._id %>"
-                          onclick="changeQty('<%= item._id %>', 1)"
-                          <%= blocked ? 'disabled' : '' %>>
-                    <i class="fas fa-plus" style="font-size:.65rem;"></i>
-                  </button>
-                </div>
-                <button class="remove-btn" onclick="removeItem('<%= item._id %>')">
-                  <i class="fas fa-trash-alt"></i> Remove
-                </button>
-              </div>
+  <div class="qty-box">
+    <button class="qty-btn" onclick="changeQty('<%= item._id %>', -1)">
+      <i class="fas fa-minus" style="font-size:.65rem;"></i>
+    </button>
+    <span class="qty-val" id="qty-<%= item._id %>"><%= item.quantity %></span>
+    <button class="qty-btn" id="qty-plus-<%= item._id %>" onclick="changeQty('<%= item._id %>', 1)" <%= (blocked || item.quantity >= 5) ? 'disabled' : '' %>>
+      <i class="fas fa-plus" style="font-size:.65rem;"></i>
+    </button>
+  </div>
+  <button class="remove-btn" onclick="removeItem('<%= item._id %>')">
+    <i class="fas fa-trash-alt"></i> Remove
+  </button>
+</div>
 
             </div>
           </div>

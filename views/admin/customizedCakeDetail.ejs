@@ -1,0 +1,349 @@
+<div class="custom-detail">
+
+  <h2>
+    Customized Cake Request
+  </h2>
+
+
+  <div class="customer-card">
+
+    <h3>Customer Information</h3>
+
+    <p>
+      <strong>Name:</strong>
+      <%= request.name %>
+    </p>
+
+    <p>
+      <strong>Email:</strong>
+      <%= request.email %>
+    </p>
+
+    <p>
+      <strong>Phone:</strong>
+      <%= request.phone %>
+    </p>
+
+    <p>
+      <strong>Address:</strong>
+      <%= request.address %>
+    </p>
+
+  </div>
+
+
+  <div class="customer-card">
+
+    <h3>Cake Information</h3>
+
+    <p>
+      <strong>Cake Type:</strong>
+      <%= request.cakeType %>
+    </p>
+
+    <p>
+      <strong>Weight:</strong>
+      <%= request.weight %>
+    </p>
+
+    <p>
+      <strong>Needed Date:</strong>
+
+      <%= new Date(
+        request.neededDate
+      ).toLocaleDateString() %>
+
+    </p>
+
+    <p>
+      <strong>Needed Time:</strong>
+      <%= request.neededTime || "Not specified" %>
+    </p>
+
+
+    <p>
+      <strong>Cake Message:</strong>
+
+      <%= request.cakeMessage || "None" %>
+
+    </p>
+
+
+    <h4>Description</h4>
+
+    <p>
+      <%= request.description %>
+    </p>
+
+
+    <h4>Additional Requirements</h4>
+
+    <p>
+      <%= request.additionalRequirements ||
+          "None" %>
+    </p>
+
+  </div>
+
+
+  <% if (request.referenceImage) { %>
+
+    <div class="customer-card">
+
+      <h3>
+        Reference Image
+      </h3>
+
+      <img
+        src="<%= request.referenceImage %>"
+        style="
+          max-width:450px;
+          width:100%;
+          border-radius:15px;
+        "
+      >
+
+    </div>
+
+  <% } %>
+
+
+  <div class="customer-card">
+
+    <h3>
+      Set Quotation
+    </h3>
+
+
+    <form id="quoteForm">
+
+      <label>
+        Final Cake Price
+      </label>
+
+      <input
+        type="number"
+        id="quotedPrice"
+        min="1"
+        value="<%= request.quotedPrice || '' %>"
+        required
+      >
+
+
+      <label>
+        Note to Customer
+      </label>
+
+      <textarea
+        id="adminNote"
+        rows="4"
+      ><%= request.adminNote || "" %></textarea>
+
+
+      <button type="submit">
+        Send Quotation
+      </button>
+
+    </form>
+
+  </div>
+
+
+  <div class="customer-card">
+
+    <h3>
+      Update Status
+    </h3>
+
+
+    <select id="status">
+
+      <% const statuses = [
+        "pending",
+        "reviewing",
+        "quoted",
+        "approved",
+        "in-production",
+        "ready",
+        "delivered",
+        "cancelled"
+      ]; %>
+
+
+      <% statuses.forEach(
+        status => {
+      %>
+
+        <option
+          value="<%= status %>"
+          <%= request.status === status
+            ? "selected"
+            : "" %>
+        >
+          <%= status %>
+        </option>
+
+      <% }) %>
+
+    </select>
+
+
+    <button
+      type="button"
+      onclick="updateStatus()"
+    >
+      Update Status
+    </button>
+
+  </div>
+
+</div>
+
+
+<style>
+
+.custom-detail {
+  padding: 30px;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.customer-card {
+  background: white;
+  padding: 25px;
+  margin: 20px 0;
+  border-radius: 15px;
+  box-shadow:
+    0 5px 25px
+    rgba(0,0,0,.08);
+}
+
+.customer-card h3 {
+  color: #8b4a5a;
+  margin-bottom: 20px;
+}
+
+.customer-card input,
+.customer-card textarea,
+.customer-card select {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.customer-card button {
+  background: #b6535d;
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+</style>
+
+
+<script>
+
+document
+  .getElementById("quoteForm")
+  .addEventListener(
+    "submit",
+    async function(e) {
+
+      e.preventDefault();
+
+
+      const quotedPrice =
+        document.getElementById(
+          "quotedPrice"
+        ).value;
+
+
+      const adminNote =
+        document.getElementById(
+          "adminNote"
+        ).value;
+
+
+      const response =
+        await fetch(
+          "/admin/customized-cakes/<%= request._id %>/quote",
+          {
+            method: "PATCH",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+              quotedPrice,
+              adminNote
+            })
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      alert(data.message);
+
+
+      if (data.success) {
+
+        location.reload();
+
+      }
+
+    }
+  );
+
+
+async function updateStatus() {
+
+  const status =
+    document.getElementById(
+      "status"
+    ).value;
+
+
+  const response =
+    await fetch(
+      "/admin/customized-cakes/<%= request._id %>/status",
+      {
+        method: "PATCH",
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body: JSON.stringify({
+          status
+        })
+      }
+    );
+
+
+  const data =
+    await response.json();
+
+
+  alert(data.message);
+
+
+  if (data.success) {
+
+    location.reload();
+
+  }
+
+}
+
+</script>

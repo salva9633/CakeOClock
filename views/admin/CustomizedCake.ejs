@@ -1,0 +1,229 @@
+<div class="customized-admin-page">
+
+  <h2>
+    Customized Cake Management
+  </h2>
+
+  <p>
+    Manage customer customized cake requests
+  </p>
+
+
+  <div class="table-container">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>Customer</th>
+          <th>Phone</th>
+          <th>Cake</th>
+          <th>Weight</th>
+          <th>Required Date</th>
+          <th>Image</th>
+          <th>Price</th>
+          <th>Payment</th>
+          <th>Status</th>
+          <th>Action</th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+
+        <% if (
+          requests &&
+          requests.length
+        ) { %>
+
+
+          <% requests.forEach(
+            request => {
+          %>
+
+            <tr>
+
+
+              <td>
+                <strong>
+                  <%= request.name %>
+                </strong>
+
+                <br>
+
+                <small>
+                  <%= request.email %>
+                </small>
+              </td>
+
+
+              <td>
+                <%= request.phone %>
+              </td>
+
+
+              <td>
+                <%= request.cakeType %>
+              </td>
+
+
+              <td>
+                <%= request.weight %>
+              </td>
+
+
+              <td>
+
+                <%= new Date(
+                  request.neededDate
+                ).toLocaleDateString() %>
+
+              </td>
+
+
+              <td>
+
+                <% if (
+                  request.referenceImage
+                ) { %>
+
+                  <img
+                    src="<%= request.referenceImage %>"
+                    style="
+                      width:60px;
+                      height:60px;
+                      object-fit:cover;
+                      border-radius:8px;
+                    "
+                  >
+
+                <% } else { %>
+
+                  No Image
+
+                <% } %>
+
+              </td>
+
+
+              <td>
+
+                <% if (
+                  request.quotedPrice
+                ) { %>
+
+                  ₹<%= request.quotedPrice %>
+
+                <% } else { %>
+
+                  Pending
+
+                <% } %>
+
+              </td>
+
+
+              <td>
+                <%= request.paymentStatus %>
+              </td>
+
+
+              <td>
+
+                <span>
+                  <%= request.status %>
+                </span>
+
+              </td>
+
+
+              <td>
+
+                <a
+                  href="/admin/customized-cakes/<%= request._id %>"
+                >
+                  View
+                </a>
+
+              </td>
+
+
+            </tr>
+
+          <% }) %>
+
+
+        <% } else { %>
+
+
+          <tr>
+
+            <td colspan="10"
+                style="text-align:center">
+
+              No customized cake requests.
+
+            </td>
+
+          </tr>
+
+
+        <% } %>
+
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+
+
+<style>
+
+.customized-admin-page {
+  padding: 30px;
+}
+
+.table-container {
+  overflow-x: auto;
+  margin-top: 25px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+th {
+  background: #b6535d;
+  color: white;
+  padding: 14px;
+  text-align: left;
+}
+
+td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+tr:hover {
+  background: #fff7f7;
+}
+
+td a {
+  background: #b6535d;
+  color: white;
+  padding: 7px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+</style>

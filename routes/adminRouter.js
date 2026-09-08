@@ -49,7 +49,12 @@ router.use((req, res, next) => {
   res.locals.layout = "layout";
   return next();
 });
-
+import {
+  loadCustomizedCakes,
+  loadCustomizedCakeDetail,
+  updateCustomizedCakeStatus,
+  updateCustomizedCakeQuote
+} from "../controllers/admin/CustomizedCakeController.js";
 
 router.use(noCache);   
 
@@ -193,4 +198,35 @@ router.get("/contact-messages/:id",         adminAuth, viewContactMessage);
 router.post("/contact-messages/:id/reply",  adminAuth, replyContactMessage);
 router.patch("/contact-messages/:id/resolve", adminAuth, resolveTicket);
 router.delete("/contact-messages/:id",      adminAuth, deleteContactMessage);
+
+
+
+// ── CUSTOMIZED CAKES ─────────────────────────────
+
+router.get(
+  "/customized-cakes",
+  adminAuth,
+  loadCustomizedCakes
+);
+
+router.get(
+  "/customized-cakes/:id",
+  adminAuth,
+  loadCustomizedCakeDetail
+);
+
+router.patch(
+  "/customized-cakes/:id/status",
+  adminAuth,
+  updateCustomizedCakeStatus
+);
+
+router.patch(
+  "/customized-cakes/:id/quote",
+  adminAuth,
+  updateCustomizedCakeQuote
+);
+
+
+
 export default router;

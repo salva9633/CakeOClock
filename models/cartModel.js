@@ -4,11 +4,16 @@ const cartItemSchema = new mongoose.Schema({
   productId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Product",
-    required: true
+    default: null
   },
   variantId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Variant"
+  },
+  customizedCakeId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "CustomizedCake",
+    default: null
   },
   quantity: {
     type: Number,

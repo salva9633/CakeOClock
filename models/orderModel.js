@@ -1,7 +1,11 @@
 import mongoose from "mongoose";
 
 const orderItemSchema = new mongoose.Schema({
-  productId:    { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
+productId: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Product",
+  default: null
+},
   variantId:    { type: mongoose.Schema.Types.ObjectId, ref: "Variant" },
   productName:  { type: String, required: true },
   productImage: { type: String },
@@ -60,12 +64,47 @@ const orderSchema = new mongoose.Schema({
 
   items: [orderItemSchema],
 
-  paymentMethod: { type: String, enum: ["COD", "Online", "Razorpay", "Wallet"], default: "COD" },
-  paymentStatus: { type: String, enum: ["Pending", "Paid", "Failed", "Refunded"], default: "Pending" },
-  razorpayOrderId:   { type: String, default: null },
-  razorpayPaymentId: { type: String, default: null },
+  paymentMethod: { 
+  type: String, 
+  enum: ["COD", "Online", "Razorpay", "Wallet"], 
+  default: "COD" 
+},
 
-  itemTotal:      { type: Number, required: true },
+paymentStatus: { 
+  type: String, 
+  enum: ["Pending", "Paid", "Failed", "Refunded"], 
+  default: "Pending" 
+},
+
+razorpayOrderId: {
+  type: String,
+  default: null
+},
+
+razorpayPaymentId: {
+  type: String,
+  default: null
+},
+
+// =====================================================
+// CUSTOMIZED CAKE ORDER
+// =====================================================
+
+isCustomizedCake: {
+  type: Boolean,
+  default: false
+},
+
+customizedCakeId: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "CustomizedCake",
+  default: null
+},
+
+itemTotal: { 
+  type: Number, 
+  required: true 
+},
 
   // ── Legacy display fields ──────────────────────────────────────────
   // Kept for backward compatibility with existing views/templates that

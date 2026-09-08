@@ -29,6 +29,15 @@ import { listOrders, orderDetail, cancelOrder, cancelOrderItem, returnOrder, ret
 import { loadWallet, createWalletOrder, verifyWalletPayment, paymentFailed } from "../controllers/user/walletController.js";
 import { loadContactMessages, viewContactMessage, replyContactMessage, deleteContactMessage } from "../controllers/admin/Contactmessagecontroller.js";
 import { myMessages, viewMyMessage, replyToTicket } from "../controllers/user/contactMessageController.js";
+import {
+  loadCustomizedCakePage,
+  submitCustomizedCake,
+  customizedCakeSuccess,
+  myCustomizedCakes,
+  loadCustomizedCakeCheckout,
+  addCustomizedCakeToCart          // ← add this
+} from "../controllers/user/customizedCakeController.js";
+
 const router = express.Router();
  
 // ── AUTH ──────────────────────────────────────────────
@@ -140,8 +149,14 @@ router.get("/checkout",              userAuth, loadCheckout);
 router.get("/payment-page",          userAuth, loadPaymentPage);
 router.post("/checkout/place",       userAuth, placeOrder);
 router.get("/order-success/:id",     userAuth, orderSuccess);
+router.get(
+  "/customized-cake/checkout/:id",
+  userAuth,
+  loadCustomizedCakeCheckout
+);
  
 router.post("/checkout/apply-coupon",  userAuth, applyCoupon);
+
 router.post("/checkout/remove-coupon", userAuth, removeCoupon);
 // ── RAZORPAY ──────────────────────────────────────────
 router.post("/checkout/create-razorpay-order",   userAuth, createRazorpayOrder);
@@ -190,5 +205,42 @@ router.get("/api/check-block-status", async (req, res) => {
 router.get("/my-messages",     userAuth, myMessages);
 router.get("/my-messages/:id", userAuth, viewMyMessage);
 router.post("/my-messages/:id/reply", userAuth, replyToTicket);
+
+
+
+
+// ─────────────────────────────────────────
+// CUSTOMIZED CAKE
+// ─────────────────────────────────────────
+
+router.get(
+  "/customizedCake",
+  userAuth,
+  loadCustomizedCakePage
+);
+
+router.post(
+  "/customizedCake",
+  userAuth,
+  upload.single("referenceImage"),
+  submitCustomizedCake
+);
+
+router.get(
+  "/customizedCake/success/:id",
+  userAuth,
+  customizedCakeSuccess
+);
+
+router.get(
+  "/my-customizedCakes",
+  userAuth,
+  myCustomizedCakes
+);
+router.get(
+  "/customized-cake/cart/:id",
+  userAuth,
+  addCustomizedCakeToCart
+);
 
 export default router;
