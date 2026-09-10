@@ -23,26 +23,29 @@ import {
   loadPaymentFailed,
   applyCoupon, removeCoupon,
   retryRazorpayOrder,
-  verifyRetryPayment          
+  verifyRetryPayment
 } from "../controllers/user/checkoutController.js";
 import { listOrders, orderDetail, cancelOrder, cancelOrderItem, returnOrder, returnOrderItem, downloadInvoice, getOrderStatus } from "../controllers/user/orderController.js";
 import { loadWallet, createWalletOrder, verifyWalletPayment, paymentFailed } from "../controllers/user/walletController.js";
 import { loadContactMessages, viewContactMessage, replyContactMessage, deleteContactMessage } from "../controllers/admin/Contactmessagecontroller.js";
 import { myMessages, viewMyMessage, replyToTicket } from "../controllers/user/contactMessageController.js";
+
+import chatbotController from "../controllers/user/chatbotController.js";
+
 const router = express.Router();
- 
+
 // ── AUTH ──────────────────────────────────────────────
 router.get("/signUp", userController.signuppage);
 router.post("/signUp", userController.createUser);
- 
+
 router.get("/login", userNotLoggedIn, userController.loadlogin);
 router.post("/login", userController.loginUser);
 router.get("/logout", userController.logout);
- 
+
 router.get("/verify-otp", userController.verifyOtpPage);
 router.post("/verify-otp", userController.verifyOtp);
 router.post("/resend-otp", userController.resendOtp);
- 
+
 // ── GOOGLE OAuth ──────────────────────────────────────
 router.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 router.get(
@@ -59,7 +62,7 @@ router.get(
     res.redirect("/");
   }
 );
- 
+
 // ── FORGOT PASSWORD ───────────────────────────────────
 router.get("/forgotPassword",   userController.forgotPasswordPage);
 router.post("/forgotPassword",  userController.sendForgotOtp);
@@ -190,5 +193,13 @@ router.get("/api/check-block-status", async (req, res) => {
 router.get("/my-messages",     userAuth, myMessages);
 router.get("/my-messages/:id", userAuth, viewMyMessage);
 router.post("/my-messages/:id/reply", userAuth, replyToTicket);
+
+// ── CHATBOT ────────────────────────────────────────────
+
+router.post(
+  "/api/chatbot/message",
+  userAuth,
+  chatbotController.sendMessage
+);
 
 export default router;
