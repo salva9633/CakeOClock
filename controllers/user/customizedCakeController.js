@@ -80,13 +80,19 @@ export const submitCustomizedCake = async (req, res) => {
     // REQUIRED FIELD VALIDATION
     // --------------------------------------------------------
 
+    // --------------------------------------------------------
+    // REQUIRED FIELD VALIDATION
+    // --------------------------------------------------------
+
     if (
       !name ||
       !email ||
       !phone ||
       !address ||
       !cakeType ||
-      !weight
+      !weight ||
+      !description ||
+      !neededDate
     ) {
       return res.status(400).json({
         success: false,
@@ -96,12 +102,212 @@ export const submitCustomizedCake = async (req, res) => {
 
 
     // --------------------------------------------------------
+    // NAME VALIDATION
+    // --------------------------------------------------------
+
+    if (name.trim().length < 2 || name.trim().length > 50) {
+      return res.status(400).json({
+        success: false,
+        message: "Name must be between 2 and 50 characters",
+      });
+    }
+
+    if (!/^[a-zA-Z\s.'-]+$/.test(name.trim())) {
+      return res.status(400).json({
+        success: false,
+        message: "Name contains invalid characters",
+      });
+    }
+
+
+    // --------------------------------------------------------
+    // EMAIL VALIDATION
+    // --------------------------------------------------------
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email.trim())) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid email address",
+      });
+    }
+
+
+    // --------------------------------------------------------
+    // PHONE VALIDATION
+    // --------------------------------------------------------
+
+    const phoneRegex = /^[6-9]\d{9}$/;
+
+    if (!phoneRegex.test(phone.trim())) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid 10-digit phone number",
+      });
+    }
+
+
+    // --------------------------------------------------------
+    // ADDRESS VALIDATION
+    // --------------------------------------------------------
+
+    if (address.trim().length < 10 || address.trim().length > 300) {
+      return res.status(400).json({
+        success: false,
+        message: "Address must be between 10 and 300 characters",
+      });
+    }
+
+
+    // --------------------------------------------------------
+    // CAKE TYPE VALIDATION
+    // --------------------------------------------------------
+
+    const allowedCakeTypes = [
+      "Chocolate",
+      "Vanilla",
+      "Red Velvet",
+      "Butterscotch",
+      "Black Forest",
+      "Other",
+    ];
+
+    if (!allowedCakeTypes.includes(cakeType.trim())) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid cake type selected",
+      });
+    }
+
+
+    // --------------------------------------------------------
+    // WEIGHT VALIDATION
+    // --------------------------------------------------------
+
+    const allowedWeights = [
+      "500g",
+      "1kg",
+      "1.5kg",
+      "2kg",
+      "3kg",
+      "4kg",
+      "5kg",
+    ];
+
+    if (!allowedWeights.includes(weight.trim())) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid weight selected",
+      });
+    }
+
+
+    // --------------------------------------------------------
+    // DESCRIPTION VALIDATION
+    // --------------------------------------------------------
+
+    if (description.trim().length < 10 || description.trim().length > 1000) {
+      return res.status(400).json({
+        success: false,
+        message: "Description must be between 10 and 1000 characters",
+      });
+    }
+
+
+    // --------------------------------------------------------
+    // NEEDED DATE VALIDATION
+    // --------------------------------------------------------
+
+    const parsedDate = new Date(neededDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (isNaN(parsedDate.getTime())) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide a valid date",
+      });
+    }
+
+    if (parsedDate < today) {
+      return res.status(400).json({
+        success: false,
+        message: "Needed date cannot be in the past",
+      });
+    }
+
+
+    // --------------------------------------------------------
+    // NEEDED TIME VALIDATION (optional field)
+    // --------------------------------------------------------
+
+    if (neededTime) {
+      const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+      if (!timeRegex.test(neededTime.trim())) {
+        return res.status(400).json({
+          success: false,
+          message: "Please provide a valid time",
+        });
+      }
+    }
+
+
+    // --------------------------------------------------------
+    // CAKE MESSAGE VALIDATION (optional field)
+    // --------------------------------------------------------
+
+    if (cakeMessage && cakeMessage.trim().length > 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Cake message must be under 100 characters",
+      });
+    }
+
+
+    // --------------------------------------------------------
+    // ADDITIONAL REQUIREMENTS VALIDATION (optional field)
+    // --------------------------------------------------------
+
+    if (
+      additionalRequirements &&
+      additionalRequirements.trim().length > 500
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Additional requirements must be under 500 characters",
+      });
+    }
+
+
+    // --------------------------------------------------------
+    // IMAGE
+    // --------------------------------------------------------
+
+    // --------------------------------------------------------
     // IMAGE
     // --------------------------------------------------------
 
     let referenceImage = "";
 
 if (req.file) {
+  const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
+  const maxSizeBytes = 5 * 1024 * 1024; // 5MB
+
+  if (!allowedMimeTypes.includes(req.file.mimetype)) {
+    return res.status(400).json({
+      success: false,
+      message: "Only JPG, PNG, and WEBP images are allowed",
+    });
+  }
+
+  if (req.file.size > maxSizeBytes) {
+    return res.status(400).json({
+      success: false,
+      message: "Image size must be under 5MB",
+    });
+  }
+
   try {
     // multer is configured with memoryStorage, so the file
     // arrives as a buffer (req.file.buffer), not a disk path.
@@ -274,6 +480,16 @@ export const myCustomizedCakes = async (
     const userId =
       req.session.user.id;
 
+    // --------------------------------------------------------
+    // PAGINATION
+    // --------------------------------------------------------
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = 2;
+    const skip = (page - 1) * limit;
+
+    const totalCakes = await CustomizedCake.countDocuments({ userId });
+    const totalPages = Math.ceil(totalCakes / limit);
 
     const customizedCakes =
       await CustomizedCake.find({
@@ -281,7 +497,9 @@ export const myCustomizedCakes = async (
       })
         .sort({
           createdAt: -1,
-        });
+        })
+        .skip(skip)
+        .limit(limit);
 
 
     res.render(
@@ -289,6 +507,8 @@ export const myCustomizedCakes = async (
 
       {
         customizedCakes,
+        currentPage: page,
+        totalPages,
       }
     );
 
@@ -304,7 +524,6 @@ export const myCustomizedCakes = async (
     );
   }
 };
-
 
 // ============================================================
 // LOAD CUSTOMIZED CAKE CHECKOUT

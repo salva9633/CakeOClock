@@ -2,492 +2,673 @@
 
 <%- include("../../views/partials/user/navbar") %>
 
-
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
 
+:root {
+  --rose:       #C97B8A;
+  --rose-dk:    #A85F6E;
+  --rose-lt:    #FAE8ED;
+  --blush:      #FDF0F3;
+  --petal:      #FBE4EC;
+  --cream:      #FDF8F5;
+  --warm-white: #FFFCFA;
+  --caramel:    #D4A574;
+  --brown:      #5C3A3A;
+  --brown-lt:   #8A6060;
+  --muted:      #B08A8A;
+  --border:     #F5D8E0;
+  --burgundy:   #8B4A5A;
+  --white:      #FFFFFF;
+  --success:    #6E9E5A;
+  --success-bg: #EEF6E9;
+  --warn:       #C4854B;
+  --warn-bg:    #FBF1E6;
+  --danger:     #C0392B;
+  --danger-bg:  #FDEDEC;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+a { text-decoration: none; color: inherit; }
+
+/* ══════════════════════════════════════
+   PAGE SHELL
+══════════════════════════════════════ */
 .my-custom-page {
+  position: relative;
   min-height: 80vh;
-  background: #fdf8f5;
-  padding: 70px 30px;
+  background: var(--blush);
+  padding: 90px 30px 110px;
+  overflow: hidden;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--brown);
+}
+.my-custom-page::before {
+  content: '';
+  position: absolute;
+  top: -140px; right: -140px;
+  width: 420px; height: 420px;
+  border-radius: 50%;
+  background: var(--petal);
+  opacity: .55;
+  pointer-events: none;
+}
+.my-custom-page::after {
+  content: '';
+  position: absolute;
+  bottom: -120px; left: -120px;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: rgba(212,165,116,.12);
+  pointer-events: none;
+}
+.account-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  align-items: start;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.account-layout > .sidebar-nav {
+  position: sticky;
+  top: 100px;
+}
+.my-custom-header {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  position: relative;
+  z-index: 2;
 }
 
 .my-custom-container {
-  max-width: 1100px;
-  margin: auto;
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .account-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ══════════════════════════════════════
+   HEADER
+══════════════════════════════════════ */
+.my-custom-eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .20em;
+  text-transform: uppercase;
+  color: var(--rose-dk);
+  margin-bottom: 16px;
+}
+.my-custom-eyebrow::before,
+.my-custom-eyebrow::after {
+  content: '';
+  width: 26px;
+  height: 1.5px;
+  background: var(--rose-dk);
+  opacity: .5;
 }
 
 .my-custom-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+  font-size: clamp(2.2rem, 4vw, 3rem);
   text-align: center;
-  color: #5c3a3a;
+  color: var(--brown);
   margin-bottom: 10px;
 }
 
 .my-custom-subtitle {
   text-align: center;
-  color: #a85f6e;
-  margin-bottom: 40px;
+  color: var(--brown-lt);
+  font-size: .98rem;
+  margin-bottom: 50px;
 }
 
-
+/* ══════════════════════════════════════
+   REQUEST CARD
+══════════════════════════════════════ */
 .custom-request-card {
-
-  background: white;
-
-  border-radius: 20px;
-
-  padding: 25px;
-
-  margin-bottom: 25px;
-
-  box-shadow:
-    0 10px 35px
-    rgba(168,95,110,.10);
-
+  background: var(--warm-white);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 28px;
+  margin-bottom: 26px;
+  box-shadow: 0 16px 46px rgba(168,95,110,.10);
   display: grid;
-
-  grid-template-columns:
-    180px 1fr;
-
-  gap: 25px;
-
+  grid-template-columns: 200px 1fr;
+  gap: 30px;
+  transition: box-shadow .25s ease, transform .25s ease;
 }
-
+.custom-request-card:hover {
+  box-shadow: 0 22px 58px rgba(168,95,110,.16);
+  transform: translateY(-2px);
+}
 
 .custom-request-image {
-
-  width: 180px;
-
-  height: 180px;
-
-  border-radius: 15px;
-
+  width: 200px;
+  height: 200px;
+  border-radius: 18px;
   overflow: hidden;
-
-  background: #fbe4ec;
-
+  background: var(--petal);
+  flex-shrink: 0;
 }
-
-
 .custom-request-image img {
-
   width: 100%;
-
   height: 100%;
-
   object-fit: cover;
-
 }
-
 
 .no-image {
-
   width: 100%;
-
   height: 100%;
-
   display: flex;
-
+  flex-direction: column;
+  gap: 8px;
   justify-content: center;
-
   align-items: center;
-
-  color: #a85f6e;
-
+  color: var(--rose-dk);
+  font-size: .78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
 }
+.no-image span.no-image-emoji { font-size: 2rem; }
 
+/* ══════════════════════════════════════
+   CARD CONTENT
+══════════════════════════════════════ */
+.custom-request-content {
+  display: flex;
+  flex-direction: column;
+}
 
 .custom-request-content h3 {
-
-  color: #8b4a5a;
-
-  margin-bottom: 15px;
-
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--burgundy);
+  margin-bottom: 16px;
 }
-
 
 .custom-info {
-
   display: grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
-  gap: 10px;
-
-  margin-bottom: 15px;
-
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 20px;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px dashed var(--border);
 }
 
-
-.custom-info p {
-
-  margin: 0;
-
-  color: #8a6060;
-
+.custom-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
-
-.status {
-
-  display: inline-block;
-
-  padding: 6px 14px;
-
-  border-radius: 30px;
-
-  background: #fbe4ec;
-
-  color: #8b4a5a;
-
-  font-size: 13px;
-
+.custom-info-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: .7rem;
   font-weight: 700;
-
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
-
-
-.price {
-
-  font-size: 20px;
-
-  font-weight: 700;
-
-  color: #a85f6e;
-
-}
-
-
-.custom-description {
-
-  background: #fdf0f3;
-
-  padding: 12px;
-
-  border-radius: 10px;
-
-  margin-top: 15px;
-
-}
-
-
-.empty-custom {
-
-  background: white;
-
+.custom-info-label i {
+  color: var(--rose-dk);
+  font-size: .75rem;
+  width: 14px;
   text-align: center;
-
-  padding: 70px 20px;
-
-  border-radius: 20px;
-
 }
 
-
-.empty-custom h2 {
-
-  color: #8b4a5a;
-
+.custom-info-value {
+  font-size: .92rem;
+  font-weight: 600;
+  color: var(--brown);
 }
 
-
-.customize-button {
-
-  display: inline-block;
-
-  margin-top: 20px;
-
-  padding: 14px 25px;
-
-  background: #a85f6e;
-
-  color: white;
-
+/* Status badge — color-coded by state */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  padding: 5px 13px;
   border-radius: 30px;
-
-  text-decoration: none;
-
+  background: var(--rose-lt);
+  color: var(--burgundy);
+  font-size: .72rem;
   font-weight: 700;
+  letter-spacing: .03em;
+  text-transform: capitalize;
+}
+.status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.status.status-pending  { background: var(--warn-bg);    color: var(--warn); }
+.status.status-quoted   { background: var(--rose-lt);    color: var(--burgundy); }
+.status.status-accepted,
+.status.status-completed{ background: var(--success-bg); color: var(--success); }
+.status.status-rejected { background: var(--danger-bg);  color: var(--danger); }
 
+/* ══════════════════════════════════════
+   PRICE
+══════════════════════════════════════ */
+.price-block {
+  margin-bottom: 18px;
 }
 
-
-@media(max-width:700px) {
-
-  .custom-request-card {
-
-    grid-template-columns: 1fr;
-
-  }
-
-  .custom-request-image {
-
-    width: 100%;
-
-    height: 230px;
-
-  }
-
-  .custom-info {
-
-    grid-template-columns: 1fr;
-
-  }
-
-}
 .quoted-price {
-  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: #a85f6e;
-  margin-bottom: 15px;
+  color: var(--rose-dk);
+  margin-bottom: 14px;
 }
+.quoted-price i { font-size: 1rem; }
 
 .waiting-price {
-  font-size: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .88rem;
   font-weight: 700;
-  color: #a85f6e;
+  color: var(--muted);
+  background: var(--cream);
+  border: 1px dashed var(--border);
+  padding: 8px 16px;
+  border-radius: 30px;
+}
+.waiting-price i {
+  font-size: .85rem;
+  color: var(--rose-dk);
 }
 
 .custom-checkout-btn {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-
   padding: 12px 22px;
-
-  background: linear-gradient(
-    135deg,
-    #a85f6e,
-    #8b4a5a
-  );
-
-  color: white;
-
+  background: linear-gradient(135deg, var(--rose-dk), var(--burgundy));
+  color: var(--white);
   border-radius: 30px;
-
-  text-decoration: none;
-
-  font-size: 14px;
-
+  font-size: .86rem;
   font-weight: 700;
-
-  transition: .2s ease;
+  transition: transform .2s ease, box-shadow .2s ease;
+  box-shadow: 0 8px 22px rgba(168,95,110,.22);
 }
-
 .custom-checkout-btn:hover {
-  color: white;
-  transform: translateY(-2px);
-
-  box-shadow:
-    0 8px 20px
-    rgba(168,95,110,.25);
+  color: var(--white);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(168,95,110,.32);
 }
 
+/* ══════════════════════════════════════
+   DESCRIPTION / NOTES
+══════════════════════════════════════ */
+.custom-description {
+  background: var(--cream);
+  border-left: 3px solid var(--rose);
+  padding: 14px 16px;
+  border-radius: 12px;
+  margin-top: 12px;
+}
+.custom-description strong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .76rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--rose-dk);
+  margin-bottom: 6px;
+}
+.custom-description p {
+  font-size: .9rem;
+  color: var(--brown-lt);
+  line-height: 1.6;
+}
+
+.custom-description.admin-note {
+  background: var(--rose-lt);
+  border-left-color: var(--burgundy);
+}
+.custom-description.admin-note strong {
+  color: var(--burgundy);
+}
+
+/* ══════════════════════════════════════
+   EMPTY STATE
+══════════════════════════════════════ */
+.empty-custom {
+  position: relative;
+  z-index: 2;
+  background: var(--warm-white);
+  border: 1px solid var(--border);
+  text-align: center;
+  padding: 80px 32px;
+  border-radius: 26px;
+  box-shadow: 0 20px 60px rgba(168,95,110,.10);
+}
+
+.empty-custom-icon {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--rose-lt), var(--petal));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.4rem;
+  box-shadow: 0 10px 30px rgba(168,95,110,.16);
+}
+
+.empty-custom h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+  font-size: 1.7rem;
+  color: var(--brown);
+  margin-bottom: 10px;
+}
+
+.empty-custom p {
+  color: var(--brown-lt);
+  font-size: .95rem;
+  margin-bottom: 8px;
+}
+
+.customize-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+  padding: 15px 30px;
+  background: linear-gradient(135deg, var(--rose-dk), var(--burgundy));
+  color: var(--white);
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: .92rem;
+  box-shadow: 0 10px 30px rgba(168,95,110,.28);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.customize-button:hover {
+  color: var(--white);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px rgba(168,95,110,.38);
+}
+
+/* ══════════════════════════════════════
+   PAGINATION
+══════════════════════════════════════ */
+.custom-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.custom-pagination a,
+.custom-pagination span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 12px;
+  font-size: .86rem;
+  font-weight: 700;
+  color: var(--brown);
+  background: var(--warm-white);
+  border: 1px solid var(--border);
+  transition: background .2s ease, color .2s ease, transform .2s ease;
+}
+
+.custom-pagination a:hover {
+  background: var(--rose-lt);
+  color: var(--rose-dk);
+  transform: translateY(-2px);
+}
+
+.custom-pagination .page-active {
+  background: linear-gradient(135deg, var(--rose-dk), var(--burgundy));
+  color: var(--white);
+  border-color: transparent;
+  box-shadow: 0 6px 16px rgba(168,95,110,.28);
+}
+
+.custom-pagination .page-disabled {
+  opacity: .4;
+  pointer-events: none;
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 700px) {
+  .my-custom-page { padding: 60px 18px 80px; }
+  .custom-request-card {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+  .custom-request-image {
+    width: 100%;
+    height: 220px;
+  }
+  .custom-info {
+    grid-template-columns: 1fr;
+  }
+  .empty-custom { padding: 56px 22px; }
+}
 </style>
 
 
 <div class="my-custom-page">
 
-  <div class="my-custom-container">
-
+  <div class="my-custom-header">
+    <div class="my-custom-eyebrow">Order Tracking</div>
 
     <h1 class="my-custom-title">
-
       My Customized Cakes
-
     </h1>
 
-
     <p class="my-custom-subtitle">
-
       Track your customized cake requests
-
     </p>
+  </div>
 
+  <div class="account-layout">
 
-       <% if (
-      customizedCakes &&
-      customizedCakes.length > 0
-    ) { %>
+    <%- include("../../views/partials/user/sider") %>
 
-      <% customizedCakes.forEach(
-        customizedCake => {
-      %>
+    <div class="my-custom-container">
 
+    <% if (customizedCakes && customizedCakes.length > 0) { %>
+
+      <% customizedCakes.forEach(customizedCake => { %>
 
         <div class="custom-request-card">
 
-
           <div class="custom-request-image">
-
-            <% if (
-              customizedCake.referenceImage
-            ) { %>
-
-                            <img
+            <% if (customizedCake.referenceImage) { %>
+              <img
                 src="<%= customizedCake.referenceImage %>"
                 alt="Cake reference"
               >
-
-
             <% } else { %>
-
               <div class="no-image">
-                🎂 No Image
+                <span class="no-image-emoji">🎂</span>
+                No Image
               </div>
-
             <% } %>
-
           </div>
-
 
           <div class="custom-request-content">
 
-
-            <h3>
-
-                         <%= customizedCake.cakeType %>
-              Cake
-            </h3>
-
+            <h3><%= customizedCake.cakeType %> Cake</h3>
 
             <div class="custom-info">
 
-              <p>
-                <strong>Weight:</strong>
-                <%= customizedCake.weight %>
-                          </p>
-
-
-              <p>
-                <strong>Required Date:</strong>
-
-                <%= new Date(
-                  customizedCake.neededDate
-                ).toLocaleDateString() %>
-
-              </p>
-
-
-              <p>
-                <strong>Time:</strong>
-
-                <%= customizedCake.neededTime ||
-                   "Not specified" %>
-              </p>
-
-
-              <p>
-
-                <strong>Status:</strong>
-
-                <span class="status">
-                  <%= customizedCake.status %>
-                </span>
-
-              </p>
-
-            </div>
-
-
-            <div class="price">
-
-<% if (customizedCake.quotedPrice && customizedCake.quotedPrice > 0) { %>
-
-    <div class="quoted-price">
-        Quoted Price:
-        ₹<%= customizedCake.quotedPrice.toLocaleString("en-IN") %>
-    </div>
-
-    <% if (customizedCake.status === "quoted") { %>
-
-        <a href="/customized-cake/cart/<%= customizedCake._id %>"
-        class="custom-checkout-btn"
-    >
-        <i class="fa-solid fa-credit-card"></i>
-        Add to Cart
-        <i class="fa-solid fa-arrow-right"></i>
-    </a>
-
-<% } %>
-
-<% } else { %>
-
-    <div class="waiting-price">
-        Price: Waiting for quotation
-    </div>
-
-<% } %>
-</div>
-
-
-            <div class="custom-description">
-
-              <strong>
-                Your Requirements:
-              </strong>
-
-                          <p>
-                <%= customizedCake.description %>
-              </p>
-            </div>
-
-
-            <% if (customizedCake.adminNote) { %>
-
-              <div class="custom-description">
-
-                <strong>
-                  Message from Cake O'Clock:
-                </strong>
-
-                <p>
-                  <%= customizedCake.adminNote %>
-                </p>
-
+              <div class="custom-info-item">
+                <div class="custom-info-label">
+                  <i class="fa-solid fa-weight-scale"></i>
+                  Weight
+                </div>
+                <div class="custom-info-value"><%= customizedCake.weight %></div>
               </div>
 
-            <% } %>
+              <div class="custom-info-item">
+                <div class="custom-info-label">
+                  <i class="fa-solid fa-calendar-days"></i>
+                  Required Date
+                </div>
+                <div class="custom-info-value">
+                  <%= new Date(customizedCake.neededDate).toLocaleDateString() %>
+                </div>
+              </div>
 
+              <div class="custom-info-item">
+                <div class="custom-info-label">
+                  <i class="fa-solid fa-clock"></i>
+                  Time
+                </div>
+                <div class="custom-info-value">
+                  <%= customizedCake.neededTime || "Not specified" %>
+                </div>
+              </div>
+
+              <div class="custom-info-item">
+                <div class="custom-info-label">
+                  <i class="fa-solid fa-circle-info"></i>
+                  Status
+                </div>
+                <span class="status status-<%= (customizedCake.status || '').toLowerCase() %>">
+                  <%= customizedCake.status %>
+                </span>
+              </div>
+
+            </div>
+
+            <div class="price-block">
+
+              <% if (customizedCake.quotedPrice && customizedCake.quotedPrice > 0) { %>
+
+                <div class="quoted-price">
+                  <i class="fa-solid fa-tag"></i>
+                  Quoted Price: ₹<%= customizedCake.quotedPrice.toLocaleString("en-IN") %>
+                </div>
+
+                <% if (customizedCake.status === "quoted") { %>
+                  <a href="/customized-cake/cart/<%= customizedCake._id %>"
+                     class="custom-checkout-btn">
+                    <i class="fa-solid fa-credit-card"></i>
+                    Add to Cart
+                    <i class="fa-solid fa-arrow-right"></i>
+                  </a>
+                <% } %>
+
+              <% } else { %>
+
+                <div class="waiting-price">
+                  <i class="fa-solid fa-hourglass-half"></i>
+                  Price: Waiting for quotation
+                </div>
+
+              <% } %>
+
+            </div>
+
+            <div class="custom-description">
+              <strong>
+                <i class="fa-solid fa-pen"></i>
+                Your Requirements
+              </strong>
+              <p><%= customizedCake.description %></p>
+            </div>
+
+            <% if (customizedCake.adminNote) { %>
+              <div class="custom-description admin-note">
+                <strong>
+                  <i class="fa-solid fa-comment-dots"></i>
+                  Message from Cake O'Clock
+                </strong>
+                <p><%= customizedCake.adminNote %></p>
+              </div>
+            <% } %>
 
           </div>
 
         </div>
 
-
       <% }) %>
 
+      <% if (totalPages > 1) { %>
+        <div class="custom-pagination">
+
+          <a href="?page=<%= currentPage - 1 %>"
+             class="<%= currentPage === 1 ? 'page-disabled' : '' %>">
+            <i class="fa-solid fa-chevron-left"></i>
+          </a>
+
+          <% for (let i = 1; i <= totalPages; i++) { %>
+            <a href="?page=<%= i %>"
+               class="<%= currentPage === i ? 'page-active' : '' %>">
+              <%= i %>
+            </a>
+          <% } %>
+
+          <a href="?page=<%= currentPage + 1 %>"
+             class="<%= currentPage === totalPages ? 'page-disabled' : '' %>">
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+
+        </div>
+      <% } %>
 
     <% } else { %>
 
-
       <div class="empty-custom">
+        <div class="empty-custom-icon">🎂</div>
+        <h2>No Customized Cakes Yet</h2>
+        <p>Create your dream cake today.</p>
 
-        <div style="font-size:60px;">
-          🎂
-        </div>
-
-        <h2>
-          No Customized Cakes Yet
-        </h2>
-
-        <p>
-          Create your dream cake today.
-        </p>
-
-
-        <a
-          href="/customized-cake"
-          class="customize-button"
-        >
+        <a href="/customized-cake" class="customize-button">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
           Customize Your Cake
         </a>
-
       </div>
-
 
     <% } %>
 
+    </div>
 
   </div>
 

@@ -1,31 +1,565 @@
+<style>
+  :root {
+    --rose: #c97b8a;
+    --rose-dark: #a85f6e;
+    --rose-light: #fae8ed;
+    --blush: #fdf5f6;
+    --brown: #5c3a3a;
+    --muted: #b08a8a;
+    --border: #f1dce1;
+    --white: #ffffff;
+    --green-bg: #e8f6f0;
+    --green-text: #4e8a5e;
+    --orange-bg: #fef0e8;
+    --orange-text: #c58a55;
+  }
+
+  /* =====================================================
+     MAIN PAGE
+     ===================================================== */
+
+  .customized-table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+  /* =====================================================
+     HEADER
+     ===================================================== */
+
+  .customized-admin-header {
+    margin-bottom: 22px;
+  }
+
+  .customized-admin-header h2 {
+    margin: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    color: var(--brown);
+
+    font-size: 26px;
+    font-weight: 600;
+
+    line-height: 1.3;
+  }
+
+  .customized-admin-header h2 i {
+    color: var(--rose);
+    font-size: 25px;
+  }
+
+  .customized-admin-header p {
+    margin: 7px 0 0;
+
+    color: var(--muted);
+
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* =====================================================
+     TABLE BOX
+     ===================================================== */
+
+  .customized-table-container {
+    width: 100%;
+    max-width: 100%;
+
+    box-sizing: border-box;
+
+    background: var(--white);
+
+    border: 1px solid var(--border);
+
+    border-radius: 14px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* =====================================================
+     TABLE
+     ===================================================== */
+
+  .customized-table {
+    width: 100%;
+    min-width: 1100px;
+    table-layout: fixed;
+
+    border-collapse: separate;
+    border-spacing: 0;
+
+    background: var(--white);
+  }
+
+  .customized-table th:nth-child(1),
+  .customized-table td:nth-child(1)  { width: 190px; }  /* Customer */
+  .customized-table th:nth-child(2),
+  .customized-table td:nth-child(2)  { width: 110px; }  /* Phone */
+  .customized-table th:nth-child(3),
+  .customized-table td:nth-child(3)  { width: 100px; }  /* Cake */
+  .customized-table th:nth-child(4),
+  .customized-table td:nth-child(4)  { width: 80px;  }  /* Weight */
+  .customized-table th:nth-child(5),
+  .customized-table td:nth-child(5)  { width: 120px; }  /* Required Date */
+  .customized-table th:nth-child(6),
+  .customized-table td:nth-child(6)  { width: 90px;  }  /* Image */
+  .customized-table th:nth-child(7),
+  .customized-table td:nth-child(7)  { width: 100px; }  /* Price */
+  .customized-table th:nth-child(8),
+  .customized-table td:nth-child(8)  { width: 90px;  }  /* Payment */
+  .customized-table th:nth-child(9),
+  .customized-table td:nth-child(9)  { width: 100px; }  /* Status */
+  .customized-table th:nth-child(10),
+  .customized-table td:nth-child(10) { width: 100px; }  /* Action */
+  /* =====================================================
+     TABLE HEADER
+     ===================================================== */
+
+  .customized-table thead th {
+    background: var(--rose);
+
+    color: var(--white);
+
+    padding: 15px 16px;
+
+    text-align: left;
+    vertical-align: middle;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.03em;
+
+    white-space: nowrap;
+  }
+
+  .customized-table thead th:first-child {
+    border-top-left-radius: 13px;
+  }
+
+  .customized-table thead th:last-child {
+    border-top-right-radius: 13px;
+  }
+
+  /* =====================================================
+     TABLE BODY
+     ===================================================== */
+
+  .customized-table tbody td {
+    padding: 14px 16px;
+
+    border-bottom: 1px solid var(--rose-light);
+
+    color: var(--brown);
+
+    font-size: 13px;
+
+    vertical-align: middle;
+
+    white-space: nowrap;
+
+    box-sizing: border-box;
+  }
+
+  .customized-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .customized-table tbody tr {
+    transition: background-color 0.15s ease;
+  }
+
+  .customized-table tbody tr:hover td {
+    background: var(--blush);
+  }
+
+  /* =====================================================
+     CUSTOMER
+     ===================================================== */
+
+  .customized-customer-name {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: var(--brown);
+
+    font-size: 14px;
+
+    font-weight: 600;
+  }
+
+  .customized-customer-email {
+    display: block;
+
+    max-width: 220px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    color: var(--muted);
+
+    font-size: 11px;
+  }
+
+  /* =====================================================
+     CAKE
+     ===================================================== */
+
+  .customized-cake-name {
+    font-weight: 500;
+
+    color: var(--brown);
+  }
+
+  /* =====================================================
+     IMAGE
+     ===================================================== */
+
+  .customized-cake-image {
+    width: 52px;
+    height: 52px;
+
+    display: block;
+
+    object-fit: cover;
+
+    border-radius: 9px;
+
+    border: 1px solid var(--border);
+
+    background: var(--rose-light);
+  }
+
+  .customized-no-image {
+    display: inline-block;
+
+    color: var(--muted);
+
+    font-size: 12px;
+
+    line-height: 1.4;
+
+    white-space: normal;
+  }
+
+  /* =====================================================
+     PRICE
+     ===================================================== */
+
+  .customized-price {
+    color: var(--brown);
+
+    font-size: 13px;
+
+    font-weight: 600;
+  }
+
+  .customized-price.pending {
+    color: var(--muted);
+
+    font-weight: 400;
+  }
+
+  /* =====================================================
+     PAYMENT
+     ===================================================== */
+
+  .customized-payment {
+    color: var(--brown);
+
+    font-size: 13px;
+
+    text-transform: capitalize;
+  }
+
+  /* =====================================================
+     STATUS
+     ===================================================== */
+
+  .customized-status {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 70px;
+
+    padding: 5px 11px;
+
+    border-radius: 20px;
+
+    background: var(--rose-light);
+
+    color: var(--rose-dark);
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    text-transform: capitalize;
+
+    white-space: nowrap;
+  }
+
+  /* Pending */
+
+  .customized-status.pending {
+    background: var(--rose-light);
+
+    color: var(--rose-dark);
+  }
+
+  /* Approved */
+
+  .customized-status.approved {
+    background: var(--orange-bg);
+
+    color: var(--orange-text);
+  }
+
+  /* Quoted */
+
+  .customized-status.quoted {
+    background: var(--orange-bg);
+
+    color: var(--orange-text);
+  }
+
+  /* Ready */
+
+  .customized-status.ready {
+    background: var(--orange-bg);
+
+    color: var(--orange-text);
+  }
+
+  /* Reviewing */
+
+  .customized-status.reviewing {
+    background: var(--rose-light);
+
+    color: var(--rose-dark);
+  }
+
+  /* In Production */
+
+  .customized-status.in-production {
+    background: var(--rose-light);
+
+    color: var(--rose-dark);
+  }
+
+  /* Delivered */
+
+  .customized-status.delivered {
+    background: var(--green-bg);
+
+    color: var(--green-text);
+  }
+
+  /* Cancelled */
+
+  .customized-status.cancelled {
+    background: #f5e6e6;
+
+    color: #a85454;
+  }
+
+  /* =====================================================
+     VIEW BUTTON
+     ===================================================== */
+
+  .customized-view-button {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+
+    min-width: 58px;
+
+    padding: 8px 14px;
+
+    border-radius: 8px;
+
+    background: var(--rose);
+
+    color: var(--white);
+
+    text-decoration: none;
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+    transition:
+      background-color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .customized-view-button:hover {
+    background: var(--rose-dark);
+
+    color: var(--white);
+
+    text-decoration: none;
+
+    transform: translateY(-1px);
+  }
+
+  .customized-view-button i {
+    font-size: 14px;
+  }
+
+  /* =====================================================
+     EMPTY STATE
+     ===================================================== */
+
+  .customized-empty {
+    padding: 45px 20px !important;
+
+    text-align: center !important;
+
+    color: var(--muted) !important;
+
+    font-size: 14px !important;
+  }
+
+  /* =====================================================
+     SCROLLBAR
+     ===================================================== */
+
+  .customized-table-container::-webkit-scrollbar {
+    height: 7px;
+  }
+
+  .customized-table-container::-webkit-scrollbar-track {
+    background: #fdf0f3;
+
+    border-radius: 10px;
+  }
+
+  .customized-table-container::-webkit-scrollbar-thumb {
+    background: #d9a0ad;
+
+    border-radius: 10px;
+  }
+
+  .customized-table-container::-webkit-scrollbar-thumb:hover {
+    background: var(--rose);
+  }
+
+  /* =====================================================
+     RESPONSIVE
+     ===================================================== */
+
+  @media (max-width: 1200px) {
+
+    .customized-admin-page {
+      padding: 25px 20px;
+    }
+
+    .customized-admin-header h2 {
+      font-size: 23px;
+    }
+  }
+
+  @media (max-width: 768px) {
+
+    .customized-admin-page {
+      padding: 20px 15px;
+    }
+
+    .customized-admin-header h2 {
+      font-size: 21px;
+    }
+
+    .customized-admin-header h2 i {
+      font-size: 21px;
+    }
+
+    .customized-admin-header p {
+      font-size: 13px;
+    }
+
+    .customized-table-container {
+      border-radius: 10px;
+    }
+  }
+</style>
+
+
+<!-- =====================================================
+     CUSTOMIZED CAKE MANAGEMENT PAGE
+===================================================== -->
+
 <div class="customized-admin-page">
 
-  <h2>
-    Customized Cake Management
-  </h2>
+  <!-- PAGE HEADER -->
+  <div class="customized-admin-header">
 
-  <p>
-    Manage customer customized cake requests
-  </p>
+    <h2>
+
+      <i
+        class="ti ti-cake"
+        aria-hidden="true"
+      ></i>
+
+      Customized Cake Management
+
+    </h2>
+
+    <p>
+      Manage and review customer customized cake requests.
+    </p>
+
+  </div>
 
 
-  <div class="table-container">
+  <!-- ===================================================
+       TABLE
+  ==================================================== -->
 
-    <table>
+  <div class="customized-table-container">
+
+    <table class="customized-table">
+
+      <!-- ===============================
+           TABLE HEADER
+      ================================ -->
 
       <thead>
 
         <tr>
 
           <th>Customer</th>
+
           <th>Phone</th>
+
           <th>Cake</th>
+
           <th>Weight</th>
+
           <th>Required Date</th>
+
           <th>Image</th>
+
           <th>Price</th>
+
           <th>Payment</th>
+
           <th>Status</th>
+
           <th>Action</th>
 
         </tr>
@@ -33,127 +567,239 @@
       </thead>
 
 
+      <!-- ===============================
+           TABLE BODY
+      ================================ -->
+
       <tbody>
 
-
-        <% if (
-          requests &&
-          requests.length
-        ) { %>
+        <% if (requests && requests.length > 0) { %>
 
 
-          <% requests.forEach(
-            request => {
-          %>
+          <% requests.forEach(request => { %>
+
+            <%
+              /*
+                Convert status into a CSS-safe class.
+
+                Example:
+                "Pending"       -> "pending"
+                "Approved"      -> "approved"
+                "In Production" -> "in-production"
+              */
+
+              const statusText =
+                request.status
+                  ? String(request.status)
+                  : "Pending";
+
+              const statusClass =
+                statusText
+                  .toLowerCase()
+                  .trim()
+                  .replace(/\s+/g, "-");
+            %>
+
 
             <tr>
 
-
-              <td>
-                <strong>
-                  <%= request.name %>
-                </strong>
-
-                <br>
-
-                <small>
-                  <%= request.email %>
-                </small>
-              </td>
-
-
-              <td>
-                <%= request.phone %>
-              </td>
-
-
-              <td>
-                <%= request.cakeType %>
-              </td>
-
-
-              <td>
-                <%= request.weight %>
-              </td>
-
+              <!-- =========================
+                   CUSTOMER
+              ========================== -->
 
               <td>
 
-                <%= new Date(
-                  request.neededDate
-                ).toLocaleDateString() %>
+                <span class="customized-customer-name">
 
-              </td>
+                  <%= request.name || "N/A" %>
 
+                </span>
 
-              <td>
+                <span class="customized-customer-email">
 
-                <% if (
-                  request.referenceImage
-                ) { %>
+                  <%= request.email || "No email" %>
 
-                  <img
-                    src="<%= request.referenceImage %>"
-                    style="
-                      width:60px;
-                      height:60px;
-                      object-fit:cover;
-                      border-radius:8px;
-                    "
-                  >
-
-                <% } else { %>
-
-                  No Image
-
-                <% } %>
-
-              </td>
-
-
-              <td>
-
-                <% if (
-                  request.quotedPrice
-                ) { %>
-
-                  ₹<%= request.quotedPrice %>
-
-                <% } else { %>
-
-                  Pending
-
-                <% } %>
-
-              </td>
-
-
-              <td>
-                <%= request.paymentStatus %>
-              </td>
-
-
-              <td>
-
-                <span>
-                  <%= request.status %>
                 </span>
 
               </td>
 
 
+              <!-- =========================
+                   PHONE
+              ========================== -->
+
               <td>
 
-                <a
-                  href="/admin/customized-cakes/<%= request._id %>"
-                >
-                  View
-                </a>
+                <%= request.phone || "N/A" %>
 
               </td>
 
 
+              <!-- =========================
+                   CAKE
+              ========================== -->
+
+              <td>
+
+                <span class="customized-cake-name">
+
+                  <%= request.cakeType || "N/A" %>
+
+                </span>
+
+              </td>
+
+
+              <!-- =========================
+                   WEIGHT
+              ========================== -->
+
+              <td>
+
+                <%= request.weight || "N/A" %>
+
+              </td>
+
+
+              <!-- =========================
+                   REQUIRED DATE
+              ========================== -->
+
+              <td>
+
+                <% if (request.neededDate) { %>
+
+                  <%= new Date(
+                    request.neededDate
+                  ).toLocaleDateString("en-IN") %>
+
+                <% } else { %>
+
+                  N/A
+
+                <% } %>
+
+              </td>
+
+
+              <!-- =========================
+                   IMAGE
+              ========================== -->
+
+              <td>
+
+                <% if (request.referenceImage) { %>
+
+                  <img
+  src="<%= request.referenceImage %>"
+  alt="Cake reference image"
+  class="customized-cake-image"
+  width="52"
+  height="52"
+  loading="lazy"
+>
+                <% } else { %>
+
+                  <span class="customized-no-image">
+
+                    No Image
+
+                  </span>
+
+                <% } %>
+
+              </td>
+
+
+              <!-- =========================
+                   PRICE
+              ========================== -->
+
+              <td>
+
+                <% if (
+                  request.quotedPrice !== undefined &&
+                  request.quotedPrice !== null &&
+                  request.quotedPrice !== ""
+                ) { %>
+
+                  <span class="customized-price">
+
+                    ₹<%= Number(
+                      request.quotedPrice
+                    ).toLocaleString("en-IN") %>
+
+                  </span>
+
+                <% } else { %>
+
+                  <span class="customized-price pending">
+
+                    Pending
+
+                  </span>
+
+                <% } %>
+
+              </td>
+
+
+              <!-- =========================
+                   PAYMENT
+              ========================== -->
+
+              <td>
+
+                <span class="customized-payment">
+
+                  <%= request.paymentStatus || "Pending" %>
+
+                </span>
+
+              </td>
+
+
+              <!-- =========================
+                   STATUS
+              ========================== -->
+
+              <td>
+
+                <span
+                  class="customized-status <%= statusClass %>"
+                >
+
+                  <%= statusText %>
+
+                </span>
+
+              </td>
+
+
+              <!-- =========================
+                   ACTION
+              ========================== -->
+
+              <td>
+
+                <a
+                  href="/admin/customized-cakes/<%= request._id %>"
+                  class="customized-view-button"
+                >
+
+                  <i
+                    class="ti ti-eye"
+                    aria-hidden="true"
+                  ></i>
+
+                  View
+
+                </a>
+
+              </td>
+
             </tr>
+
 
           <% }) %>
 
@@ -161,12 +807,18 @@
         <% } else { %>
 
 
+          <!-- =========================
+               NO REQUESTS
+          ========================== -->
+
           <tr>
 
-            <td colspan="10"
-                style="text-align:center">
+            <td
+              colspan="10"
+              class="customized-empty"
+            >
 
-              No customized cake requests.
+              No customized cake requests found.
 
             </td>
 
@@ -175,7 +827,6 @@
 
         <% } %>
 
-
       </tbody>
 
     </table>
@@ -183,47 +834,3 @@
   </div>
 
 </div>
-
-
-<style>
-
-.customized-admin-page {
-  padding: 30px;
-}
-
-.table-container {
-  overflow-x: auto;
-  margin-top: 25px;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-}
-
-th {
-  background: #b6535d;
-  color: white;
-  padding: 14px;
-  text-align: left;
-}
-
-td {
-  padding: 12px;
-  border-bottom: 1px solid #eee;
-}
-
-tr:hover {
-  background: #fff7f7;
-}
-
-td a {
-  background: #b6535d;
-  color: white;
-  padding: 7px 12px;
-  border-radius: 6px;
-  text-decoration: none;
-}
-
-</style>

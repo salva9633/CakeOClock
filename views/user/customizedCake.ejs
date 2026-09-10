@@ -1,160 +1,449 @@
+<%- include("../../views/partials/user/h2") %>
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
+
+:root {
+  --rose:       #C97B8A;
+  --rose-dk:    #A85F6E;
+  --rose-lt:    #FAE8ED;
+  --blush:      #FDF0F3;
+  --petal:      #FBE4EC;
+  --cream:      #FDF8F5;
+  --warm-white: #FFFCFA;
+  --caramel:    #D4A574;
+  --brown:      #5C3A3A;
+  --brown-lt:   #8A6060;
+  --muted:      #B08A8A;
+  --border:     #F5D8E0;
+  --burgundy:   #8B4A5A;
+  --white:      #FFFFFF;
+  --error:      #C0392B;
+  --error-bg:   #FDEDEC;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--blush);
+  color: var(--brown);
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* ══════════════════════════════════════
+   PAGE SHELL
+══════════════════════════════════════ */
+.customized-page {
+  position: relative;
+  padding: 90px 24px 110px;
+  overflow: hidden;
+}
+.customized-page::before {
+  content: '';
+  position: absolute;
+  top: -140px; right: -140px;
+  width: 420px; height: 420px;
+  border-radius: 50%;
+  background: var(--petal);
+  opacity: .6;
+  pointer-events: none;
+}
+.customized-page::after {
+  content: '';
+  position: absolute;
+  bottom: -120px; left: -120px;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: rgba(212,165,116,.14);
+  pointer-events: none;
+}
+
+.customized-container {
+  max-width: 860px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* ══════════════════════════════════════
+   PAGE HEADER
+══════════════════════════════════════ */
+.customized-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.customized-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .20em;
+  text-transform: uppercase;
+  color: var(--rose-dk);
+  margin-bottom: 18px;
+}
+.customized-eyebrow::before,
+.customized-eyebrow::after {
+  content: '';
+  width: 26px;
+  height: 1.5px;
+  background: var(--rose-dk);
+  opacity: .5;
+}
+
+.customized-container h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+  font-size: clamp(2.4rem, 4.5vw, 3.4rem);
+  color: var(--brown);
+  line-height: 1.1;
+  margin-bottom: 14px;
+}
+.customized-container h1 em {
+  font-style: italic;
+  color: var(--rose-dk);
+}
+
+.customized-container > p {
+  font-size: 1rem;
+  color: var(--brown-lt);
+  line-height: 1.7;
+  max-width: 46ch;
+  margin: 0 auto;
+}
+
+/* ══════════════════════════════════════
+   ERROR MESSAGE
+══════════════════════════════════════ */
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--error-bg);
+  border: 1px solid rgba(192,57,43,.25);
+  color: var(--error);
+  font-size: .9rem;
+  font-weight: 600;
+  padding: 14px 20px;
+  border-radius: 14px;
+  margin-bottom: 32px;
+}
+.error-message::before {
+  content: '\f06a';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════
+   FORM CARD
+══════════════════════════════════════ */
+form {
+  background: var(--warm-white);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  padding: 48px 52px;
+  box-shadow: 0 24px 70px rgba(168,95,110,.12);
+}
+
+form h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--brown);
+  margin-bottom: 22px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+form h2:not(:first-child) {
+  margin-top: 40px;
+}
+
+form h2::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--rose-dk);
+  flex-shrink: 0;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  margin-bottom: 22px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.form-row .form-group {
+  margin-bottom: 0;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+label {
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--brown);
+  letter-spacing: .02em;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="date"],
+input[type="time"],
+select,
+textarea {
+  font-family: 'DM Sans', sans-serif;
+  font-size: .92rem;
+  color: var(--brown);
+  background: var(--cream);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 13px 16px;
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+  width: 100%;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.6;
+  font-family: inherit;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
+  opacity: .8;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--rose-dk);
+  background: var(--white);
+  box-shadow: 0 0 0 4px rgba(168,95,110,.12);
+}
+
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23A85F6E' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+input[type="file"] {
+  font-size: .86rem;
+  background: var(--cream);
+  border: 1.5px dashed var(--border);
+  border-radius: 14px;
+  padding: 22px 16px;
+  cursor: pointer;
+  color: var(--brown-lt);
+}
+input[type="file"]::file-selector-button {
+  font-family: 'DM Sans', sans-serif;
+  font-size: .8rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--rose-dk);
+  border: none;
+  border-radius: 50px;
+  padding: 8px 18px;
+  margin-right: 14px;
+  cursor: pointer;
+  transition: background .2s ease;
+}
+input[type="file"]::file-selector-button:hover {
+  background: var(--burgundy);
+}
+
+.form-group small {
+  font-size: .74rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+input[type="date"],
+input[type="time"] {
+  color-scheme: light;
+}
+
+/* ══════════════════════════════════════
+   SUBMIT BUTTON
+══════════════════════════════════════ */
+button[type="submit"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 40px;
+  padding: 17px 28px;
+  background: linear-gradient(135deg, var(--rose-dk) 0%, var(--burgundy) 100%);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .98rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(168,95,110,.32);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+button[type="submit"]::after {
+  content: '\f004';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  font-size: .9rem;
+}
+button[type="submit"]:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px rgba(168,95,110,.42);
+}
+button[type="submit"]:active {
+  transform: translateY(-1px);
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 720px) {
+  .customized-page { padding: 60px 16px 80px; }
+  form { padding: 32px 24px; border-radius: 22px; }
+  .form-row { grid-template-columns: 1fr; gap: 0; }
+  form h2 { font-size: 1.3rem; }
+}
+</style>
+
 <div class="customized-page">
 
   <div class="customized-container">
 
-    <h1>Bake Your Own Cake!</h1>
-
-    <p>
-      Create a cake specially designed for your
-      celebration.
-    </p>
-
+    <div class="customized-header">
+      <div class="customized-eyebrow">Custom Cakes</div>
+      <h1>Bake Your Own <em>Cake!</em></h1>
+      <p>
+        Create a cake specially designed for your celebration —
+        tell us the details and we'll bring your idea to life.
+      </p>
+    </div>
 
     <% if (error) { %>
-
       <div class="error-message">
         <%= error %>
       </div>
-
     <% } %>
 
-
     <form
+      id="customizedCakeForm"
       action="/customizedCake"
       method="POST"
       enctype="multipart/form-data"
     >
 
-
       <!-- CUSTOMER DETAILS -->
-
       <h2>Customer Details</h2>
 
       <div class="form-row">
 
         <div class="form-group">
-
           <label>Name *</label>
-
           <input
             type="text"
             name="name"
             value="<%= user?.name || '' %>"
+            placeholder="Your full name"
             required
           >
-
         </div>
 
-
         <div class="form-group">
-
           <label>Email *</label>
-
           <input
             type="email"
             name="email"
             value="<%= user?.email || '' %>"
+            placeholder="you@example.com"
             required
           >
-
         </div>
 
       </div>
 
-
       <div class="form-row">
 
         <div class="form-group">
-
           <label>Phone *</label>
-
           <input
             type="tel"
             name="phone"
             value="<%= user?.phone || '' %>"
+            placeholder="10-digit mobile number"
             required
           >
-
         </div>
 
-
         <div class="form-group">
-
           <label>Address *</label>
-
           <input
             type="text"
             name="address"
+            placeholder="Delivery address"
             required
           >
-
         </div>
 
       </div>
 
-
       <!-- CAKE DETAILS -->
-
       <h2>Cake Details</h2>
-
 
       <div class="form-row">
 
         <div class="form-group">
-
           <label>Cake Type *</label>
-
-          <select
-            name="cakeType"
-            required
-          >
-
-            <option value="">
-              Select Cake Type
-            </option>
-
-            <option value="Chocolate">
-              Chocolate
-            </option>
-
-            <option value="Vanilla">
-              Vanilla
-            </option>
-
-            <option value="Red Velvet">
-              Red Velvet
-            </option>
-
-            <option value="Butterscotch">
-              Butterscotch
-            </option>
-
-            <option value="Black Forest">
-              Black Forest
-            </option>
-
-            <option value="Other">
-              Other
-            </option>
-
+          <select name="cakeType" required>
+            <option value="">Select Cake Type</option>
+            <option value="Chocolate">Chocolate</option>
+            <option value="Vanilla">Vanilla</option>
+            <option value="Red Velvet">Red Velvet</option>
+            <option value="Butterscotch">Butterscotch</option>
+            <option value="Black Forest">Black Forest</option>
+            <option value="Other">Other</option>
           </select>
-
         </div>
 
-
         <div class="form-group">
-
           <label>Weight *</label>
-
-          <select
-            name="weight"
-            required
-          >
-
-            <option value="">
-              Select Weight
-            </option>
-
+          <select name="weight" required>
+            <option value="">Select Weight</option>
             <option value="500g">500g</option>
             <option value="1kg">1 KG</option>
             <option value="1.5kg">1.5 KG</option>
@@ -162,126 +451,77 @@
             <option value="3kg">3 KG</option>
             <option value="4kg">4 KG</option>
             <option value="5kg">5 KG</option>
-
           </select>
-
         </div>
 
       </div>
 
-
       <!-- DESCRIPTION -->
-
       <div class="form-group">
-
-        <label>
-          Describe Your Cake *
-        </label>
-
+        <label>Describe Your Cake *</label>
         <textarea
           name="description"
           rows="5"
           placeholder="Describe your cake design..."
           required
         ></textarea>
-
       </div>
 
-
       <!-- MESSAGE -->
-
       <div class="form-group">
-
-        <label>
-          Message on Cake
-        </label>
-
+        <label>Message on Cake</label>
         <input
           type="text"
           name="cakeMessage"
           placeholder="Happy Birthday Mom"
         >
-
       </div>
 
-
       <!-- IMAGE -->
-
       <div class="form-group">
-
-        <label>
-          Reference Image
-        </label>
-
+        <label>Reference Image</label>
         <input
           type="file"
           name="referenceImage"
           accept="image/*"
         >
-
-        <small>
-          JPG, PNG, WEBP — Maximum 5MB
-        </small>
-
+        <small>JPG, PNG, WEBP — Maximum 5MB</small>
       </div>
 
-
       <!-- DATE -->
-
       <div class="form-row">
 
         <div class="form-group">
-
-          <label>
-            Needed Date *
-          </label>
-
+          <label>Needed Date *</label>
           <input
             type="date"
             name="neededDate"
             id="neededDate"
             required
           >
-
         </div>
 
-
         <div class="form-group">
-
-          <label>
-            Needed Time
-          </label>
-
+          <label>Needed Time</label>
           <input
             type="time"
             name="neededTime"
           >
-
         </div>
 
       </div>
 
-
       <!-- ADDITIONAL REQUIREMENTS -->
-
       <div class="form-group">
-
-        <label>
-          Additional Requirements
-        </label>
-
+        <label>Additional Requirements</label>
         <textarea
           name="additionalRequirements"
           rows="4"
           placeholder="Theme, colour, toppings, decoration..."
         ></textarea>
-
       </div>
 
-
-      <button
-        type="submit"
-      >
+      <button type="submit">
         Submit Custom Cake Request
       </button>
 
@@ -291,15 +531,68 @@
 
 </div>
 
-
 <script>
-
-const dateInput =
-  document.getElementById("neededDate");
-
-const today =
-  new Date().toISOString().split("T")[0];
-
+const dateInput = document.getElementById("neededDate");
+const today = new Date().toISOString().split("T")[0];
 dateInput.min = today;
 
+const form = document.getElementById("customizedCakeForm");
+const submitBtn = form.querySelector('button[type="submit"]');
+
+form.addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const originalBtnText = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = "Submitting...";
+
+  try {
+    const formData = new FormData(form);
+
+    const response = await fetch(form.action, {
+      method: "POST",
+      body: formData,
+    });
+
+    // Successful submit ends in a redirect to the success page
+    if (response.redirected) {
+      window.location.href = response.url;
+      return;
+    }
+
+    const contentType = response.headers.get("content-type") || "";
+
+    if (contentType.includes("application/json")) {
+      const data = await response.json();
+
+      await Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text: data.message || "Something went wrong. Please try again.",
+        confirmButtonColor: "#A85F6E",
+      });
+    } else {
+      await Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text: "Something went wrong. Please try again.",
+        confirmButtonColor: "#A85F6E",
+      });
+    }
+
+  } catch (err) {
+    console.error("Form submit error:", err);
+    await Swal.fire({
+      icon: "error",
+      title: "Network Error",
+      text: "Could not submit your request. Please check your connection and try again.",
+      confirmButtonColor: "#A85F6E",
+    });
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalBtnText;
+  }
+});
 </script>
+
+<%- include("../../views/partials/user/footer") %>
