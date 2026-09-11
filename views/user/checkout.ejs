@@ -855,24 +855,46 @@
     el.textContent = '';
   }
 
-  function proceedToPayment() {
-    const addressId  = document.getElementById('selectedAddrId').value;
-    const couponCode = document.getElementById('appliedCoupon').value;
+function proceedToPayment() {
 
-    if (!addressId) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Select an Address',
-        text: 'Please select or add a delivery address.',
-        confirmButtonColor: '#C97B8A'
-      });
-      return;
-    }
+  const addressId =
+    document.getElementById('selectedAddrId').value;
 
-    window.location.href =
-      `/payment-page?addressId=${addressId}&couponCode=${encodeURIComponent(couponCode)}`;
+  const couponCode =
+    document.getElementById('appliedCoupon').value;
+
+  if (!addressId) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Select an Address',
+      text: 'Please select or add a delivery address.',
+      confirmButtonColor: '#C97B8A'
+    });
+
+    return;
   }
 
+  const isCustomizedCake =
+    "<%= isCustomizedCake || false %>" === "true";
+
+  const customizedCakeId =
+    "<%= customizedCakeId || '' %>";
+
+  // Customized cake checkout
+  if (isCustomizedCake && customizedCakeId) {
+
+    window.location.href =
+      `/payment-page?addressId=${addressId}` +
+      `&customizedCakeId=${customizedCakeId}`;
+
+    return;
+  }
+
+  // Normal cart checkout
+  window.location.href =
+    `/payment-page?addressId=${addressId}` +
+    `&couponCode=${encodeURIComponent(couponCode)}`;
+}
   const urlParams   = new URLSearchParams(window.location.search);
   const couponError = urlParams.get('couponError');
   if (couponError) {

@@ -717,12 +717,20 @@
 
 <!-- ── ALL ORIGINAL LOGIC PRESERVED EXACTLY ── -->
 <script>
-  const RAZORPAY_KEY   = "<%= razorpayKeyId %>";
-  const FINAL_TOTAL    = <%= finalTotal %>;
-  const ADDRESS_ID     = "<%= addressId || '' %>";
-  const COUPON_CODE    = "<%= couponCode || '' %>";
-  const WALLET_BALANCE = <%= walletBalance || 0 %>;
-  let selectedPaymentMethod = "Razorpay";
+const RAZORPAY_KEY   = "<%= razorpayKeyId %>";
+const FINAL_TOTAL    = <%= finalTotal %>;
+const ADDRESS_ID     = "<%= addressId || '' %>";
+const COUPON_CODE    = "<%= couponCode || '' %>";
+
+const IS_CUSTOMIZED_CAKE =
+  "<%= isCustomizedCake || false %>" === "true";
+
+const CUSTOMIZED_CAKE_ID =
+  "<%= customizedCakeId || '' %>";
+
+const WALLET_BALANCE = <%= walletBalance || 0 %>;
+
+let selectedPaymentMethod = "Razorpay";
 
   function selectPayment(method, el) {
     selectedPaymentMethod = method;
@@ -747,18 +755,39 @@
   }
 
   function submitCODorWallet() {
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '/checkout/place';
-    const fields = { addressId: ADDRESS_ID, paymentMethod: selectedPaymentMethod, couponCode: COUPON_CODE };
-    Object.entries(fields).forEach(([name, value]) => {
-      const input = document.createElement('input');
-      input.type = 'hidden'; input.name = name; input.value = value;
-      form.appendChild(input);
-    });
-    document.body.appendChild(form);
-    form.submit();
-  }
+
+  const form = document.createElement('form');
+
+  form.method = 'POST';
+
+  form.action = '/checkout/place';
+
+  const fields = {
+    addressId: ADDRESS_ID,
+    paymentMethod: selectedPaymentMethod,
+    couponCode: COUPON_CODE,
+    customizedCakeId: IS_CUSTOMIZED_CAKE
+      ? CUSTOMIZED_CAKE_ID
+      : ""
+  };
+
+  Object.entries(fields).forEach(([name, value]) => {
+
+    const input = document.createElement('input');
+
+    input.type = 'hidden';
+
+    input.name = name;
+
+    input.value = value;
+
+    form.appendChild(input);
+  });
+
+  document.body.appendChild(form);
+
+  form.submit();
+}
 
   async function payWithRazorpay() {
     const btn = document.getElementById('placeOrderBtn');
@@ -801,13 +830,18 @@
             const verifyRes = await fetch('/checkout/verify-razorpay-payment', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                razorpay_order_id:   response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature:  response.razorpay_signature,
-                addressId:           ADDRESS_ID,
-                couponCode:          COUPON_CODE,
-              }),
+body: JSON.stringify({
+  razorpay_order_id: response.razorpay_order_id,
+  razorpay_payment_id: response.razorpay_payment_id,
+  razorpay_signature: response.razorpay_signature,
+  addressId: ADDRESS_ID,
+  couponCode: COUPON_CODE,
+
+  customizedCakeId:
+    IS_CUSTOMIZED_CAKE
+      ? CUSTOMIZED_CAKE_ID
+      : ""
+})
             });
             const result = await verifyRes.json();
             if (result.success) {

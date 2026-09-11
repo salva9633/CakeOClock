@@ -1,0 +1,335 @@
+<%- include("../../views/partials/user/h2") %>
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
+
+:root {
+  --rose:       #C97B8A;
+  --rose-dk:    #A85F6E;
+  --rose-lt:    #FAE8ED;
+  --blush:      #FDF0F3;
+  --petal:      #FBE4EC;
+  --cream:      #FDF8F5;
+  --warm-white: #FFFCFA;
+  --caramel:    #D4A574;
+  --brown:      #5C3A3A;
+  --brown-lt:   #8A6060;
+  --muted:      #B08A8A;
+  --border:     #F5D8E0;
+  --burgundy:   #8B4A5A;
+  --white:      #FFFFFF;
+  --success:    #6E9E5A;
+  --success-bg: #EEF6E9;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--blush);
+  color: var(--brown);
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* ══════════════════════════════════════
+   PAGE SHELL
+══════════════════════════════════════ */
+.success-container {
+  position: relative;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 90px 24px;
+  overflow: hidden;
+}
+.success-container::before {
+  content: '';
+  position: absolute;
+  top: -140px; right: -120px;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: var(--petal);
+  opacity: .6;
+  pointer-events: none;
+}
+.success-container::after {
+  content: '';
+  position: absolute;
+  bottom: -120px; left: -120px;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: rgba(212,165,116,.14);
+  pointer-events: none;
+}
+
+/* ══════════════════════════════════════
+   SUCCESS CARD
+══════════════════════════════════════ */
+.success-card {
+  position: relative;
+  z-index: 2;
+  max-width: 540px;
+  width: 100%;
+  background: var(--warm-white);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  padding: 52px 48px 44px;
+  box-shadow: 0 24px 70px rgba(168,95,110,.14);
+  text-align: center;
+  animation: cardPop .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+
+@keyframes cardPop {
+  from { opacity: 0; transform: translateY(20px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.success-icon {
+  width: 84px;
+  height: 84px;
+  margin: 0 auto 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--rose-lt), var(--petal));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  box-shadow: 0 10px 30px rgba(168,95,110,.18);
+}
+
+.success-card h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+  font-size: clamp(1.9rem, 4vw, 2.4rem);
+  color: var(--brown);
+  margin-bottom: 12px;
+  line-height: 1.15;
+}
+
+.success-card > p.success-sub {
+  font-size: .96rem;
+  color: var(--brown-lt);
+  line-height: 1.7;
+  max-width: 38ch;
+  margin: 0 auto 30px;
+}
+
+.success-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0 0 28px;
+}
+
+/* ══════════════════════════════════════
+   DETAILS LIST
+══════════════════════════════════════ */
+.success-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 8px 22px;
+  margin-bottom: 28px;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+}
+.detail-row + .detail-row {
+  border-top: 1px dashed var(--border);
+}
+
+.detail-label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: .82rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: var(--brown-lt);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.detail-label i {
+  color: var(--rose-dk);
+  font-size: .85rem;
+  width: 16px;
+  text-align: center;
+}
+
+.detail-value {
+  font-size: .94rem;
+  font-weight: 600;
+  color: var(--brown);
+  text-align: right;
+  word-break: break-word;
+}
+
+.detail-value.mono {
+  font-family: 'DM Sans', sans-serif;
+  font-size: .82rem;
+  letter-spacing: .01em;
+  color: var(--rose-dk);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--success-bg);
+  color: var(--success);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 50px;
+}
+.status-badge::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
+}
+
+/* ══════════════════════════════════════
+   NOTE + CTA
+══════════════════════════════════════ */
+.success-note {
+  font-size: .9rem;
+  color: var(--brown-lt);
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+.success-card a.btn-view {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 16px 28px;
+  background: linear-gradient(135deg, var(--rose-dk) 0%, var(--burgundy) 100%);
+  color: #fff;
+  border-radius: 50px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .94rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+  box-shadow: 0 10px 30px rgba(168,95,110,.3);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.success-card a.btn-view:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px rgba(168,95,110,.4);
+}
+.success-card a.btn-view i {
+  font-size: .85rem;
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 560px) {
+  .success-card { padding: 40px 26px 34px; border-radius: 22px; }
+  .success-details { padding: 4px 16px; }
+  .detail-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .detail-value { text-align: left; }
+}
+</style>
+
+<div class="success-container">
+
+  <div class="success-card">
+
+<div class="success-icon"><i class="fa-solid fa-cake-candles"></i></div>
+    <h1>Request Submitted!</h1>
+
+    <p class="success-sub">
+      Your customized cake request has been successfully
+      submitted. Here's a quick summary for your records.
+    </p>
+
+    <hr class="success-divider">
+
+    <div class="success-details">
+
+      <div class="detail-row">
+        <div class="detail-label">
+          <i class="fa-solid fa-hashtag"></i>
+          Request ID
+        </div>
+        <div class="detail-value mono"><%= customizedCake._id %></div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-label">
+          <i class="fa-solid fa-cake-candles"></i>
+          Cake Type
+        </div>
+        <div class="detail-value"><%= customizedCake.cakeType %></div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-label">
+          <i class="fa-solid fa-weight-scale"></i>
+          Weight
+        </div>
+        <div class="detail-value"><%= customizedCake.weight %></div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-label">
+          <i class="fa-solid fa-calendar-days"></i>
+          Required Date
+        </div>
+        <div class="detail-value">
+          <%= new Date(customizedCake.neededDate).toLocaleDateString() %>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-label">
+          <i class="fa-solid fa-circle-info"></i>
+          Status
+        </div>
+        <div class="detail-value">
+          <span class="status-badge">Pending Review</span>
+        </div>
+      </div>
+
+    </div>
+
+    <p class="success-note">
+      Our team will review your requirements and get back
+      to you with the final price shortly.
+    </p>
+
+    <a href="/my-customizedCakes" class="btn-view">
+      View My Customized Cakes
+      <i class="fa-solid fa-arrow-right"></i>
+    </a>
+
+  </div>
+
+</div>
+
+<%- include("../../views/partials/user/footer") %>

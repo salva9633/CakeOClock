@@ -1,0 +1,417 @@
+<style>
+:root {
+  --rose: #C97B8A; --rose-dk: #A85F6E; --rose-lt: #FAE8ED;
+  --blush: #FDF0F3; --caramel: #D4A574; --brown: #5C3A3A;
+  --muted: #B08A8A; --border: #F5D8E0; --mint: #E8F6F0; --white: #FFFFFF;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.custom-detail {
+  padding: 1.5rem 1rem;
+  max-width: 1000px;
+}
+.detail-header {
+  margin-bottom: 1.5rem;
+  animation: fadeUp .45s ease both;
+}
+.detail-header h2 {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--brown);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.detail-header h2 i { color: var(--rose); font-size: 20px; }
+
+.customer-card {
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  padding: 1.25rem;
+  margin: 0 0 1.25rem;
+  border-radius: 12px;
+  border-top: 3px solid var(--rose);
+  opacity: 0;
+  animation: fadeUp .5s ease forwards;
+  transition: transform .2s ease;
+}
+.customer-card:nth-of-type(2) { animation-delay: .08s; border-top-color: var(--caramel); }
+.customer-card:nth-of-type(3) { animation-delay: .16s; border-top-color: #7BB88A; }
+.customer-card:nth-of-type(4) { animation-delay: .24s; border-top-color: var(--muted); }
+
+.customer-card h3 {
+  color: var(--brown);
+  margin-bottom: 18px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.customer-card h3 i { color: var(--rose); font-size: 16px; }
+
+.customer-card h4 {
+  color: var(--brown);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin: 14px 0 6px;
+}
+
+.customer-card p {
+  font-size: 13px;
+  color: var(--brown);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+.customer-card p strong {
+  color: var(--muted);
+  font-weight: 500;
+  margin-right: 4px;
+}
+
+.customer-card input,
+.customer-card textarea,
+.customer-card select {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0 18px;
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--brown);
+  background: var(--blush);
+  transition: border-color .2s ease, background .2s ease;
+}
+.customer-card input:focus,
+.customer-card textarea:focus,
+.customer-card select:focus {
+  outline: none;
+  border-color: var(--rose);
+  background: var(--white);
+}
+
+.customer-card label {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+.customer-card button {
+  background: var(--rose);
+  color: var(--white);
+  border: none;
+  padding: 11px 22px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease;
+}
+.customer-card button:hover {
+  background: var(--rose-dk);
+  transform: translateY(-1px);
+}
+</style>
+
+<div class="custom-detail">
+
+  <div class="detail-header">
+    <h2><i class="ti ti-cake" aria-hidden="true"></i> Customized Cake Request</h2>
+  </div>
+
+  <div class="customer-card">
+
+    <h3><i class="ti ti-user" aria-hidden="true"></i> Customer Information</h3>
+
+    <p>
+      <strong>Name:</strong>
+      <%= request.name %>
+    </p>
+
+    <p>
+      <strong>Email:</strong>
+      <%= request.email %>
+    </p>
+
+    <p>
+      <strong>Phone:</strong>
+      <%= request.phone %>
+    </p>
+
+    <p>
+      <strong>Address:</strong>
+      <%= request.address %>
+    </p>
+
+  </div>
+
+
+  <div class="customer-card">
+
+    <h3><i class="ti ti-cupcake" aria-hidden="true"></i> Cake Information</h3>
+
+    <p>
+      <strong>Cake Type:</strong>
+      <%= request.cakeType %>
+    </p>
+
+    <p>
+      <strong>Weight:</strong>
+      <%= request.weight %>
+    </p>
+
+    <p>
+      <strong>Needed Date:</strong>
+
+      <%= new Date(
+        request.neededDate
+      ).toLocaleDateString() %>
+
+    </p>
+
+    <p>
+      <strong>Needed Time:</strong>
+      <%= request.neededTime || "Not specified" %>
+    </p>
+
+
+    <p>
+      <strong>Cake Message:</strong>
+
+      <%= request.cakeMessage || "None" %>
+
+    </p>
+
+
+    <h4>Description</h4>
+
+    <p>
+      <%= request.description %>
+    </p>
+
+
+    <h4>Additional Requirements</h4>
+
+    <p>
+      <%= request.additionalRequirements ||
+          "None" %>
+    </p>
+
+  </div>
+
+
+  <% if (request.referenceImage) { %>
+
+    <div class="customer-card">
+
+      <h3><i class="ti ti-photo" aria-hidden="true"></i> Reference Image</h3>
+
+      <img
+        src="<%= request.referenceImage %>"
+        style="
+          max-width:450px;
+          width:100%;
+          border-radius:12px;
+        "
+      >
+
+    </div>
+
+  <% } %>
+
+
+  <div class="customer-card">
+
+    <h3><i class="ti ti-currency-rupee" aria-hidden="true"></i> Set Quotation</h3>
+
+
+    <form id="quoteForm">
+
+      <label>
+        Final Cake Price
+      </label>
+
+      <input
+        type="number"
+        id="quotedPrice"
+        min="1"
+        value="<%= request.quotedPrice || '' %>"
+        required
+      >
+
+
+      <label>
+        Note to Customer
+      </label>
+
+      <textarea
+        id="adminNote"
+        rows="4"
+      ><%= request.adminNote || "" %></textarea>
+
+
+      <button type="submit">
+        Send Quotation
+      </button>
+
+    </form>
+
+  </div>
+
+
+  <div class="customer-card">
+
+    <h3><i class="ti ti-refresh" aria-hidden="true"></i> Update Status</h3>
+
+
+    <select id="status">
+
+      <% const statuses = [
+        "pending",
+        "reviewing",
+        "quoted",
+        "approved",
+        "in-production",
+        "ready",
+        "delivered",
+        "cancelled"
+      ]; %>
+
+
+      <% statuses.forEach(
+        status => {
+      %>
+
+        <option
+          value="<%= status %>"
+          <%= request.status === status
+            ? "selected"
+            : "" %>
+        >
+          <%= status %>
+        </option>
+
+      <% }) %>
+
+    </select>
+
+
+    <button
+      type="button"
+      onclick="updateStatus()"
+    >
+      Update Status
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+document
+  .getElementById("quoteForm")
+  .addEventListener(
+    "submit",
+    async function(e) {
+
+      e.preventDefault();
+
+
+      const quotedPrice =
+        document.getElementById(
+          "quotedPrice"
+        ).value;
+
+
+      const adminNote =
+        document.getElementById(
+          "adminNote"
+        ).value;
+
+
+      const response =
+        await fetch(
+          "/admin/customized-cakes/<%= request._id %>/quote",
+          {
+            method: "PATCH",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+              quotedPrice,
+              adminNote
+            })
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      alert(data.message);
+
+
+      if (data.success) {
+
+        location.reload();
+
+      }
+
+    }
+  );
+
+
+async function updateStatus() {
+
+  const status =
+    document.getElementById(
+      "status"
+    ).value;
+
+
+  const response =
+    await fetch(
+      "/admin/customized-cakes/<%= request._id %>/status",
+      {
+        method: "PATCH",
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body: JSON.stringify({
+          status
+        })
+      }
+    );
+
+
+  const data =
+    await response.json();
+
+
+  alert(data.message);
+
+
+  if (data.success) {
+
+    location.reload();
+
+  }
+
+}
+
+</script>

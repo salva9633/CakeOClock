@@ -307,6 +307,48 @@ img { display: block; }
   color: var(--muted);
   margin-bottom: 32px;
 }
+/* Customize Cake Button — used by About and Custom Cakes sections */
+.btn-customize {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+
+  background: linear-gradient(
+    135deg,
+    var(--rose-dk),
+    var(--burgundy)
+  );
+
+  color: #fff;
+  border-radius: 50px;
+
+  font-family: 'DM Sans', sans-serif;
+  font-size: .9rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+
+  text-decoration: none;
+
+  box-shadow: 0 8px 24px rgba(168,95,110,.28);
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    background .2s ease;
+}
+
+.btn-customize:hover {
+  color: #fff;
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 12px 32px rgba(168,95,110,.38);
+}
+
+.btn-customize i {
+  font-size: 1rem;
+}
 .about-features {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -323,7 +365,7 @@ img { display: block; }
   background: var(--rose-lt);
   border-radius: 10px;
 }
-.feat-icon { font-size: 1rem; }
+.about-feat .feat-icon { font-size: 1rem; }
 
 .about-img-stack { position: relative; padding-bottom: 32px; }
 .about-img-main {
@@ -343,6 +385,232 @@ img { display: block; }
   border: 4px solid var(--white);
 }
 .about-img-float img { width: 100%; height: 130px; object-fit: cover; }
+
+/* ══════════════════════════════════════
+   FEATURES STRIP
+══════════════════════════════════════ */
+.features-strip {
+  background: var(--warm-white);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 50px 60px;
+}
+.features-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+}
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+}
+.feature-icon-wrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background: var(--rose-lt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  box-shadow: 0 4px 16px rgba(201,123,138,.15);
+  transition: transform .2s, box-shadow .2s;
+}
+.feature-icon-wrap i{
+  font-size:32px;
+  color:var(--rose-dk);
+}
+.feature-item:hover .feature-icon-wrap {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(201,123,138,.25);
+}
+.feature-label {
+  font-size: .88rem;
+  font-weight: 700;
+  color: var(--brown);
+}
+.feature-desc {
+  font-size: .78rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-top: -4px;
+}
+
+/* ══════════════════════════════════════
+   CUSTOM CAKES SECTION
+══════════════════════════════════════ */
+.custom-section {
+  padding: 110px 0;
+  background: var(--warm-white);
+}
+.custom-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 60px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.custom-eyebrow {
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--rose-dk);
+  margin-bottom: 18px;
+}
+.custom-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.2rem, 3.5vw, 3.5rem);
+  font-weight: 700;
+  color: var(--brown);
+  line-height: 1.15;
+  margin-bottom: 24px;
+}
+.custom-title em { font-style: italic; color: var(--rose-dk); }
+.custom-body {
+  font-size: .96rem;
+  line-height: 1.85;
+  color: var(--muted);
+  margin-bottom: 36px;
+  max-width: 46ch;
+}
+
+.custom-features {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 36px;
+}
+.custom-feat {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 16px;
+  background: var(--rose-lt);
+  border-radius: 14px;
+}
+.custom-feat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: var(--rose-dk);
+  box-shadow: 0 4px 12px rgba(168,95,110,.12);
+}
+.custom-feat-title {
+  font-size: .86rem;
+  font-weight: 700;
+  color: var(--brown);
+}
+.custom-feat-desc {
+  font-size: .78rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.custom-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  padding: 13px 26px;
+  border: 1.5px solid var(--border);
+  color: var(--brown-lt);
+  border-radius: 50px;
+  font-size: .88rem;
+  font-weight: 600;
+  transition: border-color .2s, color .2s, background .2s;
+  background: transparent;
+}
+.btn-outline:hover {
+  border-color: var(--rose-dk);
+  color: var(--rose-dk);
+  background: var(--rose-lt);
+}
+
+.custom-img-stack { position: relative; }
+.custom-img-main {
+  border-radius: 28px;
+  overflow: hidden;
+  aspect-ratio: 4/3.4;
+  box-shadow: 0 20px 60px rgba(168,95,110,.18);
+}
+.custom-img-main img { width: 100%; height: 100%; object-fit: cover; }
+
+.custom-badge {
+  position: absolute;
+  top: -22px;
+  right: -22px;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--rose-dk);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  line-height: 1.5;
+  box-shadow: 0 10px 30px rgba(168,95,110,.22);
+  border: 1px solid var(--border);
+}
+.custom-badge i { color: var(--rose-dk); font-size: 13px; margin-top: 4px; }
+
+.custom-strip {
+  max-width: 1180px;
+  margin: 90px auto 0;
+  padding: 0 60px;
+}
+.custom-strip-inner {
+  padding-top: 34px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.custom-strip-label {
+  display: block;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 26px;
+}
+.custom-strip-icons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 44px;
+}
+.custom-strip-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: .9rem;
+  color: var(--brown);
+}
+.custom-strip-item i { color: var(--rose-dk); font-size: 16px; }
 
 /* ══════════════════════════════════════
    CATEGORIES — Cream Pastel
@@ -673,61 +941,6 @@ img { display: block; }
 }
 
 /* ══════════════════════════════════════
-   FEATURES STRIP
-══════════════════════════════════════ */
-.features-strip {
-  background: var(--warm-white);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  padding: 50px 60px;
-}
-.features-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 32px;
-}
-.feature-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 14px;
-}
-.feature-icon-wrap {
-width: 80px;
-  height: 80px;
-    border-radius: 20px;
-  background: var(--rose-lt);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.6rem;
-  box-shadow: 0 4px 16px rgba(201,123,138,.15);
-  transition: transform .2s, box-shadow .2s;
-}
-.feature-icon-wrap i{
-  font-size:32px;
-  color:#C97B8A;
-}
-.feature-item:hover .feature-icon-wrap {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 28px rgba(201,123,138,.25);
-}
-.feature-label {
-  font-size: .88rem;
-  font-weight: 700;
-  color: var(--brown);
-}
-.feature-desc {
-  font-size: .78rem;
-  color: var(--muted);
-  line-height: 1.5;
-  margin-top: -4px;
-}
-
-/* ══════════════════════════════════════
    SCROLL REVEAL
 ══════════════════════════════════════ */
 .reveal {
@@ -746,11 +959,20 @@ width: 80px;
   .hero-right { height: 50vw; }
   .about-inner { grid-template-columns: 1fr; gap: 48px; padding: 0 28px; }
   .about-img-float { display: none; }
+  .custom-inner { grid-template-columns: 1fr; gap: 48px; padding: 0 28px; }
+  .custom-strip { padding: 0 28px; }
   .promo-slide { flex-direction: column; }
   .promo-img-side { width: 100%; padding: 0 32px 32px; }
   .features-inner { grid-template-columns: repeat(2, 1fr); }
   .gallery-section { padding: 70px 24px; }
   .promo-section { padding: 60px 24px; }
+}
+@media (max-width: 768px) {
+  .categories-grid { gap: 26px; }
+  .cat-ring { width: 110px; height: 110px; }
+  .about-title, .section-title, .gallery-title, .custom-title {
+    font-size: clamp(1.8rem, 6vw, 2.6rem);
+  }
 }
 @media (max-width: 640px) {
   .hero-right { display: none; }
@@ -763,29 +985,28 @@ width: 80px;
   .features-inner { grid-template-columns: repeat(2, 1fr); gap: 20px; }
   .about-section { padding: 70px 0; }
   .about-inner { padding: 0 20px; }
+  .custom-section { padding: 70px 0; }
+  .custom-inner { padding: 0 20px; }
+  .custom-strip { padding: 0 20px; }
+  .custom-features { grid-template-columns: 1fr; }
+  .custom-strip-icons { gap: 24px; }
   .features-strip { padding: 40px 20px; }
 }
-@media (max-width: 768px) {
-  .categories-grid { gap: 26px; }
-  .cat-ring { width: 110px; height: 110px; }
-  .about-title, .section-title, .gallery-title {
-    font-size: clamp(1.8rem, 6vw, 2.6rem);
-  }
-}
-
 @media (max-width: 480px) {
   .hero-trust { gap: 18px; margin-top: 32px; }
   .trust-number { font-size: 1.5rem; }
   .hero-actions { flex-direction: column; align-items: stretch; }
   .btn-hero-primary, .btn-hero-ghost { justify-content: center; text-align: center; }
   .about-features { grid-template-columns: 1fr; }
+  .custom-actions { flex-direction: column; align-items: stretch; }
+  .custom-actions .btn-customize, .custom-actions .btn-outline { justify-content: center; text-align: center; }
+  .custom-badge { top: -14px; right: 6px; width: 84px; height: 84px; font-size: 9px; }
   .promo-heading { font-size: 1.6rem; }
   .promo-body { max-width: 100%; }
   .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
   .marquee-item { font-size: .62rem; padding: 0 18px; }
   .carousel-control-prev, .carousel-control-next { width: 36px; height: 36px; }
 }
-
 </style>
 
 <body>
@@ -841,7 +1062,7 @@ width: 80px;
     <div class="hero-img-cell">
       <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1780682138/premium_photo-1673809128714-36d37d85a3af_bzaho4.avif" alt="Floral Cake" loading="eager">
     </div>
-    
+
     </div>
   </div>
 
@@ -867,30 +1088,30 @@ width: 80px;
 <div class="features-strip reveal">
   <div class="features-inner">
     <div class="feature-item">
-<div class="feature-icon-wrap">
-  <i class="fa-solid fa-cake-candles"></i>
-</div>   
-   <div class="feature-label">Custom Designs</div>
+      <div class="feature-icon-wrap">
+        <i class="fa-solid fa-cake-candles"></i>
+      </div>
+      <div class="feature-label">Custom Designs</div>
       <div class="feature-desc">Made exactly to your vision and style</div>
     </div>
     <div class="feature-item">
-<div class="feature-icon-wrap">
-  <i class="fa-solid fa-truck-fast"></i>
-</div>
+      <div class="feature-icon-wrap">
+        <i class="fa-solid fa-truck-fast"></i>
+      </div>
       <div class="feature-label">Free Delivery</div>
       <div class="feature-desc">On all orders above ₹500</div>
     </div>
     <div class="feature-item">
-<div class="feature-icon-wrap">
-  <i class="fa-solid fa-cookie-bite"></i>
-</div>
+      <div class="feature-icon-wrap">
+        <i class="fa-solid fa-cookie-bite"></i>
+      </div>
       <div class="feature-label">Fresh Daily</div>
       <div class="feature-desc">Baked fresh every morning</div>
     </div>
     <div class="feature-item">
-<div class="feature-icon-wrap">
-  <i class="fa-solid fa-crown"></i>
-</div>
+      <div class="feature-icon-wrap">
+        <i class="fa-solid fa-crown"></i>
+      </div>
       <div class="feature-label">4.9★ Rated</div>
       <div class="feature-desc">Loved by 5000+ customers</div>
     </div>
@@ -898,34 +1119,103 @@ width: 80px;
 </div>
 
 <!-- ══════════════════════════════════════
-     ABOUT
+     CUSTOM CAKES
 ══════════════════════════════════════ -->
-<section class="about-section reveal" id="about">
-  <div class="about-inner">
-    <div>
-      <div class="about-eyebrow">Our Story</div>
-      <h2 class="about-title">Where Your Imagination<br>Becomes <em>a Cake</em></h2>
-      <p class="about-body">
-        Cake O'Clock creates beautifully handcrafted and fully customized cakes made to match your design, flavor, and style. Every cake is made fresh with quality ingredients and creative detailing.
-        <br><br>
-        From birthdays and weddings to any special moment, we make your celebrations sweeter and more meaningful — one slice at a time.
+<section class="custom-section reveal" id="customize">
+
+  <div class="custom-inner">
+
+    <div class="custom-content">
+
+      <div class="custom-eyebrow">Custom Cakes</div>
+
+      <h2 class="custom-title">
+        Your Ideas.<br>
+        Our Cakes. <em>Together.</em>
+      </h2>
+
+      <p class="custom-body">
+        Tell us your design, flavour and special requirements —
+        we'll create a beautiful cake that's made just for you,
+        with fresh ingredients and lots of care.
       </p>
-      <div class="about-features">
-        <div class="about-feat"><div class="feat-icon"><i class="fa-solid fa-leaf" style="color:#7AAE5C;"></i></div> Fresh Ingredients</div>
-        <div class="about-feat"><div class="feat-icon"><i class="fa-solid fa-palette" style="color:#C97B8A;"></i></div> Custom Designs</div>
-        <div class="about-feat"><div class="feat-icon"><i class="fa-solid fa-bolt" style="color:#D4A574;"></i></div> Same-Day Delivery</div>
-        <div class="about-feat"><div class="feat-icon"><i class="fa-solid fa-cake-candles" style="color:#A85F6E;"></i></div> 50+ Flavours</div>
+
+      <div class="custom-features">
+
+        <div class="custom-feat">
+          <div class="custom-feat-icon"><i class="fa-solid fa-leaf"></i></div>
+          <div class="custom-feat-title">Fresh Ingredients</div>
+          <div class="custom-feat-desc">Quality you can taste</div>
+        </div>
+
+        <div class="custom-feat">
+          <div class="custom-feat-icon"><i class="fa-solid fa-palette"></i></div>
+          <div class="custom-feat-title">Custom Designs</div>
+          <div class="custom-feat-desc">Made to match your vision</div>
+        </div>
+
+        <div class="custom-feat">
+          <div class="custom-feat-icon"><i class="fa-solid fa-truck"></i></div>
+          <div class="custom-feat-title">On-Time Delivery</div>
+          <div class="custom-feat-desc">Right on your special day</div>
+        </div>
+
+        <div class="custom-feat">
+          <div class="custom-feat-icon"><i class="fa-solid fa-cake-candles"></i></div>
+          <div class="custom-feat-title">For Every Occasion</div>
+          <div class="custom-feat-desc">Birthdays, weddings and more</div>
+        </div>
+
       </div>
+
+      <div class="custom-actions">
+
+        <a href="/customizedCake" class="btn-customize">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          Customize Your Cake
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+
+        <a href="/products" class="btn-outline">
+          View Our Cakes
+        </a>
+
+      </div>
+
     </div>
-    <div class="about-img-stack">
-      <div class="about-img-main">
-        <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1780683245/5png_e4engj.png" alt="Team Baking" loading="lazy">
+
+    <div class="custom-img-stack">
+
+      <div class="custom-img-main">
+        <img
+          src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1780683245/5png_e4engj.png"
+          alt="Team decorating a custom cake with fresh flowers"
+          loading="lazy"
+        >
       </div>
-      <div class="about-img-float">
-        <img src="https://res.cloudinary.com/dtfzp8rwt/image/upload/v1782823931/88aac0_1c56659ce1bf40fa9502e04d79cba6cf_mv2_cnbfad.png" alt="Cake Detail" loading="lazy">
+
+      <div class="custom-badge">
+        Made<br>With<br>Love<br>
+        <i class="fa-solid fa-heart"></i>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="custom-strip">
+    <div class="custom-strip-inner">
+      <span class="custom-strip-label">Cakes for life's special moments</span>
+      <div class="custom-strip-icons">
+        <div class="custom-strip-item"><i class="fa-solid fa-cake-candles"></i>Birthdays</div>
+        <div class="custom-strip-item"><i class="fa-solid fa-rings-wedding"></i>Weddings</div>
+        <div class="custom-strip-item"><i class="fa-solid fa-gift"></i>Anniversaries</div>
+        <div class="custom-strip-item"><i class="fa-regular fa-star"></i>Celebrations</div>
+        <div class="custom-strip-item"><i class="fa-regular fa-heart"></i>Just Because</div>
       </div>
     </div>
   </div>
+
 </section>
 
 <!-- ══════════════════════════════════════

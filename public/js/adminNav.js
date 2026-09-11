@@ -59,7 +59,12 @@
     window.scrollTo(0, 0);            // ← add this — the actual fix
 
     updateActiveSidebar(url);
-await runInlineScripts(contentEl); 
+    await runInlineScripts(contentEl);
+    // Force layout/scrollbar recalculation now that new content
+    // (including its own <style> block) has been inserted.
+    requestAnimationFrame(() => {
+      window.dispatchEvent(new Event("resize"));
+    });
   } catch (err) {
     console.error("Admin AJAX nav failed, falling back to full reload:", err);
     window.location.href = url;
