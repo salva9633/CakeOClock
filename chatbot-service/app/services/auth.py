@@ -1,10 +1,13 @@
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi import Header, HTTPException
 
+BASE_DIR = Path(__file__).resolve().parents[3]
+ENV_FILE = BASE_DIR / ".env"
 
-load_dotenv()
+load_dotenv(ENV_FILE)
 
 INTERNAL_SERVICE_KEY = os.getenv("CHATBOT_SERVICE_KEY")
 
