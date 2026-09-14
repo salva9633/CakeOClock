@@ -1,0 +1,1457 @@
+/* ============================================================
+   CAKE O'CLOCK AI — GLOBAL CHATBOT
+   Floating widget styles
+============================================================ */
+
+:root {
+    --coc-chat-blush: #FDF1F4;
+    --coc-chat-cream: #FFF9F7;
+    --coc-chat-rosegold: #C97B84;
+    --coc-chat-rosegold-dark: #B56570;
+    --coc-chat-choco: #3B1F29;
+    --coc-chat-beige: #F6E8E3;
+    --coc-chat-gold: #D9A857;
+    --coc-chat-white: #FFFFFF;
+    --coc-chat-muted: #8C747B;
+    --coc-chat-border: rgba(59, 31, 41, 0.08);
+
+    --coc-chat-shadow:
+        0 20px 60px rgba(59, 31, 41, 0.18),
+        0 5px 20px rgba(59, 31, 41, 0.08);
+}
+
+
+/* ============================================================
+   FLOATING LAUNCHER
+============================================================ */
+
+.coc-chatbot-launcher {
+    position: fixed;
+
+    right: 24px;
+    bottom: 24px;
+
+    width: 62px;
+    height: 62px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 50%;
+
+    /*
+     * CakeOClock rose-gold gradient.
+     */
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            #D9939B 0%,
+            #C97B84 55%,
+            #B96B76 100%
+        );
+
+    color: var(--coc-chat-white);
+
+    cursor: pointer;
+
+    box-shadow:
+        0 12px 30px rgba(201, 123, 132, 0.32),
+        0 4px 12px rgba(59, 31, 41, 0.12);
+
+    z-index: 9998;
+
+    /*
+     * Subtle idle movement.
+     */
+    animation:
+        cocChatLauncherFloat
+        4.5s
+        ease-in-out
+        infinite;
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background-position 0.4s ease;
+}
+
+
+/*
+ * IMPORTANT:
+ *
+ * Keep the same type of gradient on hover.
+ * Previously the hover state changed the entire background
+ * from radial-gradient() to a flat color, which could create
+ * a visual "blink".
+ */
+.coc-chatbot-launcher:hover {
+    transform: translateY(-3px);
+
+    background:
+        radial-gradient(
+            circle at 45% 35%,
+            #DEA0A7 0%,
+            #C97B84 52%,
+            #B96B76 100%
+        );
+
+    box-shadow:
+        0 16px 35px rgba(201, 123, 132, 0.38),
+        0 6px 15px rgba(59, 31, 41, 0.14);
+
+    animation-play-state: paused;
+}
+
+
+.coc-chatbot-launcher:active {
+    transform: translateY(-1px) scale(0.96);
+}
+
+
+.coc-chatbot-launcher:focus-visible {
+    outline:
+        3px solid
+        rgba(217, 168, 87, 0.65);
+
+    outline-offset: 4px;
+}
+
+
+/* ============================================================
+   LAUNCHER ICON
+============================================================ */
+
+.coc-chatbot-launcher-icon {
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: visible;
+
+    pointer-events: none;
+
+    transition:
+        transform 0.3s ease;
+}
+
+
+.coc-chatbot-launcher-icon img {
+    width: 48px;
+    height: 48px;
+
+    display: block;
+
+    object-fit: contain;
+
+    filter:
+        drop-shadow(
+            0 3px 5px
+            rgba(59, 31, 41, 0.14)
+        );
+
+    /*
+     * Very subtle breathing motion.
+     */
+    animation:
+        cocChatIconBreath
+        4s
+        ease-in-out
+        infinite;
+
+    transition:
+        filter 0.3s ease,
+        transform 0.3s ease;
+}
+
+
+.coc-chatbot-launcher:hover
+.coc-chatbot-launcher-icon {
+    transform: scale(1.04);
+}
+
+
+.coc-chatbot-launcher:hover
+.coc-chatbot-launcher-icon img {
+    animation-play-state: paused;
+
+    filter:
+        drop-shadow(
+            0 4px 7px
+            rgba(59, 31, 41, 0.18)
+        );
+}
+
+
+.coc-chatbot-launcher-label {
+    display: none;
+}
+
+
+/* ============================================================
+   CHAT WINDOW
+============================================================ */
+
+.coc-chatbot {
+    position: fixed;
+
+    right: 24px;
+    bottom: 98px;
+
+    width: 400px;
+    height: 610px;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    background: var(--coc-chat-cream);
+
+    border:
+        1px solid
+        var(--coc-chat-border);
+
+    border-radius: 22px;
+
+    box-shadow:
+        var(--coc-chat-shadow);
+
+    z-index: 9999;
+
+    opacity: 0;
+    visibility: hidden;
+
+    transform:
+        translateY(18px)
+        scale(0.96);
+
+    transform-origin: bottom right;
+
+    pointer-events: none;
+
+    transition:
+        opacity 0.25s ease,
+        visibility 0.25s ease,
+        transform
+        0.3s
+        cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+.coc-chatbot.is-open {
+    opacity: 1;
+    visibility: visible;
+
+    transform:
+        translateY(0)
+        scale(1);
+
+    pointer-events: auto;
+}
+
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.coc-chatbot-header {
+    flex-shrink: 0;
+
+    min-height: 78px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding:
+        14px
+        16px
+        14px
+        18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--coc-chat-blush),
+            var(--coc-chat-beige)
+        );
+
+    border-bottom:
+        1px solid
+        var(--coc-chat-border);
+}
+
+
+.coc-chatbot-title {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+/* ============================================================
+   HEADER AVATAR
+============================================================ */
+
+.coc-chatbot-avatar {
+    width: 52px;
+    height: 52px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    /*
+     * Soft radial blush.
+     *
+     * The edges fade into the header rather than creating
+     * the appearance of a solid pink circle.
+     */
+    background:
+        radial-gradient(
+            circle,
+            rgba(201, 123, 132, 0.28) 0%,
+            rgba(201, 123, 132, 0.16) 38%,
+            rgba(253, 241, 244, 0.08) 65%,
+            rgba(253, 241, 244, 0) 100%
+        );
+
+    box-shadow:
+        0 6px 18px
+        rgba(201, 123, 132, 0.12);
+
+    overflow: visible;
+
+    /*
+     * Gentle breathing glow.
+     */
+    animation:
+        cocChatAvatarGlow
+        4.5s
+        ease-in-out
+        infinite;
+}
+
+
+.coc-chatbot-avatar img {
+    width: 48px;
+    height: 48px;
+
+    display: block;
+
+    object-fit: contain;
+
+    filter:
+        drop-shadow(
+            0 3px 6px
+            rgba(59, 31, 41, 0.12)
+        );
+}
+
+
+/* ============================================================
+   TITLE
+============================================================ */
+
+.coc-chatbot-title h3 {
+    margin: 0;
+
+    color: var(--coc-chat-choco);
+
+    font-size: 16px;
+    font-weight: 700;
+
+    line-height: 1.2;
+}
+
+
+.coc-chatbot-title p {
+    margin: 4px 0 0;
+
+    color: var(--coc-chat-muted);
+
+    font-size: 11px;
+    font-weight: 500;
+
+    line-height: 1.3;
+}
+
+
+.coc-chatbot-online {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 4px;
+
+    margin-left: 5px;
+
+    color: #6F9274;
+
+    font-weight: 600;
+}
+
+
+.coc-chatbot-online-dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #78A77E;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(120, 167, 126, 0.12);
+
+    animation:
+        cocChatOnlinePulse
+        2.8s
+        ease-in-out
+        infinite;
+}
+
+
+/* ============================================================
+   CLOSE BUTTON
+============================================================ */
+
+.coc-chatbot-close {
+    width: 36px;
+    height: 36px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 10px;
+
+    background: transparent;
+
+    color: var(--coc-chat-choco);
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.coc-chatbot-close:hover {
+    background:
+        rgba(59, 31, 41, 0.07);
+
+    color:
+        var(--coc-chat-rosegold-dark);
+
+    transform:
+        rotate(3deg);
+}
+
+
+.coc-chatbot-close:active {
+    transform:
+        scale(0.94);
+}
+
+
+.coc-chatbot-close:focus-visible {
+    outline:
+        2px solid
+        var(--coc-chat-rosegold);
+
+    outline-offset: 2px;
+}
+
+
+.coc-chatbot-close svg {
+    width: 20px;
+    height: 20px;
+}
+
+
+/* ============================================================
+   MESSAGES AREA
+============================================================ */
+
+.coc-chatbot-messages {
+    flex: 1;
+
+    min-height: 0;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding:
+        20px
+        16px
+        14px;
+
+    scroll-behavior: smooth;
+
+    background:
+        var(--coc-chat-cream);
+
+    scrollbar-width: thin;
+
+    scrollbar-color:
+        rgba(201, 123, 132, 0.35)
+        transparent;
+}
+
+
+.coc-chatbot-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+
+.coc-chatbot-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+
+.coc-chatbot-messages::-webkit-scrollbar-thumb {
+    background:
+        rgba(201, 123, 132, 0.35);
+
+    border-radius: 10px;
+}
+
+
+.coc-chatbot-messages::-webkit-scrollbar-thumb:hover {
+    background:
+        rgba(201, 123, 132, 0.55);
+}
+
+
+/* ============================================================
+   WELCOME MESSAGE
+============================================================ */
+
+.coc-chatbot-welcome {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 9px;
+
+    margin-bottom: 12px;
+
+    animation:
+        cocChatMessageIn
+        0.35s
+        ease
+        both;
+}
+
+
+/* ============================================================
+   SMALL AI AVATAR
+============================================================ */
+
+.coc-chatbot-mini-avatar {
+    width: 38px;
+    height: 38px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-top: 2px;
+
+    border-radius: 50%;
+
+    /*
+     * Very soft blush glow.
+     */
+    background:
+        radial-gradient(
+            circle,
+            rgba(201, 123, 132, 0.20) 0%,
+            rgba(201, 123, 132, 0.10) 45%,
+            rgba(253, 241, 244, 0) 100%
+        );
+
+    box-shadow:
+        0 3px 10px
+        rgba(201, 123, 132, 0.08);
+
+    overflow: visible;
+}
+
+
+.coc-chatbot-mini-avatar img {
+    width: 34px;
+    height: 34px;
+
+    display: block;
+
+    object-fit: contain;
+
+    filter:
+        drop-shadow(
+            0 2px 4px
+            rgba(59, 31, 41, 0.10)
+        );
+}
+
+
+/* ============================================================
+   BUBBLE BASE
+============================================================ */
+
+.coc-chatbot-bubble {
+    max-width: 82%;
+
+    padding:
+        11px
+        14px;
+
+    border-radius:
+        5px
+        16px
+        16px
+        16px;
+
+    background:
+        var(--coc-chat-white);
+
+    color:
+        var(--coc-chat-choco);
+
+    font-size: 13px;
+
+    line-height: 1.55;
+
+    border:
+        1px solid
+        var(--coc-chat-border);
+
+    box-shadow:
+        0 2px 8px
+        rgba(59, 31, 41, 0.04);
+
+    overflow-wrap: anywhere;
+}
+
+
+/* ============================================================
+   NORMAL MESSAGES
+============================================================ */
+
+.coc-chatbot-message {
+    display: flex;
+    align-items: flex-start;
+
+    margin-bottom: 12px;
+
+    animation:
+        cocChatMessageIn
+        0.22s
+        ease
+        both;
+}
+
+
+.coc-chatbot-message.user {
+    justify-content: flex-end;
+}
+
+
+.coc-chatbot-message.ai {
+    justify-content: flex-start;
+
+    gap: 9px;
+}
+
+
+/* ============================================================
+   USER MESSAGE
+============================================================ */
+
+.coc-chatbot-message.user .coc-chatbot-bubble {
+    max-width: 82%;
+
+    padding:
+        10px
+        14px;
+
+    border-radius:
+        16px
+        5px
+        16px
+        16px;
+
+    background:
+        var(--coc-chat-rosegold);
+
+    color:
+        var(--coc-chat-white);
+
+    border: none;
+
+    box-shadow:
+        0 3px 10px
+        rgba(201, 123, 132, 0.16);
+}
+
+
+/* ============================================================
+   AI MESSAGE
+============================================================ */
+
+.coc-chatbot-message.ai .coc-chatbot-bubble {
+    max-width: 82%;
+
+    padding:
+        10px
+        14px;
+
+    border-radius:
+        5px
+        16px
+        16px
+        16px;
+
+    background:
+        var(--coc-chat-white);
+
+    color:
+        var(--coc-chat-choco);
+
+    border:
+        1px solid
+        var(--coc-chat-border);
+}
+
+
+.coc-chatbot-message.ai .coc-chatbot-mini-avatar {
+    animation:
+        cocChatAiAvatarFloat
+        4s
+        ease-in-out
+        infinite;
+}
+
+
+/* ============================================================
+   TYPING INDICATOR
+============================================================ */
+
+.coc-chatbot-typing {
+    display: none;
+
+    align-items: flex-start;
+
+    gap: 9px;
+
+    margin-bottom: 8px;
+}
+
+
+.coc-chatbot-typing.show {
+    display: flex;
+}
+
+
+.coc-chatbot-typing-bubble {
+    display: flex;
+    align-items: center;
+
+    gap: 4px;
+
+    min-width: 52px;
+    height: 38px;
+
+    padding:
+        0
+        13px;
+
+    border-radius:
+        5px
+        16px
+        16px
+        16px;
+
+    background:
+        var(--coc-chat-white);
+
+    border:
+        1px solid
+        var(--coc-chat-border);
+}
+
+
+.coc-chatbot-typing-bubble span {
+    width: 5px;
+    height: 5px;
+
+    border-radius: 50%;
+
+    background:
+        var(--coc-chat-rosegold);
+
+    animation:
+        cocChatTyping
+        1.2s
+        infinite
+        ease-in-out;
+}
+
+
+.coc-chatbot-typing-bubble span:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+
+.coc-chatbot-typing-bubble span:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+
+/* ============================================================
+   INPUT AREA
+============================================================ */
+
+.coc-chatbot-input-area {
+    flex-shrink: 0;
+
+    padding:
+        12px
+        14px
+        13px;
+
+    background:
+        var(--coc-chat-white);
+
+    border-top:
+        1px solid
+        var(--coc-chat-border);
+}
+
+
+.coc-chatbot-input-wrap {
+    display: flex;
+    align-items: flex-end;
+
+    gap: 8px;
+
+    padding:
+        6px
+        6px
+        6px
+        12px;
+
+    background:
+        var(--coc-chat-cream);
+
+    border:
+        1px solid
+        rgba(201, 123, 132, 0.16);
+
+    border-radius: 15px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.coc-chatbot-input-wrap:focus-within {
+    border-color:
+        rgba(201, 123, 132, 0.45);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(201, 123, 132, 0.08);
+}
+
+
+.coc-chatbot-input {
+    flex: 1;
+
+    width: 100%;
+
+    min-height: 28px;
+    max-height: 120px;
+
+    padding:
+        5px
+        0;
+
+    resize: none;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    color:
+        var(--coc-chat-choco);
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    line-height: 1.45;
+}
+
+
+.coc-chatbot-input::placeholder {
+    color: #A8959A;
+}
+
+
+.coc-chatbot-input:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.65;
+}
+
+
+/* ============================================================
+   SEND BUTTON
+============================================================ */
+
+.coc-chatbot-send {
+    width: 36px;
+    height: 36px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 11px;
+
+    background:
+        var(--coc-chat-rosegold);
+
+    color:
+        var(--coc-chat-white);
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        opacity 0.2s ease;
+}
+
+
+.coc-chatbot-send:hover:not(:disabled) {
+    background:
+        var(--coc-chat-rosegold-dark);
+
+    transform:
+        translateY(-1px);
+}
+
+
+.coc-chatbot-send:active:not(:disabled) {
+    transform:
+        scale(0.94);
+}
+
+
+.coc-chatbot-send:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.45;
+}
+
+
+.coc-chatbot-send:focus-visible {
+    outline:
+        2px solid
+        var(--coc-chat-gold);
+
+    outline-offset: 2px;
+}
+
+
+.coc-chatbot-send svg {
+    width: 18px;
+    height: 18px;
+}
+
+
+/* ============================================================
+   FOOTER NOTE
+============================================================ */
+
+.coc-chatbot-note {
+    margin:
+        7px
+        3px
+        0;
+
+    color: #A18E93;
+
+    font-size: 9px;
+
+    line-height: 1.35;
+
+    text-align: center;
+}
+
+
+/* ============================================================
+   MARKDOWN RESPONSE FORMATTING
+============================================================ */
+
+.coc-chatbot-bubble p {
+    margin:
+        0
+        0
+        8px;
+}
+
+
+.coc-chatbot-bubble p:last-child {
+    margin-bottom: 0;
+}
+
+
+.coc-chatbot-bubble strong {
+    font-weight: 700;
+}
+
+
+.coc-chatbot-bubble em {
+    font-style: italic;
+}
+
+
+.coc-chatbot-bubble h1,
+.coc-chatbot-bubble h2,
+.coc-chatbot-bubble h3 {
+    margin:
+        0
+        0
+        8px;
+
+    color:
+        var(--coc-chat-choco);
+
+    line-height: 1.3;
+}
+
+
+.coc-chatbot-bubble h1 {
+    font-size: 17px;
+}
+
+
+.coc-chatbot-bubble h2 {
+    font-size: 15px;
+}
+
+
+.coc-chatbot-bubble h3 {
+    font-size: 14px;
+}
+
+
+.coc-chatbot-bubble ul,
+.coc-chatbot-bubble ol {
+    margin:
+        6px
+        0
+        8px;
+
+    padding-left: 20px;
+}
+
+
+.coc-chatbot-bubble li {
+    margin:
+        3px
+        0;
+
+    padding-left: 2px;
+}
+
+
+.coc-chatbot-bubble li:last-child {
+    margin-bottom: 0;
+}
+
+
+.coc-chatbot-bubble code {
+    display: inline-block;
+
+    padding:
+        1px
+        5px;
+
+    border-radius: 5px;
+
+    background:
+        var(--coc-chat-beige);
+
+    color:
+        var(--coc-chat-rosegold-dark);
+
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        monospace;
+
+    font-size: 0.9em;
+}
+
+
+.coc-chatbot-bubble a {
+    color:
+        var(--coc-chat-rosegold-dark);
+
+    font-weight: 600;
+
+    text-decoration: underline;
+
+    text-underline-offset: 2px;
+}
+
+
+.coc-chatbot-bubble a:hover {
+    color:
+        var(--coc-chat-choco);
+}
+
+
+/* ============================================================
+   USER MARKDOWN COLORS
+============================================================ */
+
+.coc-chatbot-message.user
+.coc-chatbot-bubble code {
+    background:
+        rgba(255, 255, 255, 0.18);
+
+    color:
+        var(--coc-chat-white);
+}
+
+
+.coc-chatbot-message.user
+.coc-chatbot-bubble a {
+    color:
+        var(--coc-chat-white);
+}
+
+
+/* ============================================================
+   ANIMATIONS
+============================================================ */
+
+/*
+ * Floating launcher.
+ *
+ * Very subtle — just enough to make the assistant feel alive.
+ */
+@keyframes cocChatLauncherFloat {
+
+    0%,
+    100% {
+        transform:
+            translateY(0);
+    }
+
+    50% {
+        transform:
+            translateY(-3px);
+    }
+}
+
+
+/*
+ * Tiny movement inside the launcher.
+ */
+@keyframes cocChatIconBreath {
+
+    0%,
+    100% {
+        transform:
+            translateY(0)
+            scale(1);
+    }
+
+    50% {
+        transform:
+            translateY(-1px)
+            scale(1.015);
+    }
+}
+
+
+/*
+ * Header avatar breathing glow.
+ */
+@keyframes cocChatAvatarGlow {
+
+    0%,
+    100% {
+        box-shadow:
+            0 6px 18px
+            rgba(201, 123, 132, 0.10);
+
+        transform:
+            scale(1);
+    }
+
+    50% {
+        box-shadow:
+            0 8px 23px
+            rgba(201, 123, 132, 0.18);
+
+        transform:
+            scale(1.015);
+    }
+}
+
+
+/*
+ * Online status dot.
+ */
+@keyframes cocChatOnlinePulse {
+
+    0%,
+    100% {
+        box-shadow:
+            0 0 0 3px
+            rgba(120, 167, 126, 0.10);
+    }
+
+    50% {
+        box-shadow:
+            0 0 0 5px
+            rgba(120, 167, 126, 0.05);
+    }
+}
+
+
+/*
+ * AI message avatar.
+ */
+@keyframes cocChatAiAvatarFloat {
+
+    0%,
+    100% {
+        transform:
+            translateY(0);
+    }
+
+    50% {
+        transform:
+            translateY(-1px);
+    }
+}
+
+
+/*
+ * New message entrance.
+ */
+@keyframes cocChatMessageIn {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+}
+
+
+/*
+ * Typing dots.
+ */
+@keyframes cocChatTyping {
+
+    0%,
+    60%,
+    100% {
+        opacity: 0.35;
+
+        transform:
+            translateY(0);
+    }
+
+    30% {
+        opacity: 1;
+
+        transform:
+            translateY(-3px);
+    }
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 600px) {
+
+    .coc-chatbot-launcher {
+        right: 16px;
+        bottom: 16px;
+
+        width: 58px;
+        height: 58px;
+    }
+
+
+    .coc-chatbot-launcher-icon {
+        width: 50px;
+        height: 50px;
+    }
+
+
+    .coc-chatbot-launcher-icon img {
+        width: 46px;
+        height: 46px;
+    }
+
+
+    .coc-chatbot {
+        top: 10px;
+        right: 10px;
+        bottom: 10px;
+        left: 10px;
+
+        width: auto;
+        height: auto;
+
+        border-radius: 18px;
+
+        transform-origin:
+            bottom center;
+    }
+
+
+    .coc-chatbot-header {
+        min-height: 72px;
+
+        padding:
+            12px
+            13px
+            12px
+            14px;
+    }
+
+
+    .coc-chatbot-avatar {
+        width: 48px;
+        height: 48px;
+    }
+
+
+    .coc-chatbot-avatar img {
+        width: 44px;
+        height: 44px;
+    }
+
+
+    .coc-chatbot-messages {
+        padding:
+            16px
+            12px
+            12px;
+    }
+
+
+    .coc-chatbot-input-area {
+        padding:
+            10px
+            10px
+            11px;
+    }
+
+
+    .coc-chatbot-note {
+        font-size: 8.5px;
+    }
+}
+
+
+/* ============================================================
+   VERY SMALL SCREENS
+============================================================ */
+
+@media (max-width: 380px) {
+
+    .coc-chatbot {
+        top: 5px;
+        right: 5px;
+        bottom: 5px;
+        left: 5px;
+
+        border-radius: 15px;
+    }
+
+
+    .coc-chatbot-title p {
+        max-width: 180px;
+    }
+
+
+    .coc-chatbot-online {
+        display: none;
+    }
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .coc-chatbot,
+    .coc-chatbot-launcher,
+    .coc-chatbot-message,
+    .coc-chatbot-welcome,
+    .coc-chatbot-launcher-icon img,
+    .coc-chatbot-avatar,
+    .coc-chatbot-online-dot,
+    .coc-chatbot-message.ai .coc-chatbot-mini-avatar,
+    .coc-chatbot-typing-bubble span {
+        animation: none !important;
+        transition: none !important;
+    }
+}

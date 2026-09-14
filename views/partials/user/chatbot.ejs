@@ -1,0 +1,134 @@
+<!-- ============================================================
+     CAKE O'CLOCK AI — GLOBAL CHATBOT
+============================================================= -->
+
+<!-- Floating chatbot launcher -->
+<button type="button" id="cocChatbotLauncher" class="coc-chatbot-launcher" aria-label="Open CakeOClock AI"
+    aria-expanded="false">
+    <span class="coc-chatbot-launcher-icon">
+    <img
+        src="/media/coc_ai.png"
+        alt=""
+        aria-hidden="true"
+    >
+    </span>
+
+    <span class="coc-chatbot-launcher-label">
+        CakeOClock AI
+    </span>
+</button>
+
+
+<!-- Chatbot window -->
+<section id="cocChatbot" class="coc-chatbot" aria-label="CakeOClock AI chat" aria-hidden="true">
+
+    <!-- Header -->
+    <div class="coc-chatbot-header">
+
+        <div class="coc-chatbot-title">
+
+            <div class="coc-chatbot-avatar">
+                <img
+                    src="/media/coc_ai.png"
+                    alt=""
+                    aria-hidden="true"
+                >
+            </div>
+
+            <div>
+                <h3>CakeOClock AI</h3>
+                <p>
+                    Your personal cake assistant
+                    <span class="coc-chatbot-online">
+                        <span class="coc-chatbot-online-dot"></span>
+                        Online
+                    </span>
+                </p>
+            </div>
+
+        </div>
+
+        <button type="button" id="cocChatbotClose" class="coc-chatbot-close" aria-label="Close CakeOClock AI">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+        </button>
+
+    </div>
+
+
+    <!-- Messages -->
+    <div id="cocChatbotMessages" class="coc-chatbot-messages" aria-live="polite">
+
+        <!-- Default welcome message.
+         JavaScript removes this when an existing session is found. -->
+        <div id="cocChatbotWelcome" class="coc-chatbot-welcome">
+
+            <div class="coc-chatbot-mini-avatar">
+                <img
+                    src="/media/coc_ai.png"
+                    alt=""
+                    aria-hidden="true"
+                >
+            </div>
+
+            <div class="coc-chatbot-bubble">
+                Hi! I'm CakeOClock AI. I can help you with your
+                orders, cakes, cart, wishlist, wallet, and more.
+                How can I help you today?
+            </div>
+
+        </div>
+
+
+        <!-- Typing indicator -->
+        <div id="cocChatbotTyping" class="coc-chatbot-typing" aria-hidden="true">
+
+            <div class="coc-chatbot-mini-avatar">
+                <img
+                    src="/media/coc_ai.png"
+                    alt=""
+                    aria-hidden="true"
+                >
+            </div>
+
+            <div class="coc-chatbot-typing-bubble">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Input -->
+    <div class="coc-chatbot-input-area">
+
+        <div class="coc-chatbot-input-wrap">
+
+            <textarea id="cocChatbotInput" class="coc-chatbot-input" rows="1" maxlength="1000"
+                placeholder="Ask me anything about CakeOClock..." aria-label="Message CakeOClock AI"></textarea>
+
+            <button type="button" id="cocChatbotSend" class="coc-chatbot-send" aria-label="Send message"
+                title="Send message">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" aria-hidden="true">
+                    <path d="M22 2L11 13" />
+                    <path d="M22 2l-7 20-4-9-9-4z" />
+                </svg>
+            </button>
+
+        </div>
+
+        <p class="coc-chatbot-note">
+            CakeOClock AI can help with orders, products, cart,
+            wishlist, wallet, and general CakeOClock questions.
+        </p>
+
+    </div>
+
+</section>

@@ -210,6 +210,12 @@ router.post("/my-messages/:id/reply", userAuth, replyToTicket);
 
 // ── CHATBOT ────────────────────────────────────────────
 
+router.get(
+  "/api/chatbot/session",
+  userAuth,
+  chatbotController.getSession
+);
+
 router.post(
   "/api/chatbot/message",
   userAuth,
