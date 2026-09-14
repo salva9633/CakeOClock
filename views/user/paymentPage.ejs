@@ -651,17 +651,21 @@
         </div>
 
         <% cartItems.forEach(item => {
-          const subtotal = item.price * item.quantity;
-        %>
-          <div class="order-item">
-            <img src="<%= item.variantId?.imageUrls?.[0] || item.productId?.productImages?.[0] || '/img/placeholder.png' %>"
-                 class="item-img" alt="<%= item.productId?.productName %>">
-            <div class="item-info">
-              <div class="item-name"><%= item.productId?.productName %></div>
-              <div class="item-meta">
-                <% if (item.variantId?.weight) { %><%= item.variantId.weight %>g · <% } %>Qty: <%= item.quantity %>
-              </div>
-            </div>
+  const isCustom = !!item.customizedCakeId;
+  const itemName = isCustom ? `Customized ${item.customizedCakeId.cakeType} Cake` : item.productId?.productName;
+  const itemImg  = isCustom ? (item.customizedCakeId.referenceImage || '/img/placeholder.png')
+                             : (item.variantId?.imageUrls?.[0] || item.productId?.productImages?.[0] || '/img/placeholder.png');
+  const subtotal = item.price * item.quantity;
+%>
+  <div class="order-item">
+    <img src="<%= itemImg %>"
+         class="item-img" alt="<%= itemName %>">
+    <div class="item-info">
+      <div class="item-name"><%= itemName %></div>
+      <div class="item-meta">
+        <% if (item.variantId?.weight) { %><%= item.variantId.weight %>g · <% } %>Qty: <%= item.quantity %>
+      </div>
+    </div>
             <div class="item-price">
               <div class="final">₹<%= subtotal.toLocaleString('en-IN') %></div>
             </div>
